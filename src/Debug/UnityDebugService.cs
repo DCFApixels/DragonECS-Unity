@@ -6,10 +6,7 @@ namespace DCFApixels.DragonECS.Unity
 {
     public class UnityDebugService : DebugService
     {
-        public static void Set()
-        {
-            DebugService.Set<UnityDebugService>();
-        }
+        public static void Init() => Set<UnityDebugService>();
 
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
 
