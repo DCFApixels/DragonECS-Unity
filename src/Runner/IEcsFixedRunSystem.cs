@@ -12,4 +12,12 @@
             foreach (var item in targets) item.FixedRun(systems);
         }
     }
+
+    public static class IEcsFixedRunSystemExtensions
+    {
+        public static void FixedRun(this EcsSystems systems)
+        {
+            systems.GetRunner<IEcsFixedRunSystem>().FixedRun(systems);
+        }
+    }
 }

@@ -12,4 +12,12 @@
             foreach (var item in targets) item.LateRun(systems);
         }
     }
+
+    public static class IEcsLateRunSystemExtensions
+    {
+        public static void LateRun(this EcsSystems systems)
+        {
+            systems.GetRunner<IEcsLateRunSystem>().LateRun(systems);
+        }
+    }
 }
