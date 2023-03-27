@@ -52,7 +52,7 @@ namespace DCFApixels.DragonECS.Unity
             {
                 if (Target.source == null)
                     return;
-                if(_headerStyle == null)
+                if (_headerStyle == null)
                 {
                     _headerStyle = new GUIStyle(EditorStyles.boldLabel);
                     _interfacesStyle = new GUIStyle(EditorStyles.helpBox);
@@ -67,10 +67,12 @@ namespace DCFApixels.DragonECS.Unity
 
                 Target.showInterfaces = EditorGUILayout.Toggle("Show Interfaces", Target.showInterfaces);
 
+                GUILayout.BeginVertical();
                 foreach (var item in Target.systems.AllSystems)
                 {
                     DrawSystem(item);
                 }
+                GUILayout.EndVertical();
 
                 GUILayout.Label("[Runners]", _headerStyle);
 
@@ -82,12 +84,24 @@ namespace DCFApixels.DragonECS.Unity
 
             private void DrawSystem(IEcsSystem system)
             {
+                if(system is SystemsBlockMarkerSystem markerSystem)
+                {
+                    GUILayout.EndVertical();
+                    GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black));
+
+                    GUILayout.BeginHorizontal();
+                    GUILayout.Label("<");
+                    GUILayout.Label($"{markerSystem.name}", EditorStyles.boldLabel);
+                    GUILayout.Label(">", GUILayout.ExpandWidth(false));
+                    GUILayout.EndHorizontal();
+                    return;
+                }
+
                 Type type = system.GetType();
                 string name = type.Name;
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
 
                 //Color defaultBackgroundColor = GUI.backgroundColor;
-
                 //GUI.backgroundColor = color;
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color));
                 if (Target.showInterfaces)
@@ -96,7 +110,6 @@ namespace DCFApixels.DragonECS.Unity
                 }
                 GUILayout.Label(name, EditorStyles.boldLabel);
                 GUILayout.EndVertical();
-
                 //GUI.backgroundColor = defaultBackgroundColor;
             }
 
