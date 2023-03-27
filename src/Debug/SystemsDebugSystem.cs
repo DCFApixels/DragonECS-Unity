@@ -86,10 +86,10 @@ namespace DCFApixels.DragonECS.Unity
                 string name = type.Name;
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
 
-                Color defaultBackgroundColor = GUI.backgroundColor;
+                //Color defaultBackgroundColor = GUI.backgroundColor;
 
-                GUI.backgroundColor = color;
-                GUILayout.BeginVertical(EditorStyles.helpBox);
+                //GUI.backgroundColor = color;
+                GUILayout.BeginVertical(EcsEditor.GetStyle(color));
                 if (Target.showInterfaces)
                 {
                     GUILayout.Label(string.Join(", ", type.GetInterfaces().Select(o => o.Name)), _interfacesStyle);
@@ -97,20 +97,21 @@ namespace DCFApixels.DragonECS.Unity
                 GUILayout.Label(name, EditorStyles.boldLabel);
                 GUILayout.EndVertical();
 
-                GUI.backgroundColor = defaultBackgroundColor;
+                //GUI.backgroundColor = defaultBackgroundColor;
             }
 
             private void DrawRunner(IEcsRunner runner)
             {
                 Type type = runner.GetType();
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
-                Color defaultBackgroundColor = GUI.backgroundColor;
-                GUI.backgroundColor = color;
-                GUILayout.BeginVertical(EditorStyles.helpBox);
+                //Color defaultBackgroundColor = GUI.backgroundColor;
+                //GUI.backgroundColor = color;
+                GUILayout.BeginVertical(EcsEditor.GetStyle(color));
+                //GUILayout.BeginVertical(EditorStyles.helpBox);
                 GUILayout.Label(type.Name, EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)));
                 GUILayout.EndVertical();
-                GUI.backgroundColor = defaultBackgroundColor;
+                //GUI.backgroundColor = defaultBackgroundColor;
             }
 
             private TAttribute GetAttribute<TAttribute>(Type target) where TAttribute : Attribute
