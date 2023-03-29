@@ -1,0 +1,18 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DCFApixels.DragonECS;
+
+namespace #NAMESPACE#
+{
+    public class #SCRIPTNAME# : IEcsRunSystem, IEcsInject<EcsWorld<DefaultWorld>>
+    {
+        private EcsWorld<DefaultWorld> _world;
+        public void Inject(EcsWorld<DefaultWorld> obj) => _world = obj;
+
+        public void Run(EcsSystems systems)
+        {
+            // will be called on each EcsSystems.Run() call
+        }
+    }
+}

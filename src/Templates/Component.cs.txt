@@ -1,0 +1,10 @@
+﻿using UnityEngine;
+using DCFApixels.DragonECS;
+
+namespace #NAMESPACE#
+{
+    public struct #SCRIPTNAME#
+    {
+        // add your data here
+    }
+}

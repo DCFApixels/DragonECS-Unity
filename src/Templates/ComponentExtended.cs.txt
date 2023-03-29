@@ -1,0 +1,20 @@
+﻿using UnityEngine;
+using DCFApixels.DragonECS;
+
+namespace #NAMESPACE#
+{
+    // setting the color of the visualization in the debug window
+    //[DebugHide]
+    [DebugColor(DebugColor.Red)]
+    public struct #SCRIPTNAME# : IEcsComponentReset<#SCRIPTNAME#>
+    {
+        // add your data here
+        public float value;
+
+        public void Reset(ref #SCRIPTNAME# component)
+        {
+            // setting custom default values
+            value = 5f;
+        }
+    }
+}

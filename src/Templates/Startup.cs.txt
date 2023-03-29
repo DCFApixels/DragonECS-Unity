@@ -1,0 +1,66 @@
+﻿using UnityEngine;
+using DCFApixels.DragonECS;
+
+namespace #NAMESPACE#
+{
+    sealed class #SCRIPTNAME# : MonoBehaviour
+    {
+        private EcsWorld<DefaultWorld> _world;
+        private EcsSystems _systems;
+
+        private void Start()
+        {
+            // is needed to integrate the internal debugging tool with the unity environment
+            UnityDebugService.Init();
+
+            _world = new EcsWorld<DefaultWorld>();
+            _systems = EcsSystems.New()
+                // register your systems here, for example:
+                // .Add (new TestSystem1 ())
+                // .Add (new TestSystem2 ())
+
+                // inject worlds here, for example:
+                .Inject(_world)
+                //.Inject(new EcsWorld<EventWorld>())
+
+                // with Inject you can also inject other data, for example:
+                //.Inject(new SharedData())
+#if UNITY_EDITOR
+                // add debug systems for this EcsSystems here
+                .Add(new SystemsDebugSystem())
+#endif
+                .BuildAndInit();
+        }
+
+        private void Update()
+        {
+            _systems?.Run();
+        }
+
+        private void LateUpdate()
+        {
+            _systems?.LateRun();
+        }
+
+        private void FixedUpdate()
+        {
+            _systems?.FixedRun();
+        }
+
+        private void OnDestroy()
+        {
+            // don't forget to clear data
+            if (_systems != null)
+            {
+                _systems.Destroy();
+                _systems = null;
+            }
+
+            if (_world != null)
+            {
+                _world.Destroy();
+                _world = null;
+            }
+        }
+    }
+}

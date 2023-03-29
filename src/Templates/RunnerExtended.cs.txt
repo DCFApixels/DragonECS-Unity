@@ -1,0 +1,48 @@
+﻿using UnityEngine;
+using DCFApixels.DragonECS;
+#if DEBUG
+using Unity.Profiling;
+#endif
+
+namespace #NAMESPACE#
+{
+    public interface I#SCRIPTNAME# : IEcsSystem
+    {
+        public void Do();
+    }
+    
+    // setting the color of the visualization in the debug window
+    //[DebugHide]
+    [DebugColor(DebugColor.Red)]
+    public class #SCRIPTNAME#Runner : EcsRunner<I#SCRIPTNAME#>, I#SCRIPTNAME#
+    {
+        private ProfilerMarker[] _profilerMarkers; 
+
+        public void Do()
+        {
+            for (int i = 0; i < targets.Length; i++)
+            {
+#if DEBUG
+                _profilerMarkers[i].Begin();
+#endif
+                targets[i].Do();
+#if DEBUG
+                _profilerMarkers[i].End();
+#endif
+            }
+        }
+
+#if DEBUG
+        // will be called after changing "targets"
+        protected override void OnSetup()
+        {
+            // create an array of profiler markers for each system in "targets"
+            _profilerMarkers = new ProfilerMarker[targets.Length];
+            for (int i = 0; i < targets.Length; i++)
+            {
+                _profilerMarkers[i] = new ProfilerMarker(ProfilerCategory.Scripts, $"EcsRunner.{targets[i].GetType().Name}.{nameof(Do)}");
+            }
+        }
+#endif
+    }
+}

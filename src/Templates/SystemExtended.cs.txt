@@ -1,0 +1,55 @@
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
+using DCFApixels.DragonECS;
+
+namespace #NAMESPACE#
+{
+    // setting the color of the visualization in the debug window
+    //[DebugHide]
+    [DebugColor(DebugColor.Red)]
+    public class #SCRIPTNAME# : 
+        IEcsPreInitSystem, 
+        IEcsInitSystem, 
+        IEcsRunSystem, 
+        IEcsLateRunSystem, 
+        IEcsFixedRunSystem, 
+        IEcsDestroySystem, 
+        IEcsInject<EcsWorld<DefaultWorld>>
+    {
+        private EcsWorld<DefaultWorld> _world;
+        public void Inject(EcsWorld<DefaultWorld> obj) => _world = obj;
+
+        public void PreInit(EcsSystems systems)
+        {
+            // will be called once during EcsSystems.Init() call and before Init(EcsSystems systems).
+        }
+
+        public void Init(EcsSystems systems)
+        {
+            // will be called once during EcsSystems.Init() call and after PreInit(EcsSystems systems).
+        }
+
+        public void Run(EcsSystems systems)
+        {
+            // will be called on each EcsSystems.Run() call
+        }
+
+        public void LateRun(EcsSystems systems)
+        {
+            // will be called on each EcsSystems.LateRun() call
+        }
+
+        public void FixedRun(EcsSystems systems)
+        {
+            // will be called on each EcsSystems.FixedRun() call
+        }
+
+        public void Destroy(EcsSystems systems)
+        {
+            // will be called once during EcsSystems.Destroy() call
+        }
+
+        //Use Runners to implement additional messages
+    }
+}
