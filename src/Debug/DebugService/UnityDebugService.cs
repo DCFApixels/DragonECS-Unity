@@ -12,19 +12,25 @@ namespace DCFApixels.DragonECS
 
         public override void Print(string tag, object v)
         {
-            string log = $"[{tag}] {v}";
-            string taglower = tag.ToLower();
-            if (taglower.Contains("warning"))
+            string log;
+            if (!string.IsNullOrEmpty(tag))
             {
-                Debug.LogWarning(log);
+                log = $"[{tag}] {v}";
+                string taglower = tag.ToLower();
+                if (taglower.Contains("warning"))
+                {
+                    Debug.LogWarning(log);
+                    return;
+                }
+                if (taglower.Contains("error"))
+                {
+                    Debug.LogError(log);
+                    return;
+                }
+                Debug.Log(log);
                 return;
             }
-            if (taglower.Contains("error"))
-            {
-                Debug.LogError(log);
-                return;
-            }
-            Debug.Log(log);
+            Debug.Log(v);
         }
 
         public override void ProfileMarkBegin(int id)
