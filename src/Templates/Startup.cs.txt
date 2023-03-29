@@ -6,7 +6,7 @@ namespace #NAMESPACE#
     sealed class #SCRIPTNAME# : MonoBehaviour
     {
         private EcsWorld<DefaultWorld> _world;
-        private EcsSystems _systems;
+        private EcsPipeline _pipeline;
 
         private void Start()
         {
@@ -14,7 +14,7 @@ namespace #NAMESPACE#
             UnityDebugService.Init();
 
             _world = new EcsWorld<DefaultWorld>();
-            _systems = EcsSystems.New()
+            _pipeline = EcsPipeline.New()
                 // register your systems here, for example:
                 // .Add (new TestSystem1 ())
                 // .Add (new TestSystem2 ())
@@ -26,34 +26,34 @@ namespace #NAMESPACE#
                 // with Inject you can also inject other data, for example:
                 //.Inject(new SharedData())
 #if UNITY_EDITOR
-                // add debug systems for this EcsSystems here
-                .Add(new SystemsDebugSystem())
+                // add debug system for this EcsPipeline here
+                .Add(new PipelineDebugSystem())
 #endif
                 .BuildAndInit();
         }
 
         private void Update()
         {
-            _systems?.Run();
+            _pipeline?.Run();
         }
 
         private void LateUpdate()
         {
-            _systems?.LateRun();
+            _pipeline?.LateRun();
         }
 
         private void FixedUpdate()
         {
-            _systems?.FixedRun();
+            _pipeline?.FixedRun();
         }
 
         private void OnDestroy()
         {
             // don't forget to clear data
-            if (_systems != null)
+            if (_pipeline != null)
             {
-                _systems.Destroy();
-                _systems = null;
+                _pipeline.Destroy();
+                _pipeline = null;
             }
 
             if (_world != null)

@@ -5,29 +5,29 @@ using UnityEngine;
 namespace DCFApixels.DragonECS
 {
     [DebugHide, DebugColor(DebugColor.Gray)]
-    public class SystemsDebugSystem : IEcsPreInitSystem
+    public class PipelineDebugSystem : IEcsPreInitSystem
     {
         private string _name;
-        public SystemsDebugSystem(string name = "Systems")
+        public PipelineDebugSystem(string name = "Systems")
         {
             _name = name;
         }
 
-        void IEcsPreInitSystem.PreInit(EcsSystems systems)
+        void IEcsPreInitSystem.PreInit(EcsPipeline pipeline)
         {
             SystemsDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _name).AddComponent<SystemsDebugMonitor>();
             monitor.source = this;
-            monitor.systems = systems;
-            monitor.systemsName = _name;
+            monitor.pipeline = pipeline;
+            monitor.pipelineName = _name;
             Object.DontDestroyOnLoad(monitor.gameObject);
         }
     }
 
     public class SystemsDebugMonitor : MonoBehaviour
     {
-        internal SystemsDebugSystem source;
-        internal EcsSystems systems;
-        internal string systemsName;
+        internal PipelineDebugSystem source;
+        internal EcsPipeline pipeline;
+        internal string pipelineName;
     }
 
 #if UNITY_EDITOR
@@ -38,7 +38,7 @@ namespace DCFApixels.DragonECS
         using UnityEditor;
 
         [CustomEditor(typeof(SystemsDebugMonitor))]
-        public class SystemsDebugMonitorEditor : Editor
+        public class PipelineDebugMonitorEditor : Editor
         {
             private DebugColorAttribute _fakeDebugColorAttribute = new DebugColorAttribute(DebugColor.White);
             private Type _debugColorAttributeType = typeof(DebugColorAttribute);
@@ -67,7 +67,7 @@ namespace DCFApixels.DragonECS
                 DebugMonitorPrefs.instance.IsShowHidden = EditorGUILayout.Toggle("Show Hidden", DebugMonitorPrefs.instance.IsShowHidden);
 
                 GUILayout.BeginVertical();
-                foreach (var item in Target.systems.AllSystems)
+                foreach (var item in Target.pipeline.AllSystems)
                 {
                     DrawSystem(item);
                 }
@@ -77,7 +77,7 @@ namespace DCFApixels.DragonECS
                 GUILayout.Label("[Runners]", _headerStyle);
 
                 GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black));
-                foreach (var item in Target.systems.AllRunners)
+                foreach (var item in Target.pipeline.AllRunners)
                 {
                     DrawRunner(item.Value);
                 }

@@ -20,34 +20,34 @@ namespace #NAMESPACE#
         private EcsWorld<DefaultWorld> _world;
         public void Inject(EcsWorld<DefaultWorld> obj) => _world = obj;
 
-        public void PreInit(EcsSystems systems)
+        public void PreInit(EcsPipeline pipeline)
         {
-            // will be called once during EcsSystems.Init() call and before Init(EcsSystems systems).
+            // will be called once during EcsPipeline.Init() call and before Init(EcsPipeline pipeline).
         }
 
-        public void Init(EcsSystems systems)
+        public void Init(EcsPipeline pipeline)
         {
-            // will be called once during EcsSystems.Init() call and after PreInit(EcsSystems systems).
+            // will be called once during EcsPipeline.Init() call and after PreInit(EcsPipeline pipeline).
         }
 
-        public void Run(EcsSystems systems)
+        public void Run(EcsPipeline pipeline)
         {
-            // will be called on each EcsSystems.Run() call
+            // will be called on each EcsPipeline.Run() call
         }
 
-        public void LateRun(EcsSystems systems)
+        public void LateRun(EcsPipeline pipeline)
         {
-            // will be called on each EcsSystems.LateRun() call
+            // will be called on each EcsPipeline.LateRun() call
         }
 
-        public void FixedRun(EcsSystems systems)
+        public void FixedRun(EcsPipeline pipeline)
         {
-            // will be called on each EcsSystems.FixedRun() call
+            // will be called on each EcsPipeline.FixedRun() call
         }
 
-        public void Destroy(EcsSystems systems)
+        public void Destroy(EcsPipeline pipeline)
         {
-            // will be called once during EcsSystems.Destroy() call
+            // will be called once during EcsPipeline.Destroy() call
         }
 
         //Use Runners to implement additional messages

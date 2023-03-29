@@ -10,9 +10,9 @@ namespace #NAMESPACE#
         private EcsWorld<DefaultWorld> _world;
         public void Inject(EcsWorld<DefaultWorld> obj) => _world = obj;
 
-        public void Run(EcsSystems systems)
+        public void Run(EcsPipeline pipeline)
         {
-            // will be called on each EcsSystems.Run() call
+            // will be called on each EcsPipeline.Run() call
         }
     }
 }

@@ -13,7 +13,7 @@ namespace DCFApixels.DragonECS
             _ecsWorld = ecsWorld;
         }
 
-        public void Run(EcsSystems systems)
+        public void Run(EcsPipeline pipeline)
         {
         }
     }
