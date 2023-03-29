@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity
+namespace DCFApixels.DragonECS
 {
     public static class DebugColorAttributeExt
     {

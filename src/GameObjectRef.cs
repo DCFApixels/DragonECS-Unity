@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace DCFApixels.DragonECS.Unity
+namespace DCFApixels.DragonECS
 {
     public struct GameObjectRef
     {

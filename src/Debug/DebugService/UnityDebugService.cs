@@ -2,7 +2,7 @@
 using Unity.Profiling;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity
+namespace DCFApixels.DragonECS
 {
     public class UnityDebugService : DebugService
     {

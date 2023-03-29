@@ -1,4 +1,4 @@
-﻿namespace DCFApixels.DragonECS.Unity
+﻿namespace DCFApixels.DragonECS
 {
     public interface IEcsLateRunSystem : IEcsSystem
     {

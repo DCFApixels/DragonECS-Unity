@@ -1,10 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Reflection;
 using UnityEngine;
-using System.Reflection;
 
 
-namespace DCFApixels.DragonECS.Unity
+namespace DCFApixels.DragonECS
 {
     [DebugHide, DebugColor(DebugColor.Gray)]
     public class SystemsDebugSystem : IEcsPreInitSystem
@@ -33,7 +31,6 @@ namespace DCFApixels.DragonECS.Unity
     }
 
 #if UNITY_EDITOR
-
     namespace Editors
     {
         using System;
@@ -66,8 +63,8 @@ namespace DCFApixels.DragonECS.Unity
 
                 GUILayout.Label("[Systems]", _headerStyle);
 
-                DebugMonitorPrefs.instance.isShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", DebugMonitorPrefs.instance.isShowInterfaces);
-                DebugMonitorPrefs.instance.isShowHidden = EditorGUILayout.Toggle("Show Hidden", DebugMonitorPrefs.instance.isShowHidden);
+                DebugMonitorPrefs.instance._isShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", DebugMonitorPrefs.instance._isShowInterfaces);
+                DebugMonitorPrefs.instance.IsShowHidden = EditorGUILayout.Toggle("Show Hidden", DebugMonitorPrefs.instance.IsShowHidden);
 
                 GUILayout.BeginVertical();
                 foreach (var item in Target.systems.AllSystems)
@@ -110,16 +107,13 @@ namespace DCFApixels.DragonECS.Unity
                 string name = type.Name;
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
 
-                //Color defaultBackgroundColor = GUI.backgroundColor;
-                //GUI.backgroundColor = color;
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color));
-                if (DebugMonitorPrefs.instance.isShowInterfaces)
+                if (DebugMonitorPrefs.instance._isShowInterfaces)
                 {
                     GUILayout.Label(string.Join(", ", type.GetInterfaces().Select(o => o.Name)), _interfacesStyle);
                 }
                 GUILayout.Label(name, EditorStyles.boldLabel);
                 GUILayout.EndVertical();
-                //GUI.backgroundColor = defaultBackgroundColor;
             }
 
             private void DrawRunner(IEcsRunner runner)
@@ -129,14 +123,10 @@ namespace DCFApixels.DragonECS.Unity
                     return;
 
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
-                //Color defaultBackgroundColor = GUI.backgroundColor;
-                //GUI.backgroundColor = color;
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color));
-                //GUILayout.BeginVertical(EditorStyles.helpBox);
                 GUILayout.Label(type.Name, EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)));
                 GUILayout.EndVertical();
-                //GUI.backgroundColor = defaultBackgroundColor;
             }
 
             private TAttribute GetAttribute<TAttribute>(Type target) where TAttribute : Attribute
@@ -149,7 +139,7 @@ namespace DCFApixels.DragonECS.Unity
 
             private bool CheckIsHidden(Type target)
             {
-                if (DebugMonitorPrefs.instance.isShowHidden)
+                if (DebugMonitorPrefs.instance.IsShowHidden)
                     return false;
 
                 return target.GetCustomAttribute<DebugHideAttribute>() != null;

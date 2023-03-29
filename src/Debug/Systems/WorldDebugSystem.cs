@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity
+namespace DCFApixels.DragonECS
 {
     public class WorldDebugSystem : IEcsRunSystem 
     {
