@@ -1,5 +1,5 @@
 {
-    "name": "DCFApixels.DragonECS-Unity",
+    "name": "DCFApixels.DragonECS.Unity",
     "rootNamespace": "DCFApixels",
     "references": [
         "GUID:abb125fa67fff1e45914d0825236f608"
