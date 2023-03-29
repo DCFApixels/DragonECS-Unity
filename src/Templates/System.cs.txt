@@ -5,10 +5,10 @@ using DCFApixels.DragonECS;
 
 namespace #NAMESPACE#
 {
-    public class #SCRIPTNAME# : IEcsRunSystem, IEcsInject<EcsWorld<DefaultWorld>>
+    public class #SCRIPTNAME# : IEcsRunSystem, IEcsInject<EcsDefaultWrold>
     {
-        private EcsWorld<DefaultWorld> _world;
-        public void Inject(EcsWorld<DefaultWorld> obj) => _world = obj;
+        private EcsDefaultWrold _world;
+        public void Inject(EcsDefaultWrold obj) => _world = obj;
 
         public void Run(EcsPipeline pipeline)
         {

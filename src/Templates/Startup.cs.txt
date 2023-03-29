@@ -5,7 +5,7 @@ namespace #NAMESPACE#
 {
     sealed class #SCRIPTNAME# : MonoBehaviour
     {
-        private EcsWorld<DefaultWorld> _world;
+        private EcsDefaultWrold _world;
         private EcsPipeline _pipeline;
 
         private void Start()
@@ -13,7 +13,7 @@ namespace #NAMESPACE#
             // is needed to integrate the internal debugging tool with the unity environment
             UnityDebugService.Init();
 
-            _world = new EcsWorld<DefaultWorld>();
+            _world = new EcsDefaultWrold();
             _pipeline = EcsPipeline.New()
                 // register your systems here, for example:
                 // .Add (new TestSystem1 ())
