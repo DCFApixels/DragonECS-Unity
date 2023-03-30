@@ -5,11 +5,11 @@ namespace DCFApixels.DragonECS.Editors
 {
     public static class EcsEditor
     {
-        public static GUIStyle GetStyle(Color color)
+        public static GUIStyle GetStyle(Color color, float alphaMultiplier)
         {
             GUIStyle style = new GUIStyle(GUI.skin.box);
             Color componentColor = color;
-            componentColor.a = 0.15f;
+            componentColor.a *= alphaMultiplier;
             style.normal.background = CreateTexture(2, 2, componentColor);
 
             return style;

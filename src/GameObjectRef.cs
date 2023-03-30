@@ -6,6 +6,7 @@ using UnityEditor;
 
 namespace DCFApixels.DragonECS
 {
+    [DebugColor(DebugColor.Cyan)]
     public struct GameObjectRef
     {
         public GameObject gameObject;

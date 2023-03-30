@@ -1,4 +1,5 @@
-﻿using System.Reflection;
+﻿using DCFApixels.DragonECS.Unity.Debug;
+using System.Reflection;
 using UnityEngine;
 
 
@@ -7,27 +8,25 @@ namespace DCFApixels.DragonECS
     [DebugHide, DebugColor(DebugColor.Gray)]
     public class PipelineDebugSystem : IEcsPreInitSystem
     {
-        private string _name;
-        public PipelineDebugSystem(string name = "Systems")
+        private string _monitorName;
+        public PipelineDebugSystem(string monitorName = "Pipeline")
         {
-            _name = name;
+            _monitorName = monitorName;
         }
 
         void IEcsPreInitSystem.PreInit(EcsPipeline pipeline)
         {
-            SystemsDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _name).AddComponent<SystemsDebugMonitor>();
+            SystemsDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _monitorName).AddComponent<SystemsDebugMonitor>();
             monitor.source = this;
             monitor.pipeline = pipeline;
-            monitor.pipelineName = _name;
-            Object.DontDestroyOnLoad(monitor.gameObject);
+            monitor.monitorName = _monitorName;
         }
     }
 
-    public class SystemsDebugMonitor : MonoBehaviour
+    public class SystemsDebugMonitor : DebugMonitorBase
     {
         internal PipelineDebugSystem source;
         internal EcsPipeline pipeline;
-        internal string pipelineName;
     }
 
 #if UNITY_EDITOR
@@ -63,7 +62,7 @@ namespace DCFApixels.DragonECS
 
                 GUILayout.Label("[Systems]", _headerStyle);
 
-                DebugMonitorPrefs.instance._isShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", DebugMonitorPrefs.instance._isShowInterfaces);
+                DebugMonitorPrefs.instance.IsShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", DebugMonitorPrefs.instance.IsShowInterfaces);
                 DebugMonitorPrefs.instance.IsShowHidden = EditorGUILayout.Toggle("Show Hidden", DebugMonitorPrefs.instance.IsShowHidden);
 
                 GUILayout.BeginVertical();
@@ -76,7 +75,7 @@ namespace DCFApixels.DragonECS
 
                 GUILayout.Label("[Runners]", _headerStyle);
 
-                GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black));
+                GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
                 foreach (var item in Target.pipeline.AllRunners)
                 {
                     DrawRunner(item.Value);
@@ -89,7 +88,7 @@ namespace DCFApixels.DragonECS
                 if(system is SystemsBlockMarkerSystem markerSystem)
                 {
                     GUILayout.EndVertical();
-                    GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black));
+                    GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
 
                     GUILayout.BeginHorizontal();
                     GUILayout.Label("<");
@@ -107,8 +106,8 @@ namespace DCFApixels.DragonECS
                 string name = type.Name;
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
 
-                GUILayout.BeginVertical(EcsEditor.GetStyle(color));
-                if (DebugMonitorPrefs.instance._isShowInterfaces)
+                GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
+                if (DebugMonitorPrefs.instance.IsShowInterfaces)
                 {
                     GUILayout.Label(string.Join(", ", type.GetInterfaces().Select(o => o.Name)), _interfacesStyle);
                 }
@@ -123,7 +122,7 @@ namespace DCFApixels.DragonECS
                     return;
 
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
-                GUILayout.BeginVertical(EcsEditor.GetStyle(color));
+                GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 GUILayout.Label(type.Name, EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)));
                 GUILayout.EndVertical();

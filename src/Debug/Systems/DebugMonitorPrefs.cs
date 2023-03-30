@@ -6,23 +6,31 @@ namespace DCFApixels.DragonECS.Editors
     [FilePath("DragonECS/DebugMonitorPrefs.prefs", FilePathAttribute.Location.ProjectFolder)]
     public class DebugMonitorPrefs : ScriptableSingleton<DebugMonitorPrefs>
     {
-        private bool _isShowHidden = false;
-        public bool _isShowInterfaces = false;
-
-        public bool IsShowHidden
+        private bool _isShowInterfaces = false;
+        public bool IsShowInterfaces
         {
-            get => IsShowHidden1; set
+            get => _isShowInterfaces; set
             {
-                IsShowHidden1 = value;
+                _isShowInterfaces = value;
                 Save(false);
             }
         }
-
-        public bool IsShowHidden1
+        private bool _isShowHidden = false;
+        public bool IsShowHidden
         {
             get => _isShowHidden; set
             {
                 _isShowHidden = value;
+                Save(false);
+            }
+        }
+
+        private bool _poolsToggle = false;
+        public bool PoolsToggle
+        {
+            get => _poolsToggle; set
+            {
+                _poolsToggle = value;
                 Save(false);
             }
         }
