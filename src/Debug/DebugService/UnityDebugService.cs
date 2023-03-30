@@ -38,10 +38,9 @@ namespace DCFApixels.DragonECS
             _profilerMarkers[id].Begin();
         }
 
-        public override double ProfileMarkEnd(int id)
+        public override void ProfileMarkEnd(int id)
         {
             _profilerMarkers[id].End();
-            return -1;
         }
 
         protected override void OnDelMark(int id)
