@@ -124,7 +124,7 @@ namespace DCFApixels.DragonECS
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 GUILayout.Label(type.Name, EditorStyles.boldLabel);
-                GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)));
+                GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)), EditorStyles.miniLabel);
                 GUILayout.EndVertical();
             }
 

@@ -16,6 +16,7 @@ namespace DCFApixels.DragonECS
             _ecsWorld = ecsWorld;
             WorldDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _monitorName).AddComponent<WorldDebugMonitor>();
             WorldPoolsMonitor poolsmonitor = new GameObject(EcsConsts.DEBUG_PREFIX + _monitorName).AddComponent<WorldPoolsMonitor>();
+            poolsmonitor.transform.SetParent(monitor.transform);
 
             monitor.source = this;
             monitor.world = _ecsWorld;
@@ -23,7 +24,7 @@ namespace DCFApixels.DragonECS
 
             poolsmonitor.source = this;
             poolsmonitor.world = _ecsWorld;
-            poolsmonitor.monitorName = _monitorName;
+            poolsmonitor.monitorName = "Pools";
         }
 
         public void Run(EcsPipeline pipeline)
@@ -147,7 +148,7 @@ namespace DCFApixels.DragonECS
                 GUI.contentColor = defaultContentColor;
                 GUIStyle textStyle2 = EditorStyles.miniBoldLabel;
                 textStyle2.alignment = TextAnchor.LowerCenter;
-                GUI.Label(AddMargin(position, 3f, 3f), pool.DataType.Name, textStyle2);
+                GUI.Label(AddMargin(position, -10f, 3f), pool.DataType.Name, textStyle2);
 
             }
 
