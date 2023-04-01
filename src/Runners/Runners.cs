@@ -7,23 +7,23 @@
 
     public class EcsLateRunSystemRunner : EcsRunner<IEcsLateRunSystem>, IEcsLateRunSystem
     {
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
         private EcsProfilerMarker[] _markers;
 #endif
         public void LateRun(EcsPipeline pipeline)
         {
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
             for (int i = 0; i < targets.Length; i++)
             {
                 using (_markers[i].Auto())
                     targets[i].LateRun(pipeline);
             }
 #else
-            foreach (var item in targets) item.LateRun(systems);
+            foreach (var item in targets) item.LateRun(pipeline);
 #endif
         }
 
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
         protected override void OnSetup()
         {
             _markers = new EcsProfilerMarker[targets.Length];
@@ -52,12 +52,12 @@
     }
     public class EcsFixedRunSystemRunner : EcsRunner<IEcsFixedRunSystem>, IEcsFixedRunSystem
     {
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
         private EcsProfilerMarker[] _markers;
 #endif
         public void FixedRun(EcsPipeline pipeline)
         {
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
             for (int i = 0; i < targets.Length; i++)
             {
                 using (_markers[i].Auto())
@@ -68,7 +68,7 @@
 #endif
         }
 
-#if DEBUG
+#if DEBUG && !DISABLE_DRAGONECS_DEBUG
         protected override void OnSetup()
         {
             _markers = new EcsProfilerMarker[targets.Length];

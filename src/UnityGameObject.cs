@@ -7,7 +7,7 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [DebugColor(DebugColor.Cyan)]
-    public struct GameObjectRef
+    public struct UnityGameObject
     {
         public GameObject gameObject;
         public Transform transform;
@@ -18,7 +18,7 @@ namespace DCFApixels.DragonECS
             get => gameObject.name;
         }
 
-        public GameObjectRef(GameObject gameObject)
+        public UnityGameObject(GameObject gameObject)
         {
             this.gameObject = gameObject;
             transform = gameObject.transform;
@@ -65,7 +65,7 @@ namespace DCFApixels.DragonECS
             ent result = self.NewEntity();
             GameObject newGameObject = new GameObject(name);
             newGameObject.AddComponent<EcsEntity>()._entity = result;
-            result.Write<GameObjectRef>() = new GameObjectRef(newGameObject);
+            result.Write<UnityGameObject>() = new UnityGameObject(newGameObject);
 
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
