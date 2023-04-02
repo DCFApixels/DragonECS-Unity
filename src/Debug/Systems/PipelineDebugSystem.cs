@@ -1,4 +1,5 @@
-﻿using DCFApixels.DragonECS.Unity.Debug;
+﻿using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Debug;
 using System.Reflection;
 using UnityEngine;
 
@@ -16,14 +17,21 @@ namespace DCFApixels.DragonECS
 
         void IEcsPreInitSystem.PreInit(EcsPipeline pipeline)
         {
-            SystemsDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _monitorName).AddComponent<SystemsDebugMonitor>();
+            PipelineDebugMonitor monitor = new GameObject(EcsConsts.DEBUG_PREFIX + _monitorName).AddComponent<PipelineDebugMonitor>();
             monitor.source = this;
             monitor.pipeline = pipeline;
             monitor.monitorName = _monitorName;
+
+            //foreach (var item in pipeline.AllSystems) //Вырезано пока не сделаю TODO в SystemDebugMonitor
+            //{
+            //    DebugNameAttribute debugName = item.GetType().GetCustomAttribute<DebugNameAttribute>();
+            //    string name = debugName == null ? item.GetType().Name : debugName.name;
+            //    SystemDebugMonitor.CreateMonitor(monitor.transform, item, name);
+            //}
         }
     }
 
-    public class SystemsDebugMonitor : DebugMonitorBase
+    public class PipelineDebugMonitor : DebugMonitorBase
     {
         internal PipelineDebugSystem source;
         internal EcsPipeline pipeline;
@@ -36,7 +44,7 @@ namespace DCFApixels.DragonECS
         using System.Linq;
         using UnityEditor;
 
-        [CustomEditor(typeof(SystemsDebugMonitor))]
+        [CustomEditor(typeof(PipelineDebugMonitor))]
         public class PipelineDebugMonitorEditor : Editor
         {
             private DebugColorAttribute _fakeDebugColorAttribute = new DebugColorAttribute(DebugColor.White);
@@ -44,7 +52,7 @@ namespace DCFApixels.DragonECS
             private GUIStyle _headerStyle;
             private GUIStyle _interfacesStyle;
             private Color _interfaceColor = new Color(0.96f, 1f, 0.16f);
-            private SystemsDebugMonitor Target => (SystemsDebugMonitor)target;
+            private PipelineDebugMonitor Target => (PipelineDebugMonitor)target;
             public override void OnInspectorGUI()
             {
                 if (Target.source == null)
