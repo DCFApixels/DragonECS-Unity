@@ -123,7 +123,7 @@ namespace DCFApixels.DragonECS
 
 
                 Color mainColor = new Color(0.3f, 1f, 0f, 1f);
-                var debugColor = pool.DataType.GetCustomAttribute<DebugColorAttribute>();
+                var debugColor = pool.ComponentType.GetCustomAttribute<DebugColorAttribute>();
                 if (debugColor != null)
                 {
                     mainColor = debugColor.GetUnityColor();
@@ -132,14 +132,14 @@ namespace DCFApixels.DragonECS
 
                 EditorGUI.DrawRect(progressBar, backgroundColor);
 
-                progressBar.yMin = progressBar.yMax - ((float)pool.EntitiesCount / pool.Capacity) * progressBar.height;
+                progressBar.yMin = progressBar.yMax - ((float)pool.Count / pool.Capacity) * progressBar.height;
 
                 GUIStyle textStyle0 = EditorStyles.miniBoldLabel;
                 textStyle0.alignment = TextAnchor.MiddleCenter;
 
                 Color foregroundColor = mainColor;
                 EditorGUI.DrawRect(progressBar, foregroundColor);
-                GUI.Label(progressBar, pool.EntitiesCount.ToString(), textStyle0);
+                GUI.Label(progressBar, pool.Count.ToString(), textStyle0);
 
                 GUIStyle textStyle1 = EditorStyles.miniBoldLabel;
                 textStyle1.alignment = TextAnchor.UpperCenter;
@@ -148,7 +148,7 @@ namespace DCFApixels.DragonECS
                 GUI.contentColor = defaultContentColor;
                 GUIStyle textStyle2 = EditorStyles.miniBoldLabel;
                 textStyle2.alignment = TextAnchor.LowerCenter;
-                GUI.Label(AddMargin(position, -10f, 3f), pool.DataType.Name, textStyle2);
+                GUI.Label(AddMargin(position, -10f, 3f), pool.ComponentType.Name, textStyle2);
 
             }
 
