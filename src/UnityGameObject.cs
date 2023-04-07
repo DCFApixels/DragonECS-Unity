@@ -104,4 +104,22 @@ namespace DCFApixels.DragonECS
             get => _entity.IsAlive();
         }
     }
+
+#if UNITY_EDITOR
+
+    namespace Editors
+    {
+        using UnityEditor;
+        [CustomEditor(typeof(EcsEntity))]
+        public class EcsEntityEditor : Editor
+        {
+            private EcsEntity Target => (EcsEntity)target;
+            public override void OnInspectorGUI()
+            {
+                EditorGUILayout.IntField(Target._entity.id);
+                GUILayout.Label(Target._entity.ToString());
+            }
+        }
+    }
+#endif
 }
