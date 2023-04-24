@@ -7,7 +7,7 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [DebugColor(DebugColor.Cyan)]
-    public struct UnityGameObject
+    public struct UnityGameObject : IEcsComponent
     {
         public GameObject gameObject;
         public Transform transform;
@@ -60,13 +60,12 @@ namespace DCFApixels.DragonECS
 
     public static class GameObjectRefExt
     {
-        public static ent NewEntityWithGameObject(this IEcsWorld self, string name = "Entity", GameObjectIcon icon = GameObjectIcon.NONE)
+        public static EcsEntity NewEntityWithGameObject(this EcsWorld self, string name = "EcsEntity", GameObjectIcon icon = GameObjectIcon.NONE)
         {
-            ent result = self.NewEntity();
+            EcsEntity result = self.NewEntity();
             GameObject newGameObject = new GameObject(name);
-            newGameObject.AddComponent<EcsEntity>()._entity = result;
-            result.Write<UnityGameObject>() = new UnityGameObject(newGameObject);
-
+            newGameObject.AddComponent<EcsEntityConnect>()._entity = result;
+            self.GetPool<UnityGameObject>().Add(result.id) = new UnityGameObject(newGameObject);
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
             {
@@ -90,10 +89,10 @@ namespace DCFApixels.DragonECS
         }
     }
 
-    public class EcsEntity : MonoBehaviour
+    public class EcsEntityConnect : MonoBehaviour
     {
-        internal ent _entity;
-        public ent entity
+        internal EcsEntity _entity;
+        public EcsEntity entity
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _entity;
@@ -101,7 +100,7 @@ namespace DCFApixels.DragonECS
         public bool IsAlive
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _entity.IsAlive();
+            get => _entity.IsAlive;
         }
     }
 
@@ -110,10 +109,10 @@ namespace DCFApixels.DragonECS
     namespace Editors
     {
         using UnityEditor;
-        [CustomEditor(typeof(EcsEntity))]
+        [CustomEditor(typeof(EcsEntityConnect))]
         public class EcsEntityEditor : Editor
         {
-            private EcsEntity Target => (EcsEntity)target;
+            private EcsEntityConnect Target => (EcsEntityConnect)target;
             public override void OnInspectorGUI()
             {
                 EditorGUILayout.IntField(Target._entity.id);

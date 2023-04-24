@@ -8,9 +8,9 @@ namespace DCFApixels.DragonECS
     public class WorldDebugSystem : IEcsRunSystem 
     {
         private string _monitorName;
-        private IEcsWorld _ecsWorld;
+        private EcsWorld _ecsWorld;
 
-        public WorldDebugSystem(IEcsWorld ecsWorld, string monitorName = "World")
+        public WorldDebugSystem(EcsWorld ecsWorld, string monitorName = "World")
         {
             _monitorName = monitorName;
             _ecsWorld = ecsWorld;
@@ -24,7 +24,7 @@ namespace DCFApixels.DragonECS
 
             poolsmonitor.source = this;
             poolsmonitor.world = _ecsWorld;
-            poolsmonitor.monitorName = "Pools";
+            poolsmonitor.monitorName = "pools";
         }
 
         public void Run(EcsPipeline pipeline)
@@ -35,7 +35,7 @@ namespace DCFApixels.DragonECS
     public class WorldDebugMonitor : DebugMonitorBase
     {
         internal WorldDebugSystem source;
-        internal IEcsWorld world;
+        internal EcsWorld world;
     }
 
 #if UNITY_EDITOR
@@ -60,7 +60,7 @@ namespace DCFApixels.DragonECS
     public class WorldPoolsMonitor : DebugMonitorBase
     {
         internal WorldDebugSystem source;
-        internal IEcsWorld world;
+        internal EcsWorld world;
     }
 
 #if UNITY_EDITOR
@@ -82,75 +82,75 @@ namespace DCFApixels.DragonECS
 
             public override void OnInspectorGUI()
             {
-                _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
-                var pools = Target.world.GetAllPools().ToArray().Where(o => !(o is EcsNullPool));
-
-                GUILayout.Label("", GUILayout.ExpandWidth(true));
-                
-                float width = GUILayoutUtility.GetLastRect().width;
-
-                Vector3 newPoolBlockSize = _poolBlockMinSize;
-                int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
-                newPoolBlockSize.x = width / widthCount;
-
-                int x = -1, y = 0;
-                foreach (var pool in pools)
-                {
-                    if(++x >= widthCount)
-                    {
-                        x = 0;
-                        y++;
-                    }
-
-                    DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
-                }
-                GUILayout.EndScrollView();
+            //   _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
+            //   var pools = Target.world.GetAllPools().ToArray().Where(o => !(o is EcsNullPool)).OfType<IEcsPool>();
+            //
+            //   GUILayout.Label("", GUILayout.ExpandWidth(true));
+            //   
+            //   float width = GUILayoutUtility.GetLastRect().width;
+            //
+            //   Vector3 newPoolBlockSize = _poolBlockMinSize;
+            //   int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
+            //   newPoolBlockSize.x = width / widthCount;
+            //
+            //   int x = -1, y = 0;
+            //   foreach (var pool in pools)
+            //   {
+            //       if(++x >= widthCount)
+            //       {
+            //           x = 0;
+            //           y++;
+            //       }
+            //
+            //       DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
+            //   }
+            //   GUILayout.EndScrollView();
             }
 
 
-            private void DrawPoolBlock(IEcsPool pool, Rect position)
-            {
-                Color defaultContentColor = GUI.contentColor;
-                GUI.contentColor = Color.black * 0.925f;
-
-                position = AddMargin(position, 1f, 1f);
-
-                EditorGUI.DrawRect(position, Color.black* 0.16f);
-
-                Rect progressBar = new Rect(Vector2.zero, _poolProgressBasrSize);
-                progressBar.width = position.width;
-                progressBar.center = position.center - Vector2.up * _poolBlockMinSize.y * 0.09f;
-
-
-                Color mainColor = new Color(0.3f, 1f, 0f, 1f);
-                var debugColor = pool.ComponentType.GetCustomAttribute<DebugColorAttribute>();
-                if (debugColor != null)
-                {
-                    mainColor = debugColor.GetUnityColor();
-                }
-                Color backgroundColor = mainColor * 0.3f + Color.white * 0.2f;
-
-                EditorGUI.DrawRect(progressBar, backgroundColor);
-
-                progressBar.yMin = progressBar.yMax - ((float)pool.Count / pool.Capacity) * progressBar.height;
-
-                GUIStyle textStyle0 = EditorStyles.miniBoldLabel;
-                textStyle0.alignment = TextAnchor.MiddleCenter;
-
-                Color foregroundColor = mainColor;
-                EditorGUI.DrawRect(progressBar, foregroundColor);
-                GUI.Label(progressBar, pool.Count.ToString(), textStyle0);
-
-                GUIStyle textStyle1 = EditorStyles.miniBoldLabel;
-                textStyle1.alignment = TextAnchor.UpperCenter;
-                GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n"+ pool.Capacity, textStyle1);
-
-                GUI.contentColor = defaultContentColor;
-                GUIStyle textStyle2 = EditorStyles.miniBoldLabel;
-                textStyle2.alignment = TextAnchor.LowerCenter;
-                GUI.Label(AddMargin(position, -10f, 3f), pool.ComponentType.Name, textStyle2);
-
-            }
+          //  private void DrawPoolBlock(IEcsPool pool, Rect position)
+          //  {
+          //      Color defaultContentColor = GUI.contentColor;
+          //      GUI.contentColor = Color.black * 0.925f;
+          //
+          //      position = AddMargin(position, 1f, 1f);
+          //
+          //      EditorGUI.DrawRect(position, Color.black* 0.16f);
+          //
+          //      Rect progressBar = new Rect(Vector2.zero, _poolProgressBasrSize);
+          //      progressBar.width = position.width;
+          //      progressBar.center = position.center - Vector2.up * _poolBlockMinSize.y * 0.09f;
+          //
+          //
+          //      Color mainColor = new Color(0.3f, 1f, 0f, 1f);
+          //      var debugColor = pool.ComponentType.GetCustomAttribute<DebugColorAttribute>();
+          //      if (debugColor != null)
+          //      {
+          //          mainColor = debugColor.GetUnityColor();
+          //      }
+          //      Color backgroundColor = mainColor * 0.3f + Color.white * 0.2f;
+          //
+          //      EditorGUI.DrawRect(progressBar, backgroundColor);
+          //
+          //      progressBar.yMin = progressBar.yMax - ((float)pool.Count / pool.Capacity) * progressBar.height;
+          //
+          //      GUIStyle textStyle0 = EditorStyles.miniBoldLabel;
+          //      textStyle0.alignment = TextAnchor.MiddleCenter;
+          //
+          //      Color foregroundColor = mainColor;
+          //      EditorGUI.DrawRect(progressBar, foregroundColor);
+          //      GUI.Label(progressBar, pool.Count.ToString(), textStyle0);
+          //
+          //      GUIStyle textStyle1 = EditorStyles.miniBoldLabel;
+          //      textStyle1.alignment = TextAnchor.UpperCenter;
+          //      GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n"+ pool.Capacity, textStyle1);
+          //
+          //      GUI.contentColor = defaultContentColor;
+          //      GUIStyle textStyle2 = EditorStyles.miniBoldLabel;
+          //      textStyle2.alignment = TextAnchor.LowerCenter;
+          //      GUI.Label(AddMargin(position, -10f, 3f), pool.ComponentType.Name, textStyle2);
+          //
+          //  }
 
             private Rect AddMargin(Rect rect, Vector2 value)
             {

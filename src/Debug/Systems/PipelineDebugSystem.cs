@@ -40,6 +40,7 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
     namespace Editors
     {
+        using DCFApixels.DragonECS.RunnersCore;
         using System;
         using System.Linq;
         using UnityEditor;
