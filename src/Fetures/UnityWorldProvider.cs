@@ -1,7 +1,6 @@
-﻿using DCFApixels.DragonECS;
-using System;
+﻿using System;
 
-namespace DCFApixels.Assets.DragonECS_Unity.src.Fetures
+namespace DCFApixels.DragonECS
 {
     public static class UnityWorldProvider<TWorld>
         where TWorld : EcsWorld<TWorld>
@@ -18,5 +17,13 @@ namespace DCFApixels.Assets.DragonECS_Unity.src.Fetures
 
             return _world;
         }
+
+        public static TWorld Get()
+        {
+            if (_world == null)
+                _world = (TWorld)Activator.CreateInstance(typeof(TWorld));
+            return _world;
+        }
     }
+
 }

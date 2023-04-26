@@ -54,8 +54,15 @@ namespace DCFApixels.DragonECS
             private GUIStyle _interfacesStyle;
             private Color _interfaceColor = new Color(0.96f, 1f, 0.16f);
             private PipelineDebugMonitor Target => (PipelineDebugMonitor)target;
+
+
+            private GUIStyle systemsListStyle;
+
             public override void OnInspectorGUI()
             {
+                systemsListStyle = new GUIStyle(EditorStyles.miniLabel);
+                systemsListStyle.wordWrap = true;
+
                 if (Target.source == null)
                     return;
                 if (_headerStyle == null)
@@ -66,6 +73,7 @@ namespace DCFApixels.DragonECS
                     _interfacesStyle.focused.textColor = _interfaceColor;
                     _interfacesStyle.active.textColor = _interfaceColor;
                     _interfacesStyle.normal.textColor = _interfaceColor;
+                    _interfacesStyle.wordWrap = true;
                     _headerStyle.fontSize = 28;
                 }
 
@@ -133,7 +141,7 @@ namespace DCFApixels.DragonECS
                 Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 GUILayout.Label(type.Name, EditorStyles.boldLabel);
-                GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)), EditorStyles.miniLabel);
+                GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)), systemsListStyle);
                 GUILayout.EndVertical();
             }
 

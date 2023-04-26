@@ -1,5 +1,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using System.Linq;
+using UnityEditor.ShortcutManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -64,8 +66,8 @@ namespace DCFApixels.DragonECS
         {
             EcsEntity result = self.NewEntity();
             GameObject newGameObject = new GameObject(name);
-            newGameObject.AddComponent<EcsEntityConnect>()._entity = result;
-            self.GetPool<UnityGameObject>().Add(result.id) = new UnityGameObject(newGameObject);
+            newGameObject.AddComponent<EcsEntityConnect>().ConectWith(result);
+          //  self.GetPool<UnityGameObject>().Add(result.id) = 
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
             {
@@ -89,18 +91,57 @@ namespace DCFApixels.DragonECS
         }
     }
 
+
     public class EcsEntityConnect : MonoBehaviour
     {
-        internal EcsEntity _entity;
-        public EcsEntity entity
+        private sealed class Query : EcsQuery
+        {
+            public readonly EcsPool<UnityGameObject> unityGameObjects;
+            public Query(Builder b)
+            {
+                unityGameObjects = b.Include<UnityGameObject>();
+            }
+        }
+
+        private EcsEntity _entity;
+        private EcsWorld _world;
+
+        #region Properties
+        public EcsEntity Entity
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _entity;
+        }
+        public EcsWorld World
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => _world;
         }
         public bool IsAlive
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _entity.IsAlive;
+        }
+        #endregion
+
+        public void ConectWith(EcsEntity entity)
+        {
+            int e = _entity.id;
+            if (_world != null && _entity.IsNotNull)
+            {
+                var q = _world.Select<Query>();
+                q.unityGameObjects.Del(e);
+            }
+            _world = null;
+
+            _entity = entity;
+
+            if (_entity.IsNotNull)
+            {
+                _world = _entity.GetWorld();
+                var q = _world.Select<Query>();
+                if (!q.unityGameObjects.Has(e)) q.unityGameObjects.Add(e) = new UnityGameObject(gameObject);
+            }
         }
     }
 
@@ -115,8 +156,8 @@ namespace DCFApixels.DragonECS
             private EcsEntityConnect Target => (EcsEntityConnect)target;
             public override void OnInspectorGUI()
             {
-                EditorGUILayout.IntField(Target._entity.id);
-                GUILayout.Label(Target._entity.ToString());
+                EditorGUILayout.IntField(Target.Entity.id);
+                GUILayout.Label(Target.Entity.ToString());
             }
         }
     }

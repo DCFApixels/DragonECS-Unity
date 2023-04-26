@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    [DebugHide, DebugColor(DebugColor.Gray)]
     public class WorldDebugSystem : IEcsRunSystem 
     {
         private string _monitorName;
