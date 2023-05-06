@@ -2,7 +2,7 @@
 {
     public sealed class DebugModule : IEcsModule
     {
-        public const string DEBUG_SYSTEMS_BLOCK = nameof(DEBUG_SYSTEMS_BLOCK);
+        public const string DEBUG_LAYER = nameof(DEBUG_LAYER);
         public EcsWorld[] _worlds;
         public DebugModule(params EcsWorld[] worlds)
         {
@@ -11,11 +11,11 @@
 
         void IEcsModule.ImportSystems(EcsPipeline.Builder b)
         {
-            b.InsertSystemsBlock(DEBUG_SYSTEMS_BLOCK, EcsConsts.POST_END_SYSTEMS_BLOCK);
-            b.Add(new PipelineDebugSystem(), DEBUG_SYSTEMS_BLOCK);
+            b.Layers.Insert(EcsConsts.POST_END_LAYER, DEBUG_LAYER);
+            b.Add(new PipelineDebugSystem(), DEBUG_LAYER);
             foreach (var world in _worlds)
             {
-                b.Add(new WorldDebugSystem(world), DEBUG_SYSTEMS_BLOCK);
+                b.Add(new WorldDebugSystem(world), DEBUG_LAYER);
             }
         }
     }

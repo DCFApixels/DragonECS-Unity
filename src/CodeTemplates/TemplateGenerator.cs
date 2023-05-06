@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.IO;
+using System.Runtime.Versioning;
 using System.Text;
 using UnityEditor;
 using UnityEditor.ProjectWindowCallback;
@@ -12,9 +13,9 @@ namespace DCFApixels.DragonECS.Editors
     {
         private const int MENU_ITEM_PRIORITY = -198;
 
-        private const string TITLE = "DragonECS Template Generator";
+        private const string TITLE = EcsConsts.FRAMEWORK_NAME + " Template Generator";
 
-        private const string MENU_ITEM_PATH = "Assets/Create/DragonECS/";
+        private const string MENU_ITEM_PATH = "Assets/Create/" + EcsConsts.FRAMEWORK_NAME + "/";
 
         private const string NAMESPACE_TAG = "#NAMESPACE#";
         private const string SCRIPTANAME_TAG = "#SCRIPTNAME#";
@@ -29,25 +30,25 @@ namespace DCFApixels.DragonECS.Editors
         #endregion
 
         #region GenerateMethods
-        [MenuItem(MENU_ITEM_PATH + "[Template]Startup", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]Startup", false, MENU_ITEM_PRIORITY)]
         public static void CreateSturtupScript() => CreateScript("Startup");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]System", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]System", false, MENU_ITEM_PRIORITY)]
         public static void CreateSystemSimpleScript() => CreateScript("System");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]Component", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]Component", false, MENU_ITEM_PRIORITY)]
         public static void CreateComponentSimpleScript() => CreateScript("Component");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]Runner", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]Runner", false, MENU_ITEM_PRIORITY)]
         public static void CreateRunnerSimpleScript() => CreateScript("Runner");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]System Extended", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]System Extended", false, MENU_ITEM_PRIORITY)]
         public static void CreateSystemScript() => CreateScript("SystemExtended");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]Component Extended", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]Component Extended", false, MENU_ITEM_PRIORITY)]
         public static void CreateComponentScript() => CreateScript("ComponentExtended");
 
-        [MenuItem(MENU_ITEM_PATH + "[Template]Runner Extended", false, MENU_ITEM_PRIORITY)]
+        [MenuItem(MENU_ITEM_PATH + "[CodeTemplate]Runner Extended", false, MENU_ITEM_PRIORITY)]
         public static void CreateRunnerScript() => CreateScript("RunnerExtended");
 
 

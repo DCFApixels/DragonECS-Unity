@@ -2,7 +2,7 @@
 
 namespace DCFApixels.DragonECS
 {
-    public interface IEcsLateRunSystem : IEcsSystem
+    public interface IEcsLateRunProcess : IEcsSystem
     {
         public void LateRun(EcsPipeline pipeline);
     }
@@ -10,10 +10,10 @@ namespace DCFApixels.DragonECS
     {
         public static void LateRun(this EcsPipeline systems)
         {
-            systems.GetRunner<IEcsLateRunSystem>().LateRun(systems);
+            systems.GetRunner<IEcsLateRunProcess>().LateRun(systems);
         }
     }
-    public interface IEcsFixedRunSystem : IEcsSystem
+    public interface IEcsFixedRunProcess : IEcsSystem
     {
         public void FixedRun(EcsPipeline pipeline);
     }
@@ -21,14 +21,14 @@ namespace DCFApixels.DragonECS
     {
         public static void FixedRun(this EcsPipeline pipeline)
         {
-            pipeline.GetRunner<IEcsFixedRunSystem>().FixedRun(pipeline);
+            pipeline.GetRunner<IEcsFixedRunProcess>().FixedRun(pipeline);
         }
     }
 
     namespace Internal
     {
         [DebugColor(DebugColor.Orange)]
-        public class EcsLateRunSystemRunner : EcsRunner<IEcsLateRunSystem>, IEcsLateRunSystem
+        public class EcsLateRunSystemRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
         {
 #if DEBUG && !DISABLE_DEBUG
             private EcsProfilerMarker[] _markers;
@@ -58,7 +58,7 @@ namespace DCFApixels.DragonECS
 #endif
         }
         [DebugColor(DebugColor.Orange)]
-        public class EcsFixedRunSystemRunner : EcsRunner<IEcsFixedRunSystem>, IEcsFixedRunSystem
+        public class EcsFixedRunSystemRunner : EcsRunner<IEcsFixedRunProcess>, IEcsFixedRunProcess
         {
 #if DEBUG && !DISABLE_DEBUG
             private EcsProfilerMarker[] _markers;
