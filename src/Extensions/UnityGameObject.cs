@@ -62,7 +62,7 @@ namespace DCFApixels.DragonECS
     {
         public static entlong NewEntityWithGameObject(this EcsWorld self, string name = "EcsEntity", GameObjectIcon icon = GameObjectIcon.NONE)
         {
-            entlong result = self.GetEntityLong(self.NewEntity());
+            entlong result = self.GetEntityLong(self.NewEmptyEntity());
             GameObject newGameObject = new GameObject(name);
             newGameObject.AddComponent<EcsEntityConnect>().ConnectWith(result);
           //  self.GetPool<UnityGameObject>().Add(result.id) = 

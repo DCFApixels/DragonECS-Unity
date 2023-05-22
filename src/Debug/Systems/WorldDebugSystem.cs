@@ -88,6 +88,7 @@ namespace DCFApixels.DragonECS
             public override void OnInspectorGUI()
             {
                _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
+
                var pools = Target.world.AllPools.ToArray().Where(o => !o.IsNullOrDummy()).OfType<IEcsPool>();
             
                GUILayout.Label("", GUILayout.ExpandWidth(true));
@@ -158,7 +159,7 @@ namespace DCFApixels.DragonECS
                 textStyle2.wordWrap = true;
                 textStyle2.alignment = TextAnchor.LowerCenter;
                 string name = EcsEditor.GetGenericName(pool.ComponentType);
-                GUIContent label = new GUIContent(name, $"t({name})");
+                GUIContent label = new GUIContent(name, $"{name} e:{count}");
                 GUI.Label(AddMargin(position, -10f, 3f), label, textStyle2);
           
             }

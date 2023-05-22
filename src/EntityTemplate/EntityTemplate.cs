@@ -13,5 +13,24 @@ namespace DCFApixels.DragonECS
             foreach (var item in _components)
                 item.Add(world, entityID);
         }
+
+        private void OnDrawGizmos()
+        {
+            if (_components == null) return;
+            foreach (var item in _components)
+            {
+                if (item is ITemplateComponentGizmos g)
+                    g.OnGizmos(transform, ITemplateComponentGizmos.Mode.Always);
+            } 
+        }
+        private void OnDrawGizmosSelected()
+        {
+            if (_components == null) return;
+            foreach (var item in _components)
+            {
+                if (item is ITemplateComponentGizmos g)
+                    g.OnGizmos(transform, ITemplateComponentGizmos.Mode.Selected);
+            }
+        }
     }
 }

@@ -61,7 +61,7 @@ namespace DCFApixels.DragonECS
         [CustomEditor(typeof(PipelineDebugMonitor))]
         public class PipelineDebugMonitorEditor : Editor
         {
-            private DebugColorAttribute _fakeDebugColorAttribute = new DebugColorAttribute(DebugColor.White);
+            private DebugColorAttribute _fakeDebugColorAttribute = new DebugColorAttribute(190, 190, 190);
             private Type _debugColorAttributeType = typeof(DebugColorAttribute);
             private GUIStyle _headerStyle;
             private GUIStyle _interfacesStyle;

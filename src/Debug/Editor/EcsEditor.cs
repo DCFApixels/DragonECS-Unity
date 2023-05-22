@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using System;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
@@ -48,40 +47,13 @@ namespace DCFApixels.DragonECS.Editors
         }
 
 
-        public static string GetGenericName(Type type)
-        {
-            string friendlyName = type.Name;
-            if (type.IsGenericType)
-            {
-                int iBacktick = friendlyName.IndexOf('`');
-                if (iBacktick > 0)
-                    friendlyName = friendlyName.Remove(iBacktick);
-
-                friendlyName += "<";
-                Type[] typeParameters = type.GetGenericArguments();
-                for (int i = 0; i < typeParameters.Length; ++i)
-                {
-                    string typeParamName = GetGenericName(typeParameters[i]);
-                    friendlyName += (i == 0 ? typeParamName : "," + typeParamName);
-                }
-                friendlyName += ">";
-            }
-            return friendlyName;
-        }
+        public static string GetGenericName(Type type) => EcsDebugUtility.GetGenericTypeName(type);
 
         public static string GetName<T>() => GetName(typeof(T));
-        public static string GetName(Type type)
-        {
-            var atr = type.GetCustomAttribute<DebugNameAttribute>();
-            return atr != null ? atr.name : GetGenericName(type);
-        }
+        public static string GetName(Type type) => EcsDebugUtility.GetName(type);
 
         public static string GetDescription<T>() => GetDescription(typeof(T));
-        public static string GetDescription(Type type)
-        {
-            var atr = type.GetCustomAttribute<DebugDescriptionAttribute>();
-            return atr != null ? atr.description : string.Empty;
-        }
+        public static string GetDescription(Type type) => EcsDebugUtility.GetDescription(type);
 
         #region Utils
         [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 4)]

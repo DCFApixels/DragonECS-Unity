@@ -15,6 +15,15 @@ namespace DCFApixels.DragonECS
     {
         public string Name { get; }
     }
+    public interface ITemplateComponentGizmos
+    {
+        public void OnGizmos(Transform transform, Mode mode);
+        public enum Mode
+        {
+            Always,
+            Selected
+        }
+    }
 
     [Serializable]
     public abstract class TemplateComponentInitializerBase
@@ -62,7 +71,7 @@ namespace DCFApixels.DragonECS
         #endregion
     }
     [Serializable]
-    public abstract class TemplateComponentInitializer<T> : TemplateComponentInitializerBase, ITemplateComponentName
+    public abstract class TemplateComponentInitializer<T> : TemplateComponentInitializerBase, ITemplateComponentName, ITemplateComponentGizmos
     {
         private static string _autoname = GetName(typeof(T));
         private static Color _autoColor = GetColor(typeof(T));
@@ -79,6 +88,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         public abstract void Add(EcsWorld w, int e);
+        public virtual void OnGizmos(Transform transform, ITemplateComponentGizmos.Mode mode) { }
     }
 
     internal static class ITemplateBrowsableExt

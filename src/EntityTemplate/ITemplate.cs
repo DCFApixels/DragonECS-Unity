@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS
     {
         public static int NewEntity(this ITemplate self, EcsWorld world)
         {
-            int e = world.NewEntity();
+            int e = world.NewEmptyEntity();
             self.Apply(world, e);
             return e;
         }

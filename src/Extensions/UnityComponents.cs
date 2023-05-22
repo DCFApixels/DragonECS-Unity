@@ -69,4 +69,30 @@ namespace DCFApixels.DragonECS
     }
     #endregion
 
+    #region Joints
+    [Serializable]
+    public sealed class UnityComponentJointInitializer : TemplateComponentInitializer<UnityComponent<Joint>>
+    {
+        public override string Name => "UnityComponent/Joint/" + nameof(Joint);
+        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<Joint>>().Add(e) = component;
+    }
+    [Serializable]
+    public sealed class UnityComponentFixedJointInitializer : TemplateComponentInitializer<UnityComponent<FixedJoint>>
+    {
+        public override string Name => "UnityComponent/Joint/" + nameof(FixedJoint);
+        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<FixedJoint>>().Add(e) = component;
+    }
+    [Serializable]
+    public sealed class UnityComponentCharacterJointInitializer : TemplateComponentInitializer<UnityComponent<CharacterJoint>>
+    {
+        public override string Name => "UnityComponent/Joint/" + nameof(CharacterJoint);
+        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<CharacterJoint>>().Add(e) = component;
+    }
+    [Serializable]
+    public sealed class UnityComponentConfigurableJointInitializer : TemplateComponentInitializer<UnityComponent<ConfigurableJoint>>
+    {
+        public override string Name => "UnityComponent/Joint/" + nameof(ConfigurableJoint);
+        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<ConfigurableJoint>>().Add(e) = component;
+    }
+    #endregion
 }
