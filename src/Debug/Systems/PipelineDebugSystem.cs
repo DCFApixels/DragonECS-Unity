@@ -2,7 +2,6 @@
 using System.Reflection;
 using UnityEngine;
 
-
 namespace DCFApixels.DragonECS
 {
     [DebugHide, DebugColor(DebugColor.Gray)]
@@ -26,7 +25,6 @@ namespace DCFApixels.DragonECS
             processesMonitor.source = this;
             processesMonitor.pipeline = pipeline;
             processesMonitor.monitorName = "Processes Matrix";
-
 
             //foreach (var item in pipeline.AllSystems) //Вырезано пока не сделаю TODO в SystemDebugMonitor
             //{
@@ -52,6 +50,7 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
     namespace Editors
     {
+        using DCFApixels.DragonECS.Internal;
         using DCFApixels.DragonECS.RunnersCore;
         using System;
         using System.Collections.Generic;
@@ -170,7 +169,6 @@ namespace DCFApixels.DragonECS
             {
                 if (DebugMonitorPrefs.instance.IsShowHidden)
                     return false;
-
                 return target.GetCustomAttribute<DebugHideAttribute>() != null;
             }
         }
