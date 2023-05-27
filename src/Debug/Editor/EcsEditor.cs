@@ -1,12 +1,18 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Runtime.InteropServices;
+using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Editors
 {
+    [InitializeOnLoad]
     public static class EcsEditor
     {
+         static EcsEditor()
+        {
+            colorBoxeStyles = new SparseArray<GUIStyle>();
+        }
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
         public static GUIStyle GetStyle(Color color, float alphaMultiplier)
         {
@@ -18,8 +24,11 @@ namespace DCFApixels.DragonECS.Editors
             int colorCode = new Color32Union(color32).colorCode;
             if (colorBoxeStyles.TryGetValue(colorCode, out GUIStyle style))
             {
-                if (style == null)
+                if (style == null || style.normal.background == null)
+                {
                     style = CreateStyle(color32, colorCode);
+                    colorBoxeStyles[colorCode] = style;
+                }
                 return style;
             }
 
@@ -32,6 +41,9 @@ namespace DCFApixels.DragonECS.Editors
             GUIStyle result = new GUIStyle(GUI.skin.box);
             Color componentColor = color32;
             result.normal.background = CreateTexture(2, 2, componentColor);
+            result.active.background = CreateTexture(2, 2, componentColor);
+            result.hover.background = CreateTexture(2, 2, componentColor);
+            result.focused.background = CreateTexture(2, 2, componentColor);
             return result;
         }
         private static Texture2D CreateTexture(int width, int height, Color color)

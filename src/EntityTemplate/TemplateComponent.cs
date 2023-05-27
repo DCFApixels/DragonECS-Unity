@@ -33,6 +33,8 @@ namespace DCFApixels.DragonECS
         public virtual string Description => string.Empty;
         public abstract Type Type { get; }
 
+        internal abstract object ComponentRef { get; }
+
         #region Get meta
         internal static Color GetColor(Type type)
         {
@@ -85,6 +87,9 @@ namespace DCFApixels.DragonECS
         public override Color Color => _autoColor;
         public override string Description => _autoDescription;
         public sealed override Type Type => typeof(T);
+
+        internal T Component => component;
+        internal override object ComponentRef => component;
         #endregion
 
         public abstract void Add(EcsWorld w, int e);

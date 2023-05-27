@@ -32,5 +32,9 @@ namespace DCFApixels.DragonECS
                     g.OnGizmos(transform, ITemplateComponentGizmos.Mode.Selected);
             }
         }
+        public void Clear()
+        {
+            _components = new ITemplateComponent[0];
+        }
     }
 }

@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS
         using UnityEditor;
         using UnityEngine;
 
-        public class EntityTemplateEditorBase: Editor
+        public abstract class EntityTemplateEditorBase: Editor
         {
             private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 15f, 15f);
             private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 15f, 15f);
@@ -115,6 +115,7 @@ namespace DCFApixels.DragonECS
                     DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
                     GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * 2);
                 }
+                DrawFooter(target);
             }
             private void DrawTop(ITemplateInternal target)
             {
@@ -124,9 +125,23 @@ namespace DCFApixels.DragonECS
                     genericMenu.ShowAsContext();
                 }
             }
+            private void DrawFooter(ITemplateInternal target)
+            {
+                if (GUILayout.Button("Clear", GUILayout.Height(24f)))
+                {
+                    Init();
+                    serializedObject.FindProperty(target.ComponentsPropertyName).ClearArray();
+                    serializedObject.ApplyModifiedProperties();
+                }
+            }
             private void DrawComponentData(SerializedProperty componentRefProp, int index)
             {
-                ITemplateComponent browsable = (ITemplateComponent)componentRefProp.managedReferenceValue;
+                ITemplateComponent browsable = componentRefProp.managedReferenceValue as ITemplateComponent;
+                if(browsable == null)
+                {
+                    DrawDamagedComponent(componentRefProp, index);
+                    return;
+                }
                 ITemplateComponentName browsableName = browsable as ITemplateComponentName;
 
                 if (componentRefProp.managedReferenceValue == null)
@@ -135,24 +150,26 @@ namespace DCFApixels.DragonECS
                     return;
                 }
 
+                Type initializerType;
                 Type componentType;
                 SerializedProperty componentProperty = componentRefProp;
                 TemplateComponentInitializerBase customInitializer = componentProperty.managedReferenceValue as TemplateComponentInitializerBase;
                 if (customInitializer != null)
                 {
-                    componentProperty = componentProperty.FindPropertyRelative("component");
-                    componentType = customInitializer.Type;
+                    componentProperty = componentRefProp.FindPropertyRelative("component");
+                    initializerType = customInitializer.Type;
+                    componentType = customInitializer.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
                 }
                 else
                 {
-                    componentType = componentProperty.managedReferenceValue.GetType();
+                    initializerType = componentProperty.managedReferenceValue.GetType();
+                    componentType = initializerType;
                 }
 
                 Type type = browsable.GetType();
                 string name = browsableName == null ? type.Name : GetLastPathComponent(browsableName.Name);
-                string description = customInitializer != null ? customInitializer.Description : componentType.GetCustomAttribute<DebugDescriptionAttribute>()?.description;
-                Color panelColor = customInitializer != null ? customInitializer.Color : componentType.GetCustomAttribute<DebugColorAttribute>()?.GetUnityColor() ?? Color.black;
-
+                string description = customInitializer != null ? customInitializer.Description : initializerType.GetCustomAttribute<DebugDescriptionAttribute>()?.description;
+                Color panelColor = customInitializer != null ? customInitializer.Color : initializerType.GetCustomAttribute<DebugColorAttribute>()?.GetUnityColor() ?? Color.black;
             
                 GUILayout.BeginHorizontal();
             
@@ -160,7 +177,14 @@ namespace DCFApixels.DragonECS
 
                 EditorGUI.BeginChangeCheck();
                 GUIContent label = new GUIContent(name, $"{name} ");
-                EditorGUILayout.PropertyField(componentProperty, label, true);
+                if (componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0)
+                {
+                    GUILayout.Label(label);
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(componentProperty, label, true);
+                }
                 if (EditorGUI.EndChangeCheck())
                 {
                     componentProperty.serializedObject.ApplyModifiedProperties();

@@ -20,5 +20,10 @@ namespace DCFApixels.DragonECS
             foreach (var item in _components)
                 item.Add(world, entityID);
         }
+
+        public void Clear()
+        {
+            _components = new ITemplateComponent[0];
+        }
     }
 }
