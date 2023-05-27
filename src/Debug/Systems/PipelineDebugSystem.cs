@@ -114,7 +114,7 @@ namespace DCFApixels.DragonECS
 
             private void DrawSystem(IEcsSystem system)
             {
-                if (system is SystemsBlockMarkerSystem markerSystem)
+                if (system is SystemsLayerMarkerSystem markerSystem)
                 {
                     GUILayout.EndVertical();
                     GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
@@ -192,7 +192,7 @@ namespace DCFApixels.DragonECS
                 _processesList.Clear();
                 _processeIndexes.Clear();
                 if (showHidden)
-                    _systems = Target.pipeline.AllSystems.Where(o => o is SystemsBlockMarkerSystem == false).ToArray();
+                    _systems = Target.pipeline.AllSystems.Where(o => o is SystemsLayerMarkerSystem == false).ToArray();
                 else
                     _systems = Target.pipeline.AllSystems.Where(o => o.GetType().GetCustomAttribute<DebugHideAttribute>() == null).ToArray();
 
