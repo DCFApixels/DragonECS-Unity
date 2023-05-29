@@ -8,3 +8,4 @@
 </p>
 
 # Integration with Unity for [DragonECS](https://github.com/DCFApixels/DragonECS)
+> **ВАЖНО!** Проект в стадии разработки. API может меняться.
