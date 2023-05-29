@@ -1,0 +1,24 @@
+{
+    "name": "com.dcfa_pixels.dragonecs-unity",
+    "author": 
+    {
+        "name": "DCFApixels",
+        "url": "https://github.com/DCFApixels-Unity"
+    },
+    "displayName": "DragonECS-Unity",
+    "description": "Integration with Unity for DragonECS",
+    "unity": "2020.3",
+    "version": "0.3.0",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/DCFApixels/DCFApixels-Unity.git"
+    },
+    "keywords":
+    [
+        "ecs",
+        "dragonecs",
+        "extension",
+        "add-on",
+        "unity"
+    ]
+}
