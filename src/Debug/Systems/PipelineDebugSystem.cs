@@ -112,7 +112,7 @@ namespace DCFApixels.DragonECS
                 GUILayout.EndVertical();
             }
 
-            private void DrawSystem(IEcsSystem system)
+            private void DrawSystem(IEcsProcess system)
             {
                 if (system is SystemsLayerMarkerSystem markerSystem)
                 {
@@ -181,9 +181,9 @@ namespace DCFApixels.DragonECS
             private Dictionary<Type, int> _processeIndexes = new Dictionary<Type, int>();
 
             private PipelineProcessesDebugMonitor Target => (PipelineProcessesDebugMonitor)target;
-            private Type systemInterfaceType = typeof(IEcsSystem);
+            private Type systemInterfaceType = typeof(IEcsProcess);
 
-            private IEcsSystem[] _systems;
+            private IEcsProcess[] _systems;
             private void Init()
             {
                 if (_isInit)

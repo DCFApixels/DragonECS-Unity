@@ -2,7 +2,7 @@
 
 namespace DCFApixels.DragonECS
 {
-    public interface IEcsLateRunProcess : IEcsSystem
+    public interface IEcsLateRunProcess : IEcsProcess
     {
         public void LateRun(EcsPipeline pipeline);
     }
@@ -13,7 +13,7 @@ namespace DCFApixels.DragonECS
             systems.GetRunner<IEcsLateRunProcess>().LateRun(systems);
         }
     }
-    public interface IEcsFixedRunProcess : IEcsSystem
+    public interface IEcsFixedRunProcess : IEcsProcess
     {
         public void FixedRun(EcsPipeline pipeline);
     }

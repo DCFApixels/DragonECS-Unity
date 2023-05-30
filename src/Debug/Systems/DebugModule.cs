@@ -9,7 +9,7 @@
             _worlds = worlds;
         }
 
-        void IEcsModule.ImportSystems(EcsPipeline.Builder b)
+        void IEcsModule.Import(EcsPipeline.Builder b)
         {
             b.Layers.Insert(EcsConsts.POST_END_LAYER, DEBUG_LAYER);
             b.Add(new PipelineDebugSystem(), DEBUG_LAYER);
