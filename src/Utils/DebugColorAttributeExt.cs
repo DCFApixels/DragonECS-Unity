@@ -6,7 +6,7 @@ namespace DCFApixels.DragonECS
     {
         public static Color GetUnityColor(this DebugColorAttribute self)
         {
-            return new Color(self.rn, self.gn, self.bn);
+            return new Color(self.r / 255f, self.g / 255f, self.b / 255f);
         }
         public static Color32 GetUnityColor32(this DebugColorAttribute self)
         {

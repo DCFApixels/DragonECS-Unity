@@ -83,7 +83,9 @@ namespace DCFApixels.DragonECS
 
     namespace Editors
     {
+        using System.Collections.Generic;
         using UnityEditor;
+
         [CustomEditor(typeof(EcsEntityConnect))]
         public class EcsEntityEditor : Editor
         {
@@ -135,6 +137,13 @@ namespace DCFApixels.DragonECS
                         item.SetTemplates_Editor(item.GetComponents<EntityTemplate>());
                         EditorUtility.SetDirty(item);
                     }
+                }
+
+                if (Target.IsAlive)
+                {
+                    List<object> comps = new List<object>();
+                    Target.World.GetComponents(Target.Entity.ID, comps);
+                    GUILayout.TextArea(string.Join("\r\n", comps));
                 }
             }
         }
