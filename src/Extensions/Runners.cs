@@ -52,7 +52,7 @@ namespace DCFApixels.DragonECS
                 _markers = new EcsProfilerMarker[targets.Length];
                 for (int i = 0; i < targets.Length; i++)
                 {
-                    _markers[i] = new EcsProfilerMarker(EcsDebug.RegisterMark($"EcsRunner.{targets[i].GetType().Name}.{nameof(LateRun)}"));
+                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{targets[i].GetType().Name}.{nameof(LateRun)}");
                 }
             }
 #endif
@@ -82,7 +82,7 @@ namespace DCFApixels.DragonECS
                 _markers = new EcsProfilerMarker[targets.Length];
                 for (int i = 0; i < targets.Length; i++)
                 {
-                    _markers[i] = new EcsProfilerMarker(EcsDebug.RegisterMark($"EcsRunner.{targets[i].GetType().Name}.{nameof(FixedRun)}"));
+                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{targets[i].GetType().Name}.{nameof(FixedRun)}");
                 }
             }
 #endif
