@@ -33,22 +33,22 @@ namespace DCFApixels.DragonECS
             Debug.Log(v);
         }
 
-        public override void ProfileMarkBegin(int id)
+        public override void ProfilerMarkBegin(int id)
         {
             _profilerMarkers[id].Begin();
         }
 
-        public override void ProfileMarkEnd(int id)
+        public override void ProfilerMarkEnd(int id)
         {
             _profilerMarkers[id].End();
         }
 
-        protected override void OnDelMark(int id)
+        protected override void OnDelProfilerMark(int id)
         {
             _profilerMarkers[id] = default;
         }
 
-        protected override void OnNewMark(int id, string name)
+        protected override void OnNewProfilerMark(int id, string name)
         {
             if (id >= _profilerMarkers.Length) Array.Resize(ref _profilerMarkers, _profilerMarkers.Length << 1);
             _profilerMarkers[id] = new ProfilerMarker(ProfilerCategory.Scripts, name);
