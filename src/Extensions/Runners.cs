@@ -2,6 +2,18 @@
 
 namespace DCFApixels.DragonECS
 {
+    public interface IEcsGizmosProcess : IEcsProcess
+    {
+        public void DrawGizmos(EcsPipeline pipeline);
+    }
+    public static class IEcsGizmosProcessExtensions
+    {
+        public static void DrawGizmos(this EcsPipeline systems)
+        {
+            systems.GetRunner<IEcsGizmosProcess>().DrawGizmos(systems);
+        }
+    }
+
     public interface IEcsLateRunProcess : IEcsProcess
     {
         public void LateRun(EcsPipeline pipeline);
@@ -27,6 +39,37 @@ namespace DCFApixels.DragonECS
 
     namespace Internal
     {
+        [DebugColor(DebugColor.Orange)]
+        public class EcsLateGizmosSystemRunner : EcsRunner<IEcsGizmosProcess>, IEcsGizmosProcess
+        {
+#if DEBUG && !DISABLE_DEBUG
+            private EcsProfilerMarker[] _markers;
+#endif
+            public void DrawGizmos(EcsPipeline pipeline)
+            {
+#if DEBUG && !DISABLE_DEBUG
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    using (_markers[i].Auto())
+                        targets[i].DrawGizmos(pipeline);
+                }
+#else
+            foreach (var item in targets) item.DrawGizmos(pipeline);
+#endif
+            }
+
+#if DEBUG && !DISABLE_DEBUG
+            protected override void OnSetup()
+            {
+                _markers = new EcsProfilerMarker[targets.Length];
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    _markers[i] = new EcsProfilerMarker($"{targets[i].GetType().Name}.{nameof(DrawGizmos)}");
+                }
+            }
+#endif
+        }
+
         [DebugColor(DebugColor.Orange)]
         public class EcsLateRunSystemRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
         {

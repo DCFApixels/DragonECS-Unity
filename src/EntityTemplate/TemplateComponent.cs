@@ -38,9 +38,10 @@ namespace DCFApixels.DragonECS
         #region Get meta
         internal static Color GetColor(Type type)
         {
-            var atr = type.GetCustomAttribute<DebugColorAttribute>();
-            if (atr == null) return Color.black;
-            return atr.GetUnityColor();
+            //var atr = type.GetCustomAttribute<DebugColorAttribute>();
+            //if (atr == null) return Color.black;
+            //return atr.GetUnityColor();
+            return EcsDebugUtility.GetColorRGB(type).ToUnityColor();
         }
         internal static string GetName(Type type)
         {

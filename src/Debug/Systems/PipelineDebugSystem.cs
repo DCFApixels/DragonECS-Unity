@@ -133,7 +133,8 @@ namespace DCFApixels.DragonECS
                     return;
 
                 string name = EcsEditor.GetGenericName(type);
-                Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
+                //Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
+                Color color = EcsDebugUtility.GetColorRGB(type).ToUnityColor();
 
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 if (DebugMonitorPrefs.instance.IsShowInterfaces)
@@ -150,7 +151,9 @@ namespace DCFApixels.DragonECS
                 if (CheckIsHidden(type))
                     return;
 
-                Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
+                //Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
+                Color color = EcsDebugUtility.GetColorRGB(type).ToUnityColor();
+
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 GUILayout.Label(EcsEditor.GetGenericName(type), EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.Targets.Cast<object>().Select(o => o.GetType().Name)), systemsListStyle);
