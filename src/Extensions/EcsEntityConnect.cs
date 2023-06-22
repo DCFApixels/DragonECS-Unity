@@ -5,10 +5,10 @@ namespace DCFApixels.DragonECS
 {
     public class EcsEntityConnect : MonoBehaviour
     {
-        private sealed class Subject : EcsSubject
+        private sealed class Aspect : EcsAspect
         {
             public readonly EcsPool<UnityGameObject> unityGameObjects;
-            public Subject(Builder b)
+            public Aspect(Builder b)
             {
                 unityGameObjects = b.Include<UnityGameObject>();
             }
@@ -49,7 +49,7 @@ namespace DCFApixels.DragonECS
         {
             if(_entity.TryGetID(out int oldE) && _world != null)
             {
-                var s = _world.GetSubject<Subject>();
+                var s = _world.GetAspect<Aspect>();
                 s.unityGameObjects.Del(oldE);
             }
             _world = null;
@@ -58,7 +58,7 @@ namespace DCFApixels.DragonECS
             {
                 _entity = entity;
                 _world = _entity.World;
-                var s = _world.GetSubject<Subject>();
+                var s = _world.GetAspect<Aspect>();
                 if (!s.unityGameObjects.Has(newE)) s.unityGameObjects.Add(newE) = new UnityGameObject(gameObject);
 
                 if (applyTemplates)
