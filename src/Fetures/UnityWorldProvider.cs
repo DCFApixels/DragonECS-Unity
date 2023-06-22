@@ -3,7 +3,6 @@
 namespace DCFApixels.DragonECS
 {
     public static class UnityWorldProvider<TWorld>
-        where TWorld : EcsWorld<TWorld>
     {
         private static TWorld _world;
 
