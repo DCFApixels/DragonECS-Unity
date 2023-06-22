@@ -47,7 +47,7 @@ namespace DCFApixels.DragonECS
 
         public void ConnectWith(entlong entity, bool applyTemplates = false)
         {
-            if(_entity.TryGetID(out int oldE) && _world != null)
+            if (_entity.TryGetID(out int oldE) && _world != null)
             {
                 var s = _world.GetAspect<Aspect>();
                 s.unityGameObjects.Del(oldE);
@@ -115,8 +115,8 @@ namespace DCFApixels.DragonECS
                     GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
                 else
                     GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
-                
-                if(Target.Entity.TryGetID(out int id))
+
+                if (Target.Entity.TryGetID(out int id))
                     EditorGUILayout.IntField(id);
                 else
                     EditorGUILayout.IntField(0);
@@ -124,10 +124,10 @@ namespace DCFApixels.DragonECS
 
                 base.OnInspectorGUI();
 
-                if(GUILayout.Button("Autoset Templates"))
+                if (GUILayout.Button("Autoset Templates"))
                 {
                     Target.SetTemplates_Editor(Target.GetComponents<EntityTemplate>());
-                    
+
                     EditorUtility.SetDirty(target);
                 }
                 if (GUILayout.Button("Autoset Templates Cascade"))

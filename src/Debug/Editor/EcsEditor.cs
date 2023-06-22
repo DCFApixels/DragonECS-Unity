@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS.Editors
     [InitializeOnLoad]
     public static class EcsEditor
     {
-         static EcsEditor()
+        static EcsEditor()
         {
             colorBoxeStyles = new SparseArray<GUIStyle>();
         }

@@ -25,7 +25,7 @@ namespace DCFApixels.DragonECS.Editors
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
-                if(value)
+                if (value)
                     _data[index >> OFFSET] |= (1 << (index & MOD_MASK));
                 else
                     _data[index >> OFFSET] &= ~(1 << (index & MOD_MASK));

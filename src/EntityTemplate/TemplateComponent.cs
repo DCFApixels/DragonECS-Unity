@@ -1,5 +1,4 @@
-﻿using DCFApixels.DragonECS.Editors;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -51,7 +50,7 @@ namespace DCFApixels.DragonECS
                 int iBacktick = friendlyName.IndexOf('`');
                 if (iBacktick > 0)
                     friendlyName = friendlyName.Remove(iBacktick);
-            
+
                 friendlyName += "/" + friendlyName;
                 friendlyName += "<";
                 Type[] typeParameters = type.GetGenericArguments();
@@ -122,7 +121,7 @@ namespace DCFApixels.DragonECS
                 Type interfaceType = typeof(ITemplateComponent);
                 foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
                 {
-                    var targetTypes = assembly.GetTypes().Where(type => !type.IsGenericType && (type.IsValueType|| type.IsClass) && type.GetCustomAttribute<SerializableAttribute>() != null);
+                    var targetTypes = assembly.GetTypes().Where(type => !type.IsGenericType && (type.IsValueType || type.IsClass) && type.GetCustomAttribute<SerializableAttribute>() != null);
 
                     types.AddRange(targetTypes.Where(type => interfaceType.IsAssignableFrom(type)));
 
@@ -130,7 +129,7 @@ namespace DCFApixels.DragonECS
                     {
                         if (t.IsSubclassOf(typeof(TemplateComponentInitializer<>)))
                         {
-                            if(t.GetCustomAttribute<SerializableAttribute>() != null)
+                            if (t.GetCustomAttribute<SerializableAttribute>() != null)
                                 types.Add(t);
                         }
                     }

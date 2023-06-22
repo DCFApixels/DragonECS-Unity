@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS
         using UnityEditor;
         using UnityEngine;
 
-        public abstract class EntityTemplateEditorBase: Editor
+        public abstract class EntityTemplateEditorBase : Editor
         {
             private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 15f, 15f);
             private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 15f, 15f);
@@ -31,7 +31,7 @@ namespace DCFApixels.DragonECS
 
                 removeButtonStyle = new GUIStyle(EditorStyles.linkLabel);
                 removeButtonStyle.alignment = TextAnchor.MiddleCenter;
-                
+
                 removeButtonStyle.normal = tmpstylebase.normal;
                 removeButtonStyle.hover = tmpStyle.normal;
                 removeButtonStyle.active = tmpStyle.normal;
@@ -44,7 +44,7 @@ namespace DCFApixels.DragonECS
                 genericMenu = new GenericMenu();
 
                 var dummies = TemplateBrowsableTypeCache.Dummies;
-                foreach ( var dummy in dummies )
+                foreach (var dummy in dummies)
                 {
                     string name, description;
                     if (dummy is ITemplateComponentName browsableName)
@@ -137,7 +137,7 @@ namespace DCFApixels.DragonECS
             private void DrawComponentData(SerializedProperty componentRefProp, int index)
             {
                 ITemplateComponent browsable = componentRefProp.managedReferenceValue as ITemplateComponent;
-                if(browsable == null)
+                if (browsable == null)
                 {
                     DrawDamagedComponent(componentRefProp, index);
                     return;
@@ -173,7 +173,7 @@ namespace DCFApixels.DragonECS
                 Color panelColor = customInitializer != null ? customInitializer.Color : EcsDebugUtility.GetColorRGB(initializerType).ToUnityColor();
 
                 GUILayout.BeginHorizontal();
-            
+
                 GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.2f));
 
                 EditorGUI.BeginChangeCheck();
@@ -198,7 +198,7 @@ namespace DCFApixels.DragonECS
 
                 GUILayout.EndVertical();
                 GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
-            
+
                 if (GUI.Button(removeButtonRect, "x", removeButtonStyle))
                     OnRemoveComponentAt(index);
 

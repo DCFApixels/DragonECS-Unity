@@ -21,7 +21,7 @@ namespace DCFApixels.DragonECS
             {
                 if (item is ITemplateComponentGizmos g)
                     g.OnGizmos(transform, ITemplateComponentGizmos.Mode.Always);
-            } 
+            }
         }
         private void OnDrawGizmosSelected()
         {

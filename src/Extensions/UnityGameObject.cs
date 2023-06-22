@@ -65,7 +65,7 @@ namespace DCFApixels.DragonECS
             entlong result = self.GetEntityLong(self.NewEmptyEntity());
             GameObject newGameObject = new GameObject(name);
             newGameObject.AddComponent<EcsEntityConnect>().ConnectWith(result);
-          //  self.GetPool<UnityGameObject>().Add(result.id) = 
+            //  self.GetPool<UnityGameObject>().Add(result.id) = 
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
             {

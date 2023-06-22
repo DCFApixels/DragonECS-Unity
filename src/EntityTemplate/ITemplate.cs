@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace DCFApixels.DragonECS
+﻿namespace DCFApixels.DragonECS
 {
     public interface ITemplate
     {
@@ -9,7 +7,7 @@ namespace DCFApixels.DragonECS
 
     public interface ITemplateInternal : ITemplate
     {
-       // internal ITemplateBrowsable[] Components { get; set; }
+        // internal ITemplateBrowsable[] Components { get; set; }
         internal string ComponentsPropertyName { get; }
     }
 

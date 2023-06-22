@@ -204,7 +204,7 @@ namespace DCFApixels.DragonECS
                 {
                     foreach (var intr in system.GetType().GetInterfaces())
                     {
-                        if(systemInterfaceType.IsAssignableFrom(intr) && systemInterfaceType != intr && (showHidden || intr.GetCustomAttribute<DebugHideAttribute>() == null))
+                        if (systemInterfaceType.IsAssignableFrom(intr) && systemInterfaceType != intr && (showHidden || intr.GetCustomAttribute<DebugHideAttribute>() == null))
                         {
                             ProcessData data;
                             if (!_processeIndexes.TryGetValue(intr, out int index))
@@ -217,7 +217,7 @@ namespace DCFApixels.DragonECS
 
                                 data.name = EcsEditor.GetGenericName(intr);
                                 data.interfaceType = intr;
-                                data.systemsBitMask = new BitMask(_systems.Length); 
+                                data.systemsBitMask = new BitMask(_systems.Length);
                             }
                             data = _processesList[index];
                             data.systemsBitMask[i] = true;
@@ -266,7 +266,7 @@ namespace DCFApixels.DragonECS
                 rect.y = _nameCellSize.y;
                 rect.width = _nameCellSize.x;
                 rect.height = _cellsize.x;
-                    rect.y -= _cellsize.y;
+                rect.y -= _cellsize.y;
                 for (int i = 0; i < _processesList.Count; i++)
                 {
                     lineRect = rect;
@@ -301,7 +301,7 @@ namespace DCFApixels.DragonECS
                     lineRect.width = rectView.width;
                     GUI.Label(lineRect, "", i % 2 == 1 ? whiteStyle : blackStyle);
 
-                   // GUIContent label = new GUIContent(name, i + " " + name);
+                    // GUIContent label = new GUIContent(name, i + " " + name);
                     label.text = name;
                     label.tooltip = i + " " + name;
                     GUI.Label(rect, label, EditorStyles.miniBoldLabel);

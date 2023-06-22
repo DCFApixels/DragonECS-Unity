@@ -1,12 +1,10 @@
 using DCFApixels.DragonECS.Unity.Debug;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
     [DebugHide, DebugColor(DebugColor.Gray)]
-    public class WorldDebugSystem : IEcsRunProcess 
+    public class WorldDebugSystem : IEcsRunProcess
     {
         private string _monitorName;
         private EcsWorld _ecsWorld;
@@ -72,8 +70,8 @@ namespace DCFApixels.DragonECS
     namespace Editors
     {
         using System.Linq;
-        using UnityEditor;
         using System.Reflection;
+        using UnityEditor;
 
         [CustomEditor(typeof(WorldPoolsMonitor))]
         public class WorldPoolsMonitorEditor : Editor
@@ -87,30 +85,30 @@ namespace DCFApixels.DragonECS
 
             public override void OnInspectorGUI()
             {
-               _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
+                _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
 
-               var pools = Target.world.AllPools.ToArray().Where(o => !o.IsNullOrDummy()).OfType<IEcsPool>();
-            
-               GUILayout.Label("", GUILayout.ExpandWidth(true));
-               
-               float width = GUILayoutUtility.GetLastRect().width;
-            
-               Vector3 newPoolBlockSize = _poolBlockMinSize;
-               int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
-               newPoolBlockSize.x = width / widthCount;
-            
-               int x = -1, y = 0;
-               foreach (var pool in pools)
-               {
-                   if(++x >= widthCount)
-                   {
-                       x = 0;
-                       y++;
-                   }
-            
-                   DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
-               }
-               GUILayout.EndScrollView();
+                var pools = Target.world.AllPools.ToArray().Where(o => !o.IsNullOrDummy()).OfType<IEcsPool>();
+
+                GUILayout.Label("", GUILayout.ExpandWidth(true));
+
+                float width = GUILayoutUtility.GetLastRect().width;
+
+                Vector3 newPoolBlockSize = _poolBlockMinSize;
+                int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
+                newPoolBlockSize.x = width / widthCount;
+
+                int x = -1, y = 0;
+                foreach (var pool in pools)
+                {
+                    if (++x >= widthCount)
+                    {
+                        x = 0;
+                        y++;
+                    }
+
+                    DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
+                }
+                GUILayout.EndScrollView();
             }
 
 
@@ -121,16 +119,16 @@ namespace DCFApixels.DragonECS
 
                 Color defaultContentColor = GUI.contentColor;
                 GUI.contentColor = Color.black * 0.925f;
-          
+
                 position = AddMargin(position, 1f, 1f);
-          
-                EditorGUI.DrawRect(position, Color.black* 0.16f);
-          
+
+                EditorGUI.DrawRect(position, Color.black * 0.16f);
+
                 Rect progressBar = new Rect(Vector2.zero, _poolProgressBasrSize);
                 progressBar.width = position.width;
                 progressBar.center = position.center - Vector2.up * _poolBlockMinSize.y * 0.09f;
-          
-          
+
+
                 Color mainColor = new Color(0.3f, 1f, 0f, 1f);
                 var debugColor = pool.ComponentType.GetCustomAttribute<DebugColorAttribute>();
                 if (debugColor != null)
@@ -138,22 +136,22 @@ namespace DCFApixels.DragonECS
                     mainColor = debugColor.GetUnityColor();
                 }
                 Color backgroundColor = mainColor * 0.3f + Color.white * 0.2f;
-          
+
                 EditorGUI.DrawRect(progressBar, backgroundColor);
-          
+
                 progressBar.yMin = progressBar.yMax - ((float)count / capacity) * progressBar.height;
-          
+
                 GUIStyle textStyle0 = new GUIStyle(EditorStyles.miniBoldLabel);
                 textStyle0.alignment = TextAnchor.MiddleCenter;
-          
+
                 Color foregroundColor = mainColor;
                 EditorGUI.DrawRect(progressBar, foregroundColor);
                 GUI.Label(progressBar, count.ToString(), textStyle0);
-          
+
                 GUIStyle textStyle1 = new GUIStyle(EditorStyles.miniBoldLabel);
                 textStyle1.alignment = TextAnchor.UpperCenter;
-                GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n"+ capacity, textStyle1);
-          
+                GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n" + capacity, textStyle1);
+
                 GUI.contentColor = defaultContentColor;
                 GUIStyle textStyle2 = new GUIStyle(EditorStyles.miniBoldLabel);
                 textStyle2.wordWrap = true;
@@ -161,7 +159,7 @@ namespace DCFApixels.DragonECS
                 string name = EcsEditor.GetGenericName(pool.ComponentType);
                 GUIContent label = new GUIContent(name, $"{name} e:{count}");
                 GUI.Label(AddMargin(position, -10f, 3f), label, textStyle2);
-          
+
             }
 
             private Rect AddMargin(Rect rect, Vector2 value)

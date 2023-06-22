@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
-using UnityEngine;
 
 namespace DCFApixels.DragonECS.Editors
 {
