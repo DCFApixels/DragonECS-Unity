@@ -78,75 +78,75 @@ namespace DCFApixels.DragonECS
                 t.Apply(_world, entityID);
         }
     }
+}
+
+
 
 #if UNITY_EDITOR
 
-    namespace Editors
+namespace DCFApixels.DragonECS.Editors
+{
+    using System.Collections.Generic;
+    using UnityEditor;
+
+    [CustomEditor(typeof(EcsEntityConnect))]
+    public class EcsEntityEditor : Editor
     {
-        using System.Collections.Generic;
-        using UnityEditor;
+        private EcsEntityConnect Target => (EcsEntityConnect)target;
+        private GUIStyle _greenStyle;
+        private GUIStyle _redStyle;
 
-        [CustomEditor(typeof(EcsEntityConnect))]
-        public class EcsEntityEditor : Editor
+        private bool _isInit = false;
+
+        private void Init()
         {
-            private EcsEntityConnect Target => (EcsEntityConnect)target;
-            private GUIStyle _greenStyle;
-            private GUIStyle _redStyle;
+            if (_isInit)
+                return;
 
+            _greenStyle = EcsEditor.GetStyle(new Color32(75, 255, 0, 100));
+            _redStyle = EcsEditor.GetStyle(new Color32(255, 0, 75, 100));
 
-            private bool _isInit = false;
+            _isInit = true;
+        }
 
-            private void Init()
+        public override void OnInspectorGUI()
+        {
+            Init();
+            if (Target.IsAlive)
+                GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
+            else
+                GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
+
+            if (Target.Entity.TryGetID(out int id))
+                EditorGUILayout.IntField(id);
+            else
+                EditorGUILayout.IntField(0);
+            GUILayout.Label(Target.Entity.ToString());
+
+            base.OnInspectorGUI();
+
+            if (GUILayout.Button("Autoset Templates"))
             {
-                if (_isInit)
-                    return;
+                Target.SetTemplates_Editor(Target.GetComponents<EntityTemplate>());
 
-                _greenStyle = EcsEditor.GetStyle(new Color32(75, 255, 0, 100));
-                _redStyle = EcsEditor.GetStyle(new Color32(255, 0, 75, 100));
-
-
-                _isInit = true;
+                EditorUtility.SetDirty(target);
+            }
+            if (GUILayout.Button("Autoset Templates Cascade"))
+            {
+                foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
+                {
+                    item.SetTemplates_Editor(item.GetComponents<EntityTemplate>());
+                    EditorUtility.SetDirty(item);
+                }
             }
 
-            public override void OnInspectorGUI()
+            if (Target.IsAlive)
             {
-                Init();
-                if (Target.IsAlive)
-                    GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
-                else
-                    GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
-
-                if (Target.Entity.TryGetID(out int id))
-                    EditorGUILayout.IntField(id);
-                else
-                    EditorGUILayout.IntField(0);
-                GUILayout.Label(Target.Entity.ToString());
-
-                base.OnInspectorGUI();
-
-                if (GUILayout.Button("Autoset Templates"))
-                {
-                    Target.SetTemplates_Editor(Target.GetComponents<EntityTemplate>());
-
-                    EditorUtility.SetDirty(target);
-                }
-                if (GUILayout.Button("Autoset Templates Cascade"))
-                {
-                    foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
-                    {
-                        item.SetTemplates_Editor(item.GetComponents<EntityTemplate>());
-                        EditorUtility.SetDirty(item);
-                    }
-                }
-
-                if (Target.IsAlive)
-                {
-                    List<object> comps = new List<object>();
-                    Target.World.GetComponents(Target.Entity.ID, comps);
-                    GUILayout.TextArea(string.Join("\r\n", comps));
-                }
+                List<object> comps = new List<object>();
+                Target.World.GetComponents(Target.Entity.ID, comps);
+                GUILayout.TextArea(string.Join("\r\n", comps));
             }
         }
     }
-#endif
 }
+#endif

@@ -2,97 +2,94 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
 namespace DCFApixels.DragonECS
 {
     [Serializable]
     [DebugColor(255 / 3, 255, 0)]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
-        where T : class
+        where T : Component
     {
         public T obj;
-
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
         IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
     }
 
-    [Serializable]
-    [MovedFrom(false, "Client", null, "RefRigitBodyInitializer")]
-    public sealed class UnityComponentRigitBodyInitializer : TemplateComponentInitializer<UnityComponent<Rigidbody>>
+
+    public class UnityComponentInitializer<T> : TemplateComponentInitializer<UnityComponent<T>> where T : Component
     {
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<Rigidbody>>().Add(e) = component;
+        public override string Name => "UnityComponent/" + typeof(T).Name;
+        public sealed override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<T>>().Add(e) = component;
+        public override void OnValidate(GameObject gameObject)
+        {
+            if (component.obj == null)
+                component.obj = gameObject.GetComponent<T>();
+        }
+    }
+
+
+    [Serializable]
+    public sealed class UnityComponentRigitBodyInitializer : UnityComponentInitializer<Rigidbody>
+    {
     }
 
     [Serializable]
-    [MovedFrom(false, "Client", null, "RefAnimatorInitializer")]
-    public sealed class UnityComponentAnimatorInitializer : TemplateComponentInitializer<UnityComponent<Animator>>
+    public sealed class UnityComponentAnimatorInitializer : UnityComponentInitializer<Animator> 
     {
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<Animator>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentCharacterControllerInitializer : TemplateComponentInitializer<UnityComponent<CharacterController>>
+    public sealed class UnityComponentCharacterControllerInitializer : UnityComponentInitializer<CharacterController>
     {
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<CharacterController>>().Add(e) = component;
     }
 
     #region Colliders
     [Serializable]
-    public sealed class UnityComponentColliderInitializer : TemplateComponentInitializer<UnityComponent<Collider>>
+    public sealed class UnityComponentColliderInitializer : UnityComponentInitializer<Collider>
     {
         public override string Name => "UnityComponent/Collider/" + nameof(Collider);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<Collider>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentBoxColliderInitializer : TemplateComponentInitializer<UnityComponent<BoxCollider>>
+    public sealed class UnityComponentBoxColliderInitializer : UnityComponentInitializer<BoxCollider>
     {
         public override string Name => "UnityComponent/Collider/" + nameof(BoxCollider);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<BoxCollider>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentSphereColliderInitializer : TemplateComponentInitializer<UnityComponent<SphereCollider>>
+    public sealed class UnityComponentSphereColliderInitializer : UnityComponentInitializer<SphereCollider>
     {
         public override string Name => "UnityComponent/Collider/" + nameof(SphereCollider);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<SphereCollider>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentCapsuleColliderInitializer : TemplateComponentInitializer<UnityComponent<CapsuleCollider>>
+    public sealed class UnityComponentCapsuleColliderInitializer : UnityComponentInitializer<CapsuleCollider>
     {
         public override string Name => "UnityComponent/Collider/" + nameof(CapsuleCollider);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<CapsuleCollider>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentMeshColliderInitializer : TemplateComponentInitializer<UnityComponent<MeshCollider>>
+    public sealed class UnityComponentMeshColliderInitializer : UnityComponentInitializer<MeshCollider>
     {
         public override string Name => "UnityComponent/Collider/" + nameof(MeshCollider);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<MeshCollider>>().Add(e) = component;
     }
     #endregion
 
     #region Joints
     [Serializable]
-    public sealed class UnityComponentJointInitializer : TemplateComponentInitializer<UnityComponent<Joint>>
+    public sealed class UnityComponentJointInitializer : UnityComponentInitializer<Joint>
     {
         public override string Name => "UnityComponent/Joint/" + nameof(Joint);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<Joint>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentFixedJointInitializer : TemplateComponentInitializer<UnityComponent<FixedJoint>>
+    public sealed class UnityComponentFixedJointInitializer : UnityComponentInitializer<FixedJoint>
     {
         public override string Name => "UnityComponent/Joint/" + nameof(FixedJoint);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<FixedJoint>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentCharacterJointInitializer : TemplateComponentInitializer<UnityComponent<CharacterJoint>>
+    public sealed class UnityComponentCharacterJointInitializer : UnityComponentInitializer<CharacterJoint>
     {
         public override string Name => "UnityComponent/Joint/" + nameof(CharacterJoint);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<CharacterJoint>>().Add(e) = component;
     }
     [Serializable]
-    public sealed class UnityComponentConfigurableJointInitializer : TemplateComponentInitializer<UnityComponent<ConfigurableJoint>>
+    public sealed class UnityComponentConfigurableJointInitializer : UnityComponentInitializer<ConfigurableJoint>
     {
         public override string Name => "UnityComponent/Joint/" + nameof(ConfigurableJoint);
-        public override void Add(EcsWorld w, int e) => w.GetPool<UnityComponent<ConfigurableJoint>>().Add(e) = component;
     }
     #endregion
 }

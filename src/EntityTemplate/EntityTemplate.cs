@@ -13,7 +13,16 @@ namespace DCFApixels.DragonECS
             foreach (var item in _components)
                 item.Add(world, entityID);
         }
-
+        private void OnValidate()
+        {
+            if (_components == null) return;
+            foreach (var item in _components)
+            {
+                if (item is ITemplateComponentOnValidate g)
+                    g.OnValidate(gameObject);
+            }
+            
+        }
         private void OnDrawGizmos()
         {
             if (_components == null) return;

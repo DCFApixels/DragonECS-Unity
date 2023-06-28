@@ -23,6 +23,10 @@ namespace DCFApixels.DragonECS
             Selected
         }
     }
+    public interface ITemplateComponentOnValidate
+    {
+        public void OnValidate(GameObject gameObject);
+    }
 
     [Serializable]
     public abstract class TemplateComponentInitializerBase
@@ -73,7 +77,7 @@ namespace DCFApixels.DragonECS
         #endregion
     }
     [Serializable]
-    public abstract class TemplateComponentInitializer<T> : TemplateComponentInitializerBase, ITemplateComponentName, ITemplateComponentGizmos
+    public abstract class TemplateComponentInitializer<T> : TemplateComponentInitializerBase, ITemplateComponentName, ITemplateComponentGizmos, ITemplateComponentOnValidate
     {
         private static string _autoname = GetName(typeof(T));
         private static Color _autoColor = GetColor(typeof(T));
@@ -94,6 +98,7 @@ namespace DCFApixels.DragonECS
 
         public abstract void Add(EcsWorld w, int e);
         public virtual void OnGizmos(Transform transform, ITemplateComponentGizmos.Mode mode) { }
+        public virtual void OnValidate(GameObject gameObject) { }
     }
 
     internal static class ITemplateBrowsableExt
