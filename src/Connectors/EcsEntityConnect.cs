@@ -93,8 +93,6 @@ namespace DCFApixels.DragonECS.Editors
     public class EcsEntityEditor : Editor
     {
         private EcsEntityConnect Target => (EcsEntityConnect)target;
-        private GUIStyle _greenStyle;
-        private GUIStyle _redStyle;
 
         private bool _isInit = false;
 
@@ -103,19 +101,13 @@ namespace DCFApixels.DragonECS.Editors
             if (_isInit)
                 return;
 
-            _greenStyle = EcsEditor.GetStyle(new Color32(75, 255, 0, 100));
-            _redStyle = EcsEditor.GetStyle(new Color32(255, 0, 75, 100));
-
             _isInit = true;
         }
 
         public override void OnInspectorGUI()
         {
             Init();
-            if (Target.IsAlive)
-                GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
-            else
-                GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
+            EcsGUI.Layout.DrawConnectStatus(Target.IsAlive);
 
             if (Target.Entity.TryGetID(out int id))
                 EditorGUILayout.IntField(id);

@@ -6,6 +6,44 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Editors
 {
+    public static class EcsGUI
+    {
+        private static GUIStyle _greenStyle;
+        private static GUIStyle _redStyle;
+
+        private static bool _isInit = false;
+        private static void Init()
+        {
+            if (_isInit)
+                return;
+
+            _greenStyle = EcsEditor.GetStyle(new Color32(75, 255, 0, 100));
+            _redStyle = EcsEditor.GetStyle(new Color32(255, 0, 75, 100));
+            _isInit = true;
+        }
+
+        public static void DrawConnectStatus(Rect position, bool status)
+        {
+            Init();
+            if (status)
+                GUI.Box(position, "Connected", _greenStyle);
+            else
+                GUI.Box(position, "Not connected", _redStyle);
+        }
+
+
+        public static class Layout
+        {
+            public static void DrawConnectStatus(bool status, params GUILayoutOption[] options)
+            {
+                Init();
+                if (status)
+                    GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
+                else
+                    GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
+            }
+        }
+    }
     [InitializeOnLoad]
     public static class EcsEditor
     {
@@ -40,10 +78,11 @@ namespace DCFApixels.DragonECS.Editors
         {
             GUIStyle result = new GUIStyle(GUI.skin.box);
             Color componentColor = color32;
-            result.normal.background = CreateTexture(2, 2, componentColor);
-            result.active.background = CreateTexture(2, 2, componentColor);
-            result.hover.background = CreateTexture(2, 2, componentColor);
-            result.focused.background = CreateTexture(2, 2, componentColor);
+            Texture2D texture2D = CreateTexture(2, 2, componentColor);
+            result.hover.background = texture2D;
+            result.focused.background = texture2D;
+            result.active.background = texture2D;
+            result.normal.background = texture2D;
             return result;
         }
         private static Texture2D CreateTexture(int width, int height, Color color)
@@ -57,7 +96,6 @@ namespace DCFApixels.DragonECS.Editors
             result.Apply();
             return result;
         }
-
 
         public static string GetGenericName(Type type) => EcsDebugUtility.GetGenericTypeName(type);
 

@@ -7,10 +7,10 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [DebugColor(DebugColor.Cyan)]
-    public struct UnityGameObject : IEcsComponent
+    public readonly struct UnityGameObject : IEcsComponent
     {
-        public GameObject gameObject;
-        public Transform transform;
+        public readonly GameObject gameObject;
+        public readonly Transform transform;
 
         public string Name
         {
