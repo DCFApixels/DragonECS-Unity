@@ -32,6 +32,10 @@ namespace DCFApixels.DragonECS
             }
             Debug.Log(v);
         }
+        public override void Break()
+        {
+            Debug.Break();
+        }
 
         public override void ProfilerMarkBegin(int id)
         {
@@ -53,6 +57,5 @@ namespace DCFApixels.DragonECS
             if (id >= _profilerMarkers.Length) Array.Resize(ref _profilerMarkers, _profilerMarkers.Length << 1);
             _profilerMarkers[id] = new ProfilerMarker(ProfilerCategory.Scripts, name);
         }
-
     }
 }
