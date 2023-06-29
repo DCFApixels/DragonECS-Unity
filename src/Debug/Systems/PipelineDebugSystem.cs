@@ -134,7 +134,7 @@ namespace DCFApixels.DragonECS
 
                 string name = EcsEditor.GetGenericName(type);
                 //Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
-                Color color = EcsDebugUtility.GetColorRGB(type).ToUnityColor();
+                Color color = EcsDebugUtility.GetColor(type).ToUnityColor();
 
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 if (DebugMonitorPrefs.instance.IsShowInterfaces)
@@ -152,7 +152,7 @@ namespace DCFApixels.DragonECS
                     return;
 
                 //Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
-                Color color = EcsDebugUtility.GetColorRGB(type).ToUnityColor();
+                Color color = EcsDebugUtility.GetColor(type).ToUnityColor();
 
                 GUILayout.BeginVertical(EcsEditor.GetStyle(color, 0.2f));
                 GUILayout.Label(EcsEditor.GetGenericName(type), EditorStyles.boldLabel);

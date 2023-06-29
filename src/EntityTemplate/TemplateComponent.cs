@@ -44,7 +44,7 @@ namespace DCFApixels.DragonECS
             //var atr = type.GetCustomAttribute<DebugColorAttribute>();
             //if (atr == null) return Color.black;
             //return atr.GetUnityColor();
-            return EcsDebugUtility.GetColorRGB(type).ToUnityColor();
+            return EcsDebugUtility.GetColor(type).ToUnityColor();
         }
         internal static string GetName(Type type)
         {

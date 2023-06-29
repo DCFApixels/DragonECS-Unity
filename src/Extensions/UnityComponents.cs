@@ -7,10 +7,10 @@ namespace DCFApixels.DragonECS
 {
     [Serializable]
     [DebugColor(255 / 3, 255, 0)]
-    public readonly struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
+    public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
     {
-        public readonly T obj;
+        public T obj;
         public UnityComponent(T obj) => this.obj = obj;
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
         IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
@@ -24,7 +24,7 @@ namespace DCFApixels.DragonECS
         public override void OnValidate(GameObject gameObject)
         {
             if (component.obj == null)
-                component = new UnityComponent<T>(gameObject.GetComponent<T>());
+                component.obj = gameObject.GetComponent<T>();
         }
     }
 

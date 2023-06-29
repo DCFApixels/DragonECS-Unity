@@ -170,7 +170,7 @@ namespace DCFApixels.DragonECS
                 string name = browsableName == null ? type.Name : GetLastPathComponent(browsableName.Name);
                 string description = customInitializer != null ? customInitializer.Description : initializerType.GetCustomAttribute<DebugDescriptionAttribute>()?.description;
                 // Color panelColor = customInitializer != null ? customInitializer.Color : initializerType.GetCustomAttribute<DebugColorAttribute>()?.GetUnityColor() ?? Color.black;
-                Color panelColor = customInitializer != null ? customInitializer.Color : EcsDebugUtility.GetColorRGB(initializerType).ToUnityColor();
+                Color panelColor = customInitializer != null ? customInitializer.Color : EcsDebugUtility.GetColor(initializerType).ToUnityColor();
 
                 GUILayout.BeginHorizontal();
 
