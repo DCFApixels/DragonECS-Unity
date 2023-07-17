@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 using System;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEditor;
+using UnityEditor.UI;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Editors
@@ -135,6 +137,19 @@ namespace DCFApixels.DragonECS.Editors
             }
         }
         #endregion
+    }
+
+    public static class ReflectionExtensions
+    {
+        public static bool TryGetAttribute<T>(this MemberInfo self, out T attrbiute) where T : Attribute
+        {
+            attrbiute = self.GetCustomAttribute<T>();
+            return attrbiute != null;
+        }
+        public static bool HasAttribute<T>(this MemberInfo self) where T : Attribute
+        {
+            return self.GetCustomAttribute<T>() != null;
+        }
     }
 }
 #endif

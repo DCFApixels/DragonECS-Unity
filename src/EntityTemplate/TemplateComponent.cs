@@ -134,7 +134,7 @@ namespace DCFApixels.DragonECS
                     {
                         if (t.IsSubclassOf(typeof(TemplateComponentInitializer<>)))
                         {
-                            if (t.GetCustomAttribute<SerializableAttribute>() != null)
+                            if (t.HasAttribute<SerializableAttribute>())
                                 types.Add(t);
                         }
                     }
