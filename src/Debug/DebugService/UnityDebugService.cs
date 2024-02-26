@@ -6,14 +6,22 @@ namespace DCFApixels.DragonECS
 {
     public class UnityDebugService : DebugService
     {
-        public static void Init() => Set<UnityDebugService>();
-
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
 
+        public static void Activate()
+        {
+            Set<UnityDebugService>();
+        }
         public override void Print(string tag, object v)
         {
             string log;
-            if (!string.IsNullOrEmpty(tag))
+            if (v is Exception e)
+            {
+                Debug.LogException(e);
+            }
+
+            bool hasTag = string.IsNullOrEmpty(tag) == false;
+            if (hasTag)
             {
                 log = $".[{tag}] {v}";
                 string taglower = tag.ToLower();
@@ -36,25 +44,24 @@ namespace DCFApixels.DragonECS
         {
             Debug.Break();
         }
-
-        public override void ProfilerMarkBegin(int id)
+        public sealed override void ProfilerMarkBegin(int id)
         {
             _profilerMarkers[id].Begin();
         }
-
-        public override void ProfilerMarkEnd(int id)
+        public sealed override void ProfilerMarkEnd(int id)
         {
             _profilerMarkers[id].End();
         }
-
-        protected override void OnDelProfilerMark(int id)
+        protected sealed override void OnDelProfilerMark(int id)
         {
             _profilerMarkers[id] = default;
         }
-
-        protected override void OnNewProfilerMark(int id, string name)
+        protected sealed override void OnNewProfilerMark(int id, string name)
         {
-            if (id >= _profilerMarkers.Length) Array.Resize(ref _profilerMarkers, _profilerMarkers.Length << 1);
+            if (id >= _profilerMarkers.Length)
+            {
+                Array.Resize(ref _profilerMarkers, _profilerMarkers.Length << 1);
+            }
             _profilerMarkers[id] = new ProfilerMarker(ProfilerCategory.Scripts, name);
         }
     }
