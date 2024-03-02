@@ -18,6 +18,7 @@ namespace DCFApixels.DragonECS
             if (v is Exception e)
             {
                 Debug.LogException(e);
+                return;
             }
 
             bool hasTag = string.IsNullOrEmpty(tag) == false;

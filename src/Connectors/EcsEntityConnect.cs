@@ -18,13 +18,13 @@ namespace DCFApixels.DragonECS
         private EcsWorld _world;
 
         [SerializeField]
-        private EntityTemplatePreset[] _entityTemplatePresets;
+        private ScriptableEntityTemplate[] _scriptableTemplates;
         [SerializeField]
-        private EntityTemplate[] _entityTemplates;
+        private MonoEntityTemplate[] _monoTemplates;
 
-        internal void SetTemplates_Editor(EntityTemplate[] tempaltes)
+        internal void SetTemplates_Editor(MonoEntityTemplate[] tempaltes)
         {
-            _entityTemplates = tempaltes;
+            _monoTemplates = tempaltes;
         }
 
         #region Properties
@@ -38,7 +38,7 @@ namespace DCFApixels.DragonECS
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _world;
         }
-        public bool IsAlive
+        public bool IsConected
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get => _entity.IsAlive;
@@ -69,70 +69,157 @@ namespace DCFApixels.DragonECS
                 _entity = entlong.NULL;
             }
         }
-        public void ApplyTemplates() => ApplyTemplatesFor(_entity.ID);
+        public void ApplyTemplates()
+        {
+            ApplyTemplatesFor(_entity.ID);
+        }
         public void ApplyTemplatesFor(int entityID)
         {
-            foreach (var t in _entityTemplatePresets)
-                t.Apply(_world, entityID);
-            foreach (var t in _entityTemplates)
-                t.Apply(_world, entityID);
+            foreach (var t in _scriptableTemplates)
+            {
+                t.Apply(_world.id, entityID);
+            }
+            foreach (var t in _monoTemplates)
+            {
+                t.Apply(_world.id, entityID);
+            }
         }
     }
 }
 
 
-
 #if UNITY_EDITOR
-
-namespace DCFApixels.DragonECS.Editors
+namespace DCFApixels.DragonECS.Unity.Editors
 {
     using System.Collections.Generic;
     using UnityEditor;
 
     [CustomEditor(typeof(EcsEntityConnect))]
+    [CanEditMultipleObjects]
     public class EcsEntityEditor : Editor
     {
-        private EcsEntityConnect Target => (EcsEntityConnect)target;
-
         private bool _isInit = false;
+        private EcsEntityConnect Target => (EcsEntityConnect)target;
+        private bool IsMultipleTargets => targets.Length > 1;
 
         private void Init()
         {
             if (_isInit)
+            {
                 return;
-
+            }
             _isInit = true;
         }
 
         public override void OnInspectorGUI()
         {
             Init();
-            EcsGUI.Layout.DrawConnectStatus(Target.IsAlive);
+            EcsEntityConnect[] targets = new EcsEntityConnect[this.targets.Length];
+            for (int i = 0; i < targets.Length; i++)
+            {
+                targets[i] = (EcsEntityConnect)this.targets[i];
+            }
+            DrawTop();
 
-            if (Target.Entity.TryGetID(out int id))
-                EditorGUILayout.IntField(id);
+            DrawConnectStatus(targets);
+            DrawEntityInfo();
+
+            DrawTemplates();
+
+            DrawButtons();
+            DrawComponents();
+        }
+        private void DrawTop()
+        {
+            var iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true);
+            using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
+            {
+                EditorGUILayout.PropertyField(iterator, true);
+            }
+        }
+        private void DrawConnectStatus(EcsEntityConnect[] targets)
+        {
+            bool isConnected = Target.IsConected;
+            for (int i = 0; i < targets.Length; i++)
+            {
+                if (isConnected != targets[i].IsConected)
+                {
+                    isConnected = !Target.IsConected;
+                    break;
+                }
+            }
+            if (isConnected == Target.IsConected)
+            {
+                EcsGUI.Layout.DrawConnectStatus(Target.IsConected);
+            }
             else
-                EditorGUILayout.IntField(0);
-            GUILayout.Label(Target.Entity.ToString());
+            {
+                EcsGUI.Layout.DrawUndeterminedConnectStatus();
+            }
+        }
 
-            base.OnInspectorGUI();
+        private void DrawEntityInfo()
+        {
+            GUILayout.Label(string.Empty);
+            Rect entityRect = GUILayoutUtility.GetLastRect();
+            Rect idRect = entityRect;
+            idRect.xMax -= idRect.width / 2f;
+            Rect genRect = entityRect;
+            genRect.xMin = idRect.xMax;
+            genRect.xMax -= genRect.width / 2f;
+            Rect worldRect = genRect;
+            worldRect.x += worldRect.width;
 
+            if (IsMultipleTargets == false && Target.Entity.TryUnpack(out int id, out short gen, out short world))
+            {
+                EditorGUI.IntField(idRect, id);
+                EditorGUI.IntField(genRect, gen);
+                EditorGUI.IntField(worldRect, world);
+            }
+            else
+            {
+                EditorGUI.TextField(idRect, "-");
+                EditorGUI.TextField(genRect, "-");
+                EditorGUI.TextField(worldRect, "-");
+            }
+        }
+
+        private void DrawTemplates()
+        {
+            var iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true);
+            bool enterChildren = true;
+            while (iterator.NextVisible(enterChildren))
+            {
+                using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
+                {
+                    EditorGUILayout.PropertyField(iterator, true);
+                }
+                enterChildren = false;
+            }
+        }
+
+        private void DrawButtons()
+        {
             if (GUILayout.Button("Autoset Templates"))
             {
-                Target.SetTemplates_Editor(Target.GetComponents<EntityTemplate>());
-
+                Target.SetTemplates_Editor(Target.GetComponents<MonoEntityTemplate>());
                 EditorUtility.SetDirty(target);
             }
             if (GUILayout.Button("Autoset Templates Cascade"))
             {
                 foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
                 {
-                    item.SetTemplates_Editor(item.GetComponents<EntityTemplate>());
+                    item.SetTemplates_Editor(item.GetComponents<MonoEntityTemplate>());
                     EditorUtility.SetDirty(item);
                 }
             }
+        }
 
-            if (Target.IsAlive)
+        private void DrawComponents()
+        {
+            if (Target.IsConected)
             {
                 List<object> comps = new List<object>();
                 Target.World.GetComponents(Target.Entity.ID, comps);

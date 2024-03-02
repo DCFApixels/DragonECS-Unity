@@ -1,7 +1,7 @@
 ﻿#if UNITY_EDITOR
 using UnityEditor;
 
-namespace DCFApixels.DragonECS.Editors
+namespace DCFApixels.DragonECS.Unity.Editors
 {
     [FilePath("DragonECS/DebugMonitorPrefs.prefs", FilePathAttribute.Location.ProjectFolder)]
     public class DebugMonitorPrefs : ScriptableSingleton<DebugMonitorPrefs>

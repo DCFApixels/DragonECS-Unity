@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace DCFApixels.DragonECS.Editors
+namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal class BitMask
     {
@@ -21,21 +21,30 @@ namespace DCFApixels.DragonECS.Editors
         public bool this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => (_data[index >> OFFSET] & (1 << (index & MOD_MASK))) != 0;
+            get
+            {
+                return (_data[index >> OFFSET] & (1 << (index & MOD_MASK))) != 0;
+            }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set
             {
                 if (value)
+                {
                     _data[index >> OFFSET] |= (1 << (index & MOD_MASK));
+                }
                 else
+                {
                     _data[index >> OFFSET] &= ~(1 << (index & MOD_MASK));
+                }
             }
         }
 
         public void Resize(int newSize)
         {
             if (newSize <= _size)
+            {
                 return;
+            }
 
             _size = newSize / DATA_BITS + 1;
             Array.Resize(ref _data, _size);

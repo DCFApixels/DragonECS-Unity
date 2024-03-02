@@ -1,10 +1,11 @@
 using DCFApixels.DragonECS.Unity.Debug;
 using UnityEngine;
+using System.Linq;
 
 namespace DCFApixels.DragonECS
 {
-    [DebugHide, DebugColor(DebugColor.Gray)]
-    public class WorldDebugSystem : IEcsRunProcess
+    [MetaTags(MetaTags.HIDDEN), MetaColor(MetaColor.Gray)]
+    public class WorldDebugSystem : IEcsRun
     {
         private string _monitorName;
         private EcsWorld _ecsWorld;
@@ -27,7 +28,7 @@ namespace DCFApixels.DragonECS
             poolsmonitor.monitorName = "pools";
         }
 
-        public void Run(EcsPipeline pipeline)
+        public void Run()
         {
         }
     }
@@ -65,116 +66,112 @@ namespace DCFApixels.DragonECS
         internal WorldDebugSystem source;
         internal EcsWorld world;
     }
+}
 
 #if UNITY_EDITOR
-    namespace Editors
+namespace DCFApixels.DragonECS.Unity.Editors
+{
+    using UnityEditor;
+
+    [CustomEditor(typeof(WorldPoolsMonitor))]
+    public class WorldPoolsMonitorEditor : Editor
     {
-        using System.Linq;
-        using System.Reflection;
-        using UnityEditor;
+        private static Vector2 _poolBlockMinSize = new Vector2(80, 160);
+        private static Vector2 _poolProgressBasrSize = _poolBlockMinSize * new Vector2(1f, 0.8f);
 
-        [CustomEditor(typeof(WorldPoolsMonitor))]
-        public class WorldPoolsMonitorEditor : Editor
+        private WorldPoolsMonitor Target => (WorldPoolsMonitor)target;
+
+        private Vector2 _scroll;
+
+        public override void OnInspectorGUI()
         {
-            private static Vector2 _poolBlockMinSize = new Vector2(80, 160);
-            private static Vector2 _poolProgressBasrSize = _poolBlockMinSize * new Vector2(1f, 0.8f);
+            _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
 
-            private WorldPoolsMonitor Target => (WorldPoolsMonitor)target;
+            var pools = Target.world.AllPools.ToArray().Where(o => !o.IsNullOrDummy()).OfType<IEcsPool>();
 
-            private Vector2 _scroll;
+            GUILayout.Label("", GUILayout.ExpandWidth(true));
 
-            public override void OnInspectorGUI()
+            float width = GUILayoutUtility.GetLastRect().width;
+
+            Vector3 newPoolBlockSize = _poolBlockMinSize;
+            int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
+            newPoolBlockSize.x = width / widthCount;
+
+            int x = -1, y = 0;
+            foreach (var pool in pools)
             {
-                _scroll = GUILayout.BeginScrollView(_scroll, GUILayout.Height(800f));
-
-                var pools = Target.world.AllPools.ToArray().Where(o => !o.IsNullOrDummy()).OfType<IEcsPool>();
-
-                GUILayout.Label("", GUILayout.ExpandWidth(true));
-
-                float width = GUILayoutUtility.GetLastRect().width;
-
-                Vector3 newPoolBlockSize = _poolBlockMinSize;
-                int widthCount = Mathf.Max(1, Mathf.Min((Mathf.FloorToInt(width / _poolBlockMinSize.x)), pools.Count()));
-                newPoolBlockSize.x = width / widthCount;
-
-                int x = -1, y = 0;
-                foreach (var pool in pools)
+                if (++x >= widthCount)
                 {
-                    if (++x >= widthCount)
-                    {
-                        x = 0;
-                        y++;
-                    }
-
-                    DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
+                    x = 0;
+                    y++;
                 }
-                GUILayout.EndScrollView();
+
+                DrawPoolBlock(pool, new Rect(newPoolBlockSize.x * x, newPoolBlockSize.y * y, newPoolBlockSize.x, newPoolBlockSize.y));
             }
+            GUILayout.EndScrollView();
+        }
 
+        /// Дефолтный цвет для пула: new Color(0.3f, 1f, 0f, 1f);
 
-            private void DrawPoolBlock(IEcsPool pool, Rect position)
-            {
-                int count = pool.Count;
-                int capacity = pool.Capacity < 0 ? count : pool.Capacity;
+        private void DrawPoolBlock(IEcsPool pool, Rect position)
+        {
+            var meta = pool.GetMeta();
 
-                Color defaultContentColor = GUI.contentColor;
-                GUI.contentColor = Color.black * 0.925f;
+            int count = pool.Count;
+            int capacity = pool.Capacity < 0 ? count : pool.Capacity;
 
-                position = AddMargin(position, 1f, 1f);
+            Color defaultContentColor = GUI.contentColor;
+            GUI.contentColor = Color.black * 0.925f;
 
-                EditorGUI.DrawRect(position, Color.black * 0.16f);
+            position = AddMargin(position, 1f, 1f);
 
-                Rect progressBar = new Rect(Vector2.zero, _poolProgressBasrSize);
-                progressBar.width = position.width;
-                progressBar.center = position.center - Vector2.up * _poolBlockMinSize.y * 0.09f;
+            EditorGUI.DrawRect(position, Color.black * 0.16f);
 
+            Rect progressBar = new Rect(Vector2.zero, _poolProgressBasrSize);
+            progressBar.width = position.width;
+            progressBar.center = position.center - Vector2.up * _poolBlockMinSize.y * 0.09f;
 
-                Color mainColor = new Color(0.3f, 1f, 0f, 1f);
-                var debugColor = pool.ComponentType.GetCustomAttribute<DebugColorAttribute>();
-                if (debugColor != null)
-                {
-                    mainColor = debugColor.GetUnityColor();
-                }
-                Color backgroundColor = mainColor * 0.3f + Color.white * 0.2f;
+            Color mainColor = meta.Color.ToUnityColor();
+            Color backgroundColor = mainColor * 0.3f + Color.white * 0.2f;
 
-                EditorGUI.DrawRect(progressBar, backgroundColor);
+            EditorGUI.DrawRect(progressBar, backgroundColor);
 
-                progressBar.yMin = progressBar.yMax - ((float)count / capacity) * progressBar.height;
+            progressBar.yMin = progressBar.yMax - ((float)count / capacity) * progressBar.height;
 
-                GUIStyle textStyle0 = new GUIStyle(EditorStyles.miniBoldLabel);
-                textStyle0.alignment = TextAnchor.MiddleCenter;
+            GUIStyle textStyle0 = new GUIStyle(EditorStyles.miniBoldLabel);
+            textStyle0.alignment = TextAnchor.MiddleCenter;
 
-                Color foregroundColor = mainColor;
-                EditorGUI.DrawRect(progressBar, foregroundColor);
-                GUI.Label(progressBar, count.ToString(), textStyle0);
+            Color foregroundColor = mainColor;
+            EditorGUI.DrawRect(progressBar, foregroundColor);
+            GUI.Label(progressBar, count.ToString(), textStyle0);
 
-                GUIStyle textStyle1 = new GUIStyle(EditorStyles.miniBoldLabel);
-                textStyle1.alignment = TextAnchor.UpperCenter;
-                GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n" + capacity, textStyle1);
+            GUIStyle textStyle1 = new GUIStyle(EditorStyles.miniBoldLabel);
+            textStyle1.alignment = TextAnchor.UpperCenter;
+            GUI.Label(AddMargin(position, 3f, 3f), "Total\r\n" + capacity, textStyle1);
 
-                GUI.contentColor = defaultContentColor;
-                GUIStyle textStyle2 = new GUIStyle(EditorStyles.miniBoldLabel);
-                textStyle2.wordWrap = true;
-                textStyle2.alignment = TextAnchor.LowerCenter;
-                string name = EcsEditor.GetGenericName(pool.ComponentType);
-                GUIContent label = new GUIContent(name, $"{name} e:{count}");
-                GUI.Label(AddMargin(position, -10f, 3f), label, textStyle2);
+            GUI.contentColor = defaultContentColor;
+            GUIStyle textStyle2 = new GUIStyle(EditorStyles.miniBoldLabel);
+            textStyle2.wordWrap = true;
+            textStyle2.alignment = TextAnchor.LowerCenter;
+            string name = EcsEditor.GetGenericName(pool.ComponentType);
+            GUIContent label = new GUIContent(name, $"{name} e:{count}");
+            GUI.Label(AddMargin(position, -10f, 3f), label, textStyle2);
 
-            }
+        }
 
-            private Rect AddMargin(Rect rect, Vector2 value)
-            {
-                return AddMargin(rect, value.x, value.y);
-            }
-            private Rect AddMargin(Rect rect, float x, float y)
-            {
-                rect.yMax -= y;
-                rect.yMin += y;
-                rect.xMax -= x;
-                rect.xMin += x;
-                return rect;
-            }
+        private Rect AddMargin(Rect rect, Vector2 value)
+        {
+            return AddMargin(rect, value.x, value.y);
+        }
+        private Rect AddMargin(Rect rect, float x, float y)
+        {
+            rect.yMax -= y;
+            rect.yMin += y;
+            rect.xMax -= x;
+            rect.xMin += x;
+            return rect;
         }
     }
-#endif
 }
+#endif
+

@@ -6,7 +6,7 @@ using UnityEditor;
 
 namespace DCFApixels.DragonECS
 {
-    [DebugColor(DebugColor.Cyan)]
+    [MetaColor(MetaColor.Cyan)]
     public readonly struct UnityGameObject : IEcsComponent
     {
         public readonly GameObject gameObject;
@@ -60,12 +60,11 @@ namespace DCFApixels.DragonECS
 
     public static class GameObjectRefExt
     {
-        public static entlong NewEntityWithGameObject(this EcsWorld self, string name = "EcsEntity", GameObjectIcon icon = GameObjectIcon.NONE)
+        public static entlong NewEntityWithGameObject(this EcsWorld self, string name = "Entity", GameObjectIcon icon = GameObjectIcon.NONE)
         {
-            entlong result = self.GetEntityLong(self.NewEmptyEntity());
+            entlong result = self.NewEntityLong();
             GameObject newGameObject = new GameObject(name);
             newGameObject.AddComponent<EcsEntityConnect>().ConnectWith(result);
-            //  self.GetPool<UnityGameObject>().Add(result.id) = 
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
             {
@@ -84,7 +83,6 @@ namespace DCFApixels.DragonECS
                 EditorGUIUtility.SetIconForObject(newGameObject, (Texture2D)iconContent.image);
             }
 #endif
-
             return result;
         }
     }

@@ -1,4 +1,5 @@
-﻿using DCFApixels.DragonECS.RunnersCore;
+﻿using DCFApixels.DragonECS.Internal;
+using DCFApixels.DragonECS.RunnersCore;
 
 namespace DCFApixels.DragonECS
 {
@@ -10,7 +11,7 @@ namespace DCFApixels.DragonECS
     {
         public static void DrawGizmos(this EcsPipeline systems)
         {
-            systems.GetRunner<IEcsGizmosProcess>().DrawGizmos(systems);
+            systems.GetRunnerInstance<EcsLateGizmosRunner>().DrawGizmos(systems);
         }
     }
 
@@ -20,9 +21,9 @@ namespace DCFApixels.DragonECS
     }
     public static class IEcsLateRunSystemExtensions
     {
-        public static void LateRun(this EcsPipeline systems)
+        public static void LateRun(this EcsPipeline pipeline)
         {
-            systems.GetRunner<IEcsLateRunProcess>().LateRun(systems);
+            pipeline.GetRunnerInstance<EcsLateRunRunner>().LateRun(pipeline);
         }
     }
     public interface IEcsFixedRunProcess : IEcsProcess
@@ -33,14 +34,14 @@ namespace DCFApixels.DragonECS
     {
         public static void FixedRun(this EcsPipeline pipeline)
         {
-            pipeline.GetRunner<IEcsFixedRunProcess>().FixedRun(pipeline);
+            pipeline.GetRunnerInstance<EcsFixedRunRunner>().FixedRun(pipeline);
         }
     }
 
     namespace Internal
     {
-        [DebugColor(DebugColor.Orange)]
-        public class EcsLateGizmosSystemRunner : EcsRunner<IEcsGizmosProcess>, IEcsGizmosProcess
+        [MetaColor(MetaColor.Orange)]
+        public class EcsLateGizmosRunner : EcsRunner<IEcsGizmosProcess>, IEcsGizmosProcess
         {
 #if DEBUG && !DISABLE_DEBUG
             private EcsProfilerMarker[] _markers;
@@ -48,10 +49,10 @@ namespace DCFApixels.DragonECS
             public void DrawGizmos(EcsPipeline pipeline)
             {
 #if DEBUG && !DISABLE_DEBUG
-                for (int i = 0; i < targets.Length; i++)
+                for (int i = 0; i < Process.Length; i++)
                 {
                     using (_markers[i].Auto())
-                        targets[i].DrawGizmos(pipeline);
+                        Process[i].DrawGizmos(pipeline);
                 }
 #else
             foreach (var item in targets) item.DrawGizmos(pipeline);
@@ -61,17 +62,17 @@ namespace DCFApixels.DragonECS
 #if DEBUG && !DISABLE_DEBUG
             protected override void OnSetup()
             {
-                _markers = new EcsProfilerMarker[targets.Length];
-                for (int i = 0; i < targets.Length; i++)
+                _markers = new EcsProfilerMarker[Process.Length];
+                for (int i = 0; i < Process.Length; i++)
                 {
-                    _markers[i] = new EcsProfilerMarker($"{targets[i].GetType().Name}.{nameof(DrawGizmos)}");
+                    _markers[i] = new EcsProfilerMarker($"{Process[i].GetType().Name}.{nameof(DrawGizmos)}");
                 }
             }
 #endif
         }
 
-        [DebugColor(DebugColor.Orange)]
-        public class EcsLateRunSystemRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
+        [MetaColor(MetaColor.Orange)]
+        public class EcsLateRunRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
         {
 #if DEBUG && !DISABLE_DEBUG
             private EcsProfilerMarker[] _markers;
@@ -79,10 +80,12 @@ namespace DCFApixels.DragonECS
             public void LateRun(EcsPipeline pipeline)
             {
 #if DEBUG && !DISABLE_DEBUG
-                for (int i = 0; i < targets.Length; i++)
+                for (int i = 0; i < Process.Length; i++)
                 {
                     using (_markers[i].Auto())
-                        targets[i].LateRun(pipeline);
+                    {
+                        Process[i].LateRun(pipeline);
+                    }
                 }
 #else
             foreach (var item in targets) item.LateRun(pipeline);
@@ -92,16 +95,16 @@ namespace DCFApixels.DragonECS
 #if DEBUG && !DISABLE_DEBUG
             protected override void OnSetup()
             {
-                _markers = new EcsProfilerMarker[targets.Length];
-                for (int i = 0; i < targets.Length; i++)
+                _markers = new EcsProfilerMarker[Process.Length];
+                for (int i = 0; i < Process.Length; i++)
                 {
-                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{targets[i].GetType().Name}.{nameof(LateRun)}");
+                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{Process[i].GetType().Name}.{nameof(LateRun)}");
                 }
             }
 #endif
         }
-        [DebugColor(DebugColor.Orange)]
-        public class EcsFixedRunSystemRunner : EcsRunner<IEcsFixedRunProcess>, IEcsFixedRunProcess
+        [MetaColor(MetaColor.Orange)]
+        public class EcsFixedRunRunner : EcsRunner<IEcsFixedRunProcess>, IEcsFixedRunProcess
         {
 #if DEBUG && !DISABLE_DEBUG
             private EcsProfilerMarker[] _markers;
@@ -109,10 +112,12 @@ namespace DCFApixels.DragonECS
             public void FixedRun(EcsPipeline pipeline)
             {
 #if DEBUG && !DISABLE_DEBUG
-                for (int i = 0; i < targets.Length; i++)
+                for (int i = 0; i < Process.Length; i++)
                 {
                     using (_markers[i].Auto())
-                        targets[i].FixedRun(pipeline);
+                    {
+                        Process[i].FixedRun(pipeline);
+                    }
                 }
 #else
             foreach (var item in targets) item.FixedRun(pipeline);
@@ -122,10 +127,10 @@ namespace DCFApixels.DragonECS
 #if DEBUG && !DISABLE_DEBUG
             protected override void OnSetup()
             {
-                _markers = new EcsProfilerMarker[targets.Length];
-                for (int i = 0; i < targets.Length; i++)
+                _markers = new EcsProfilerMarker[Process.Length];
+                for (int i = 0; i < Process.Length; i++)
                 {
-                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{targets[i].GetType().Name}.{nameof(FixedRun)}");
+                    _markers[i] = new EcsProfilerMarker($"EcsRunner.{Process[i].GetType().Name}.{nameof(FixedRun)}");
                 }
             }
 #endif

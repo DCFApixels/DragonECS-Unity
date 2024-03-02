@@ -6,7 +6,7 @@ using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace DCFApixels.DragonECS.Editors
+namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal class SparseArray<TValue>
     {

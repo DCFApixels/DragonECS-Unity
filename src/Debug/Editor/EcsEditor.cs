@@ -1,48 +1,83 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEditor;
-using UnityEditor.UI;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Editors
+namespace DCFApixels.DragonECS.Unity.Editors
 {
     public static class EcsGUI
     {
+        private static GUIStyle _grayStyle;
         private static GUIStyle _greenStyle;
         private static GUIStyle _redStyle;
+        private static GUILayoutOption[] _defaultParams;
 
         private static bool _isInit = false;
         private static void Init()
         {
             if (_isInit)
+            {
                 return;
+            }
 
+            _defaultParams = new GUILayoutOption[] { GUILayout.ExpandWidth(true) };
+            _grayStyle = EcsEditor.GetStyle(new Color32(100, 100, 100, 100));
             _greenStyle = EcsEditor.GetStyle(new Color32(75, 255, 0, 100));
             _redStyle = EcsEditor.GetStyle(new Color32(255, 0, 75, 100));
             _isInit = true;
         }
 
+
+        private const string CONNECTED = "Connected";
+        private const string NOT_CONNECTED = "Not connected";
+        private const string UNDETERMINED_CONNECTED = "---";
         public static void DrawConnectStatus(Rect position, bool status)
         {
             Init();
             if (status)
-                GUI.Box(position, "Connected", _greenStyle);
+            {
+                GUI.Box(position, CONNECTED, _greenStyle);
+            }
             else
-                GUI.Box(position, "Not connected", _redStyle);
+            {
+                GUI.Box(position, NOT_CONNECTED, _redStyle);
+            }
         }
 
-
+        public static void DrawUndeterminedConnectStatus(Rect position)
+        {
+            Init();
+            GUI.Box(position, UNDETERMINED_CONNECTED, _grayStyle);
+        }
         public static class Layout
         {
             public static void DrawConnectStatus(bool status, params GUILayoutOption[] options)
             {
                 Init();
+                if(options == null || options.Length <= 0)
+                {
+                    options = _defaultParams;
+                }
                 if (status)
-                    GUILayout.Box("Connected", _greenStyle, GUILayout.ExpandWidth(true));
+                {
+                    GUILayout.Box(CONNECTED, _greenStyle, options);
+                }
                 else
-                    GUILayout.Box("Not connected", _redStyle, GUILayout.ExpandWidth(true));
+                {
+                    GUILayout.Box(NOT_CONNECTED, _redStyle, options);
+                }
+            }
+            public static void DrawUndeterminedConnectStatus(params GUILayoutOption[] options)
+            {
+                Init();
+                if (options == null || options.Length <= 0)
+                {
+                    options = _defaultParams;
+                }
+                GUILayout.Box(UNDETERMINED_CONNECTED, _grayStyle, options);
             }
         }
     }
