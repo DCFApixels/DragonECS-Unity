@@ -9,6 +9,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         [SerializeReference]
         public object data;
+
         public override object Data
         {
             get { return data; }
@@ -17,8 +18,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var result = Take();
             result.data = data;
+            result.SO.Update();
             return result;
         }
     }
+}
+
+[Serializable]
+public class EmptyDummy
+{
+    public static readonly EmptyDummy Instance = new EmptyDummy();
+    private EmptyDummy() { }
 }
 #endif

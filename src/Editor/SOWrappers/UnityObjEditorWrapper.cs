@@ -9,6 +9,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         [SerializeField]
         public UnityEngine.Object data;
+
         public override object Data
         {
             get { return data; }
@@ -17,6 +18,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var result = Take();
             result.data = data;
+            result.SO.Update();
             return result;
         }
     }

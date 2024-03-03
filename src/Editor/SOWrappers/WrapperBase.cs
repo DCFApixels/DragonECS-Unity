@@ -10,6 +10,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal abstract class WrapperBase : ScriptableObject
     {
         public abstract object Data { get; }
+        public abstract bool IsExpanded { get; set; }
         public abstract SerializedObject SO { get; }
         public abstract SerializedProperty Property { get; }
         public abstract void Release();
@@ -21,8 +22,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private SerializedObject _so;
         private SerializedProperty _property;
 
+        private bool _isDestroyed = false;
         private bool _isReleased = false;
+
         private static Stack<TSelf> _wrappers = new Stack<TSelf>();
+
+        public override bool IsExpanded
+        {
+            get { return Property.isExpanded; }
+            set { Property.isExpanded = value; }
+        }
         public override SerializedObject SO
         {
             get { return _so; }
@@ -31,7 +40,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get { return _property; }
         }
-
         public static TSelf Take()
         {
             TSelf result;
@@ -44,30 +52,33 @@ namespace DCFApixels.DragonECS.Unity.Editors
             else
             {
                 result = _wrappers.Pop();
+                if (result._isDestroyed)
+                {
+                    result = Take();
+                }
             }
+            result._isReleased = false;
             return result;
         }
         public static void Release(TSelf wrapper)
         {
             if (wrapper._isReleased)
             {
-                return;
+                throw new Exception();
             }
             wrapper._isReleased = true;
             _wrappers.Push(wrapper);
+        }
+
+        private void OnDestroy()
+        {
+            _isDestroyed = true;
         }
 
         public override void Release()
         {
             Release((TSelf)this);
         }
-    }
-
-    [Serializable]
-    public class EmptyDummy
-    {
-        public static readonly EmptyDummy Instance = new EmptyDummy();
-        private EmptyDummy() { }
     }
 }
 #endif

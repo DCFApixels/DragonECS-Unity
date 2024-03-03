@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -38,20 +39,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (nextWorld == false && prewIsUpper == false)
                     {
                         b.Append(' ');
+                        nextWorld = true;
                     }
+                }
+
+                if (nextWorld)
+                {
+                    b.Append(char.ToUpper(c));
                 }
                 else
                 {
-                    if (nextWorld)
-                    {
-                        b.Append(char.ToUpper(c));
-                    }
-                    else
-                    {
-                        b.Append(c);
-                    }
-                    nextWorld = false;
+                    b.Append(c);
                 }
+                nextWorld = false;
                 prewIsUpper = isUpper;
             }
 
@@ -121,21 +121,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 GUILayout.Box("", options);
                 Rect lastRect = GUILayoutUtility.GetLastRect();
-                if (status)
-                {
-                    Color color = _greenColor;
-                    color.a = 0.6f;
-                    EditorGUI.DrawRect(lastRect, color);
-                    GUI.Box(lastRect, CONNECTED);
-                }
-                else
-                {
-                    Color color = _redColor;
-                    color.a = 0.6f;
-                    EditorGUI.DrawRect(lastRect, color);
-                    GUI.Box(lastRect, NOT_CONNECTED);
-                }
+                Color color = status ? _greenColor : _redColor;
+                string text = status ? CONNECTED : NOT_CONNECTED;
+                color.a = 0.6f;
+                EditorGUI.DrawRect(lastRect, color);
+                GUI.Box(lastRect, text);
             }
+
             public static void DrawUndeterminedConnectStatus(params GUILayoutOption[] options)
             {
                 Init();
@@ -174,8 +166,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
                 EditorGUI.BeginChangeCheck();
 
-                bool changed = DrawData(pool.ComponentType, new GUIContent(meta.Name), data, out object resultData);
-
+                Type componentType = pool.ComponentType;
+                ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
+                bool changed = DrawData(componentType, new GUIContent(meta.Name), expandMatrix, data, out object resultData);
                 if (changed)
                 {
                     pool.SetRaw(entityID, resultData);
@@ -193,26 +186,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.Space(2f);
             }
 
-            private static bool DrawData(Type fieldType, GUIContent label, object data, out object outData)
+            private static bool DrawData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
             {
                 Type type = data.GetType();
                 var uobj = data as UnityEngine.Object;
+                ref bool isExpanded = ref expandMatrix.Down();
 
                 if ((uobj == false && type.IsGenericType) ||
                     (uobj == false && !type.IsSerializable))
                 {
                     bool result = false;
-                    WrapperBase w = RefEditorWrapper.Take(EmptyDummy.Instance);
-                    //w.SO.Update();
-                    //EditorGUILayout.PropertyField(w.Property, label, true);
-                    w.Property.isExpanded = EditorGUILayout.Foldout(w.Property.isExpanded, label);
-                    if (w.Property.isExpanded)
+
+                    isExpanded = EditorGUILayout.Foldout(isExpanded, label);
+
+                    if (isExpanded)
                     {
                         EditorGUI.indentLevel++;
                         foreach (var field in type.GetFields(fieldFlags))
                         {
                             GUIContent subLabel = new GUIContent(EcsUnityEditorUtility.TransformFieldName(field.Name));
-                            if (DrawData(field.FieldType, subLabel, field.GetValue(data), out object fieldData))
+                            if (DrawData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
                             {
                                 field.SetValue(data, fieldData);
                                 result = true;
@@ -220,26 +213,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                         EditorGUI.indentLevel--;
                     }
-                    w.Release();
+
+                    expandMatrix.Up();
+
                     outData = data;
                     return result;
                 }
                 else
                 {
                     EditorGUI.BeginChangeCheck();
-                    WrapperBase w;
-                    if (uobj == null)
-                    {
-                        w = RefEditorWrapper.Take(data);
-                    }
-                    else
-                    {
-                        w = UnityObjEditorWrapper.Take(uobj);
-                    }
-                    w.SO.Update();
+                    WrapperBase w = uobj == null ? RefEditorWrapper.Take(data) : UnityObjEditorWrapper.Take(uobj);
 
+                    w.IsExpanded = isExpanded;
                     EditorGUILayout.PropertyField(w.Property, label, true);
+                    isExpanded = w.IsExpanded;
+
                     w.Release();
+                    expandMatrix.Up();
 
                     if (EditorGUI.EndChangeCheck())
                     {
