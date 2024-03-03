@@ -99,11 +99,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
 
             DrawTop(target);
+            GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
                 GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * 2);
             }
+            GUILayout.EndVertical();
             DrawFooter(target);
         }
         private void DrawTop(ITemplateInternal target)
@@ -183,12 +185,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             removeButtonRect.center = new Vector2(lastrect.xMax + removeButtonRect.width, lastrect.yMin + removeButtonRect.height / 2f);
 
             GUILayout.EndVertical();
-            Rect lineRect = GUILayoutUtility.GetLastRect();
-            lineRect.y = lineRect.yMax;
-            lineRect.height = 3f;
-            Color rectColor = panelColor;
-            rectColor.a = 0.34f;
-            EditorGUI.DrawRect(lineRect, rectColor);
+            //Rect lineRect = GUILayoutUtility.GetLastRect();
+            //lineRect.y = lineRect.yMax;
+            //lineRect.height = 3f;
+            //Color rectColor = panelColor;
+            //rectColor.a = 0.34f;
+            //EditorGUI.DrawRect(lineRect, rectColor);
             GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
 
             if (GUI.Button(removeButtonRect, "x", removeButtonStyle))

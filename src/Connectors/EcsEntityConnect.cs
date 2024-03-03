@@ -91,7 +91,9 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    using DCFApixels.DragonECS.Unity.Internal;
     using UnityEditor;
+    using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
     [CustomEditor(typeof(EcsEntityConnect))]
     [CanEditMultipleObjects]
@@ -120,8 +122,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             DrawTop();
 
-            DrawConnectStatus(targets);
-            DrawEntityInfo();
+            DrawEntityInfo(targets);
 
             DrawTemplates();
 
@@ -132,57 +133,48 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
-            using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
+            using (new EditorGUI.DisabledScope(true))
             {
                 EditorGUILayout.PropertyField(iterator, true);
             }
         }
-        private void DrawConnectStatus(EcsEntityConnect[] targets)
-        {
-            bool isConnected = Target.IsConected;
-            for (int i = 0; i < targets.Length; i++)
-            {
-                if (isConnected != targets[i].IsConected)
-                {
-                    isConnected = !Target.IsConected;
-                    break;
-                }
-            }
-            if (isConnected == Target.IsConected)
-            {
-                EcsGUI.Layout.DrawConnectStatus(Target.IsConected);
-            }
-            else
-            {
-                EcsGUI.Layout.DrawUndeterminedConnectStatus();
-            }
-        }
 
-        private void DrawEntityInfo()
+        private void DrawEntityInfo(EcsEntityConnect[] targets)
         {
-            GUILayout.Label(string.Empty);
-            Rect entityRect = GUILayoutUtility.GetLastRect();
-            Rect idRect = entityRect;
-            idRect.xMax -= idRect.width / 2f;
-            Rect genRect = entityRect;
-            genRect.xMin = idRect.xMax;
-            genRect.xMax -= genRect.width / 2f;
-            Rect worldRect = genRect;
-            worldRect.x += worldRect.width;
+            float width = EditorGUIUtility.currentViewWidth;
+            float height = EditorGUIUtility.singleLineHeight;
+            Rect entityRect = GUILayoutUtility.GetRect(width, height + 3f);
 
-            if (IsMultipleTargets == false && Target.Entity.TryUnpack(out int id, out short gen, out short world))
+            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, 3f);
+
+            var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(entityInfoRect, 0.5f);
+            var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
+
+
+
+            bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out short world);
+           
+
+            if (IsMultipleTargets == false && isConnected)
             {
+                Color statusColor = EcsGUI.GreenColor;
+                statusColor.a = 0.32f;
+                EditorGUI.DrawRect(statusRect, statusColor);
                 EditorGUI.IntField(idRect, id);
                 EditorGUI.IntField(genRect, gen);
                 EditorGUI.IntField(worldRect, world);
             }
             else
             {
-                GUI.enabled = false;
-                EditorGUI.TextField(idRect, "Entity ID");
-                EditorGUI.TextField(genRect, "Gen");
-                EditorGUI.TextField(worldRect, "World ID");
-                GUI.enabled = true;
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    Color statusColor = IsMultipleTargets ? EcsGUI.GrayColor : EcsGUI.RedColor;
+                    statusColor.a = 0.32f;
+                    EditorGUI.DrawRect(statusRect, statusColor);
+                    EditorGUI.TextField(idRect, "Entity ID");
+                    EditorGUI.TextField(genRect, "Gen");
+                    EditorGUI.TextField(worldRect, "World ID");
+                }
             }
         }
 
@@ -193,22 +185,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
             bool enterChildren = true;
             while (iterator.NextVisible(enterChildren))
             {
-                using (new EditorGUI.DisabledScope("m_Script" == iterator.propertyPath))
-                {
-                    EditorGUILayout.PropertyField(iterator, true);
-                }
+                EditorGUILayout.PropertyField(iterator, true);
                 enterChildren = false;
             }
         }
 
         private void DrawButtons()
         {
-            if (GUILayout.Button("Autoset Templates"))
+            GUILayout.BeginHorizontal();
+            if (GUILayout.Button("Autoset"))
             {
                 Target.SetTemplates_Editor(Target.GetComponents<MonoEntityTemplate>());
                 EditorUtility.SetDirty(target);
             }
-            if (GUILayout.Button("Autoset Templates Cascade"))
+            if (GUILayout.Button("Autoset Cascade"))
             {
                 foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
                 {
@@ -216,6 +206,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorUtility.SetDirty(item);
                 }
             }
+            GUILayout.EndHorizontal();
         }
 
         private void DrawComponents(EcsEntityConnect[] targets)
@@ -227,13 +218,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (targets[i].IsConected == true)
                     {
                         EditorGUILayout.HelpBox("Multiple component editing is not available.", MessageType.Warning);
-                        break;
+                        return;
                     }
                 }
             }
-            if (Target.IsConected)
+            if (Target.Entity.TryUnpack(out int entityID, out EcsWorld world))
             {
-                EcsGUI.Layout.DrawComponents(Target.Entity);
+                EcsGUI.Layout.DrawComponents(entityID, world);
             }
         }
     }

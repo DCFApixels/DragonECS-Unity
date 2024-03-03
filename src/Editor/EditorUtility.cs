@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -60,15 +59,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
 
-    public static class EcsGUI
+    internal static class EcsGUI
     {
-        private static Color _grayColor = new Color32(100, 100, 100, 100);
-        private static Color _greenColor = new Color32(75, 255, 0, 100);
-        private static Color _redColor = new Color32(255, 0, 75, 100);
+        internal readonly static Color GrayColor = new Color32(100, 100, 100, 255);
+        internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);
+        internal readonly static Color RedColor = new Color32(255, 0, 75, 255);
 
-        private static GUIStyle _grayStyle;
-        private static GUIStyle _greenStyle;
-        private static GUIStyle _redStyle;
+        //private static GUIStyle _grayStyle;
+        //private static GUIStyle _greenStyle;
+        //private static GUIStyle _redStyle;
         private static GUILayoutOption[] _defaultParams;
 
         private static bool _isInit = false;
@@ -81,62 +80,62 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             _defaultParams = new GUILayoutOption[] { GUILayout.ExpandWidth(true) };
-            _grayStyle = EcsEditor.GetStyle(_grayColor);
-            _greenStyle = EcsEditor.GetStyle(_greenColor);
-            _redStyle = EcsEditor.GetStyle(_redColor);
+            //_grayStyle = EcsEditor.GetStyle(GrayColor);
+            //_greenStyle = EcsEditor.GetStyle(GreenColor);
+            //_redStyle = EcsEditor.GetStyle(RedColor);
             _isInit = true;
         }
 
 
-        private const string CONNECTED = "Connected";
-        private const string NOT_CONNECTED = "Not connected";
-        private const string UNDETERMINED_CONNECTED = "---";
-        public static void DrawConnectStatus(Rect position, bool status)
-        {
-            Init();
-            if (status)
-            {
-                GUI.Box(position, CONNECTED, _greenStyle);
-            }
-            else
-            {
-                GUI.Box(position, NOT_CONNECTED, _redStyle);
-            }
-        }
-
-        public static void DrawUndeterminedConnectStatus(Rect position)
-        {
-            Init();
-            GUI.Box(position, UNDETERMINED_CONNECTED, _grayStyle);
-        }
+        //private const string CONNECTED = "Connected";
+        //private const string NOT_CONNECTED = "Not connected";
+        //private const string UNDETERMINED_CONNECTED = "---";
+        //public static void DrawConnectStatus(Rect position, bool status)
+        //{
+        //    Init();
+        //    if (status)
+        //    {
+        //        GUI.Box(position, CONNECTED, _greenStyle);
+        //    }
+        //    else
+        //    {
+        //        GUI.Box(position, NOT_CONNECTED, _redStyle);
+        //    }
+        //}
+        //
+        //public static void DrawUndeterminedConnectStatus(Rect position)
+        //{
+        //    Init();
+        //    GUI.Box(position, UNDETERMINED_CONNECTED, _grayStyle);
+        //}
 
         public static class Layout
         {
-            public static void DrawConnectStatus(bool status, params GUILayoutOption[] options)
-            {
-                Init();
-                if (options == null || options.Length <= 0)
-                {
-                    options = _defaultParams;
-                }
-                GUILayout.Box("", options);
-                Rect lastRect = GUILayoutUtility.GetLastRect();
-                Color color = status ? _greenColor : _redColor;
-                string text = status ? CONNECTED : NOT_CONNECTED;
-                color.a = 0.6f;
-                EditorGUI.DrawRect(lastRect, color);
-                GUI.Box(lastRect, text);
-            }
+            //public static void DrawConnectStatus(bool status, params GUILayoutOption[] options)
+            //{
+            //    Init();
+            //    if (options == null || options.Length <= 0)
+            //    {
+            //        options = _defaultParams;
+            //    }
+            //    GUILayout.Box("", options);
+            //    Rect lastRect = GUILayoutUtility.GetLastRect();
+            //    Color color = status ? GreenColor : RedColor;
+            //    string text = status ? CONNECTED : NOT_CONNECTED;
+            //    color.a = 0.6f;
+            //    EditorGUI.DrawRect(lastRect, color);
+            //    GUI.Box(lastRect, text);
+            //}
 
-            public static void DrawUndeterminedConnectStatus(params GUILayoutOption[] options)
-            {
-                Init();
-                if (options == null || options.Length <= 0)
-                {
-                    options = _defaultParams;
-                }
-                GUILayout.Box(UNDETERMINED_CONNECTED, _grayStyle, options);
-            }
+            //public static void DrawUndeterminedConnectStatus(params GUILayoutOption[] options)
+            //{
+            //    Init();
+            //    if (options == null || options.Length <= 0)
+            //    {
+            //        options = _defaultParams;
+            //    }
+            //    GUILayout.Box(UNDETERMINED_CONNECTED, _grayStyle, options);
+            //}
             public static void DrawComponents(entlong entity)
             {
                 if (entity.TryUnpack(out int entityID, out EcsWorld world))
@@ -147,17 +146,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public static void DrawComponents(int entityID, EcsWorld world)
             {
                 var componentTypeIDs = world.GetComponentTypeIDs(entityID);
-
+                GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
                 foreach (var componentTypeID in componentTypeIDs)
                 {
                     var pool = world.GetPool(componentTypeID);
                     {
-                        DrawComponent(entityID, world, pool);
+                        DrawComponent(entityID, pool);
                     }
                 }
+                GUILayout.EndVertical();
             }
             private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            private static void DrawComponent(int entityID, EcsWorld world, IEcsPool pool)
+            private static void DrawComponent(int entityID, IEcsPool pool)
             {
                 object data = pool.GetRaw(entityID);
                 var meta = data.GetMeta();
@@ -176,27 +176,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 GUILayout.EndVertical();
 
-                Rect lineRect = GUILayoutUtility.GetLastRect();
-                lineRect.y = lineRect.yMax;
-                lineRect.height = 3f;
-                Color rectColor = panelColor;
-                rectColor.a = 0.34f;
-                EditorGUI.DrawRect(lineRect, rectColor);
-
                 GUILayout.Space(2f);
             }
 
             private static bool DrawData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
             {
                 Type type = data.GetType();
-                var uobj = data as UnityEngine.Object;
+                UnityEngine.Object uobj = data as UnityEngine.Object;
                 ref bool isExpanded = ref expandMatrix.Down();
+                bool changed = false;
+                outData = data;
 
-                if ((uobj == false && type.IsGenericType) ||
-                    (uobj == false && !type.IsSerializable))
+                if (uobj == null && (type.IsGenericType || !type.IsSerializable))
                 {
-                    bool result = false;
-
                     isExpanded = EditorGUILayout.Foldout(isExpanded, label);
 
                     if (isExpanded)
@@ -208,16 +200,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             if (DrawData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
                             {
                                 field.SetValue(data, fieldData);
-                                result = true;
+
+                                outData = fieldData;
+                                changed = true;
                             }
                         }
                         EditorGUI.indentLevel--;
                     }
-
-                    expandMatrix.Up();
-
-                    outData = data;
-                    return result;
                 }
                 else
                 {
@@ -228,19 +217,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorGUILayout.PropertyField(w.Property, label, true);
                     isExpanded = w.IsExpanded;
 
-                    w.Release();
-                    expandMatrix.Up();
-
                     if (EditorGUI.EndChangeCheck())
                     {
                         w.SO.ApplyModifiedProperties();
                         outData = w.Data;
-                        return true;
+                        changed = true;
                     }
-
-                    outData = data;
-                    return false;
                 }
+                
+                expandMatrix.Up();
+                return changed;
             }
         }
     }

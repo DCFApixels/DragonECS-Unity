@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
@@ -29,17 +30,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override bool IsExpanded
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return Property.isExpanded; }
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { Property.isExpanded = value; }
         }
         public override SerializedObject SO
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _so; }
         }
         public override SerializedProperty Property
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _property; }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TSelf Take()
         {
             TSelf result;
@@ -60,6 +66,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             result._isReleased = false;
             return result;
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Release(TSelf wrapper)
         {
             if (wrapper._isReleased)
@@ -75,6 +82,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _isDestroyed = true;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override void Release()
         {
             Release((TSelf)this);

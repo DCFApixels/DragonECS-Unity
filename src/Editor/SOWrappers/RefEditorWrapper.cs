@@ -1,5 +1,6 @@
-﻿#if UNITY_EDITOR
+﻿ #if UNITY_EDITOR
 using System;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -12,8 +13,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override object Data
         {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return data; }
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static RefEditorWrapper Take(object data)
         {
             var result = Take();

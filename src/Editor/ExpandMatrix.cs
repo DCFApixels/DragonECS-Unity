@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static Dictionary<Type, ExpandMatrix> _instances = new Dictionary<Type, ExpandMatrix>();
         public static ExpandMatrix Take(Type type)
         {
-            if(_instances.TryGetValue(type, out ExpandMatrix result) == false)
+            if (_instances.TryGetValue(type, out ExpandMatrix result) == false)
             {
                 result = new ExpandMatrix();
                 _instances.Add(type, result);
