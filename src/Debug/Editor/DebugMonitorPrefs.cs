@@ -3,7 +3,7 @@ using UnityEditor;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [FilePath("DragonECS/DebugMonitorPrefs.prefs", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath(EcsConsts.FRAMEWORK_NAME + "/" + nameof(DebugMonitorPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     public class DebugMonitorPrefs : ScriptableSingleton<DebugMonitorPrefs>
     {
         private bool _isShowInterfaces = false;
@@ -34,7 +34,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 Save(false);
             }
         }
-
     }
 }
 #endif

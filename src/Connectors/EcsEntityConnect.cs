@@ -91,7 +91,6 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    using System.Collections.Generic;
     using UnityEditor;
 
     [CustomEditor(typeof(EcsEntityConnect))]
@@ -127,7 +126,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DrawTemplates();
 
             DrawButtons();
-            DrawComponents();
+            DrawComponents(targets);
         }
         private void DrawTop()
         {
@@ -179,9 +178,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                EditorGUI.TextField(idRect, "-");
-                EditorGUI.TextField(genRect, "-");
-                EditorGUI.TextField(worldRect, "-");
+                //Color defColor = GUI.contentColor;
+                //Color c = defColor;
+                //c.a = 0.55f;
+                //GUI.contentColor = c;
+                GUI.enabled = false;
+               EditorGUI.TextField(idRect, "Entity ID");
+               EditorGUI.TextField(genRect, "Gen");
+               EditorGUI.TextField(worldRect, "World ID");
+                GUI.enabled = true;
+               //GUI.contentColor = defColor;
             }
         }
 
@@ -217,13 +223,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawComponents()
+        private void DrawComponents(EcsEntityConnect[] targets)
         {
+            if (IsMultipleTargets)
+            {
+                for (int i = 0; i < targets.Length; i++)
+                {
+                    if (targets[i].IsConected == true)
+                    {
+                        EditorGUILayout.HelpBox("Multiple component editing is not available.", MessageType.Warning);
+                        break;
+                    }
+                }
+            }
             if (Target.IsConected)
             {
-                List<object> comps = new List<object>();
-                Target.World.GetComponents(Target.Entity.ID, comps);
-                GUILayout.TextArea(string.Join("\r\n", comps));
+                EcsGUI.Layout.DrawComponents(Target.Entity);
             }
         }
     }

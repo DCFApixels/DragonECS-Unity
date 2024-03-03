@@ -192,7 +192,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
 
             if (GUI.Button(removeButtonRect, "x", removeButtonStyle))
+            {
                 OnRemoveComponentAt(index);
+            }
 
             if (!string.IsNullOrEmpty(description))
             {
