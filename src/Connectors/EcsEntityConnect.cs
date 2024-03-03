@@ -178,16 +178,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                //Color defColor = GUI.contentColor;
-                //Color c = defColor;
-                //c.a = 0.55f;
-                //GUI.contentColor = c;
                 GUI.enabled = false;
-               EditorGUI.TextField(idRect, "Entity ID");
-               EditorGUI.TextField(genRect, "Gen");
-               EditorGUI.TextField(worldRect, "World ID");
+                EditorGUI.TextField(idRect, "Entity ID");
+                EditorGUI.TextField(genRect, "Gen");
+                EditorGUI.TextField(worldRect, "World ID");
                 GUI.enabled = true;
-               //GUI.contentColor = defColor;
             }
         }
 

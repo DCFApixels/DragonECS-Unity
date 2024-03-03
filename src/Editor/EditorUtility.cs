@@ -1,67 +1,64 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal class WrapperBase<TSelf> : ScriptableObject
-        where TSelf : WrapperBase<TSelf>
+    internal static class EcsUnityEditorUtility
     {
-        private SerializedObject _so;
-        private SerializedProperty _property;
-
-        private bool _isReleased = false;
-        private static Stack<TSelf> _wrappers = new Stack<TSelf>();
-
-        public SerializedObject SO
+        public static string TransformFieldName(string name)
         {
-            get { return _so; }
-        }
-        public SerializedProperty Property
-        {
-            get { return _property; }
-        }
-
-        public static TSelf Take()
-        {
-            TSelf result;
-            if (_wrappers.Count <= 0)
+            if (name.Length <= 0)
             {
-                result = CreateInstance<TSelf>();
-                result._so = new SerializedObject(result);
-                result._property = result._so.FindProperty("data");
+                return name;
             }
-            else
+            StringBuilder b = new StringBuilder();
+            bool nextWorld = true;
+            bool prewIsUpper = false;
+
+
+            for (int i = 0; i < name.Length; i++)
             {
-                result = _wrappers.Pop();
+                char c = name[i];
+                if (char.IsLetter(c) == false)
+                {
+                    nextWorld = true;
+                    prewIsUpper = false;
+                    continue;
+                }
+
+                bool isUpper = char.IsUpper(c);
+                if (isUpper)
+                {
+                    if (nextWorld == false && prewIsUpper == false)
+                    {
+                        b.Append(' ');
+                    }
+                }
+                else
+                {
+                    if (nextWorld)
+                    {
+                        b.Append(char.ToUpper(c));
+                    }
+                    else
+                    {
+                        b.Append(c);
+                    }
+                    nextWorld = false;
+                }
+                prewIsUpper = isUpper;
             }
-            return result;
-        }
-        public static void Release(TSelf wrapper)
-        {
-            if (wrapper._isReleased)
-            {
-                return;
-            }
-            wrapper._isReleased = true;
-            _wrappers.Push(wrapper);
+
+            return b.ToString();
         }
     }
-    internal class RefEditorWrapper : WrapperBase<RefEditorWrapper>
-    {
-        [SerializeReference]
-        public object data;
-    }
-    internal class UnityObjEditorWrapper : WrapperBase<UnityObjEditorWrapper>
-    {
-        [SerializeField]
-        public UnityEngine.Object data;
-    }
+
 
     public static class EcsGUI
     {
@@ -177,7 +174,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
                 EditorGUI.BeginChangeCheck();
 
-                bool changed = DrawData(pool.ComponentType, data, out object resultData);
+                bool changed = DrawData(pool.ComponentType, new GUIContent(meta.Name), data, out object resultData);
 
                 if (changed)
                 {
@@ -196,64 +193,59 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.Space(2f);
             }
 
-            private static bool DrawData(Type fieldType, object data, out object outData)
+            private static bool DrawData(Type fieldType, GUIContent label, object data, out object outData)
             {
-                var meta = data.GetMeta();
-                GUIContent label = new GUIContent(meta.Name);
-
                 Type type = data.GetType();
                 var uobj = data as UnityEngine.Object;
-                if (uobj == false && type.IsGenericType)
+
+                if ((uobj == false && type.IsGenericType) ||
+                    (uobj == false && !type.IsSerializable))
                 {
                     bool result = false;
-                    foreach (var field in type.GetFields(fieldFlags))
+                    WrapperBase w = RefEditorWrapper.Take(EmptyDummy.Instance);
+                    //w.SO.Update();
+                    //EditorGUILayout.PropertyField(w.Property, label, true);
+                    w.Property.isExpanded = EditorGUILayout.Foldout(w.Property.isExpanded, label);
+                    if (w.Property.isExpanded)
                     {
-                        if (DrawData(field.FieldType, field.GetValue(data), out object fieldData))
+                        EditorGUI.indentLevel++;
+                        foreach (var field in type.GetFields(fieldFlags))
                         {
-                            field.SetValue(data, fieldData);
-                            result = true;
+                            GUIContent subLabel = new GUIContent(EcsUnityEditorUtility.TransformFieldName(field.Name));
+                            if (DrawData(field.FieldType, subLabel, field.GetValue(data), out object fieldData))
+                            {
+                                field.SetValue(data, fieldData);
+                                result = true;
+                            }
                         }
+                        EditorGUI.indentLevel--;
                     }
+                    w.Release();
                     outData = data;
                     return result;
                 }
                 else
                 {
+                    EditorGUI.BeginChangeCheck();
+                    WrapperBase w;
                     if (uobj == null)
                     {
-                        EditorGUI.BeginChangeCheck();
-
-                        var w = RefEditorWrapper.Take();
-                        w.data = data;
-                        w.SO.Update();
-
-                        EditorGUILayout.PropertyField(w.Property, true);
-                        RefEditorWrapper.Release(w);
-
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            w.SO.ApplyModifiedProperties();
-                            outData = w.data;
-                            return true;
-                        }
+                        w = RefEditorWrapper.Take(data);
                     }
                     else
                     {
-                        EditorGUI.BeginChangeCheck();
+                        w = UnityObjEditorWrapper.Take(uobj);
+                    }
+                    w.SO.Update();
 
-                        var w = UnityObjEditorWrapper.Take();
-                        w.data = uobj;
-                        w.SO.Update();
+                    EditorGUILayout.PropertyField(w.Property, label, true);
+                    w.Release();
 
-                        EditorGUILayout.PropertyField(w.Property, true);
-                        UnityObjEditorWrapper.Release(w);
-
-                        if (EditorGUI.EndChangeCheck())
-                        {
-                            w.SO.ApplyModifiedProperties();
-                            outData = uobj;
-                            return true;
-                        }
+                    if (EditorGUI.EndChangeCheck())
+                    {
+                        w.SO.ApplyModifiedProperties();
+                        outData = w.Data;
+                        return true;
                     }
 
                     outData = data;
