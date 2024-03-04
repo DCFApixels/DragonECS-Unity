@@ -93,7 +93,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     using DCFApixels.DragonECS.Unity.Internal;
     using UnityEditor;
-    using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
     [CustomEditor(typeof(EcsEntityConnect))]
     [CanEditMultipleObjects]
@@ -128,43 +127,38 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DrawComponents(targets);
         }
 
-        private const float line1 = 1f;
-        private const float line2 = 2f;
         private void DrawEntityInfo(EcsEntityConnect[] targets)
         {
             float width = EditorGUIUtility.currentViewWidth;
             float height = EditorGUIUtility.singleLineHeight;
-            Rect entityRect = GUILayoutUtility.GetRect(width, height + line2 * 2f);
+            Rect entityRect = GUILayoutUtility.GetRect(width, height + 3f);
+            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, 3f);
 
             Color w = Color.gray;
             w.a = 0.6f;
             Color b = Color.black;
             b.a = 0.55f;
-            EditorGUI.DrawRect(entityRect, w);
-
-            entityRect = RectUtility.AddPadding(entityRect, line1, line1, line2, 0);
-            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, line2);
+            EditorGUI.DrawRect(entityInfoRect, w);
 
             var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(entityInfoRect, 0.5f);
             var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
-
-            idRect = RectUtility.AddPadding(idRect, line1, 0);
-            genRect = RectUtility.AddPadding(genRect, line1, 0);
-            worldRect = RectUtility.AddPadding(worldRect, line1, 0);
-
+            
+            idRect = RectUtility.AddPadding(idRect, 2, 1, 0, 0);
+            genRect = RectUtility.AddPadding(genRect, 1, 1, 0, 0);
+            worldRect = RectUtility.AddPadding(worldRect, 1, 2, 0, 0);
             EditorGUI.DrawRect(idRect, b);
             EditorGUI.DrawRect(genRect, b);
             EditorGUI.DrawRect(worldRect, b);
 
-
             bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out short world);
 
-            GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+            GUIStyle style = new GUIStyle(EditorStyles.numberField);
             style.alignment = TextAnchor.MiddleCenter;
+            style.font = EditorStyles.boldFont;
             if (IsMultipleTargets == false && isConnected)
             {
                 Color statusColor = EcsGUI.GreenColor;
-                statusColor.a = 0.4f;
+                statusColor.a = 0.6f;
                 EditorGUI.DrawRect(statusRect, statusColor);
 
                 EditorGUI.IntField(idRect, id, style);
@@ -174,17 +168,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             else
             {
                 Color statusColor = IsMultipleTargets ? new Color32(200, 200, 200, 255) : EcsGUI.RedColor;
-                statusColor.a = 0.4f;
+                statusColor.a = 0.6f;
                 EditorGUI.DrawRect(statusRect, statusColor);
 
-                Color dc = GUI.color;
-                Color ndc = Color.white;
-                ndc.a = 0.4f;
-                GUI.color = ndc;
-                GUI.Label(idRect, "Entity ID", EditorStyles.boldLabel);
-                GUI.Label(genRect, "Generation", EditorStyles.boldLabel);
-                GUI.Label(worldRect, "World ID", EditorStyles.boldLabel);
-                GUI.color = dc;
+                using (new EditorGUI.DisabledScope(true))
+                {
+                    GUI.Label(idRect, "Entity ID", style);
+                    GUI.Label(genRect, "Generation", style);
+                    GUI.Label(worldRect, "World ID", style);
+                }
             }
         }
 
