@@ -10,8 +10,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
     public abstract class EntityTemplateEditorBase : Editor
     {
-        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 15f, 15f);
-        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 15f, 15f);
+        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
+        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 21f, 15f);
 
         private GUIStyle removeButtonStyle;
         private GenericMenu genericMenu;
@@ -96,14 +96,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Init();
             SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
             if (componentsProp == null)
+            {
                 return;
+            }
 
             DrawTop(target);
             GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
-                GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * 2);
             }
             GUILayout.EndVertical();
             DrawFooter(target);
@@ -140,72 +141,70 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            Type initializerType;
             Type componentType;
             SerializedProperty componentProperty = componentRefProp;
             ComponentTemplateBase customInitializer = componentProperty.managedReferenceValue as ComponentTemplateBase;
             if (customInitializer != null)
             {
                 componentProperty = componentRefProp.FindPropertyRelative("component");
-                initializerType = customInitializer.Type;
                 componentType = customInitializer.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
             }
             else
             {
-                initializerType = componentProperty.managedReferenceValue.GetType();
-                componentType = initializerType;
+                componentType = componentProperty.managedReferenceValue.GetType(); ;
             }
 
             string name = template.Name;
             string description = template.Description;
-            Color panelColor = template.Color;
-
-            GUILayout.BeginHorizontal();
-
-            GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
+            Color panelColor = template.Color.Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
             EditorGUI.BeginChangeCheck();
+
             GUIContent label = new GUIContent(name);
-            if (componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0)
+            bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
+
+            float width = EditorGUIUtility.currentViewWidth;
+            float height = isEmpty ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(componentProperty, label, true);
+            float padding = EditorGUIUtility.standardVerticalSpacing;
+
+            Rect propertyFullRect = GUILayoutUtility.GetRect(width, height + padding * 3f);
+            propertyFullRect = RectUtility.AddPadding(propertyFullRect, padding / 2f);
+            Color alphaPanelColor = panelColor;
+            alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+
+            var (propertyRect, controlRect) = RectUtility.HorizontalSliceRight(propertyFullRect, RemoveButtonRect.width);
+            var (removeButtonRect, _) = RectUtility.VerticalSliceTop(controlRect, RemoveButtonRect.height);
+
+            #region Draw Component Block 
+            EditorGUI.DrawRect(propertyFullRect, alphaPanelColor);
+            propertyRect = RectUtility.AddPadding(propertyRect, padding);
+            if (isEmpty)
             {
-                GUILayout.Label(label);
+                GUI.Label(propertyRect, label);
             }
             else
             {
-                EditorGUILayout.PropertyField(componentProperty, label, true);
+                EditorGUI.PropertyField(propertyRect, componentProperty, label, true);
             }
-            if (EditorGUI.EndChangeCheck())
-            {
-                componentProperty.serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
-            }
-
-            Rect lastrect = GUILayoutUtility.GetLastRect();
-            Rect removeButtonRect = RemoveButtonRect;
-            removeButtonRect.center = new Vector2(lastrect.xMax + removeButtonRect.width, lastrect.yMin + removeButtonRect.height / 2f);
-
-            GUILayout.EndVertical();
-            //Rect lineRect = GUILayoutUtility.GetLastRect();
-            //lineRect.y = lineRect.yMax;
-            //lineRect.height = 3f;
-            //Color rectColor = panelColor;
-            //rectColor.a = 0.34f;
-            //EditorGUI.DrawRect(lineRect, rectColor);
-            GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
-
-            if (GUI.Button(removeButtonRect, "x", removeButtonStyle))
+            if (GUI.Button(removeButtonRect, "x"))
             {
                 OnRemoveComponentAt(index);
             }
+            #endregion
 
             if (!string.IsNullOrEmpty(description))
             {
                 Rect tooltipIconRect = TooltipIconRect;
-                tooltipIconRect.center = new Vector2(lastrect.xMax - removeButtonRect.width / 2f, lastrect.yMin + removeButtonRect.height / 2f);
-                GUIContent descriptionLabel = new GUIContent(EcsUnityConsts.INFO_MARK, description);
+                tooltipIconRect.center = new Vector2(propertyRect.xMax - removeButtonRect.width / 2f, propertyRect.yMin + removeButtonRect.height / 2f);
+                GUIContent descriptionLabel = new GUIContent("( i )", description);
                 GUI.Label(tooltipIconRect, descriptionLabel, EditorStyles.boldLabel);
             }
-            GUILayout.EndHorizontal();
+
+            if (EditorGUI.EndChangeCheck())
+            {
+                componentProperty.serializedObject.ApplyModifiedProperties();
+                componentProperty.serializedObject.SetIsDifferentCacheDirty();
+            }
         }
 
         private void DrawDamagedComponent(SerializedProperty componentRefProp, int index)

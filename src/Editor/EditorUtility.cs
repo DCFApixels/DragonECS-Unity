@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using Codice.Utils;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
@@ -105,8 +106,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 IsShowRuntimeComponents = EditorGUILayout.Foldout(IsShowRuntimeComponents, "RUNTIME COMPONENTS");
                 if (IsShowRuntimeComponents)
                 {
-                    //TODO галочкаслишком чернаяя, невидно
-                    IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHiddens);
+                    GUILayout.Box("", EcsEditor.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
+                    IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
                     foreach (var componentTypeID in componentTypeIDs)
                     {
                         var pool = world.GetPool(componentTypeID);
@@ -124,8 +125,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (meta.IsHidden == false || IsShowHidden)
                 {
                     object data = pool.GetRaw(entityID);
-                    Color panelColor = meta.Color.ToUnityColor();
-                    GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
+                    Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+                    GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
 
                     Type componentType = pool.ComponentType;
@@ -151,7 +152,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (uobj == null && (type.IsGenericType || !type.IsSerializable))
                 {
-                    isExpanded = EditorGUILayout.Foldout(isExpanded, label);
+                    isExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(isExpanded, label, EditorStyles.foldout);
+                    EditorGUILayout.EndFoldoutHeaderGroup();
 
                     if (isExpanded)
                     {

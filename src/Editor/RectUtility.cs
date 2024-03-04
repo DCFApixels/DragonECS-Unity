@@ -29,6 +29,14 @@ namespace DCFApixels.DragonECS.Unity.Internal
             return (l, r);
         }
 
+        public static (Rect, Rect) VerticalSliceTop(Rect rect, float height)
+        {
+            Rect t = rect;
+            Rect b = rect;
+            t.yMax = t.yMin + height;
+            b.yMin += height;
+            return (t, b);
+        }
         public static (Rect, Rect) VerticalSliceBottom(Rect rect, float height)
         {
             Rect t = rect;
@@ -36,6 +44,20 @@ namespace DCFApixels.DragonECS.Unity.Internal
             t.yMax -= height;
             b.yMin = b.yMax - height;
             return (t, b);
+        }
+
+        public static Rect AddPadding(Rect rect, float verticalHorizontal)
+        {
+            return AddPadding(rect, verticalHorizontal, verticalHorizontal);
+        }
+
+        public static Rect AddPadding(Rect rect, float vertical, float horizontal)
+        {
+            rect.xMax -= horizontal;
+            rect.xMin += horizontal;
+            rect.yMax -= vertical;
+            rect.yMin += vertical;
+            return rect;
         }
     }
 }
