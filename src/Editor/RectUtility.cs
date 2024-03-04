@@ -48,15 +48,18 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         public static Rect AddPadding(Rect rect, float verticalHorizontal)
         {
-            return AddPadding(rect, verticalHorizontal, verticalHorizontal);
+            return AddPadding(rect, verticalHorizontal, verticalHorizontal, verticalHorizontal, verticalHorizontal);
         }
-
         public static Rect AddPadding(Rect rect, float vertical, float horizontal)
         {
-            rect.xMax -= horizontal;
-            rect.xMin += horizontal;
-            rect.yMax -= vertical;
-            rect.yMin += vertical;
+            return AddPadding(rect, vertical, vertical, horizontal, horizontal);
+        }
+        public static Rect AddPadding(Rect rect, float left, float right, float top, float bottom)
+        {
+            rect.xMin += left;
+            rect.xMax -= right;
+            rect.yMin += top;
+            rect.yMax -= bottom;
             return rect;
         }
     }

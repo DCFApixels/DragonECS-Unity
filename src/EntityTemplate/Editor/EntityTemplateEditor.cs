@@ -178,15 +178,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
             #region Draw Component Block 
             EditorGUI.DrawRect(propertyFullRect, alphaPanelColor);
             propertyRect = RectUtility.AddPadding(propertyRect, padding);
+            bool isRemoveComponent = false;
+            if (GUI.Button(removeButtonRect, "x"))
+            {
+                isRemoveComponent = true;
+            }
+
             if (isEmpty)
             {
                 GUI.Label(propertyRect, label);
             }
             else
             {
-                EditorGUI.PropertyField(propertyRect, componentProperty, label, true);
+                EditorGUI.PropertyField(propertyFullRect, componentProperty, label, true);
             }
-            if (GUI.Button(removeButtonRect, "x"))
+            if (isRemoveComponent)
             {
                 OnRemoveComponentAt(index);
             }

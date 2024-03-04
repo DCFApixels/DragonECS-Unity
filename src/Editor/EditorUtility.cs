@@ -138,19 +138,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
 
                     GUILayout.EndVertical();
-                    GUILayout.Space(2f);
                 }
             }
 
             private static bool DrawRuntimeData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
             {
                 Type type = data.GetType();
-                UnityEngine.Object uobj = data as UnityEngine.Object;
+                bool isUnityObject = typeof(UnityEngine.Object).IsAssignableFrom(fieldType);
                 ref bool isExpanded = ref expandMatrix.Down();
                 bool changed = false;
                 outData = data;
 
-                if (uobj == null && (type.IsGenericType || !type.IsSerializable))
+                if (isUnityObject == false && (type.IsGenericType || !type.IsSerializable))
                 {
                     isExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(isExpanded, label, EditorStyles.foldout);
                     EditorGUILayout.EndFoldoutHeaderGroup();
@@ -174,18 +173,32 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    EditorGUI.BeginChangeCheck();
-                    WrapperBase w = uobj == null ? RefEditorWrapper.Take(data) : UnityObjEditorWrapper.Take(uobj);
-
-                    w.IsExpanded = isExpanded;
-                    EditorGUILayout.PropertyField(w.Property, label, true);
-                    isExpanded = w.IsExpanded;
-
-                    if (EditorGUI.EndChangeCheck())
+                    if (isUnityObject)
                     {
-                        w.SO.ApplyModifiedProperties();
-                        outData = w.Data;
-                        changed = true;
+                        EditorGUI.BeginChangeCheck();
+                        UnityEngine.Object uobj = (UnityEngine.Object)data;
+                        uobj = EditorGUILayout.ObjectField(label, uobj, fieldType, true);
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            outData = uobj;
+                            changed = true;
+                        }
+                    }
+                    else
+                    {
+                        EditorGUI.BeginChangeCheck();
+                        WrapperBase w = RefEditorWrapper.Take(data);
+
+                        w.IsExpanded = isExpanded;
+                        EditorGUILayout.PropertyField(w.Property, label, true);
+                        isExpanded = w.IsExpanded;
+
+                        if (EditorGUI.EndChangeCheck())
+                        {
+                            w.SO.ApplyModifiedProperties();
+                            outData = w.Data;
+                            changed = true;
+                        }
                     }
                 }
                 

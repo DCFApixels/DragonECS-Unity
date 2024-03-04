@@ -120,8 +120,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 targets[i] = (EcsEntityConnect)this.targets[i];
             }
-            DrawTop();
-
             DrawEntityInfo(targets);
 
             DrawTemplates();
@@ -129,52 +127,64 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DrawButtons();
             DrawComponents(targets);
         }
-        private void DrawTop()
-        {
-            var iterator = serializedObject.GetIterator();
-            iterator.NextVisible(true);
-            using (new EditorGUI.DisabledScope(true))
-            {
-                EditorGUILayout.PropertyField(iterator, true);
-            }
-        }
 
+        private const float line1 = 1f;
+        private const float line2 = 2f;
         private void DrawEntityInfo(EcsEntityConnect[] targets)
         {
             float width = EditorGUIUtility.currentViewWidth;
             float height = EditorGUIUtility.singleLineHeight;
-            Rect entityRect = GUILayoutUtility.GetRect(width, height + 3f);
+            Rect entityRect = GUILayoutUtility.GetRect(width, height + line2 * 2f);
 
-            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, 3f);
+            Color w = Color.gray;
+            w.a = 0.6f;
+            Color b = Color.black;
+            b.a = 0.55f;
+            EditorGUI.DrawRect(entityRect, w);
+
+            entityRect = RectUtility.AddPadding(entityRect, line1, line1, line2, 0);
+            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, line2);
 
             var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(entityInfoRect, 0.5f);
             var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
 
+            idRect = RectUtility.AddPadding(idRect, line1, 0);
+            genRect = RectUtility.AddPadding(genRect, line1, 0);
+            worldRect = RectUtility.AddPadding(worldRect, line1, 0);
+
+            EditorGUI.DrawRect(idRect, b);
+            EditorGUI.DrawRect(genRect, b);
+            EditorGUI.DrawRect(worldRect, b);
 
 
             bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out short world);
-           
 
+            GUIStyle style = new GUIStyle(EditorStyles.boldLabel);
+            style.alignment = TextAnchor.MiddleCenter;
             if (IsMultipleTargets == false && isConnected)
             {
                 Color statusColor = EcsGUI.GreenColor;
-                statusColor.a = 0.32f;
+                statusColor.a = 0.4f;
                 EditorGUI.DrawRect(statusRect, statusColor);
-                EditorGUI.IntField(idRect, id);
-                EditorGUI.IntField(genRect, gen);
-                EditorGUI.IntField(worldRect, world);
+
+                EditorGUI.IntField(idRect, id, style);
+                EditorGUI.IntField(genRect, gen, style);
+                EditorGUI.IntField(worldRect, world, style);
             }
             else
             {
-                using (new EditorGUI.DisabledScope(true))
-                {
-                    Color statusColor = IsMultipleTargets ? EcsGUI.GrayColor : EcsGUI.RedColor;
-                    statusColor.a = 0.32f;
-                    EditorGUI.DrawRect(statusRect, statusColor);
-                    EditorGUI.TextField(idRect, "Entity ID");
-                    EditorGUI.TextField(genRect, "Gen");
-                    EditorGUI.TextField(worldRect, "World ID");
-                }
+                Color statusColor = IsMultipleTargets ? new Color32(200, 200, 200, 255) : EcsGUI.RedColor;
+                statusColor.a = 0.4f;
+                EditorGUI.DrawRect(statusRect, statusColor);
+
+                Color dc = GUI.color;
+                Color ndc = Color.white;
+                ndc.a = 0.4f;
+                GUI.color = ndc;
+                GUI.Label(idRect, "Entity ID", EditorStyles.boldLabel);
+                GUI.Label(genRect, "Generation", EditorStyles.boldLabel);
+                GUI.Label(worldRect, "World ID", EditorStyles.boldLabel);
+                GUI.color = dc;
             }
         }
 
