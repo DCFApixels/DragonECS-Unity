@@ -65,77 +65,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);
         internal readonly static Color RedColor = new Color32(255, 0, 75, 255);
 
-        //private static GUIStyle _grayStyle;
-        //private static GUIStyle _greenStyle;
-        //private static GUIStyle _redStyle;
-        private static GUILayoutOption[] _defaultParams;
-
-        private static bool _isInit = false;
-
-        private static void Init()
-        {
-            if (_isInit)
-            {
-                return;
-            }
-
-            _defaultParams = new GUILayoutOption[] { GUILayout.ExpandWidth(true) };
-            //_grayStyle = EcsEditor.GetStyle(GrayColor);
-            //_greenStyle = EcsEditor.GetStyle(GreenColor);
-            //_redStyle = EcsEditor.GetStyle(RedColor);
-            _isInit = true;
-        }
-
-
-        //private const string CONNECTED = "Connected";
-        //private const string NOT_CONNECTED = "Not connected";
-        //private const string UNDETERMINED_CONNECTED = "---";
-        //public static void DrawConnectStatus(Rect position, bool status)
+        //private static GUILayoutOption[] _defaultParams;
+        //private static bool _isInit = false;
+        //private static void Init()
         //{
-        //    Init();
-        //    if (status)
+        //    if (_isInit)
         //    {
-        //        GUI.Box(position, CONNECTED, _greenStyle);
+        //        return;
         //    }
-        //    else
-        //    {
-        //        GUI.Box(position, NOT_CONNECTED, _redStyle);
-        //    }
-        //}
-        //
-        //public static void DrawUndeterminedConnectStatus(Rect position)
-        //{
-        //    Init();
-        //    GUI.Box(position, UNDETERMINED_CONNECTED, _grayStyle);
+        //    _defaultParams = new GUILayoutOption[] { GUILayout.ExpandWidth(true) };
+        //    _isInit = true;
         //}
 
         public static class Layout
         {
-            //public static void DrawConnectStatus(bool status, params GUILayoutOption[] options)
-            //{
-            //    Init();
-            //    if (options == null || options.Length <= 0)
-            //    {
-            //        options = _defaultParams;
-            //    }
-            //    GUILayout.Box("", options);
-            //    Rect lastRect = GUILayoutUtility.GetLastRect();
-            //    Color color = status ? GreenColor : RedColor;
-            //    string text = status ? CONNECTED : NOT_CONNECTED;
-            //    color.a = 0.6f;
-            //    EditorGUI.DrawRect(lastRect, color);
-            //    GUI.Box(lastRect, text);
-            //}
-
-            //public static void DrawUndeterminedConnectStatus(params GUILayoutOption[] options)
-            //{
-            //    Init();
-            //    if (options == null || options.Length <= 0)
-            //    {
-            //        options = _defaultParams;
-            //    }
-            //    GUILayout.Box(UNDETERMINED_CONNECTED, _grayStyle, options);
-            //}
+            private static bool IsShowHidden
+            {
+                get { return DebugMonitorPrefs.instance.IsShowHidden; }
+                set { DebugMonitorPrefs.instance.IsShowHidden = value; }
+            }
             public static void DrawComponents(entlong entity)
             {
                 if (entity.TryUnpack(out int entityID, out EcsWorld world))
@@ -146,7 +94,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public static void DrawComponents(int entityID, EcsWorld world)
             {
                 var componentTypeIDs = world.GetComponentTypeIDs(entityID);
+
                 GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
+                GUILayout.Label("COMPONENTS");
+                IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
+
                 foreach (var componentTypeID in componentTypeIDs)
                 {
                     var pool = world.GetPool(componentTypeID);
@@ -159,24 +111,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
             private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             private static void DrawComponent(int entityID, IEcsPool pool)
             {
-                object data = pool.GetRaw(entityID);
-                var meta = data.GetMeta();
-
-                Color panelColor = meta.Color.ToUnityColor();
-                GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
-                EditorGUI.BeginChangeCheck();
-
-                Type componentType = pool.ComponentType;
-                ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
-                bool changed = DrawData(componentType, new GUIContent(meta.Name), expandMatrix, data, out object resultData);
-                if (changed)
+                var meta = pool.ComponentType.ToMeta();
+                if (meta.IsHidden == false || IsShowHidden)
                 {
-                    pool.SetRaw(entityID, resultData);
+                    object data = pool.GetRaw(entityID);
+                    Color panelColor = meta.Color.ToUnityColor();
+                    GUILayout.BeginVertical(EcsEditor.GetStyle(panelColor, 0.22f));
+                    EditorGUI.BeginChangeCheck();
+
+                    Type componentType = pool.ComponentType;
+                    ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
+                    bool changed = DrawData(componentType, new GUIContent(meta.Name), expandMatrix, data, out object resultData);
+                    if (changed)
+                    {
+                        pool.SetRaw(entityID, resultData);
+                    }
+
+                    GUILayout.EndVertical();
+                    GUILayout.Space(2f);
                 }
-
-                GUILayout.EndVertical();
-
-                GUILayout.Space(2f);
             }
 
             private static bool DrawData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
