@@ -9,7 +9,7 @@
             {
                 if (_instance == null)
                 {
-                    _instance = FindOrCreateSingleton<EcsDefaultWorldSingletonProvider>("DefaultSingletonProvider");
+                    _instance = FindOrCreateSingleton<EcsDefaultWorldSingletonProvider>("SingletonDefaultWorld");
                 }
                 return _instance;
             }

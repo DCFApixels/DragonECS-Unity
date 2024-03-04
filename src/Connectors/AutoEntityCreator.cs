@@ -65,6 +65,7 @@ namespace DCFApixels.DragonECS
         internal void Autoset_Editor()
         {
             _connect = GetComponentInChildren<EcsEntityConnect>();
+            AutoResolveWorldProviderDependensy();
         }
 #endif
     }

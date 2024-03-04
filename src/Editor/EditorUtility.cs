@@ -84,32 +84,41 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 get { return DebugMonitorPrefs.instance.IsShowHidden; }
                 set { DebugMonitorPrefs.instance.IsShowHidden = value; }
             }
-            public static void DrawComponents(entlong entity)
+            private static bool IsShowRuntimeComponents
+            {
+                get { return DebugMonitorPrefs.instance.IsShowRuntimeComponents; }
+                set { DebugMonitorPrefs.instance.IsShowRuntimeComponents = value; }
+            }
+            public static void DrawRuntimeComponents(entlong entity)
             {
                 if (entity.TryUnpack(out int entityID, out EcsWorld world))
                 {
-                    DrawComponents(entityID, world);
+                    DrawRuntimeComponents(entityID, world);
                 }
             }
-            public static void DrawComponents(int entityID, EcsWorld world)
+            public static void DrawRuntimeComponents(int entityID, EcsWorld world)
             {
                 var componentTypeIDs = world.GetComponentTypeIDs(entityID);
 
                 GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
-                GUILayout.Label("COMPONENTS");
-                IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
 
-                foreach (var componentTypeID in componentTypeIDs)
+                IsShowRuntimeComponents = EditorGUILayout.Foldout(IsShowRuntimeComponents, "RUNTIME COMPONENTS");
+                if (IsShowRuntimeComponents)
                 {
-                    var pool = world.GetPool(componentTypeID);
+                    //TODO галочкаслишком чернаяя, невидно
+                    IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHiddens);
+                    foreach (var componentTypeID in componentTypeIDs)
                     {
-                        DrawComponent(entityID, pool);
+                        var pool = world.GetPool(componentTypeID);
+                        {
+                            DrawRuntimeComponent(entityID, pool);
+                        }
                     }
                 }
                 GUILayout.EndVertical();
             }
             private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
-            private static void DrawComponent(int entityID, IEcsPool pool)
+            private static void DrawRuntimeComponent(int entityID, IEcsPool pool)
             {
                 var meta = pool.ComponentType.ToMeta();
                 if (meta.IsHidden == false || IsShowHidden)
@@ -121,7 +130,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     Type componentType = pool.ComponentType;
                     ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
-                    bool changed = DrawData(componentType, new GUIContent(meta.Name), expandMatrix, data, out object resultData);
+                    bool changed = DrawRuntimeData(componentType, new GUIContent(meta.Name), expandMatrix, data, out object resultData);
                     if (changed)
                     {
                         pool.SetRaw(entityID, resultData);
@@ -132,7 +141,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            private static bool DrawData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
+            private static bool DrawRuntimeData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
             {
                 Type type = data.GetType();
                 UnityEngine.Object uobj = data as UnityEngine.Object;
@@ -150,7 +159,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         foreach (var field in type.GetFields(fieldFlags))
                         {
                             GUIContent subLabel = new GUIContent(EcsUnityEditorUtility.TransformFieldName(field.Name));
-                            if (DrawData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
+                            if (DrawRuntimeData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
                             {
                                 field.SetValue(data, fieldData);
 

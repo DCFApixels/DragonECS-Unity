@@ -224,7 +224,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             if (Target.Entity.TryUnpack(out int entityID, out EcsWorld world))
             {
-                EcsGUI.Layout.DrawComponents(entityID, world);
+                EcsGUI.Layout.DrawRuntimeComponents(entityID, world);
             }
         }
     }
