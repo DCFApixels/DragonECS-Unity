@@ -2,6 +2,6 @@
 {
     public static class EcsUnityConsts
     {
-        public const string INFO_MARK = "[i]";
+        public const string INFO_MARK = "[D]";
     }
 }

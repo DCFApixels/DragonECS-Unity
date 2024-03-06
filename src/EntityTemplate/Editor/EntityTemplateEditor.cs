@@ -68,7 +68,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 for (int i = 0; i < componentsProp.arraySize; i++)
                 {
                     if (componentsProp.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+                    {
                         return;
+                    }
                 }
 
                 componentsProp.InsertArrayElementAtIndex(0);
@@ -102,6 +104,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             DrawTop(target);
             GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
+            GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
@@ -158,27 +161,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
             string description = template.Description;
             Color panelColor = template.Color.Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
-            EditorGUI.BeginChangeCheck();
+            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
 
             GUIContent label = new GUIContent(name);
             bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
-
-            float width = EditorGUIUtility.currentViewWidth;
-            float height = isEmpty ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(componentProperty, label, true);
             float padding = EditorGUIUtility.standardVerticalSpacing;
-
-            Rect propertyFullRect = GUILayoutUtility.GetRect(width, height + padding * 3f);
-            propertyFullRect = RectUtility.AddPadding(propertyFullRect, padding / 2f);
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-            var (propertyRect, controlRect) = RectUtility.HorizontalSliceRight(propertyFullRect, RemoveButtonRect.width);
-            var (removeButtonRect, _) = RectUtility.VerticalSliceTop(controlRect, RemoveButtonRect.height);
+            EditorGUI.BeginChangeCheck();
+            GUILayout.BeginVertical(EcsEditor.GetStyle(alphaPanelColor));
 
             #region Draw Component Block 
-            EditorGUI.DrawRect(propertyFullRect, alphaPanelColor);
-            propertyRect = RectUtility.AddPadding(propertyRect, padding);
             bool isRemoveComponent = false;
+            removeButtonRect.yMin = removeButtonRect.yMax;
+            removeButtonRect.yMax += RemoveButtonRect.height;
+            removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
+            removeButtonRect.center += Vector2.up * padding * 2f;
             if (GUI.Button(removeButtonRect, "x"))
             {
                 isRemoveComponent = true;
@@ -186,30 +185,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (isEmpty)
             {
-                GUI.Label(propertyRect, label);
+                GUILayout.Label(label);
             }
             else
             {
-                EditorGUI.PropertyField(propertyFullRect, componentProperty, label, true);
+                EditorGUILayout.PropertyField(componentProperty, label, true);
             }
             if (isRemoveComponent)
             {
                 OnRemoveComponentAt(index);
             }
-            #endregion
-
             if (!string.IsNullOrEmpty(description))
             {
                 Rect tooltipIconRect = TooltipIconRect;
-                tooltipIconRect.center = new Vector2(propertyRect.xMax - removeButtonRect.width / 2f, propertyRect.yMin + removeButtonRect.height / 2f);
-                GUIContent descriptionLabel = new GUIContent("( i )", description);
+                tooltipIconRect.center = removeButtonRect.center;
+                tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
+                GUIContent descriptionLabel = new GUIContent(EcsUnityConsts.INFO_MARK, description);
                 GUI.Label(tooltipIconRect, descriptionLabel, EditorStyles.boldLabel);
             }
+            #endregion
 
+            GUILayout.EndVertical();
             if (EditorGUI.EndChangeCheck())
             {
                 componentProperty.serializedObject.ApplyModifiedProperties();
-                componentProperty.serializedObject.SetIsDifferentCacheDirty();
+                EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
             }
         }
 
@@ -225,7 +225,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
             if (GUI.Button(removeButtonRect, "x", removeButtonStyle))
+            {
                 OnRemoveComponentAt(index);
+            }
 
             GUILayout.EndHorizontal();
         }
@@ -234,9 +236,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             int lastSlashIndex = input.LastIndexOfAny(new char[] { '/', '\\' });
             if (lastSlashIndex == -1)
+            {
                 return input;
+            }
             else
+            {
                 return input.Substring(lastSlashIndex + 1);
+            }
         }
     }
 

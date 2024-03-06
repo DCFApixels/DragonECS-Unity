@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DCFApixels.DragonECS.Unity.Editors
+﻿namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal static class EscEditorConsts
     {

@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using Codice.Utils;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
@@ -201,7 +200,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
                 }
-                
+
                 expandMatrix.Up();
                 return changed;
             }

@@ -56,7 +56,7 @@ namespace DCFApixels.DragonECS
     [Serializable]
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, IComponentTemplate
     {
-        private static TypeMetaDataCached _meta = EcsDebugUtility.GetCachedTypeMeta<T>();
+        private static TypeMeta _meta = EcsDebugUtility.GetTypeMeta<T>();
         [SerializeField]
         protected T component;
 
@@ -142,7 +142,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _types = types.ToArray();
             foreach (var type in _types)
             {
-                EcsDebugUtility.GetCachedTypeMeta(type);
+                EcsDebugUtility.GetTypeMeta(type);
             }
             _dummies = new IComponentTemplate[_types.Length];
 

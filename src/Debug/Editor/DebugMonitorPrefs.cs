@@ -1,6 +1,6 @@
 ﻿#if UNITY_EDITOR
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -22,7 +22,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isShowHidden = false;
         public bool IsShowHidden
         {
-            get => _isShowHidden; 
+            get => _isShowHidden;
             set
             {
                 _isShowHidden = value;
