@@ -46,7 +46,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public static void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout = true)
             {
-                var componentTypeIDs = world.GetComponentTypeIDs(entityID);
+                var componentTypeIDs = world.GetComponentTypeIDsFor(entityID);
 
                 GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
 
@@ -61,7 +61,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
                     foreach (var componentTypeID in componentTypeIDs)
                     {
-                        var pool = world.GetPool(componentTypeID);
+                        var pool = world.GetPoolInstance(componentTypeID);
                         {
                             DrawRuntimeComponent(entityID, pool);
                         }
