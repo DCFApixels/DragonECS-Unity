@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Codice.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -11,11 +12,6 @@ namespace DCFApixels.DragonECS
     {
         #region Properties
         Type Type { get; }
-        string Name { get; }
-        MetaGroup Group { get; }
-        string Description { get; }
-        IReadOnlyCollection<string> Tags { get; }
-        Color Color { get; }
         #endregion
 
         #region Methods
@@ -31,17 +27,18 @@ namespace DCFApixels.DragonECS
             Selected
         }
     }
+    public interface IComponentTemplateWithMetaOverride : IComponentTemplate, ITypeMeta { }
 
     [Serializable]
-    public abstract class ComponentTemplateBase : IComponentTemplate
+    public abstract class ComponentTemplateBase : IComponentTemplateWithMetaOverride
     {
         #region Properties
         public abstract Type Type { get; }
         public virtual string Name { get { return string.Empty; } }
-        public virtual MetaGroup Group { get { return default; } }
+        public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
+        public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
         public virtual string Description { get { return string.Empty; } }
         public virtual IReadOnlyCollection<string> Tags { get { return Array.Empty<string>(); } }
-        public virtual Color Color { get { return Color.black; } }
         #endregion
 
         #region Methods
@@ -54,19 +51,19 @@ namespace DCFApixels.DragonECS
         #endregion
     }
     [Serializable]
-    public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, IComponentTemplate
+    public abstract class ComponentTemplateBase<T> : ComponentTemplateBase
     {
-        private static TypeMeta _meta = EcsDebugUtility.GetTypeMeta<T>();
+        protected static TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
         [SerializeField]
         protected T component;
 
         #region Properties
         public override Type Type { get { return typeof(T); } }
-        public override string Name { get { return _meta.Name; } }
-        public override MetaGroup Group { get { return _meta.Group; } }
-        public override string Description { get { return _meta.Description; } }
-        public override IReadOnlyCollection<string> Tags { get { return _meta.Tags; } }
-        public override Color Color { get { return _meta.Color.ToUnityColor(); } }
+        public override string Name { get { return Meta.Name; } }
+        public override MetaGroup Group { get { return Meta.Group; } }
+        public override string Description { get { return Meta.Description; } }
+        public override IReadOnlyCollection<string> Tags { get { return Meta.Tags; } }
+        public override MetaColor Color { get { return Meta.Color; } }
         #endregion
 
         #region Methods
@@ -81,7 +78,7 @@ namespace DCFApixels.DragonECS
         #endregion
     }
 
-    public abstract class ComponentTemplate<T> : ComponentTemplateBase<T>, IComponentTemplate
+    public abstract class ComponentTemplate<T> : ComponentTemplateBase<T>
         where T : struct, IEcsComponent
     {
         public override void Apply(int worldID, int entityID)
@@ -89,7 +86,7 @@ namespace DCFApixels.DragonECS
             EcsWorld.GetPool<EcsPool<T>>(worldID).TryAddOrGet(entityID) = component;
         }
     }
-    public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>, IComponentTemplate
+    public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>
     where T : struct, IEcsTagComponent
     {
         public override void Apply(int worldID, int entityID)
@@ -118,8 +115,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         private static Type[] _types;
         private static IComponentTemplate[] _dummies;
-        internal static ReadOnlySpan<Type> Types => _types;
-        internal static ReadOnlySpan<IComponentTemplate> Dummies => _dummies;
+        internal static ReadOnlySpan<Type> Types
+        {
+            get { return _types; }
+        }
+        internal static ReadOnlySpan<IComponentTemplate> Dummies
+        {
+            get { return _dummies; }
+        }
 
         static ComponentTemplateTypeCache()
         {

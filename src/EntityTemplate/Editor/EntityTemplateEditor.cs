@@ -42,11 +42,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             genericMenu = new GenericMenu();
 
-            var dummies = ComponentTemplateTypeCache.Dummies;
-            foreach (var dummy in dummies)
+            var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
+            foreach (var dummy in componentTemplateDummies)
             {
-                string name = dummy.Name;
-                string description = dummy.Description;
+                ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
+                string name = meta.Name;
+                string description = meta.Description;
+                MetaGroup group = meta.Group;
+
+                if(group.Name.Length > 0)
+                {
+                    name = group.Name + name;
+                }
+
                 if (string.IsNullOrEmpty(description) == false)
                 {
                     name = $"{name} {EcsUnityConsts.INFO_MARK}";
@@ -156,10 +164,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 componentType = componentProperty.managedReferenceValue.GetType(); ;
             }
-
-            string name = template.Name;
-            string description = template.Description;
-            Color panelColor = template.Color.Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+            
+            ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
+            string name = meta.Name;
+            string description = meta.Description;
+            Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
             Rect removeButtonRect = GUILayoutUtility.GetLastRect();
 
@@ -230,19 +239,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             GUILayout.EndHorizontal();
-        }
-
-        public string GetLastPathComponent(string input)
-        {
-            int lastSlashIndex = input.LastIndexOfAny(new char[] { '/', '\\' });
-            if (lastSlashIndex == -1)
-            {
-                return input;
-            }
-            else
-            {
-                return input.Substring(lastSlashIndex + 1);
-            }
         }
     }
 

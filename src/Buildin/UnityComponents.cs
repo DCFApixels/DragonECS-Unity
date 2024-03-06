@@ -5,6 +5,13 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    internal static class UnityComponentConsts
+    {
+        private const string UNITY_COMPONENT_NAME = "UnityComponent";
+        public static readonly MetaGroup BaseGroup = new MetaGroupRef(UNITY_COMPONENT_NAME);
+        public static readonly MetaGroup ColliderGroup = new MetaGroupRef($"{UNITY_COMPONENT_NAME}/Collider/");
+        public static readonly MetaGroup JointGroup = new MetaGroupRef($"{UNITY_COMPONENT_NAME}/Joint/");
+    }
     [Serializable]
     [MetaColor(255 / 3, 255, 0)]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
@@ -22,7 +29,14 @@ namespace DCFApixels.DragonECS
     #region Unity Component Templates
     public class UnityComponentTemplate<T> : ComponentTemplateBase<UnityComponent<T>> where T : Component
     {
-        public override string Name => "UnityComponent/" + typeof(T).Name;
+        public override string Name
+        {
+            get { return typeof(T).Name; }
+        }
+        public override MetaGroup Group
+        {
+            get { return UnityComponentConsts.BaseGroup; }
+        }
         public sealed override void Apply(int worldID, int entityID)
         {
             EcsWorld.GetPool<EcsPool<UnityComponent<T>>>(worldID).TryAddOrGet(entityID) = component;
@@ -51,27 +65,27 @@ namespace DCFApixels.DragonECS
     [Serializable]
     public sealed class UnityComponentColliderTemplate : UnityComponentTemplate<Collider>
     {
-        public override string Name => "UnityComponent/Collider/" + nameof(Collider);
+        public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentBoxColliderTemplate : UnityComponentTemplate<BoxCollider>
     {
-        public override string Name => "UnityComponent/Collider/" + nameof(BoxCollider);
+        public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentSphereColliderTemplate : UnityComponentTemplate<SphereCollider>
     {
-        public override string Name => "UnityComponent/Collider/" + nameof(SphereCollider);
+        public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentCapsuleColliderTemplate : UnityComponentTemplate<CapsuleCollider>
     {
-        public override string Name => "UnityComponent/Collider/" + nameof(CapsuleCollider);
+        public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentMeshColliderTemplate : UnityComponentTemplate<MeshCollider>
     {
-        public override string Name => "UnityComponent/Collider/" + nameof(MeshCollider);
+        public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
     #endregion
 
@@ -79,22 +93,22 @@ namespace DCFApixels.DragonECS
     [Serializable]
     public sealed class UnityComponentJointTemplate : UnityComponentTemplate<Joint>
     {
-        public override string Name => "UnityComponent/Joint/" + nameof(Joint);
+        public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentFixedJointTemplate : UnityComponentTemplate<FixedJoint>
     {
-        public override string Name => "UnityComponent/Joint/" + nameof(FixedJoint);
+        public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentCharacterJointTemplate : UnityComponentTemplate<CharacterJoint>
     {
-        public override string Name => "UnityComponent/Joint/" + nameof(CharacterJoint);
+        public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
     [Serializable]
     public sealed class UnityComponentConfigurableJointTemplate : UnityComponentTemplate<ConfigurableJoint>
     {
-        public override string Name => "UnityComponent/Joint/" + nameof(ConfigurableJoint);
+        public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
     #endregion
 }
