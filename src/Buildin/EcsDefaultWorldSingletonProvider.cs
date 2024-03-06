@@ -14,10 +14,5 @@
                 return _instance;
             }
         }
-
-        protected override EcsDefaultWorld BuildWorld()
-        {
-            return new EcsDefaultWorld();
-        }
     }
 }

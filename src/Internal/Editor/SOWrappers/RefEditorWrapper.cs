@@ -25,12 +25,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return result;
         }
     }
-}
 
-[Serializable]
-public class EmptyDummy
-{
-    public static readonly EmptyDummy Instance = new EmptyDummy();
-    private EmptyDummy() { }
+    [Serializable]
+    internal class EmptyDummy
+    {
+        public static readonly EmptyDummy Instance = new EmptyDummy();
+        private EmptyDummy() { }
+    }
 }
 #endif

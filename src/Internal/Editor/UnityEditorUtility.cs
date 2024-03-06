@@ -1,0 +1,160 @@
+﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
+using System.Runtime.InteropServices;
+using System.Text;
+using UnityEditor;
+using UnityEngine;
+
+namespace DCFApixels.DragonECS.Unity.Editors
+{
+    [InitializeOnLoad]
+    internal static class UnityEditorUtility
+    {
+        static UnityEditorUtility()
+        {
+            colorBoxeStyles = new SparseArray<GUIStyle>();
+        }
+        private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
+        private static GUIContent _singletonContent = null;
+
+        #region TransformFieldName
+        public static string TransformFieldName(string name)
+        {
+            if (name.Length <= 0)
+            {
+                return name;
+            }
+            StringBuilder b = new StringBuilder();
+            bool nextWorld = true;
+            bool prewIsUpper = false;
+
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                char c = name[i];
+                if (char.IsLetter(c) == false)
+                {
+                    nextWorld = true;
+                    prewIsUpper = false;
+                    continue;
+                }
+
+                bool isUpper = char.IsUpper(c);
+                if (isUpper)
+                {
+                    if (nextWorld == false && prewIsUpper == false)
+                    {
+                        b.Append(' ');
+                        nextWorld = true;
+                    }
+                }
+
+                if (nextWorld)
+                {
+                    b.Append(char.ToUpper(c));
+                }
+                else
+                {
+                    b.Append(c);
+                }
+                nextWorld = false;
+                prewIsUpper = isUpper;
+            }
+
+            return b.ToString();
+        }
+        #endregion
+
+        #region Label
+        public static GUIContent GetLabel(string name, string tooltip = null)
+        {
+            if (_singletonContent == null)
+            {
+                _singletonContent = new GUIContent();
+            }
+            _singletonContent.text = name;
+            _singletonContent.tooltip = tooltip;
+            return _singletonContent;
+        }
+        #endregion
+
+        #region GetStyle
+        public static GUIStyle GetStyle(Color color, float alphaMultiplier)
+        {
+            color.a *= alphaMultiplier;
+            return GetStyle(color);
+        }
+        public static GUIStyle GetStyle(Color32 color32)
+        {
+            int colorCode = new Color32Union(color32).colorCode;
+            if (colorBoxeStyles.TryGetValue(colorCode, out GUIStyle style))
+            {
+                if (style == null || style.normal.background == null)
+                {
+                    style = CreateStyle(color32, colorCode);
+                    colorBoxeStyles[colorCode] = style;
+                }
+                return style;
+            }
+
+            style = CreateStyle(color32, colorCode);
+            colorBoxeStyles.Add(colorCode, style);
+            return style;
+        }
+        private static GUIStyle CreateStyle(Color32 color32, int colorCode)
+        {
+            GUIStyle result = new GUIStyle(GUI.skin.box);
+            Color componentColor = color32;
+            Texture2D texture2D = CreateTexture(2, 2, componentColor);
+            result.hover.background = texture2D;
+            result.focused.background = texture2D;
+            result.active.background = texture2D;
+            result.normal.background = texture2D;
+            return result;
+        }
+        private static Texture2D CreateTexture(int width, int height, Color color)
+        {
+            var pixels = new Color[width * height];
+            for (var i = 0; i < pixels.Length; ++i)
+                pixels[i] = color;
+
+            var result = new Texture2D(width, height);
+            result.SetPixels(pixels);
+            result.Apply();
+            return result;
+        }
+        #endregion
+
+        #region Utils
+        [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 4)]
+        private readonly ref struct Color32Union
+        {
+            [FieldOffset(0)]
+            public readonly int colorCode;
+            [FieldOffset(0)]
+            public readonly byte r;
+            [FieldOffset(1)]
+            public readonly byte g;
+            [FieldOffset(2)]
+            public readonly byte b;
+            [FieldOffset(3)]
+            public readonly byte a;
+            public Color32Union(byte r, byte g, byte b, byte a) : this()
+            {
+                this.r = r;
+                this.g = g;
+                this.b = b;
+                this.a = a;
+            }
+            public Color32Union(Color32 color) : this()
+            {
+                r = color.r;
+                g = color.g;
+                b = color.b;
+                a = color.a;
+            }
+        }
+        #endregion
+    }
+}
+#endif

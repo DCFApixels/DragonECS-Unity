@@ -1,13 +1,18 @@
 ﻿using System;
 using Unity.Profiling;
+using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    [InitializeOnLoad]
     public class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
-
+        static UnityDebugService()
+        {
+            Activate();
+        }
         public static void Activate()
         {
             Set<UnityDebugService>();

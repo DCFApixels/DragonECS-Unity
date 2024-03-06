@@ -1,7 +1,4 @@
-﻿//SparseArray. Analogous to Dictionary<int, T>, but faster.
-//Benchmark result of indexer.get speed test with 300 elements:
-//[Dictinary: 5.786us] [SparseArray: 2.047us].
-using System;
+﻿using System;
 using System.Diagnostics.Contracts;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;

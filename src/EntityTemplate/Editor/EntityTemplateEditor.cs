@@ -1,13 +1,12 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
+﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
+using UnityEditor;
+using UnityEngine;
 
-#if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    using UnityEditor;
-    using UnityEngine;
-
     public abstract class EntityTemplateEditorBase : Editor
     {
         private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
@@ -20,13 +19,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Init
         private void Init()
         {
-            if (genericMenu == null)
-                _isInit = false;
-            if (_isInit)
-                return;
+            if (genericMenu == null) { _isInit = false; }
+            if (_isInit) { return; }
 
-            var tmpstylebase = EcsEditor.GetStyle(new Color(0.9f, 0f, 0.22f), 0.5f);
-            var tmpStyle = EcsEditor.GetStyle(new Color(1f, 0.5f, 0.7f), 0.5f);
+            var tmpstylebase = UnityEditorUtility.GetStyle(new Color(0.9f, 0f, 0.22f), 0.5f);
+            var tmpStyle = UnityEditorUtility.GetStyle(new Color(1f, 0.5f, 0.7f), 0.5f);
 
             removeButtonStyle = new GUIStyle(EditorStyles.linkLabel);
             removeButtonStyle.alignment = TextAnchor.MiddleCenter;
@@ -50,7 +47,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 string description = meta.Description;
                 MetaGroup group = meta.Group;
 
-                if(group.Name.Length > 0)
+                if (group.Name.Length > 0)
                 {
                     name = group.Name + name;
                 }
@@ -111,7 +108,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             DrawTop(target);
-            GUILayout.BeginVertical(EcsEditor.GetStyle(Color.black, 0.2f));
+            GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
             GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
@@ -164,7 +161,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 componentType = componentProperty.managedReferenceValue.GetType(); ;
             }
-            
+
             ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
             string name = meta.Name;
             string description = meta.Description;
@@ -172,14 +169,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Rect removeButtonRect = GUILayoutUtility.GetLastRect();
 
-            GUIContent label = new GUIContent(name);
+            //GUIContent label = new GUIContent(name);
+            GUIContent label = UnityEditorUtility.GetLabel(name);
             bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
             float padding = EditorGUIUtility.standardVerticalSpacing;
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
             EditorGUI.BeginChangeCheck();
-            GUILayout.BeginVertical(EcsEditor.GetStyle(alphaPanelColor));
+            GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
             #region Draw Component Block 
             bool isRemoveComponent = false;
@@ -204,12 +202,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 OnRemoveComponentAt(index);
             }
-            if (!string.IsNullOrEmpty(description))
+            if (string.IsNullOrEmpty(description) == false)
             {
                 Rect tooltipIconRect = TooltipIconRect;
                 tooltipIconRect.center = removeButtonRect.center;
                 tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                GUIContent descriptionLabel = new GUIContent(EcsUnityConsts.INFO_MARK, description);
+                GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EcsUnityConsts.INFO_MARK, description);
                 GUI.Label(tooltipIconRect, descriptionLabel, EditorStyles.boldLabel);
             }
             #endregion
