@@ -13,6 +13,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);
         internal readonly static Color RedColor = new Color32(255, 0, 75, 255);
 
+        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
+        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 21f, 15f);
         //private static GUILayoutOption[] _defaultParams;
         //private static bool _isInit = false;
         //private static void Init()
@@ -68,6 +70,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 GUILayout.EndVertical();
+
+                if (GUILayout.Button("Add Component", GUILayout.Height(24f)))
+                {
+                    GenericMenu genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
+                    RuntimeComponentsUtility.CurrentEntityID = entityID;
+                    genericMenu.ShowAsContext();
+                }
             }
             private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             private static void DrawRuntimeComponent(int entityID, IEcsPool pool)
@@ -77,15 +86,36 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     object data = pool.GetRaw(entityID);
                     Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+
+                    float padding = EditorGUIUtility.standardVerticalSpacing;
+                    Rect removeButtonRect = GUILayoutUtility.GetLastRect();
+
                     GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
+
+                    bool isRemoveComponent = false;
+                    removeButtonRect.yMin = removeButtonRect.yMax;
+                    removeButtonRect.yMax += RemoveButtonRect.height;
+                    removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
+                    removeButtonRect.center += Vector2.up * padding * 2f;
+                    if (GUI.Button(removeButtonRect, "x"))
+                    {
+                        isRemoveComponent = true;
+                    }
 
                     Type componentType = pool.ComponentType;
                     ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
                     bool changed = DrawRuntimeData(componentType, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData);
-                    if (changed)
+                    if (changed || isRemoveComponent)
                     {
-                        pool.SetRaw(entityID, resultData);
+                        if (isRemoveComponent)
+                        {
+                            pool.Del(entityID);
+                        }
+                        else
+                        {
+                            pool.SetRaw(entityID, resultData);
+                        }
                     }
 
                     GUILayout.EndVertical();

@@ -12,32 +12,32 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
         private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 21f, 15f);
 
-        private GUIStyle removeButtonStyle;
-        private GenericMenu genericMenu;
+        private GUIStyle _removeButtonStyle;
+        private GenericMenu _genericMenu;
         private bool _isInit = false;
 
         #region Init
         private void Init()
         {
-            if (genericMenu == null) { _isInit = false; }
+            if (_genericMenu == null) { _isInit = false; }
             if (_isInit) { return; }
 
             var tmpstylebase = UnityEditorUtility.GetStyle(new Color(0.9f, 0f, 0.22f), 0.5f);
             var tmpStyle = UnityEditorUtility.GetStyle(new Color(1f, 0.5f, 0.7f), 0.5f);
 
-            removeButtonStyle = new GUIStyle(EditorStyles.linkLabel);
-            removeButtonStyle.alignment = TextAnchor.MiddleCenter;
+            _removeButtonStyle = new GUIStyle(EditorStyles.linkLabel);
+            _removeButtonStyle.alignment = TextAnchor.MiddleCenter;
 
-            removeButtonStyle.normal = tmpstylebase.normal;
-            removeButtonStyle.hover = tmpStyle.normal;
-            removeButtonStyle.active = tmpStyle.normal;
-            removeButtonStyle.focused = tmpStyle.normal;
+            _removeButtonStyle.normal = tmpstylebase.normal;
+            _removeButtonStyle.hover = tmpStyle.normal;
+            _removeButtonStyle.active = tmpStyle.normal;
+            _removeButtonStyle.focused = tmpStyle.normal;
 
-            removeButtonStyle.padding = new RectOffset(0, 0, 0, 0);
-            removeButtonStyle.margin = new RectOffset(0, 0, 0, 0);
-            removeButtonStyle.border = new RectOffset(0, 0, 0, 0);
+            _removeButtonStyle.padding = new RectOffset(0, 0, 0, 0);
+            _removeButtonStyle.margin = new RectOffset(0, 0, 0, 0);
+            _removeButtonStyle.border = new RectOffset(0, 0, 0, 0);
 
-            genericMenu = new GenericMenu();
+            _genericMenu = new GenericMenu();
 
             var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
             foreach (var dummy in componentTemplateDummies)
@@ -56,7 +56,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     name = $"{name} {EcsUnityConsts.INFO_MARK}";
                 }
-                genericMenu.AddItem(new GUIContent(name, description), false, OnAddComponent, dummy);
+                _genericMenu.AddItem(new GUIContent(name, description), false, OnAddComponent, dummy);
             }
 
             _isInit = true;
@@ -122,7 +122,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (GUILayout.Button("Add Component", GUILayout.Height(24f)))
             {
                 Init();
-                genericMenu.ShowAsContext();
+                _genericMenu.ShowAsContext();
             }
         }
         private void DrawFooter(ITemplateInternal target)
@@ -167,14 +167,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             string description = meta.Description;
             Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
-            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
-
             //GUIContent label = new GUIContent(name);
             GUIContent label = UnityEditorUtility.GetLabel(name);
             bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
             float padding = EditorGUIUtility.standardVerticalSpacing;
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+
+            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
 
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
@@ -231,7 +231,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             removeButtonRect.center = new Vector2(lastrect.xMax + removeButtonRect.width, lastrect.yMin + removeButtonRect.height / 2f);
 
             GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
-            if (GUI.Button(removeButtonRect, "x", removeButtonStyle))
+            if (GUI.Button(removeButtonRect, "x", _removeButtonStyle))
             {
                 OnRemoveComponentAt(index);
             }

@@ -1,5 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEditor;
@@ -155,6 +157,96 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
         #endregion
+    }
+
+    internal static class RuntimeComponentsUtility
+    {
+        public struct WorldData
+        {
+            public GenericMenu addComponentGenericMenu;
+            public int poolsCount;
+            public WorldData(GenericMenu addComponentGenericMenu, int poolsCount)
+            {
+                this.addComponentGenericMenu = addComponentGenericMenu;
+                this.poolsCount = poolsCount;
+            }
+        }
+        //world id
+        private static Dictionary<EcsWorld, WorldData> _worldDatas = new Dictionary<EcsWorld, WorldData>();
+
+        public static GenericMenu GetAddComponentGenericMenu(EcsWorld world)
+        {
+            if (_worldDatas.TryGetValue(world, out WorldData data))
+            {
+                if (data.poolsCount != world.PoolsCount)
+                {
+                    data = CreateWorldData(world);
+                    _worldDatas[world] = data;
+                }
+            }
+            else
+            {
+                data = CreateWorldData(world);
+                _worldDatas[world] = data;
+                world.AddListener(new Listener(world));
+            }
+
+            return data.addComponentGenericMenu;
+        }
+
+        private static WorldData CreateWorldData(EcsWorld world)
+        {
+            GenericMenu genericMenu = new GenericMenu();
+
+            var pools = world.AllPools;
+            for (int i = 0; i < world.PoolsCount; i++)
+            {
+                var pool = pools[i];
+                if (pool.IsNullOrDummy())
+                {
+                    i--;
+                    continue;
+                }
+                var meta = pool.ComponentType.ToMeta();
+
+                genericMenu.AddItem(new GUIContent(meta.Name, meta.Description), false, OnAddComponent, pool);
+            }
+            return new WorldData(genericMenu, world.PoolsCount);
+        }
+
+        public static int CurrentEntityID = 0;
+
+        private static void OnAddComponent(object userData)
+        {
+            IEcsPool pool = (IEcsPool)userData;
+            if (pool.World.IsUsed(CurrentEntityID) == false)
+            {
+                return;
+            }
+            if (pool.Has(CurrentEntityID) == false)
+            {
+                pool.AddRaw(CurrentEntityID, Activator.CreateInstance(pool.ComponentType));
+            }
+            else
+            {
+                Debug.LogWarning($"Entity({CurrentEntityID}) already has component {EcsDebugUtility.GetGenericTypeName(pool.ComponentType)}.");
+            }
+        }
+
+        private class Listener : IEcsWorldEventListener
+        {
+            private EcsWorld _world;
+            public Listener(EcsWorld world)
+            {
+                _world = world;
+            }
+            public void OnReleaseDelEntityBuffer(ReadOnlySpan<int> buffer) { }
+            public void OnWorldDestroy()
+            {
+                _worldDatas.Remove(_world);
+            }
+            public void OnWorldResize(int newSize) { }
+        }
     }
 }
 #endif
