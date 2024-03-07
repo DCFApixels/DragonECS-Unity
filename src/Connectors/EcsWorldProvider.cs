@@ -16,7 +16,6 @@ namespace DCFApixels.DragonECS
     [Serializable]
     public abstract class EcsWorldProvider<TWorld> : EcsWorldProviderBase where TWorld : EcsWorld
     {
-        private readonly static EcsWorldConfig _emptyConfig = new EcsWorldConfig();
         private TWorld _world;
 
         [SerializeField]
@@ -25,19 +24,19 @@ namespace DCFApixels.DragonECS
         [Header("Default Configs")]
         [Header("Entites")]
         [SerializeField]
-        private int EntitiesCapacity = _emptyConfig.Get_EntitiesCapacity();
+        private int EntitiesCapacity = EcsWorldConfig.Default.EntitiesCapacity;
 
         [Header("Groups")]
         [SerializeField]
-        private int GroupCapacity = _emptyConfig.Get_GroupCapacity();
+        private int GroupCapacity = EcsWorldConfig.Default.GroupCapacity;
 
         [Header("Pools/Components")]
         [SerializeField]
-        private int PoolsCapacity = _emptyConfig.Get_PoolsCapacity();
+        private int PoolsCapacity = EcsWorldConfig.Default.PoolsCapacity;
         [SerializeField]
-        private int PoolComponentsCapacity = _emptyConfig.Get_PoolComponentsCapacity();
+        private int PoolComponentsCapacity = EcsWorldConfig.Default.PoolComponentsCapacity;
         [SerializeField]
-        private int PoolRecycledComponentsCapacity = _emptyConfig.Get_PoolRecycledComponentsCapacity();
+        private int PoolRecycledComponentsCapacity = EcsWorldConfig.Default.PoolRecycledComponentsCapacity;
 
         #region Properties
         public sealed override bool IsEmpty
@@ -95,13 +94,9 @@ namespace DCFApixels.DragonECS
         #region Events
         protected virtual TWorld BuildWorld()
         {
-            EcsWorldConfig config = new EcsWorldConfig();
-            config.Set_EntitiesCapacity(EntitiesCapacity);
-            config.Set_GroupCapacity(GroupCapacity);
-            config.Set_PoolComponentsCapacity(PoolComponentsCapacity);
-            config.Set_PoolRecycledComponentsCapacity(PoolRecycledComponentsCapacity);
-            config.Set_PoolsCapacity(PoolsCapacity);
-            return (TWorld)Activator.CreateInstance(typeof(TWorld), new object[] { config, _worldID });
+            EcsWorldConfig config = new EcsWorldConfig(EntitiesCapacity, GroupCapacity, PoolsCapacity, PoolComponentsCapacity, PoolRecycledComponentsCapacity);
+            ConfigContainer configs = new ConfigContainer().Set(config);
+            return (TWorld)Activator.CreateInstance(typeof(TWorld), new object[] { configs, _worldID });
         }
         protected virtual void OnWorldCreated(TWorld world) { }
         #endregion
