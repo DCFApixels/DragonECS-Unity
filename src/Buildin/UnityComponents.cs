@@ -22,8 +22,14 @@ namespace DCFApixels.DragonECS
         {
             this.obj = obj;
         }
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
-        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException(); //IntelliSense hack
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() //IntelliSense hack
+        {
+            throw new NotImplementedException();
+        }
+        IEnumerator IEnumerable.GetEnumerator() //IntelliSense hack
+        {
+            throw new NotImplementedException();
+        }
     }
 
     #region Unity Component Templates

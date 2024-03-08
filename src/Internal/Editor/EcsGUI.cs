@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -15,6 +16,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
         private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 21f, 15f);
+
+        private static bool IsShowHidden
+        {
+            get { return DebugMonitorPrefs.instance.IsShowHidden; }
+            set { DebugMonitorPrefs.instance.IsShowHidden = value; }
+        }
+        private static bool IsShowRuntimeComponents
+        {
+            get { return DebugMonitorPrefs.instance.IsShowRuntimeComponents; }
+            set { DebugMonitorPrefs.instance.IsShowRuntimeComponents = value; }
+        }
+
+        public enum AddClearComponentButton : byte
+        {
+            None = 0,
+            AddComponent,
+            Clear,
+        }
+
         //private static GUILayoutOption[] _defaultParams;
         //private static bool _isInit = false;
         //private static void Init()
@@ -27,17 +47,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //    _isInit = true;
         //}
 
+        public static AddClearComponentButton AddClearComponentButtons(Rect position)
+        {
+            //Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f);
+            position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
+            var (left, right) = RectUtility.HorizontalSliceLerp(position, 0.75f);
+
+            if (GUI.Button(left, "Add Component"))
+            {
+                return AddClearComponentButton.AddComponent;
+            }
+            if (GUI.Button(right, "Clear"))
+            {
+                return AddClearComponentButton.Clear;
+            }
+            return AddClearComponentButton.None;
+        }
+
         public static class Layout
         {
-            private static bool IsShowHidden
+
+            public static AddClearComponentButton AddClearComponentButtons()
             {
-                get { return DebugMonitorPrefs.instance.IsShowHidden; }
-                set { DebugMonitorPrefs.instance.IsShowHidden = value; }
-            }
-            private static bool IsShowRuntimeComponents
-            {
-                get { return DebugMonitorPrefs.instance.IsShowRuntimeComponents; }
-                set { DebugMonitorPrefs.instance.IsShowRuntimeComponents = value; }
+                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f));
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout = true)
             {
@@ -59,8 +91,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 if (isWithFoldout == false || IsShowRuntimeComponents)
                 {
+                    switch (EcsGUI.Layout.AddClearComponentButtons())
+                    {
+                        case AddClearComponentButton.AddComponent:
+                            GenericMenu genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
+                            RuntimeComponentsUtility.CurrentEntityID = entityID;
+                            genericMenu.ShowAsContext();
+                            break;
+                        case AddClearComponentButton.Clear:
+                            break;
+                    }
+
+
                     GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
                     IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
+
                     foreach (var componentTypeID in componentTypeIDs)
                     {
                         var pool = world.GetPoolInstance(componentTypeID);
@@ -70,13 +115,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 GUILayout.EndVertical();
-
-                if (GUILayout.Button("Add Component", GUILayout.Height(24f)))
-                {
-                    GenericMenu genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
-                    RuntimeComponentsUtility.CurrentEntityID = entityID;
-                    genericMenu.ShowAsContext();
-                }
             }
             private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
             private static void DrawRuntimeComponent(int entityID, IEcsPool pool)
@@ -123,9 +161,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             private static bool DrawRuntimeData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
-            {
-                Type type = data.GetType();
+            {   
+                outData = data;
+                Type type = data == null ? typeof(void) : data.GetType();
+ 
                 bool isUnityObject = typeof(UnityEngine.Object).IsAssignableFrom(fieldType);
+
+                if (isUnityObject == false && data == null)
+                {
+                    EditorGUILayout.TextField(label, "Null");
+                    return false;
+                }
                 ref bool isExpanded = ref expandMatrix.Down();
                 bool changed = false;
                 outData = data;

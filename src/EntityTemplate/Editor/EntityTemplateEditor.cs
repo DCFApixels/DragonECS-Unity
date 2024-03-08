@@ -107,43 +107,35 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            DrawTop(target);
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
+            DrawTop(target);
             GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
             }
             GUILayout.EndVertical();
-            DrawFooter(target);
         }
         private void DrawTop(ITemplateInternal target)
         {
-            if (GUILayout.Button("Add Component", GUILayout.Height(24f)))
+            switch (EcsGUI.Layout.AddClearComponentButtons())
             {
-                Init();
-                _genericMenu.ShowAsContext();
+                case EcsGUI.AddClearComponentButton.AddComponent:
+                    Init();
+                    _genericMenu.ShowAsContext();
+                    break;
+                case EcsGUI.AddClearComponentButton.Clear:
+                    Init();
+                    serializedObject.FindProperty(target.ComponentsPropertyName).ClearArray();
+                    serializedObject.ApplyModifiedProperties();
+                    break;
             }
         }
-        private void DrawFooter(ITemplateInternal target)
-        {
-            if (GUILayout.Button("Clear", GUILayout.Height(24f)))
-            {
-                Init();
-                serializedObject.FindProperty(target.ComponentsPropertyName).ClearArray();
-                serializedObject.ApplyModifiedProperties();
-            }
-        }
+
         private void DrawComponentData(SerializedProperty componentRefProp, int index)
         {
             IComponentTemplate template = componentRefProp.managedReferenceValue as IComponentTemplate;
-            if (template == null)
-            {
-                DrawDamagedComponent(componentRefProp, index);
-                return;
-            }
-
-            if (componentRefProp.managedReferenceValue == null)
+            if (template == null || componentRefProp.managedReferenceValue == null)
             {
                 DrawDamagedComponent(componentRefProp, index);
                 return;

@@ -1,7 +1,10 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using static PlasticGui.LaunchDiffParameters;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -94,14 +97,39 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawTemplates()
         {
+            EditorGUI.BeginChangeCheck();
             var iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
-            bool enterChildren = true;
-            while (iterator.NextVisible(enterChildren))
+            while (iterator.NextVisible(false))
             {
                 EditorGUILayout.PropertyField(iterator, true);
-                enterChildren = false;
             }
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+        }
+
+        private void Autoset(EcsEntityConnect target)
+        {
+            var result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
+
+            target.SetTemplates_Editor(result.ToArray());
+            EditorUtility.SetDirty(target);
+        }
+        private IEnumerable<MonoEntityTemplate> GetTemplatesFor(Transform parent)
+        {
+            IEnumerable<MonoEntityTemplate> result = parent.GetComponents<MonoEntityTemplate>();
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i);
+                if (child.TryGetComponent<EcsEntityConnect>(out _))
+                {
+                    return Enumerable.Empty<MonoEntityTemplate>();
+                }
+                result = result.Concat(GetTemplatesFor(child));
+            }
+            return result;
         }
 
         private void DrawButtons()
@@ -109,15 +137,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.BeginHorizontal();
             if (GUILayout.Button("Autoset"))
             {
-                Target.SetTemplates_Editor(Target.GetComponents<MonoEntityTemplate>());
-                EditorUtility.SetDirty(target);
+                Autoset(Target);
             }
             if (GUILayout.Button("Autoset Cascade"))
             {
                 foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
                 {
-                    item.SetTemplates_Editor(item.GetComponents<MonoEntityTemplate>());
-                    EditorUtility.SetDirty(item);
+                    Autoset(item);
                 }
             }
             GUILayout.EndHorizontal();
