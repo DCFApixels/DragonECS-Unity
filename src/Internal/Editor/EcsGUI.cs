@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using Codice.Client.Common.GameUI;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
@@ -20,6 +21,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public void Dispose()
             {
                 GUI.color = _oldColor;
+            }
+        }
+
+        public struct ContentColorScope : IDisposable
+        {
+            private readonly Color _oldColor;
+            public ContentColorScope(Color color)
+            {
+                _oldColor = GUI.contentColor;
+                GUI.contentColor = color;
+            }
+            public void Dispose()
+            {
+                GUI.contentColor = _oldColor;
             }
         }
 
@@ -274,6 +289,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
+            public static void DrawWorldBaseInfo(EcsWorld world)
+            {
+                bool isNull = world == null || world.id == 0;
+                int entitesCount = isNull ? 0 : world.Count;
+                int capacity = isNull ? 0 : world.Capacity;
+                int leakedEntitesCount = isNull ? 0 : world.CountLeakedEntitesDebug();
+                EditorGUILayout.IntField("Entities", entitesCount, EditorStyles.boldLabel);
+                EditorGUILayout.IntField("Capacity", capacity, EditorStyles.boldLabel);
+                Color color = leakedEntitesCount > 0 ? Color.yellow : GUI.contentColor;
+                using (new ContentColorScope(color))
+                {
+                    EditorGUILayout.IntField("Leaked Entites", leakedEntitesCount, EditorStyles.boldLabel);
+                }
+            }
             public static void EntityBar(EntityStatus status, int id, short gen, short world)
             {
                 float width = EditorGUIUtility.currentViewWidth;

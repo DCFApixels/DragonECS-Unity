@@ -12,6 +12,7 @@ namespace DCFApixels.DragonECS
         public abstract bool IsEmpty { get; }
         public abstract void SetRaw(EcsWorld world);
         public abstract EcsWorld GetRaw();
+        public abstract EcsWorld GetCurrentWorldRaw();
     }
     [Serializable]
     public abstract class EcsWorldProvider<TWorld> : EcsWorldProviderBase where TWorld : EcsWorld
@@ -77,6 +78,10 @@ namespace DCFApixels.DragonECS
         public sealed override EcsWorld GetRaw()
         {
             return Get();
+        }
+        public sealed override EcsWorld GetCurrentWorldRaw()
+        {
+            return _world;
         }
         public TWorld Get()
         {

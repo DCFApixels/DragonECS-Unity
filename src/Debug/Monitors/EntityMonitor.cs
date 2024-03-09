@@ -1,31 +1,19 @@
 ﻿using UnityEngine;
 
-namespace DCFApixels.DragonECS
+namespace DCFApixels.DragonECS.Unity.Internal
 {
-    [MetaTags(MetaTags.HIDDEN), MetaColor(MetaColor.Gray)]
-    public class EntityMonitor : MonoBehaviour, IEcsProcess
+    [MetaTags(MetaTags.HIDDEN)]
+    [MetaColor(MetaColor.Gray)]
+    public class EntityMonitor : MonoBehaviour
     {
         private entlong _entity;
-        private int _entityID;
-        private short _gen;
-        private EcsWorld _world;
-
-        public EcsWorld World
+        public entlong Entity
         {
-            get { return _world; }
+            get { return _entity; }
         }
-        public int EntityID
-        {
-            get { return _entityID; }
-        }
-
-        public EntityMonitor(entlong entity)
+        public void Set(entlong entity)
         {
             _entity = entity;
-            if (_entity.TryUnpack(out _entityID, out _gen, out _world))
-            {
-
-            }
         }
     }
 }

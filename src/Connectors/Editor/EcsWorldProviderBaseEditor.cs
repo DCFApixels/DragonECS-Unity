@@ -23,6 +23,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 EcsWorld world = Target.GetRaw();
                 GUILayout.Box($"{world.GetMeta().Name} ( {world.id} )", style, GUILayout.ExpandWidth(true));
             }
+            EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
+
+
             base.OnInspectorGUI();
 
             GUILayout.Space(10);

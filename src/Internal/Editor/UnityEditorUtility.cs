@@ -20,6 +20,43 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static GUIContent _singletonContent = null;
 
         #region TransformFieldName
+        public static string TransformToUpperName(string name)
+        {
+            if (name.Length <= 0)
+            {
+                return name;
+            }
+            StringBuilder b = new StringBuilder();
+            bool nextWorld = true;
+            bool prewIsUpper = false;
+
+
+            for (int i = 0; i < name.Length; i++)
+            {
+                char c = name[i];
+                if (char.IsLetter(c) == false)
+                {
+                    nextWorld = true;
+                    prewIsUpper = false;
+                    continue;
+                }
+
+                bool isUpper = char.IsUpper(c);
+                if (isUpper)
+                {
+                    if (nextWorld == false && prewIsUpper == false)
+                    {
+                        b.Append('_');
+                    }
+                }
+                b.Append(char.ToUpper(c));
+                nextWorld = false;
+                prewIsUpper = isUpper;
+            }
+
+            return b.ToString();
+        }
+
         public static string TransformFieldName(string name)
         {
             if (name.Length <= 0)
