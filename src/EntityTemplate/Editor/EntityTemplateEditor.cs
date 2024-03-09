@@ -9,8 +9,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     public abstract class EntityTemplateEditorBase : Editor
     {
-        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 17f, 19f);
-        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 21f, 15f);
+        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 19f, 19f);
+        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 19f, 19f);
 
         private GUIStyle _removeButtonStyle;
         private GenericMenu _genericMenu;
@@ -141,6 +141,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
+
             Type componentType;
             SerializedProperty componentProperty = componentRefProp;
             ComponentTemplateBase customInitializer = componentProperty.managedReferenceValue as ComponentTemplateBase;
@@ -177,7 +178,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             removeButtonRect.yMax += RemoveButtonRect.height;
             removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
             removeButtonRect.center += Vector2.up * padding * 2f;
-            if (GUI.Button(removeButtonRect, "x"))
+
+            if (EcsGUI.CloseButton(removeButtonRect))
             {
                 isRemoveComponent = true;
             }
@@ -199,12 +201,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 Rect tooltipIconRect = TooltipIconRect;
                 tooltipIconRect.center = removeButtonRect.center;
                 tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EcsUnityConsts.INFO_MARK, description);
-                GUI.Label(tooltipIconRect, descriptionLabel, EditorStyles.boldLabel);
+                EcsGUI.DescriptionIcon(tooltipIconRect, description);
             }
             #endregion
 
             GUILayout.EndVertical();
+
             if (EditorGUI.EndChangeCheck())
             {
                 componentProperty.serializedObject.ApplyModifiedProperties();

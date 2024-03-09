@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
-using static PlasticGui.LaunchDiffParameters;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -43,56 +42,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawEntityInfo(EcsEntityConnect[] targets)
         {
-            //TODO Отрефакторить
+            bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out EcsWorld world);
+            EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
+
             float width = EditorGUIUtility.currentViewWidth;
             float height = EditorGUIUtility.singleLineHeight;
-            Rect entityRect = GUILayoutUtility.GetRect(width, height + 3f);
-            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(entityRect, 3f);
+            Rect rect = GUILayoutUtility.GetRect(width, height + 3f);
+            var (left, delEntityButtonRect) = RectUtility.HorizontalSliceRight(rect, height + 3);
+            var (entityRect, unlinkButtonRect) = RectUtility.HorizontalSliceRight(left, height + 3);
 
-            Color w = Color.gray;
-            w.a = 0.6f;
-            Color b = Color.black;
-            b.a = 0.55f;
-            EditorGUI.DrawRect(entityInfoRect, w);
-
-            var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(entityInfoRect, 0.5f);
-            var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
-
-            idRect = RectUtility.AddPadding(idRect, 2, 1, 0, 0);
-            genRect = RectUtility.AddPadding(genRect, 1, 1, 0, 0);
-            worldRect = RectUtility.AddPadding(worldRect, 1, 2, 0, 0);
-            EditorGUI.DrawRect(idRect, b);
-            EditorGUI.DrawRect(genRect, b);
-            EditorGUI.DrawRect(worldRect, b);
-
-            bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out short world);
-
-            GUIStyle style = new GUIStyle(EditorStyles.numberField);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.font = EditorStyles.boldFont;
-            if (IsMultipleTargets == false && isConnected)
+            using (new EditorGUI.DisabledScope(status != EcsGUI.EntityStatus.Alive))
             {
-                Color statusColor = EcsGUI.GreenColor;
-                statusColor.a = 0.6f;
-                EditorGUI.DrawRect(statusRect, statusColor);
-
-                EditorGUI.IntField(idRect, id, style);
-                EditorGUI.IntField(genRect, gen, style);
-                EditorGUI.IntField(worldRect, world, style);
-            }
-            else
-            {
-                Color statusColor = IsMultipleTargets ? new Color32(200, 200, 200, 255) : EcsGUI.RedColor;
-                statusColor.a = 0.6f;
-                EditorGUI.DrawRect(statusRect, statusColor);
-
-                using (new EditorGUI.DisabledScope(true))
+                if (EcsGUI.UnlinkButton(unlinkButtonRect))
                 {
-                    GUI.Label(idRect, "Entity ID", style);
-                    GUI.Label(genRect, "Generation", style);
-                    GUI.Label(worldRect, "World ID", style);
+                    Target.ConnectWith(entlong.NULL);
+                }
+                if (EcsGUI.DelEntityButton(delEntityButtonRect))
+                {
+                    world.DelEntity(id);
+                    Target.ConnectWith(entlong.NULL);
                 }
             }
+
+            EcsGUI.DrawEntity(entityRect, status, id, gen, world.id);
         }
 
         private void DrawTemplates()

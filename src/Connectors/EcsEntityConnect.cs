@@ -60,7 +60,7 @@ namespace DCFApixels.DragonECS
             if (_entity.TryGetID(out int oldEntityID) && _world != null)
             {
                 var a = _world.GetAspect<Aspect>();
-                a.unityGameObjects.Del(oldEntityID);
+                a.unityGameObjects.TryDel(oldEntityID);
             }
             _world = null;
 

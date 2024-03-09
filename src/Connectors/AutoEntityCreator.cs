@@ -30,6 +30,7 @@ namespace DCFApixels.DragonECS
         }
         #endregion
 
+        #region Methods
         private void AutoResolveWorldProviderDependensy()
         {
             _world = EcsDefaultWorldSingletonProvider.Instance;
@@ -54,13 +55,14 @@ namespace DCFApixels.DragonECS
             }
             _created = true;
         }
-
         private void InitConnect(EcsEntityConnect connect, EcsWorld world)
         {
             connect.ConnectWith(world.NewEntityLong());
             connect.ApplyTemplates();
         }
+        #endregion
 
+        #region Editor
 #if UNITY_EDITOR
         internal void Autoset_Editor()
         {
@@ -68,5 +70,6 @@ namespace DCFApixels.DragonECS
             AutoResolveWorldProviderDependensy();
         }
 #endif
+        #endregion
     }
 }

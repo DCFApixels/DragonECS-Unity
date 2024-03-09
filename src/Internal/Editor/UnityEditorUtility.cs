@@ -75,6 +75,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _singletonContent = new GUIContent();
             }
             _singletonContent.text = name;
+            _singletonContent.image = null;
+            _singletonContent.tooltip = tooltip;
+            return _singletonContent;
+        }
+        public static GUIContent GetLabel(Texture image, string tooltip = null)
+        {
+            if (_singletonContent == null)
+            {
+                _singletonContent = new GUIContent();
+            }
+            _singletonContent.text = string.Empty;
+            _singletonContent.image = image;
             _singletonContent.tooltip = tooltip;
             return _singletonContent;
         }
