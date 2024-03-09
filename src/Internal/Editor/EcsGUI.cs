@@ -185,11 +185,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static bool AutosetCascadeButton(Rect position)
         {
-            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_max@2x").image, 1f, "Autoset Cascade");
+            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image, 0f, "Autoset Cascade");
         }
         public static bool AutosetButton(Rect position)
         {
-            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image, 1f, "Autoset");
+            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_max@2x").image, 1f, "Autoset");
         }
         public static bool UnlinkButton(Rect position)
         {
