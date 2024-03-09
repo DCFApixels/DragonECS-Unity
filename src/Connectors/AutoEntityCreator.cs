@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    [DisallowMultipleComponent]
     public class AutoEntityCreator : MonoBehaviour
     {
         [SerializeField]

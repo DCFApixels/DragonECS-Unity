@@ -5,6 +5,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    [DisallowMultipleComponent]
     public class EcsEntityConnect : MonoBehaviour
     {
         private sealed class Aspect : EcsAspect

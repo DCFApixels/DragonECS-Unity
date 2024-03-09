@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    [DisallowMultipleComponent]
     public class MonoEntityTemplate : MonoBehaviour, ITemplateInternal
     {
         [SerializeReference]

@@ -10,7 +10,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public override void OnInspectorGUI()
         {
-            base.OnInspectorGUI();
+            EditorGUI.BeginChangeCheck();
+            var iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true);
+            while (iterator.NextVisible(false))
+            {
+                EditorGUILayout.PropertyField(iterator, true);
+            }
+            if (EditorGUI.EndChangeCheck())
+            {
+                serializedObject.ApplyModifiedProperties();
+            }
+
+
             if (GUILayout.Button("Autoset"))
             {
                 foreach (var tr in targets)
