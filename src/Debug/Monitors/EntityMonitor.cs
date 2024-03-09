@@ -4,7 +4,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
-    public class EntityMonitor : MonoBehaviour
+    internal class EntityMonitor : MonoBehaviour
     {
         private entlong _entity;
         public entlong Entity

@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using Codice.Client.Common.GameUI;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;

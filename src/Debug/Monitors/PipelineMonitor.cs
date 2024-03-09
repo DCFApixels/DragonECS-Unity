@@ -5,7 +5,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
-    public class PipelineMonitor : MonoBehaviour
+    internal class PipelineMonitor : MonoBehaviour
     {
         private EcsPipeline _pipeline;
         public EcsPipeline Pipeline
@@ -20,9 +20,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
     [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
-    public class PipelineMonitorSystem : IEcsInit, IEcsPipelineMember, IEcsDestroy
+    internal class PipelineMonitorSystem : IEcsInit, IEcsPipelineMember, IEcsDestroy
     {
         private PipelineMonitor _monitor;
+        private PipelineProcessMonitor _processesMonitor;
         public EcsPipeline Pipeline { get; set; }
 
         public void Init()
@@ -32,6 +33,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
             UnityEngine.Object.DontDestroyOnLoad(_monitor);
             _monitor.Set(Pipeline);
             _monitor.gameObject.SetActive(false);
+
+            _processesMonitor = new GameObject($"PROCESS_MATRIX").AddComponent<PipelineProcessMonitor>();
+            _processesMonitor.transform.SetParent(_monitor.transform);
+            _processesMonitor.Set(Pipeline);
+            _processesMonitor.gameObject.SetActive(false);
         }
 
         public void Destroy()

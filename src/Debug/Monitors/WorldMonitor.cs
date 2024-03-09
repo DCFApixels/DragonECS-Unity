@@ -6,7 +6,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
-    public class WorldMonitor : MonoBehaviour
+    internal class WorldMonitor : MonoBehaviour
     {
         private EcsWorld _world;
         public EcsWorld World
@@ -21,7 +21,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
     [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
-    public class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener
+    internal class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener
     {
         private EcsWorld _world;
         private WorldMonitor _monitor;
@@ -76,7 +76,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         private void InitNewEntity(int entityID, bool check)
         {
-            if(_monitor == null) { return; }
+            if (_monitor == null) { return; }
             ref var _entityMonitorRef = ref _entityMonitors[entityID];
             if (_entityMonitorRef == null)
             {
@@ -92,7 +92,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         void IEcsEntityEventListener.OnDelEntity(int entityID)
         {
-            if(_monitor == null) { return; }
+            if (_monitor == null) { return; }
             ref var _entityMonitorRef = ref _entityMonitors[entityID];
             if (_entityMonitorRef != null)
             {
