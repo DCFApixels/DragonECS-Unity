@@ -6,7 +6,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(EcsWorldProviderBase), true)]
     [CanEditMultipleObjects]
-    public class EcsWorldProviderBaseEditor : Editor
+    internal class EcsWorldProviderBaseEditor : Editor
     {
         private EcsWorldProviderBase Target => (EcsWorldProviderBase)target;
 

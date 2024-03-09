@@ -7,7 +7,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(AutoEntityCreator))]
     [CanEditMultipleObjects]
-    public class AutoEntityCreatorEditor : Editor
+    internal class AutoEntityCreatorEditor : Editor
     {
         private AutoEntityCreator Target => (AutoEntityCreator)target;
 

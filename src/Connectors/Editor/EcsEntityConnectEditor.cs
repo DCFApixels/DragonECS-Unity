@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using Codice.CM.Client.Differences;
 using DCFApixels.DragonECS.Unity.Internal;
 using UnityEditor;
 using UnityEngine;
@@ -8,7 +7,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(EcsEntityConnect))]
     [CanEditMultipleObjects]
-    public class EcsEntityConnectEditor : Editor
+    internal class EcsEntityConnectEditor : Editor
     {
         private bool _isInit = false;
         private EcsEntityConnect Target => (EcsEntityConnect)target;
@@ -75,7 +74,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     target.AutosetCascade_Editor();
                 }
             }
-            buttonRect = RectUtility.Move(buttonRect , - height, 0);
+            buttonRect = RectUtility.Move(buttonRect, -height, 0);
             if (EcsGUI.AutosetButton(buttonRect))
             {
                 foreach (var target in targets)
