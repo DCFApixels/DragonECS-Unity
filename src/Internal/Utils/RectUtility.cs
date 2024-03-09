@@ -50,9 +50,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             return AddPadding(rect, verticalHorizontal, verticalHorizontal, verticalHorizontal, verticalHorizontal);
         }
-        public static Rect AddPadding(Rect rect, float vertical, float horizontal)
+        public static Rect AddPadding(Rect rect, float horizontal, float vertical)
         {
-            return AddPadding(rect, vertical, vertical, horizontal, horizontal);
+            return AddPadding(rect, horizontal, horizontal, vertical, vertical);
         }
         public static Rect AddPadding(Rect rect, float left, float right, float top, float bottom)
         {
@@ -61,6 +61,15 @@ namespace DCFApixels.DragonECS.Unity.Internal
             rect.yMin += top;
             rect.yMax -= bottom;
             return rect;
+        }
+        public static Rect Move(Rect rect, Vector2 addVector)
+        {
+            rect.center += addVector;
+            return rect;
+        }
+        public static Rect Move(Rect rect, float addX, float addY)
+        {
+            return Move(rect, new Vector2(addX, addY));
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
 using UnityEditor;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CanEditMultipleObjects]
     public class AutoEntityCreatorEditor : Editor
     {
+        private AutoEntityCreator Target => (AutoEntityCreator)target;
+
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
@@ -21,15 +24,32 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 serializedObject.ApplyModifiedProperties();
             }
+            DrawControlButtons();
+        }
 
 
-            if (GUILayout.Button("Autoset"))
+        private void DrawControlButtons()
+        {
+            float height = EcsGUI.EntityBarHeight;
+            Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
+            EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
+            rect = RectUtility.AddPadding(rect, 2f, 0f);
+            var (left, autosetCascadeRect) = RectUtility.HorizontalSliceRight(rect, height);
+            var (_, autosetRect) = RectUtility.HorizontalSliceRight(left, height);
+
+            if (EcsGUI.AutosetCascadeButton(autosetCascadeRect))
             {
-                foreach (var tr in targets)
+                foreach (AutoEntityCreator target in targets)
                 {
-                    AutoEntityCreator creator = (AutoEntityCreator)tr;
-                    creator.Autoset_Editor();
-                    EditorUtility.SetDirty(creator);
+                    target.AutosetCascade_Editor();
+                }
+            }
+
+            if (EcsGUI.AutosetButton(autosetRect))
+            {
+                foreach (AutoEntityCreator target in targets)
+                {
+                    target.Autoset_Editor();
                 }
             }
         }

@@ -30,6 +30,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 19f, 19f);
         private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 19f, 19f);
 
+        public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
+
         private static bool IsShowHidden
         {
             get { return DebugMonitorPrefs.instance.IsShowHidden; }
@@ -111,7 +113,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //    
         //    return result;
         //}
-        public static (bool, bool) IconButton(Rect position)
+        public static (bool, bool) IconButtonGeneric(Rect position)
         {
             Color dc = GUI.color;
             GUI.color = Color.clear; //Хак чтобы сделать реакцию от курсора мыши без лага
@@ -121,42 +123,46 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var current = Event.current;
             return (GUI.enabled && HitTest(position, current), result);
         }
-        public static bool SingleIconButton(Rect position, Texture icon)
+        public static bool IconButton(Rect position, Texture icon, float iconPadding, string description)
         {
-            var (hover, click) = IconButton(position);
-            Color color = GUI.color;
-            float enableMultiplier = GUI.enabled ? 1f : 0.72f;
+            //var (hover, click) = IconButton(position);
+            //Color color = GUI.color;
+            //float enableMultiplier = GUI.enabled ? 1f : 0.72f;
+            //
+            //if (hover)
+            //{
+            //    if (Event.current.type == EventType.Repaint)
+            //    {
+            //        GUI.color = Color.white * 2.2f * enableMultiplier;
+            //        EditorStyles.helpBox.Draw(position, hover, false, false, false);
+            //    }
+            //
+            //    Rect rect = RectUtility.AddPadding(position, -1f);
+            //    GUI.color = Color.white * enableMultiplier;
+            //    GUI.DrawTexture(rect, icon);
+            //}
+            //else
+            //{
+            //    if (Event.current.type == EventType.Repaint)
+            //    {
+            //        GUI.color = Color.white * 1.7f * enableMultiplier;
+            //        EditorStyles.helpBox.Draw(position, hover, false, false, false);
+            //    }
+            //    GUI.color = Color.white * enableMultiplier;
+            //    GUI.DrawTexture(position, icon);
+            //}
+            //GUI.color = color;
+            //return click;
 
-            if (hover)
-            {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    GUI.color = Color.white * 2.2f * enableMultiplier;
-                    EditorStyles.helpBox.Draw(position, hover, false, false, false);
-                }
-
-                Rect rect = RectUtility.AddPadding(position, -1f);
-                GUI.color = Color.white * enableMultiplier;
-                GUI.DrawTexture(rect, icon);
-            }
-            else
-            {
-                if (Event.current.type == EventType.Repaint)
-                {
-                    GUI.color = Color.white * 1.7f * enableMultiplier;
-                    EditorStyles.helpBox.Draw(position, hover, false, false, false);
-                }
-                GUI.color = Color.white * enableMultiplier;
-                GUI.DrawTexture(position, icon);
-            }
-            GUI.color = color;
-            return click;
+            bool result = GUI.Button(position, UnityEditorUtility.GetLabel(string.Empty));
+            GUI.Label(RectUtility.AddPadding(position, iconPadding), UnityEditorUtility.GetLabel(icon, description));
+            return result;
         }
         public static void DescriptionIcon(Rect position, string description)
         {
             using (new ColorScope(new Color(1f, 1f, 1f, 0.8f)))
             {
-                GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d__Help@2x").image, description);
+                GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d__Help").image, description);
                 GUI.Label(position, descriptionLabel, EditorStyles.boldLabel);
             }
         }
@@ -164,7 +170,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             using (new ColorScope(new Color(1f, 1f, 1f, 0.8f)))
             {
-                var (hover, click) = IconButton(position);
+                var (hover, click) = IconButtonGeneric(position);
                 if (hover)
                 {
                     Rect rect = RectUtility.AddPadding(position, -4f);
@@ -172,20 +178,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    GUI.DrawTexture(position, EditorGUIUtility.IconContent("d_winbtn_win_close@2x").image);
+                    GUI.DrawTexture(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image);
                 }
                 return click;
             }
         }
+        public static bool AutosetCascadeButton(Rect position)
+        {
+            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_max@2x").image, 1f, "Autoset Cascade");
+        }
+        public static bool AutosetButton(Rect position)
+        {
+            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image, 1f, "Autoset");
+        }
         public static bool UnlinkButton(Rect position)
         {
-            return SingleIconButton(position, EditorGUIUtility.IconContent("d_Unlinked@2x").image);
+            bool result = GUI.Button(position, UnityEditorUtility.GetLabel(string.Empty));
+            GUI.Label(RectUtility.Move(position, 0, -1f), UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d_Unlinked").image, "Unlink Entity"));
+            return result;
         }
         public static bool DelEntityButton(Rect position)
         {
-            return SingleIconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_close@2x").image);
+            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image, 0f, "Delete Entity");
         }
-        public static void DrawEntity(Rect position, EntityStatus status, int id, short gen, short world)
+        public static void EntityBar(Rect position, EntityStatus status, int id, short gen, short world)
         {
             var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(position, 3f);
 
@@ -258,11 +274,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
-            public static void DrawEntity(EntityStatus status, int id, short gen, short world)
+            public static void EntityBar(EntityStatus status, int id, short gen, short world)
             {
                 float width = EditorGUIUtility.currentViewWidth;
-                float height = EditorGUIUtility.singleLineHeight;
-                EcsGUI.DrawEntity(GUILayoutUtility.GetRect(width, height + 3f), status, id, gen, world);
+                float height = EntityBarHeight;
+                EcsGUI.EntityBar(GUILayoutUtility.GetRect(width, height), status, id, gen, world);
             }
             public static bool AddComponentButtons()
             {

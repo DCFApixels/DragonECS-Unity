@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
+using Codice.CM.Client.Differences;
 using DCFApixels.DragonECS.Unity.Internal;
-using System.Collections.Generic;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -36,7 +35,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             DrawTemplates();
 
-            DrawButtons();
+            DrawControlButtons(targets);
             DrawComponents(targets);
         }
 
@@ -44,27 +43,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out EcsWorld world);
             EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
-
-            float width = EditorGUIUtility.currentViewWidth;
-            float height = EditorGUIUtility.singleLineHeight;
-            Rect rect = GUILayoutUtility.GetRect(width, height + 3f);
-            var (left, delEntityButtonRect) = RectUtility.HorizontalSliceRight(rect, height + 3);
-            var (entityRect, unlinkButtonRect) = RectUtility.HorizontalSliceRight(left, height + 3);
-
-            using (new EditorGUI.DisabledScope(status != EcsGUI.EntityStatus.Alive))
-            {
-                if (EcsGUI.UnlinkButton(unlinkButtonRect))
-                {
-                    Target.ConnectWith(entlong.NULL);
-                }
-                if (EcsGUI.DelEntityButton(delEntityButtonRect))
-                {
-                    world.DelEntity(id);
-                    Target.ConnectWith(entlong.NULL);
-                }
-            }
-
-            EcsGUI.DrawEntity(entityRect, status, id, gen, world.id);
+            EcsGUI.Layout.EntityBar(status, id, gen, world.id);
         }
 
         private void DrawTemplates()
@@ -82,43 +61,47 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void Autoset(EcsEntityConnect target)
+        private void DrawControlButtons(EcsEntityConnect[] targets)
         {
-            var result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
-
-            target.SetTemplates_Editor(result.ToArray());
-            EditorUtility.SetDirty(target);
-        }
-        private IEnumerable<MonoEntityTemplate> GetTemplatesFor(Transform parent)
-        {
-            IEnumerable<MonoEntityTemplate> result = parent.GetComponents<MonoEntityTemplate>();
-            for (int i = 0; i < parent.childCount; i++)
+            float height = EcsGUI.EntityBarHeight;
+            Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
+            EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
+            rect = RectUtility.AddPadding(rect, 2f, 0f);
+            var (_, buttonRect) = RectUtility.HorizontalSliceRight(rect, height);
+            if (EcsGUI.AutosetCascadeButton(buttonRect))
             {
-                var child = parent.GetChild(i);
-                if (child.TryGetComponent<EcsEntityConnect>(out _))
+                foreach (var target in targets)
                 {
-                    return Enumerable.Empty<MonoEntityTemplate>();
-                }
-                result = result.Concat(GetTemplatesFor(child));
-            }
-            return result;
-        }
-
-        private void DrawButtons()
-        {
-            GUILayout.BeginHorizontal();
-            if (GUILayout.Button("Autoset"))
-            {
-                Autoset(Target);
-            }
-            if (GUILayout.Button("Autoset Cascade"))
-            {
-                foreach (var item in Target.GetComponentsInChildren<EcsEntityConnect>())
-                {
-                    Autoset(item);
+                    target.AutosetCascade_Editor();
                 }
             }
-            GUILayout.EndHorizontal();
+            buttonRect = RectUtility.Move(buttonRect , - height, 0);
+            if (EcsGUI.AutosetButton(buttonRect))
+            {
+                foreach (var target in targets)
+                {
+                    target.Autoset_Editor();
+                }
+            }
+            using (new EditorGUI.DisabledScope(!Application.isPlaying))
+            {
+                buttonRect = RectUtility.Move(buttonRect, -height, 0);
+                if (EcsGUI.DelEntityButton(buttonRect))
+                {
+                    foreach (var target in targets)
+                    {
+                        target.DeleteEntity_Editor();
+                    }
+                }
+                buttonRect = RectUtility.Move(buttonRect, -height, 0);
+                if (EcsGUI.UnlinkButton(buttonRect))
+                {
+                    foreach (var target in targets)
+                    {
+                        target.UnlinkEntity_Editor();
+                    }
+                }
+            }
         }
 
         private void DrawComponents(EcsEntityConnect[] targets)

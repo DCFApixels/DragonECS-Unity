@@ -65,10 +65,27 @@ namespace DCFApixels.DragonECS
 
         #region Editor
 #if UNITY_EDITOR
+        [ContextMenu("Autoset")]
         internal void Autoset_Editor()
         {
-            _connect = GetComponentInChildren<EcsEntityConnect>();
-            AutoResolveWorldProviderDependensy();
+            foreach (var connect in GetComponentsInChildren<EcsEntityConnect>())
+            {
+                if (connect.GetComponentInParent<AutoEntityCreator>() == this)
+                {
+                    _connect = connect;
+                    AutoResolveWorldProviderDependensy();
+                    break;
+                }
+            }
+        }
+        [ContextMenu("Autoset Cascade")]
+        internal void AutosetCascade_Editor()
+        {
+            foreach (var target in GetComponentsInChildren<AutoEntityCreator>())
+            {
+                target.Autoset_Editor();
+            }
+
         }
 #endif
         #endregion

@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEditor;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace DCFApixels.DragonECS
 {
@@ -105,10 +107,57 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Editor
-        internal void SetTemplates_Editor(MonoEntityTemplate[] tempaltes)
+#if UNITY_EDITOR
+        [ContextMenu("Autoset")]
+        internal void Autoset_Editor()
         {
-            _monoTemplates = tempaltes;
+            Autoset(this);
         }
+        [ContextMenu("Autoset Cascade")]
+        internal void AutosetCascade_Editor()
+        {
+            foreach (var item in GetComponentsInChildren<EcsEntityConnect>())
+            {
+                Autoset(item);
+            }
+        }
+        [ContextMenu("Unlink Entity")]
+        internal void UnlinkEntity_Editor()
+        {
+            ConnectWith(entlong.NULL);
+        }
+        [ContextMenu("Delete Entity")]
+        internal void DeleteEntity_Editor()
+        {
+            if (_entity.TryUnpack(out int id, out EcsWorld world))
+            {
+                world.DelEntity(id);
+            }
+            UnlinkEntity_Editor();
+        }
+
+        private static void Autoset(EcsEntityConnect target)
+        {
+            var result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
+
+            target._monoTemplates = result.ToArray();
+            EditorUtility.SetDirty(target);
+        }
+        private static IEnumerable<MonoEntityTemplate> GetTemplatesFor(Transform parent)
+        {
+            IEnumerable<MonoEntityTemplate> result = parent.GetComponents<MonoEntityTemplate>();
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                var child = parent.GetChild(i);
+                if (child.TryGetComponent<EcsEntityConnect>(out _))
+                {
+                    return Enumerable.Empty<MonoEntityTemplate>();
+                }
+                result = result.Concat(GetTemplatesFor(child));
+            }
+            return result;
+        }
+#endif
         #endregion
     }
 }
