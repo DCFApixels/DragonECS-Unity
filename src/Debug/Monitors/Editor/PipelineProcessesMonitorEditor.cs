@@ -23,13 +23,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private PipelineProcessMonitor Target => (PipelineProcessMonitor)target;
         private bool IsShowInterfaces
         {
-            get { return DebugMonitorPrefs.instance.IsShowInterfaces; }
-            set { DebugMonitorPrefs.instance.IsShowInterfaces = value; }
+            get { return SettingsPrefs.instance.IsShowInterfaces; }
+            set { SettingsPrefs.instance.IsShowInterfaces = value; }
         }
         private bool IsShowHidden
         {
-            get { return DebugMonitorPrefs.instance.IsShowHidden; }
-            set { DebugMonitorPrefs.instance.IsShowHidden = value; }
+            get { return SettingsPrefs.instance.IsShowHidden; }
+            set { SettingsPrefs.instance.IsShowHidden = value; }
         }
 
         private void Init()
@@ -78,7 +78,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private Vector2 _cellsize = new Vector2(EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
         private Vector2 _nameCellSize = new Vector2(200f, 200f);
 
-        //private Vector2Int _selectedPoint = new Vector2Int(-1, -1);
         private (TypeMeta system, TypeMeta process) _selectedPointMeta = default;
         public override void OnInspectorGUI()
         {
@@ -126,7 +125,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (EcsGUI.HitTest(lineRect))
                 {
                     GUI.Button(lineRect, "", EditorStyles.selectionRect);
-                    //_selectedPoint.x = i;
                     _selectedPointMeta.process = meta;
                 }
                 GUIUtility.RotateAroundPivot(90, pivod);
@@ -158,7 +156,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (EcsGUI.HitTest(lineRect))
                 {
                     GUI.Button(lineRect, "", EditorStyles.selectionRect);
-                    //_selectedPoint.y = i;
                     _selectedPointMeta.system = meta;
                 }
                 GUI.Label(rect, UnityEditorUtility.GetLabel(name, i + " " + name), EditorStyles.miniBoldLabel);
@@ -175,10 +172,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     rect = new Rect(x * _cellsize.x + _nameCellSize.x, y * _cellsize.y + _nameCellSize.y, _cellsize.x, _cellsize.y);
                     bool flag = process.systemsBitMask[y];
-
-                    //string tooltip = $"{process.meta.Name}-{_systemsList[x].meta.Name}";
-                    //GUIContent label = flag ? UnityEditorUtility.GetLabel(checkIcon, tooltip) : UnityEditorUtility.GetLabel("", tooltip);
-                    //GUI.Label(rect, label);
                     if (flag)
                     {
                         GUI.Label(rect, UnityEditorUtility.GetLabel(checkIcon));

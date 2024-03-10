@@ -48,13 +48,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static bool IsShowHidden
         {
-            get { return DebugMonitorPrefs.instance.IsShowHidden; }
-            set { DebugMonitorPrefs.instance.IsShowHidden = value; }
+            get { return SettingsPrefs.instance.IsShowHidden; }
+            set { SettingsPrefs.instance.IsShowHidden = value; }
         }
         private static bool IsShowRuntimeComponents
         {
-            get { return DebugMonitorPrefs.instance.IsShowRuntimeComponents; }
-            set { DebugMonitorPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return SettingsPrefs.instance.IsShowRuntimeComponents; }
+            set { SettingsPrefs.instance.IsShowRuntimeComponents = value; }
         }
 
         public enum AddClearComponentButton : byte

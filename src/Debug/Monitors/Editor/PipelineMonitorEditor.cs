@@ -22,13 +22,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private PipelineMonitor Target => (PipelineMonitor)target;
         private bool IsShowInterfaces
         {
-            get { return DebugMonitorPrefs.instance.IsShowInterfaces; }
-            set { DebugMonitorPrefs.instance.IsShowInterfaces = value; }
+            get { return SettingsPrefs.instance.IsShowInterfaces; }
+            set { SettingsPrefs.instance.IsShowInterfaces = value; }
         }
         private bool IsShowHidden
         {
-            get { return DebugMonitorPrefs.instance.IsShowHidden; }
-            set { DebugMonitorPrefs.instance.IsShowHidden = value; }
+            get { return SettingsPrefs.instance.IsShowHidden; }
+            set { SettingsPrefs.instance.IsShowHidden = value; }
         }
 
         public override void OnInspectorGUI()

@@ -4,8 +4,8 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [FilePath(EcsConsts.FRAMEWORK_NAME + "/" + nameof(DebugMonitorPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
-    public class DebugMonitorPrefs : ScriptableSingleton<DebugMonitorPrefs>
+    [FilePath(EcsConsts.FRAMEWORK_NAME + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
+    public class SettingsPrefs : ScriptableSingleton<SettingsPrefs>
     {
         [SerializeField]
         private bool _isShowInterfaces = false;
@@ -30,7 +30,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
         [SerializeField]
-        private bool _isShowRuntimeComponents = true;
+        private bool _isShowRuntimeComponents = false;
         public bool IsShowRuntimeComponents
         {
             get => _isShowRuntimeComponents;
