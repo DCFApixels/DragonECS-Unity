@@ -109,7 +109,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 for (int i = 0; i < targets.Length; i++)
                 {
-                    if (targets[i].IsConected == true)
+                    if (targets[i].IsConnected == true)
                     {
                         EditorGUILayout.HelpBox("Multiple component editing is not available.", MessageType.Warning);
                         return;

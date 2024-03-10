@@ -2,9 +2,7 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -181,7 +179,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUI.EndScrollView();
 
             Rect r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, EditorGUIUtility.singleLineHeight);
-            if(_selectedPointMeta.process != null && _selectedPointMeta.system != null)
+            if (_selectedPointMeta.process != null && _selectedPointMeta.system != null)
             {
                 GUI.Label(r, $"{_selectedPointMeta.process.Name}-{_selectedPointMeta.system.Name}");
             }

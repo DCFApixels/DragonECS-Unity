@@ -6,6 +6,33 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    public static class EcsConnect
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(GameObject go, entlong entity, bool applyTemplates)
+        {
+            Connect(entity, go, applyTemplates);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(entlong entity, GameObject go, bool applyTemplates)
+        {
+            if (go.TryGetComponent(out EcsEntityConnect connect) == false)
+            {
+                connect = go.AddComponent<EcsEntityConnect>();
+            }
+            connect.ConnectWith(entity, applyTemplates);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(EcsEntityConnect connect, entlong entity, bool applyTemplates)
+        {
+            Connect(entity, connect, applyTemplates);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(entlong entity, EcsEntityConnect connect, bool applyTemplates)
+        {
+            connect.ConnectWith(entity, applyTemplates);
+        }
+    }
     [DisallowMultipleComponent]
     public class EcsEntityConnect : MonoBehaviour
     {
@@ -37,7 +64,7 @@ namespace DCFApixels.DragonECS
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _world; }
         }
-        public bool IsConected
+        public bool IsConnected
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _entity.IsAlive; }
@@ -59,22 +86,23 @@ namespace DCFApixels.DragonECS
         #region Connect
         public void ConnectWith(entlong entity, bool applyTemplates)
         {
-            if (_entity.TryGetID(out int oldEntityID) && _world != null)
-            {
-                var a = _world.GetAspect<Aspect>();
-                a.unityGameObjects.TryDel(oldEntityID);
-            }
-            _world = null;
+            Disconnect();
 
             if (entity.TryUnpack(out int newEntityID, out EcsWorld world))
             {
                 _entity = entity;
                 _world = world;
                 var a = _world.GetAspect<Aspect>();
-                if (a.unityGameObjects.Has(newEntityID) == false)
+                if (a.unityGameObjects.Has(newEntityID))
                 {
-                    a.unityGameObjects.Add(newEntityID) = new UnityGameObjectConnect(this);
+                    ref readonly var uconnect = ref a.unityGameObjects.Read(newEntityID);
+                    if (uconnect.IsConnected)
+                    {
+                        uconnect.connect.Disconnect();
+                    }
                 }
+
+                a.unityGameObjects.TryAddOrGet(newEntityID) = new UnityGameObjectConnect(this);
                 if (applyTemplates)
                 {
                     ApplyTemplatesFor(world.id, newEntityID);
@@ -84,6 +112,15 @@ namespace DCFApixels.DragonECS
             {
                 _entity = entlong.NULL;
             }
+        }
+        public void Disconnect()
+        {
+            if (_entity.TryGetID(out int oldEntityID) && _world != null)
+            {
+                var a = _world.GetAspect<Aspect>();
+                a.unityGameObjects.TryDel(oldEntityID);
+            }
+            _world = null;
         }
         #endregion
 

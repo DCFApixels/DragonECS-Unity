@@ -14,9 +14,19 @@ namespace DCFApixels.DragonECS
         public string Name
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => connect.name;
+            get { return connect.name; }
         }
-        public UnityGameObjectConnect(EcsEntityConnect connect)
+        public bool IsUnidirectional
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return connect == null; }
+        }
+        public bool IsConnected
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return transform != null; }
+        }
+        internal UnityGameObjectConnect(EcsEntityConnect connect)
         {
             this.connect = connect;
             transform = connect.transform;
