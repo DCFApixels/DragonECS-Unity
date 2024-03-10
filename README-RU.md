@@ -86,19 +86,51 @@ EcsDebug.Break();
 ## Визуальная отладка
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/2d3c842f-c0c9-44f7-b35b-4f879a08f267)
+
+### Pipeline
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3682fd0f-f47a-40ed-9d4c-cbad5d512e5d)
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c1a7960a-d65a-4f22-9597-fd863ff2b00c)
+
+### World
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543)
+
+### Entity
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1)
 
 # Шаблоны
-
+Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовавыть интерфейс  `ITemplateNode`. 
+```c#
+ITemplateNode someSamplate = /*...*/;
+//...
+foreach (var e in _world.Where(out Aspect a))
+{
+    // Применение шаблона сущности.
+    someSamplate.Apply(e, _world.id);
+}
+```
+```c#
+// Применение шаблона сразу при создании сущности.
+int e = _world.NewEntity(someSamplate);
+```
+По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate` и `MonoEntityTemplate`. 
 ## ScriptableEntityTemplate
+Хранится как отдельынй ассет. Наследуется от `ScriptableObject`. </br>
+Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
+
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8362e2d8-b83a-4dfc-91fd-38993746012f)
+
+Пример:
+
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1)
 
 ## MonoEntityTemplate
+Крепится к GameObject. Наследуется от `MonoBehaviour`. </br>
+Дейсвия чтобы добавить `MonoEntityTemplate` на GameObject:
+
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/07a43cb7-96e5-440c-965d-2970803df330)
+
+Пример:
+
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd)
 
 # Связь с GameObject
