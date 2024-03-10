@@ -18,7 +18,7 @@ The extension will add a set of tools for debugging and communicating with the U
 > [!WARNING]
 > The project is a work in progress, API may change.
 > 
-> While the English version of the README is incomplete, you can view the [Russian version](https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md).
+> While the English version of the README is incomplete, you can view the [Russian version](https://github.com/DCFApixels/DragonECS-Unity/blob/main/README_RU.md).
 
 </br>
 
