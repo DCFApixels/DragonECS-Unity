@@ -58,8 +58,7 @@ namespace DCFApixels.DragonECS
         }
         private void InitConnect(EcsEntityConnect connect, EcsWorld world)
         {
-            connect.ConnectWith(world.NewEntityLong());
-            connect.ApplyTemplates();
+            connect.ConnectWith(world.NewEntityLong(), true);
         }
         #endregion
 

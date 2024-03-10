@@ -7,21 +7,19 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [MetaColor(MetaColor.Cyan)]
-    public readonly struct UnityGameObject : IEcsComponent
+    public readonly struct UnityGameObjectConnect : IEcsComponent
     {
-        public readonly GameObject gameObject;
+        public readonly EcsEntityConnect connect;
         public readonly Transform transform;
-
         public string Name
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => gameObject.name;
+            get => connect.name;
         }
-
-        public UnityGameObject(GameObject gameObject)
+        public UnityGameObjectConnect(EcsEntityConnect connect)
         {
-            this.gameObject = gameObject;
-            transform = gameObject.transform;
+            this.connect = connect;
+            transform = connect.transform;
         }
     }
 
@@ -64,7 +62,7 @@ namespace DCFApixels.DragonECS
         {
             entlong result = self.NewEntityLong();
             GameObject newGameObject = new GameObject(name);
-            newGameObject.AddComponent<EcsEntityConnect>().ConnectWith(result);
+            newGameObject.AddComponent<EcsEntityConnect>().ConnectWith(result, false);
 #if UNITY_EDITOR
             if (icon != GameObjectIcon.NONE)
             {

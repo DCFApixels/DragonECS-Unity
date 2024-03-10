@@ -11,10 +11,10 @@ namespace DCFApixels.DragonECS
     {
         private sealed class Aspect : EcsAspect
         {
-            public EcsPool<UnityGameObject> unityGameObjects;
+            public EcsPool<UnityGameObjectConnect> unityGameObjects;
             protected override void Init(Builder b)
             {
-                unityGameObjects = b.Include<UnityGameObject>();
+                unityGameObjects = b.Include<UnityGameObjectConnect>();
             }
         }
 
@@ -35,12 +35,12 @@ namespace DCFApixels.DragonECS
         public EcsWorld World
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _world;
+            get { return _world; }
         }
         public bool IsConected
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get => _entity.IsAlive;
+            get { return _entity.IsAlive; }
         }
         public IEnumerable<ScriptableEntityTemplate> ScriptableTemplates
         {
@@ -57,7 +57,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Connect
-        public void ConnectWith(entlong entity, bool applyTemplates = false)
+        public void ConnectWith(entlong entity, bool applyTemplates)
         {
             if (_entity.TryGetID(out int oldEntityID) && _world != null)
             {
@@ -66,18 +66,18 @@ namespace DCFApixels.DragonECS
             }
             _world = null;
 
-            if (entity.TryGetID(out int newEntityID))
+            if (entity.TryUnpack(out int newEntityID, out EcsWorld world))
             {
                 _entity = entity;
-                _world = _entity.World;
+                _world = world;
                 var a = _world.GetAspect<Aspect>();
-                if (!a.unityGameObjects.Has(newEntityID))
+                if (a.unityGameObjects.Has(newEntityID) == false)
                 {
-                    a.unityGameObjects.Add(newEntityID) = new UnityGameObject(gameObject);
+                    a.unityGameObjects.Add(newEntityID) = new UnityGameObjectConnect(this);
                 }
                 if (applyTemplates)
                 {
-                    ApplyTemplates();
+                    ApplyTemplatesFor(world.id, newEntityID);
                 }
             }
             else
@@ -88,19 +88,15 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region ApplyTemplates
-        public void ApplyTemplates()
-        {
-            ApplyTemplatesFor(_entity.ID);
-        }
-        public void ApplyTemplatesFor(int entityID)
+        public void ApplyTemplatesFor(short worldID, int entityID)
         {
             foreach (var template in _scriptableTemplates)
             {
-                template.Apply(_world.id, entityID);
+                template.Apply(worldID, entityID);
             }
             foreach (var template in _monoTemplates)
             {
-                template.Apply(_world.id, entityID);
+                template.Apply(worldID, entityID);
             }
         }
         #endregion
@@ -123,7 +119,7 @@ namespace DCFApixels.DragonECS
         [ContextMenu("Unlink Entity")]
         internal void UnlinkEntity_Editor()
         {
-            ConnectWith(entlong.NULL);
+            ConnectWith(entlong.NULL, false);
         }
         [ContextMenu("Delete Entity")]
         internal void DeleteEntity_Editor()
