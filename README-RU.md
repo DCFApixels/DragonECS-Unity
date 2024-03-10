@@ -86,37 +86,37 @@ EcsDebug.Break();
 ## Визуальная отладка
 Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных аспектов фреймворка. Найти эти мониторы можно в Play Mode в разделе `DontDestroyOnLoad`. 
 
-<p align="center" style="background-color: #2b2b2b80;">
+<div align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/54e3f6d1-13c4-4226-a983-c672a29d33bb">   
-</p>
+</div>
 
 * ### `PipelineMonitor`
 Показывает состояние `EcsPipeline`. Системы отображаются в порядке их выполнения.
 
-<p align="center" style="background-color: #2b2b2b80;">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3682fd0f-f47a-40ed-9d4c-cbad5d512e5d">   
-</p>
+<div align="center">
+<img width="270px" src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3682fd0f-f47a-40ed-9d4c-cbad5d512e5d">   
+</div>
 
 * ### `PipelineProcessMonitor` 
 Отображает в виде матрицы процессы и сситемы. Системы отображабтся в порядке их выполнения. Точка в пересечении системы и процесса означает что эта система является частью этого процесса.
 
-<p align="center" style="background-color: #2b2b2b80;">
+<div align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c1a7960a-d65a-4f22-9597-fd863ff2b00c">   
-</p>
+</div>
 
 * ### `WorldMonitor` 
 Показывает состояние `EcsWorld`. на каждый казанный мир создается отдельный монитор.
 
-<p align="center" style="background-color: #2b2b2b80;">
+<div align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543">   
-</p>
+</div>
 
 * ### `EntityMonitor`
 Показывает состояние сущности мира. На кажду сущность в мире создается отдельынй монитор. Все мониторы сущностей помещаются в монитор мира.
 
-<p align="center" style="background-color: #2b2b2b80;">
+<div align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1">   
-</p>
+</div>
 
 # Шаблоны
 Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовавыть интерфейс  `ITemplateNode`. 
