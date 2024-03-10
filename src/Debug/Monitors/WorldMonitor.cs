@@ -63,8 +63,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
         void IEcsWorldEventListener.OnReleaseDelEntityBuffer(ReadOnlySpan<int> buffer) { }
         void IEcsWorldEventListener.OnWorldDestroy()
         {
-            UnityEngine.Object.Destroy(_monitor);
-            UnityEngine.Object.Destroy(_entityMonitorsPoolRoot);
+            if (Application.isPlaying)
+            {
+                UnityEngine.Object.Destroy(_monitor);
+                UnityEngine.Object.Destroy(_entityMonitorsPoolRoot);
+            }
             _monitor = null;
             _entityMonitorsPoolRoot = null;
         }
