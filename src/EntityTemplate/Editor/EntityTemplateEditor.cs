@@ -54,7 +54,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (string.IsNullOrEmpty(description) == false)
                 {
-                    name = $"{name} {EcsUnityConsts.INFO_MARK}";
+                    name = $"{name} [i]";
                 }
                 _genericMenu.AddItem(new GUIContent(name, description), false, OnAddComponent, dummy);
             }
