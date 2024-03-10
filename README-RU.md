@@ -21,6 +21,12 @@
 
 # Оглавление
 - [Установка](#установка)
+- [Debug](#debug)
+  - [Debug Модуль](#debug-модуль)
+  - [Debug Сервис](#debug-сервис)
+  - [Визуальная отладка](#визуальная-отладка)
+- [Шаблоны](#шаблоны)
+- [Связь с GameObject](#связь-с-gameObject)
 
 </br>
 
@@ -45,3 +51,41 @@ https://github.com/DCFApixels/DragonECS-Unity.git
 Фреймворк так же может быть добавлен в проект в виде исходников.
 
 </br>
+
+# Debug
+## Debug Модуль
+Подключение модуля отладки в Unity.
+```c#
+EcsDefaultWorld _world = new EcsDefaultWorld();
+EcsEventWorld _eventWorld = new EcsDefaultWorld();
+
+_pipeline = EcsPipeline.New()
+    //...
+    // Подключение и инициализация отладки для миров _world и _eventWorld
+    .AddUnityDebug(_world, _eventWorld)
+    //...
+    .BuildAndInit();
+```
+## Debug Сервис
+`UnityDebugService`- реализация [Debug-сервиса для `EcsDebug`](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#ecsdebug). В редакторе по умолчанию автоматически инициализируется и связывает `EcsDebug.Print` с консолью юнити, `EcsProfilerMarker` c профайлером и т.д.
+```c#
+//Ручная активация.
+UnityDebugService.Activate();
+
+//Выведет сообщение в консоле Unity.
+EcsDebug.Print(); 
+
+var someMarker = new EcsProfilerMarker("SomeMarker");
+someMarker.Begin();
+//время выполнения этого участка будет отражено в профайлере юнити.
+someMarker.End();
+
+//Остановка игрового режима.
+EcsDebug.Break();
+```
+## Визуальная отладка
+
+# Шаблоны
+
+# Связь с GameObject
+
