@@ -83,7 +83,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //    _isInit = true;
         //}
 
-
+        internal static bool HitTest(Rect rect)
+        {
+            return HitTest(rect, Event.current.mousePosition);
+        }
         internal static bool HitTest(Rect rect, Event evt)
         {
             return HitTest(rect, evt.mousePosition);

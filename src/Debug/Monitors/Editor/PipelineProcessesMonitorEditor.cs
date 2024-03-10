@@ -2,6 +2,7 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -62,7 +63,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             _processeIndexes.Add(interfaceType, index);
 
                             data = new ProcessData();
-                            data.interfaceMeta = meta;
+                            data.meta = meta;
                             data.systemsBitMask = new BitMask(_systemsList.Length);
                             _processList.Add(data);
                         }
@@ -77,6 +78,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private Vector2 _cellsize = new Vector2(EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
         private Vector2 _nameCellSize = new Vector2(200f, 200f);
 
+        //private Vector2Int _selectedPoint = new Vector2Int(-1, -1);
+        private (TypeMeta system, TypeMeta process) _selectedPointMeta = default;
         public override void OnInspectorGUI()
         {
             EditorGUI.BeginChangeCheck();
@@ -95,9 +98,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Rect rectView = new Rect(0f, 0f, _nameCellSize.x + _cellsize.x * _processList.Count, _nameCellSize.y + _cellsize.y * _systemsList.Length);
             EditorGUI.DrawRect(rect, new Color(0, 0, 0, 0.6f));
+            GUI.Button(rect, "", EditorStyles.helpBox);
+
             _position = GUI.BeginScrollView(rect, _position, rectView, true, true);
-            //var blackStyle = UnityEditorUtility.GetStyle(Color.black, 0.04f);
-            //var whiteStyle = UnityEditorUtility.GetStyle(Color.white, 0.04f);
 
             Vector2 pivod = _nameCellSize;
             rect = default;
@@ -108,18 +111,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //processes line
             for (int i = 0; i < _processList.Count; i++)
             {
-                TypeMeta meta = _processList[i].interfaceMeta;
+                TypeMeta meta = _processList[i].meta;
                 Rect lineRect = rect;
                 lineRect.y = 0f;
                 lineRect.x = _nameCellSize.x + _cellsize.x * i;
                 lineRect.width = _cellsize.x;
                 lineRect.height = rectView.height;
                 lineRect = RectUtility.AddPadding(lineRect, 1, 0);
-                //GUI.Label(lineRect, "", i % 2 == 1 ? whiteStyle : blackStyle);
+
                 Color color = meta.Color.ToUnityColor();
                 color = NormalizeGridColor(i, color);
                 EditorGUI.DrawRect(lineRect, color);
 
+                if (EcsGUI.HitTest(lineRect))
+                {
+                    GUI.Button(lineRect, "", EditorStyles.selectionRect);
+                    //_selectedPoint.x = i;
+                    _selectedPointMeta.process = meta;
+                }
                 GUIUtility.RotateAroundPivot(90, pivod);
                 GUI.Label(rect, UnityEditorUtility.GetLabel(meta.Name), EditorStyles.miniBoldLabel);
                 GUIUtility.RotateAroundPivot(-90, pivod);
@@ -141,14 +150,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 Rect lineRect = rect;
                 lineRect.width = rectView.width;
                 lineRect = RectUtility.AddPadding(lineRect, 0, 1);
-                //GUI.Label(lineRect, "", i % 2 == 1 ? whiteStyle : blackStyle);
+
                 Color color = meta.Color.ToUnityColor();
                 color = NormalizeGridColor(i, color);
                 EditorGUI.DrawRect(lineRect, color);
 
+                if (EcsGUI.HitTest(lineRect))
+                {
+                    GUI.Button(lineRect, "", EditorStyles.selectionRect);
+                    //_selectedPoint.y = i;
+                    _selectedPointMeta.system = meta;
+                }
                 GUI.Label(rect, UnityEditorUtility.GetLabel(name, i + " " + name), EditorStyles.miniBoldLabel);
                 rect.y += _cellsize.y;
             }
+
+            Texture checkIcon = EditorGUIUtility.IconContent("DotFill").image;
 
             //matrix
             for (int x = 0; x < _processList.Count; x++)
@@ -158,11 +175,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     rect = new Rect(x * _cellsize.x + _nameCellSize.x, y * _cellsize.y + _nameCellSize.y, _cellsize.x, _cellsize.y);
                     bool flag = process.systemsBitMask[y];
-                    string labeltext = flag ? "^" : " ";
-                    GUI.Label(rect, UnityEditorUtility.GetLabel(labeltext, $"{process.interfaceMeta.Name}-{_systemsList[x].meta.Name}"));
+
+                    //string tooltip = $"{process.meta.Name}-{_systemsList[x].meta.Name}";
+                    //GUIContent label = flag ? UnityEditorUtility.GetLabel(checkIcon, tooltip) : UnityEditorUtility.GetLabel("", tooltip);
+                    //GUI.Label(rect, label);
+                    if (flag)
+                    {
+                        GUI.Label(rect, UnityEditorUtility.GetLabel(checkIcon));
+                    }
                 }
             }
             GUI.EndScrollView();
+
+            Rect r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, EditorGUIUtility.singleLineHeight);
+            if(_selectedPointMeta.process != null && _selectedPointMeta.system != null)
+            {
+                GUI.Label(r, $"{_selectedPointMeta.process.Name}-{_selectedPointMeta.system.Name}");
+            }
         }
 
         private static Color NormalizeGridColor(int index, Color color)
@@ -190,7 +219,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private class ProcessData
         {
-            public TypeMeta interfaceMeta;
+            public TypeMeta meta;
             public BitMask systemsBitMask;
         }
     }
