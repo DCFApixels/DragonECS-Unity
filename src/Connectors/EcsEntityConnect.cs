@@ -122,7 +122,7 @@ namespace DCFApixels.DragonECS
         }
         public void Disconnect()
         {
-            if(_isConnected == false)
+            if (_isConnected == false)
             {
                 return;
             }
