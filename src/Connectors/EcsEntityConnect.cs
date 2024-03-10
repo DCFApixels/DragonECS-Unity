@@ -53,15 +53,6 @@ namespace DCFApixels.DragonECS
     [DisallowMultipleComponent]
     public class EcsEntityConnect : MonoBehaviour
     {
-        private sealed class Aspect : EcsAspect
-        {
-            public EcsPool<UnityGameObjectConnect> unityGameObjects;
-            protected override void Init(Builder b)
-            {
-                unityGameObjects = b.Include<UnityGameObjectConnect>();
-            }
-        }
-
         private entlong _entity;
         private EcsWorld _world;
 
@@ -109,17 +100,17 @@ namespace DCFApixels.DragonECS
             {
                 _entity = entity;
                 _world = world;
-                var a = _world.GetAspect<Aspect>();
-                if (a.unityGameObjects.Has(newEntityID))
+                var unityGameObjects = _world.GetPool<UnityGameObjectConnect>();
+                if (unityGameObjects.Has(newEntityID))
                 {
-                    ref readonly var uconnect = ref a.unityGameObjects.Read(newEntityID);
+                    ref readonly var uconnect = ref unityGameObjects.Read(newEntityID);
                     if (uconnect.IsConnected)
                     {
                         uconnect.connect.Disconnect();
                     }
                 }
 
-                a.unityGameObjects.TryAddOrGet(newEntityID) = new UnityGameObjectConnect(this);
+                unityGameObjects.TryAddOrGet(newEntityID) = new UnityGameObjectConnect(this);
                 if (applyTemplates)
                 {
                     ApplyTemplatesFor(world.id, newEntityID);
@@ -134,8 +125,8 @@ namespace DCFApixels.DragonECS
         {
             if (_entity.TryGetID(out int oldEntityID) && _world != null)
             {
-                var a = _world.GetAspect<Aspect>();
-                a.unityGameObjects.TryDel(oldEntityID);
+                var unityGameObjects = _world.GetPool<UnityGameObjectConnect>();
+                unityGameObjects.TryDel(oldEntityID);
             }
             _world = null;
         }
