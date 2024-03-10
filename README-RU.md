@@ -85,7 +85,21 @@ EcsDebug.Break();
 ```
 ## Визуальная отладка
 
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/2d3c842f-c0c9-44f7-b35b-4f879a08f267)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3682fd0f-f47a-40ed-9d4c-cbad5d512e5d)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c1a7960a-d65a-4f22-9597-fd863ff2b00c)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1)
+
 # Шаблоны
+
+## ScriptableEntityTemplate
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8362e2d8-b83a-4dfc-91fd-38993746012f)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1)
+
+## MonoEntityTemplate
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/07a43cb7-96e5-440c-965d-2970803df330)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd)
 
 # Связь с GameObject
 
