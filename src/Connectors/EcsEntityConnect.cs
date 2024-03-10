@@ -9,12 +9,27 @@ namespace DCFApixels.DragonECS
     public static class EcsConnect
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(GameObject go, entlong entity, bool applyTemplates)
+        public static void Connect(this Component cmp, entlong entity, bool applyTemplates)
+        {
+            Connect(entity, cmp, applyTemplates);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(this entlong entity, Component cmp, bool applyTemplates)
+        {
+            if (cmp.TryGetComponent(out EcsEntityConnect connect) == false)
+            {
+                connect = cmp.gameObject.AddComponent<EcsEntityConnect>();
+            }
+            connect.ConnectWith(entity, applyTemplates);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Connect(this GameObject go, entlong entity, bool applyTemplates)
         {
             Connect(entity, go, applyTemplates);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(entlong entity, GameObject go, bool applyTemplates)
+        public static void Connect(this entlong entity, GameObject go, bool applyTemplates)
         {
             if (go.TryGetComponent(out EcsEntityConnect connect) == false)
             {
@@ -22,17 +37,19 @@ namespace DCFApixels.DragonECS
             }
             connect.ConnectWith(entity, applyTemplates);
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(EcsEntityConnect connect, entlong entity, bool applyTemplates)
+        public static void Connect(this EcsEntityConnect connect, entlong entity, bool applyTemplates)
         {
             Connect(entity, connect, applyTemplates);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(entlong entity, EcsEntityConnect connect, bool applyTemplates)
+        public static void Connect(this entlong entity, EcsEntityConnect connect, bool applyTemplates)
         {
             connect.ConnectWith(entity, applyTemplates);
         }
     }
+
     [DisallowMultipleComponent]
     public class EcsEntityConnect : MonoBehaviour
     {
