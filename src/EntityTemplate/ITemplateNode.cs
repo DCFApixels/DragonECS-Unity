@@ -9,13 +9,6 @@
         //void Add(ITemplateNode template);
         //void Remove(ITemplateNode template);
     }
-
-    public interface ITemplateInternal : ITemplate
-    {
-        string ComponentsPropertyName { get; }
-        //EntityTemplateInheritanceMatrix InheritanceMatrix { get; }
-    }
-
     public static class ITemplateExtensions
     {
         public static int NewEntity(this EcsWorld world, ITemplateNode template)
@@ -54,4 +47,13 @@
     //    }
     //    #endregion
     //}
+}
+
+namespace DCFApixels.DragonECS.Unity.Internal
+{
+    internal interface ITemplateInternal : ITemplate
+    {
+        string ComponentsPropertyName { get; }
+        //EntityTemplateInheritanceMatrix InheritanceMatrix { get; }
+    }
 }

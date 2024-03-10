@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DCFApixels.DragonECS.Unity.Internal;
+using System;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
