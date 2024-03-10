@@ -187,6 +187,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (isEmpty)
             {
                 GUILayout.Label(label);
+                EditorGUI.BeginProperty(GUILayoutUtility.GetLastRect(), label, componentRefProp);
+                EditorGUI.EndProperty();
             }
             else
             {
