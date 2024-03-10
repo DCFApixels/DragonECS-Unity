@@ -11,7 +11,7 @@
     "version": "0.3.0",
     "repository": {
         "type": "git",
-        "url": "https://github.com/DCFApixels/DCFApixels-Unity.git"
+        "url": "https://github.com/DCFApixels/DragonECS-Unity.git"
     },
     "dependencies": {
         "com.dcfa_pixels.dragonecs": "https://github.com/DCFApixels/DragonECS.git" 
