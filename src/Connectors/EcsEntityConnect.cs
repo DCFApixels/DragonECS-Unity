@@ -129,6 +129,7 @@ namespace DCFApixels.DragonECS
                 unityGameObjects.TryDel(oldEntityID);
             }
             _world = null;
+            _entity = entlong.NULL;
         }
         #endregion
 
