@@ -147,6 +147,13 @@ namespace DCFApixels.DragonECS
         }
         #endregion
 
+        #region UnityEvents
+        private void OnDestroy()
+        {
+            Disconnect();
+        }
+        #endregion
+
         #region Editor
 #if UNITY_EDITOR
         [ContextMenu("Autoset")]

@@ -7,7 +7,7 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [MetaColor(MetaColor.Cyan)]
-    public readonly struct UnityGameObjectConnect : IEcsComponent
+    public readonly struct UnityGameObjectConnect : IEcsComponent, IEcsComponentLifecycle<UnityGameObjectConnect>
     {
         public readonly EcsEntityConnect connect;
         public readonly Transform transform;
@@ -16,20 +16,28 @@ namespace DCFApixels.DragonECS
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return connect.name; }
         }
-        public bool IsUnidirectional
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return connect == null; }
-        }
         public bool IsConnected
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return transform != null; }
+            get { return connect != null; }
         }
         internal UnityGameObjectConnect(EcsEntityConnect connect)
         {
             this.connect = connect;
             transform = connect.transform;
+        }
+
+        void IEcsComponentLifecycle<UnityGameObjectConnect>.Enable(ref UnityGameObjectConnect component)
+        {
+            component = default;
+        }
+        void IEcsComponentLifecycle<UnityGameObjectConnect>.Disable(ref UnityGameObjectConnect component)
+        {
+            if (component.connect != null)
+            {
+                component.connect.Disconnect();
+            }
+            component = default;
         }
     }
 
