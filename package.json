@@ -3,7 +3,7 @@
     "author": 
     {
         "name": "DCFApixels",
-        "url": "https://github.com/DCFApixels-Unity"
+        "url": "https://github.com/DCFApixels"
     },
     "displayName": "DragonECS-Unity",
     "description": "Integration with Unity for DragonECS",
@@ -13,6 +13,10 @@
         "type": "git",
         "url": "https://github.com/DCFApixels/DCFApixels-Unity.git"
     },
+    "dependencies": {
+        "com.dcfa_pixels.dragonecs": "https://github.com/DCFApixels/DragonECS.git" 
+    },
+
     "keywords":
     [
         "ecs",
