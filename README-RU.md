@@ -90,7 +90,7 @@ EcsDebug.Break();
 * `WorldMonitor` - показывает состояние `EcsWorld`. на каждый казанный мир создается отдельный монитор.
 * `EntityMonitor` - показывает состояние сущности мира. На кажду сущность в мире создается отдельынй монитор, все мониторы сущностей помещаются в монитор мира.
 
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/2d3c842f-c0c9-44f7-b35b-4f879a08f267)
+![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/54e3f6d1-13c4-4226-a983-c672a29d33bb)
 
 ### Pipeline
 Пример `PipelineMonitor`:
