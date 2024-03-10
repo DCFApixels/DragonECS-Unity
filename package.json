@@ -7,7 +7,7 @@
     },
     "displayName": "DragonECS-Unity",
     "description": "Integration with Unity for DragonECS",
-    "unity": "2020.3",
+    "unity": "2021.2",
     "version": "0.3.0",
     "repository": {
         "type": "git",
