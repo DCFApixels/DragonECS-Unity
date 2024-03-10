@@ -51,6 +51,7 @@ namespace DCFApixels.DragonECS
     }
 
     [DisallowMultipleComponent]
+    [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
     public class EcsEntityConnect : MonoBehaviour
     {
         private entlong _entity;

@@ -3,6 +3,7 @@ using UnityEngine;
 namespace DCFApixels.DragonECS
 {
     [DisallowMultipleComponent]
+    [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(AutoEntityCreator), 30)]
     public class AutoEntityCreator : MonoBehaviour
     {
         [SerializeField]

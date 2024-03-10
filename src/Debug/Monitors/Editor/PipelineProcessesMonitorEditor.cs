@@ -95,7 +95,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Rect rectView = new Rect(0f, 0f, _nameCellSize.x + _cellsize.x * _processList.Count, _nameCellSize.y + _cellsize.y * _systemsList.Length);
             EditorGUI.DrawRect(rect, new Color(0, 0, 0, 0.6f));
-            GUI.Button(rect, "", EditorStyles.helpBox);
+            //GUI.Button(rect, "", EditorStyles.helpBox);
 
             _position = GUI.BeginScrollView(rect, _position, rectView, true, true);
 

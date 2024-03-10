@@ -4,6 +4,7 @@ using UnityEngine;
 namespace DCFApixels.DragonECS
 {
     [DisallowMultipleComponent]
+    [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(MonoEntityTemplate), 30)]
     public class MonoEntityTemplate : MonoBehaviour, ITemplateInternal
     {
         [SerializeReference]
