@@ -7,35 +7,29 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [MetaColor(MetaColor.Cyan)]
-    public readonly struct UnityGameObjectConnect : IEcsComponent, IEcsComponentLifecycle<UnityGameObjectConnect>
+    public readonly struct GameObjectConnect : IEcsComponent, IEcsComponentLifecycle<GameObjectConnect>
     {
-        public readonly EcsEntityConnect connect;
-        public readonly Transform transform;
-        public string Name
-        {
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return connect.name; }
-        }
+        public readonly EcsEntityConnect Connect;
         public bool IsConnected
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return connect != null; }
+            get { return Connect != null; }
         }
-        internal UnityGameObjectConnect(EcsEntityConnect connect)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal GameObjectConnect(EcsEntityConnect connect)
         {
-            this.connect = connect;
-            transform = connect.transform;
+            Connect = connect;
         }
 
-        void IEcsComponentLifecycle<UnityGameObjectConnect>.Enable(ref UnityGameObjectConnect component)
+        void IEcsComponentLifecycle<GameObjectConnect>.Enable(ref GameObjectConnect component)
         {
             component = default;
         }
-        void IEcsComponentLifecycle<UnityGameObjectConnect>.Disable(ref UnityGameObjectConnect component)
+        void IEcsComponentLifecycle<GameObjectConnect>.Disable(ref GameObjectConnect component)
         {
-            if (component.connect != null)
+            if (component.Connect != null)
             {
-                component.connect.Disconnect();
+                component.Connect.Disconnect();
             }
             component = default;
         }
@@ -69,7 +63,7 @@ namespace DCFApixels.DragonECS
         Diamond_Red,
         Diamond_Purple
     }
-    public static class GameObjectIconConsts
+    internal static class GameObjectIconConsts
     {
         public const int RAW_LABEL_ICON_LAST = (int)GameObjectIcon.Label_Purple;
     }

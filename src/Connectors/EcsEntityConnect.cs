@@ -61,6 +61,8 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private MonoEntityTemplate[] _monoTemplates;
 
+        private bool _isConnected = false;
+
         #region Properties
         public entlong Entity
         {
@@ -98,34 +100,36 @@ namespace DCFApixels.DragonECS
 
             if (entity.TryUnpack(out int newEntityID, out EcsWorld world))
             {
+                _isConnected = true;
                 _entity = entity;
                 _world = world;
-                var unityGameObjects = _world.GetPool<UnityGameObjectConnect>();
-                if (unityGameObjects.Has(newEntityID))
+                var goConnects = world.GetPool<GameObjectConnect>();
+                if (goConnects.Has(newEntityID))
                 {
-                    ref readonly var uconnect = ref unityGameObjects.Read(newEntityID);
-                    if (uconnect.IsConnected)
+                    ref readonly var goConnect = ref goConnects.Read(newEntityID);
+                    if (goConnect.IsConnected)
                     {
-                        uconnect.connect.Disconnect();
+                        goConnect.Connect.Disconnect();
                     }
                 }
 
-                unityGameObjects.TryAddOrGet(newEntityID) = new UnityGameObjectConnect(this);
+                goConnects.TryAddOrGet(newEntityID) = new GameObjectConnect(this);
                 if (applyTemplates)
                 {
                     ApplyTemplatesFor(world.id, newEntityID);
                 }
             }
-            else
-            {
-                _entity = entlong.NULL;
-            }
         }
         public void Disconnect()
         {
+            if(_isConnected == false)
+            {
+                return;
+            }
+            _isConnected = false;
             if (_entity.TryGetID(out int oldEntityID) && _world != null)
             {
-                var unityGameObjects = _world.GetPool<UnityGameObjectConnect>();
+                var unityGameObjects = _world.GetPool<GameObjectConnect>();
                 unityGameObjects.TryDel(oldEntityID);
             }
             _world = null;
