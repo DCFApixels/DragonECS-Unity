@@ -105,6 +105,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region Label
+        public static GUIContent GetLabelTemp()
+        {
+            if (_singletonContent == null)
+            {
+                _singletonContent = new GUIContent();
+            }
+            return _singletonContent;
+        }
         public static GUIContent GetLabel(string name, string tooltip = null)
         {
             if (_singletonContent == null)

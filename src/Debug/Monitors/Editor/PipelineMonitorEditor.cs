@@ -77,7 +77,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             GUILayout.EndVertical();
         }
-
         private void DrawSystem(IEcsProcess system)
         {
             if (system is SystemsLayerMarkerSystem markerSystem)
@@ -112,7 +111,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label(name, EditorStyles.boldLabel);
             GUILayout.EndVertical();
         }
-
         private void DrawRunner(IEcsRunner runner)
         {
             Type type = runner.GetType();
@@ -122,8 +120,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 return;
             }
-
-            //Color color = (GetAttribute<DebugColorAttribute>(type) ?? _fakeDebugColorAttribute).GetUnityColor();
             Color color = meta.Color.ToUnityColor();
 
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f));
@@ -131,15 +127,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label(string.Join(", ", runner.ProcessRaw.Cast<object>().Select(o => o.GetType().Name)), systemsListStyle);
             GUILayout.EndVertical();
         }
-
-        private TAttribute GetAttribute<TAttribute>(Type target) where TAttribute : Attribute
-        {
-            var result = target.GetCustomAttributes(_debugColorAttributeType, false);
-            if (result.Length > 0)
-                return (TAttribute)result[0];
-            return null;
-        }
-
         private bool CheckIsHidden(TypeMeta meta)
         {
             if (IsShowHidden)

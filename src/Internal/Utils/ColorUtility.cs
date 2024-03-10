@@ -14,7 +14,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             r = r + (gray - r) * (1 - t);
             g = g + (gray - g) * (1 - t);
             b = b + (gray - b) * (1 - t);
-            return new Color(r, g, b);
+            return new Color(r, g, b, self.a);
         }
     }
 }
