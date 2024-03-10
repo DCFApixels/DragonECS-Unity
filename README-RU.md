@@ -84,32 +84,27 @@ someMarker.End();
 EcsDebug.Break();
 ```
 ## Визуальная отладка
-Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных аспектов фреймворка. Найти эти мониторы можно в Play Mode в разделе `DontDestroyOnLoad`. Расширение содержит 4 объекта-монитора: 
-* `PipelineMonitor` - показывает состояние `EcsPipeline`.
-* `PipelineProcessMonitor` - отображает в виде матрицы процессы и сситемы.
-* `WorldMonitor` - показывает состояние `EcsWorld`. на каждый казанный мир создается отдельный монитор.
-* `EntityMonitor` - показывает состояние сущности мира. На кажду сущность в мире создается отдельынй монитор, все мониторы сущностей помещаются в монитор мира.
+Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных аспектов фреймворка. Найти эти мониторы можно в Play Mode в разделе `DontDestroyOnLoad`. 
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/54e3f6d1-13c4-4226-a983-c672a29d33bb)
 
-### Pipeline
-Пример `PipelineMonitor`:
+* ### `PipelineMonitor`
+Показывает состояние `EcsPipeline`. Системы отображаются в порядке их выполнения.
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3682fd0f-f47a-40ed-9d4c-cbad5d512e5d)
 
-Пример `PipelineProcessMonitor`:
+* ### `PipelineProcessMonitor` 
+Отображает в виде матрицы процессы и сситемы. Системы отображабтся в порядке их выполнения. Точка в пересечении системы и процесса означает что эта система является частью этого процесса.
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c1a7960a-d65a-4f22-9597-fd863ff2b00c)
 
-### World
-
-Пример `WorldMonitor`:
+* ### `WorldMonitor` 
+Показывает состояние `EcsWorld`. на каждый казанный мир создается отдельный монитор.
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543)
 
-### Entity
-
-Пример `EntityMonitor`:
+* ### `EntityMonitor`
+Показывает состояние сущности мира. На кажду сущность в мире создается отдельынй монитор. Все мониторы сущностей помещаются в монитор мира.
 
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1)
 
