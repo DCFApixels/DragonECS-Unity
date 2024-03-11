@@ -152,7 +152,7 @@ int e = _world.NewEntity(someSamplate);
 Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
 
 <details>
-<summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate</summary>
+<summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate.</summary>
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8362e2d8-b83a-4dfc-91fd-38993746012f">   
@@ -172,7 +172,7 @@ int e = _world.NewEntity(someSamplate);
 Крепится к GameObject. Наследуется от `MonoBehaviour`. 
 
 <details>
-<summary>Повесить компонент: Add Component > DragonECS > MonoEntityTemplate</summary>
+<summary>Повесить компонент: Add Component > DragonECS > MonoEntityTemplate.</summary>
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/07a43cb7-96e5-440c-965d-2970803df330">   
@@ -234,9 +234,25 @@ class SomeComponentTemplate : IComponentTemplate
 </br>
 
 # Связь с GameObject
+Связываются сущности и GameObject-ы с помощью коннектов. Коннекты со стороны GameObject - `EcsEntityConnect`, со стороны сущности - `GameObjectConnect`. `EcsEntityConnect` - ключевой коннект, `GameObjectConnect` - создается/удаляется автоматически.
+```c#
+EcsEntityConnect connect = /*...*/;
+entlong entity = _world.NewEntityLong();
 
+// Связывание сущности с GameObject.
+// Автоматически добавляется GameObjectConnect в сущность.
+// Автоматическки применяются шаблоны.
+connect.ConnectWith(entity);
+
+// Или создать без применения шаблнов.
+connect.ConnectWith(entity, false);
+
+// Отвязать.
+// Автоматически удалится GameObjectConnect.
+connect.Disconnect();
+```
 <details>
-<summary>Повесить компонент: Add Component > DragonECS > EcsEntityConnect</summary>
+<summary>Повесить компонент: Add Component > DragonECS > EcsEntityConnect.</summary>
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/cfa6eb1c-82ba-47f6-bee1-7986c1e31be7">   
@@ -248,10 +264,16 @@ class SomeComponentTemplate : IComponentTemplate
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3484ed12-5417-4450-9908-1d3eb2858a2b">   
 </p>
 
-Для автоматического создания сущности и связи с GameObject есть `AutoEntityCreator`.
+> Просмотреть все компоненты связанной сущности можно развернув `RUNTIME COMPONENTS`.
+
+> На панели внизу есть вспомогательные кнопки: 1) Отвязать сущность. 2) Удалить сущность. 3) Автоматическое заполнение массива шаблонов. 4) Каскадный вызов автозаполнения для всех дочерних коннектов в иерархии.
+
+---
+
+`AutoEntityCreator` автоматический создает сущность и связывает с GameObject. В инспекторе ему нужно указать `EcsEntityConnect` с которым связывать сущность и [Провайдер мира](#world-provider) в котормо создать сущность.
 
 <details>
-<summary>Повесить компонент: Add Component > DragonECS > AutoEntityCreator</summary>
+<summary>Повесить компонент: Add Component > DragonECS > AutoEntityCreator.</summary>
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/29bfef68-6e77-467c-84d3-14d73a9c614d">   
@@ -264,11 +286,11 @@ class SomeComponentTemplate : IComponentTemplate
 </p>
 
 # World Provider
-`EcsWorldProvider` - это `ScriptableObject` обертка над `EcsWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity.
+`EcsWorldProvider` - это `ScriptableObject` обертка над `EcsWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity. Для простых случаев достаточно будет использовать синглтон версию провайдера `EcsDefaultWorldSingletonProvider`.
 
 
 <details>
-<summary>Создать ассет: Asset > Create > DragonECS > WorldProviders > Выбрать тип мира</summary>
+<summary>Создать ассет провайдера: Asset > Create > DragonECS > WorldProviders > Выбрать тип мира.</summary>
     
 <p align="center">
 <img width="780px" src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8aa1bd82-8a15-46ce-b950-3e74252243c6">   
