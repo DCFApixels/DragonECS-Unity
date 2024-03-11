@@ -145,7 +145,49 @@ foreach (var e in _world.Where(out Aspect a))
 // Применение шаблона сразу при создании сущности.
 int e = _world.NewEntity(someSamplate);
 ```
-По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate` и `MonoEntityTemplate`. 
+По умолчанию расширение содержит 3 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
+
+## Шаблон компонента
+Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это классы реализующие `IComponentTemplate`. 
+
+* Упрощенная реализация:
+```c#
+// Обязательно добавить [Serializable] к компоненту и к шаблону
+[Serializable]
+struct SomeComponent : IEcsComponent { /*...*/ }
+[Serializable]
+class SomeComponentTemplate : ComponentTemplate<SomeComponent> { }
+```
+
+* Упрощенная реализация для компонентов-тегов:
+```c#
+[Serializable]
+struct SomeTagComponent : IEcsTagComponent { /*...*/ }
+[Serializable]
+class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
+```
+
+* Полная реализация:
+```c#
+[Serializable] 
+struct SomeComponent : IEcsComponent { /*...*/ }
+[Serializable]
+class SomeComponentTemplate : IComponentTemplate
+{
+    [SerializeField]
+    protected SomeComponent component;
+    public Type Type { get { return typeof(SomeComponent); } }
+    public void Apply(int worldID, int entityID)
+    {
+        EcsWorld.GetPoolInstance<EcsPool<SomeComponent>>(worldID).TryAddOrGet(entityID);
+    }
+    public object GetRaw() { return component; }
+    public void SetRaw(object raw) { component = (SomeComponent)raw; }
+    public void OnGizmos(Transform transform, IComponentTemplate.GizmosMode mode) { /*...*/ }
+    public void OnValidate(UnityEngine.Object obj) { /*...*/ }
+}
+```
+> 
 ## ScriptableEntityTemplate
 Хранится как отдельынй ассет. Наследуется от `ScriptableObject`. </br>
 Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
@@ -169,6 +211,8 @@ int e = _world.NewEntity(someSamplate);
 ![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd)
 
 -----
+
+Чтобы компонент можно было добавить в шаблон, нужно реализовать шаблон компонента. 
 
 </br>
 
