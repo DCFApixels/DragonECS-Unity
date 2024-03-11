@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    public abstract class EntityTemplateEditorBase : Editor
+    internal abstract class EntityTemplateEditorBase : Editor
     {
         private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 19f, 19f);
         private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 19f, 19f);
@@ -237,7 +237,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
-    public class EntityTemplatePresetEditor : EntityTemplateEditorBase
+    internal class EntityTemplatePresetEditor : EntityTemplateEditorBase
     {
         public override void OnInspectorGUI()
         {
@@ -245,7 +245,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
     }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
-    public class EntityTemplateEditor : EntityTemplateEditorBase
+    internal class EntityTemplateEditor : EntityTemplateEditorBase
     {
         public override void OnInspectorGUI()
         {
