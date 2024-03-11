@@ -145,7 +145,48 @@ foreach (var e in _world.Where(out Aspect a))
 // Применение шаблона сразу при создании сущности.
 int e = _world.NewEntity(someSamplate);
 ```
-По умолчанию расширение содержит 3 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
+По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
+
+## ScriptableEntityTemplate
+Хранится как отдельынй ассет. Наследуется от `ScriptableObject`.
+Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
+
+<details>
+<summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate</summary>
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8362e2d8-b83a-4dfc-91fd-38993746012f">   
+</p>
+
+</details>
+
+Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента). Пример:
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1">   
+</p>
+
+-----
+
+## MonoEntityTemplate
+Крепится к GameObject. Наследуется от `MonoBehaviour`. 
+
+<details>
+<summary>Повесить компонент: Add Component > DragonECS > MonoEntityTemplate</summary>
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/07a43cb7-96e5-440c-965d-2970803df330">   
+</p>
+
+</details>
+
+Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента). Пример:
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd">   
+</p>
+
+-----
 
 ## Шаблон компонента
 Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это классы реализующие `IComponentTemplate`. 
@@ -187,30 +228,6 @@ class SomeComponentTemplate : IComponentTemplate
     public void OnValidate(UnityEngine.Object obj) { /*...*/ }
 }
 ```
-> 
-## ScriptableEntityTemplate
-Хранится как отдельынй ассет. Наследуется от `ScriptableObject`. </br>
-Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
-
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8362e2d8-b83a-4dfc-91fd-38993746012f)
-
-Пример:
-
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1)
-
------
-
-## MonoEntityTemplate
-Крепится к GameObject. Наследуется от `MonoBehaviour`. </br>
-Дейсвия чтобы добавить `MonoEntityTemplate` на GameObject:
-
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/07a43cb7-96e5-440c-965d-2970803df330)
-
-Пример:
-
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd)
-
------
 
 Чтобы компонент можно было добавить в шаблон, нужно реализовать шаблон компонента. 
 
@@ -218,15 +235,47 @@ class SomeComponentTemplate : IComponentTemplate
 
 # Связь с GameObject
 
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8aa1bd82-8a15-46ce-b950-3e74252243c6)
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/d01a671a-69e9-44b9-9ad1-e58d0e8857d7)
+<details>
+<summary>Повесить компонент: Add Component > DragonECS > EcsEntityConnect</summary>
 
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/cfa6eb1c-82ba-47f6-bee1-7986c1e31be7)
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3484ed12-5417-4450-9908-1d3eb2858a2b)
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/cfa6eb1c-82ba-47f6-bee1-7986c1e31be7">   
+</p>
 
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/29bfef68-6e77-467c-84d3-14d73a9c614d)
-![image](https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/55c11f1c-c0e0-435c-af9b-4c06678491a6)
+</details>
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/3484ed12-5417-4450-9908-1d3eb2858a2b">   
+</p>
+
+Для автоматического создания сущности и связи с GameObject есть `AutoEntityCreator`.
+
+<details>
+<summary>Повесить компонент: Add Component > DragonECS > AutoEntityCreator</summary>
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/29bfef68-6e77-467c-84d3-14d73a9c614d">   
+</p>
+
+</details>
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/55c11f1c-c0e0-435c-af9b-4c06678491a6">   
+</p>
+
+# World Provider
+`EcsWorldProvider` - это `ScriptableObject` обертка над `EcsWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity.
 
 
+<details>
+<summary>Создать ассет: Asset > Create > DragonECS > WorldProviders > Выбрать тип мира</summary>
+    
+<p align="center">
+<img width="780px" src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/8aa1bd82-8a15-46ce-b950-3e74252243c6">   
+</p>
 
+</details>
 
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/d01a671a-69e9-44b9-9ad1-e58d0e8857d7">   
+</p>
