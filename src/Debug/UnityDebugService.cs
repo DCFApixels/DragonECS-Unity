@@ -29,7 +29,7 @@ namespace DCFApixels.DragonECS
             bool hasTag = string.IsNullOrEmpty(tag) == false;
             if (hasTag)
             {
-                log = $".[{tag}] {v}";
+                log = $"[{tag}] {v}";
                 string taglower = tag.ToLower();
                 if (taglower.Contains("warning"))
                 {

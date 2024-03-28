@@ -40,9 +40,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawEntityInfo(EcsEntityConnect[] targets)
         {
-            bool isConnected = Target.Entity.TryUnpack(out int id, out short gen, out EcsWorld world);
+            bool isConnected = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
             EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
-            EcsGUI.Layout.EntityBar(status, id, gen, world.id);
+            EcsGUI.Layout.EntityBar(status, id, gen, worldID);
         }
 
         private void DrawTemplates()
@@ -116,9 +116,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
             }
-            if (Target.Entity.TryUnpack(out int entityID, out EcsWorld world))
+            if (Target.Entity.TryUnpackForUnityEditor(out int entityID, out short gen, out short worldID, out EcsWorld world))
             {
-                EcsGUI.Layout.DrawRuntimeComponents(entityID, world);
+                if (world.IsNullOrDetroyed() == false)
+                {
+                    EcsGUI.Layout.DrawRuntimeComponents(entityID, world);
+                }
             }
         }
     }

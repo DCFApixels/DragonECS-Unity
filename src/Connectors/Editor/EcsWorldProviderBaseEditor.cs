@@ -12,16 +12,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override void OnInspectorGUI()
         {
-            if (Target.IsEmpty)
+            EcsWorld world = Target.GetCurrentWorldRaw();
+            if (world == null)
             {
                 var style = UnityEditorUtility.GetStyle(new Color32(255, 0, 75, 100));
                 GUILayout.Box("Is Empty", style, GUILayout.ExpandWidth(true));
             }
             else
             {
-                var style = UnityEditorUtility.GetStyle(new Color32(75, 255, 0, 100));
-                EcsWorld world = Target.GetRaw();
-                GUILayout.Box($"{world.GetMeta().Name} ( {world.id} )", style, GUILayout.ExpandWidth(true));
+                if (world.IsDestroyed)
+                {
+                    var style = UnityEditorUtility.GetStyle(new Color32(255, 75, 0, 100));
+                    GUILayout.Box($"{world.GetMeta().Name} ( {world.id} ) Destroyed", style, GUILayout.ExpandWidth(true));
+                }
+                else
+                {
+                    var style = UnityEditorUtility.GetStyle(new Color32(75, 255, 0, 100));
+                    GUILayout.Box($"{world.GetMeta().Name} ( {world.id} )", style, GUILayout.ExpandWidth(true));
+                }
             }
             EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
 
@@ -30,9 +38,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.Space(10);
 
-            if (GUILayout.Button("Destroy"))
+            if (GUILayout.Button("Destroy & Clear"))
             {
-                var w = Target.GetRaw();
+                var w = Target.GetCurrentWorldRaw();
                 if (w != null && w.IsDestroyed == false)
                 {
                     w.Destroy();

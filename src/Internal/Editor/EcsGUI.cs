@@ -293,7 +293,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public static void DrawWorldBaseInfo(EcsWorld world)
             {
-                bool isNull = world == null || world.id == 0;
+                bool isNull = world == null || world.IsDestroyed || world.id == 0;
                 int entitesCount = isNull ? 0 : world.Count;
                 int capacity = isNull ? 0 : world.Capacity;
                 int leakedEntitesCount = isNull ? 0 : world.CountLeakedEntitesDebug();
@@ -321,7 +321,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout = true)
             {
-                if (entity.TryUnpack(out int entityID, out EcsWorld world))
+                if (entity.TryUnpackForUnityEditor(out int entityID, out _, out _, out EcsWorld world))
                 {
                     DrawRuntimeComponents(entityID, world, isWithFoldout);
                 }

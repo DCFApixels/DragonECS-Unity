@@ -130,7 +130,7 @@ namespace DCFApixels.DragonECS
                 return;
             }
             _isConnectInvoked = false;
-            if (_entity.TryGetID(out int oldEntityID) && _world != null)
+            if (_world.IsNullOrDetroyed() == false && _entity.TryGetID(out int oldEntityID))
             {
                 var unityGameObjects = _world.GetPool<GameObjectConnect>();
                 unityGameObjects.TryDel(oldEntityID);

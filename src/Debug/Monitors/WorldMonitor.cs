@@ -41,18 +41,26 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
         public void Init()
         {
+            if (_world == null)
+            {
+                return;
+            }
             TypeMeta meta = _world.GetMeta();
             _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)} ( {_world.id} )").AddComponent<WorldMonitor>();
             UnityEngine.Object.DontDestroyOnLoad(_monitor);
             _monitor.Set(_world);
             _monitor.gameObject.SetActive(false);
 
-            _entityMonitorsPoolRoot = new GameObject("__POOL").transform;
+            _entityMonitorsPoolRoot = new GameObject("__pool__").transform;
             _entityMonitorsPoolRoot.SetParent(_monitor.transform);
 
-            foreach (var e in _world.Entities)
+
+            if (_world.IsNullOrDetroyed() == false)
             {
-                InitNewEntity(e, false);
+                foreach (var e in _world.Entities)
+                {
+                    InitNewEntity(e, false);
+                }
             }
         }
 
@@ -65,8 +73,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             if (Application.isPlaying)
             {
-                UnityEngine.Object.Destroy(_monitor);
-                UnityEngine.Object.Destroy(_entityMonitorsPoolRoot);
+                UnityEngine.Object.Destroy(_monitor.gameObject);
+                UnityEngine.Object.Destroy(_entityMonitorsPoolRoot.gameObject);
             }
             _monitor = null;
             _entityMonitorsPoolRoot = null;
