@@ -256,12 +256,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GenericMenu genericMenu = new GenericMenu();
 
             var pools = world.AllPools;
-            for (int i = 0; i < world.PoolsCount; i++)
+            for (int i = 0; i < pools.Length; i++)
             {
                 var pool = pools[i];
                 if (pool.IsNullOrDummy())
                 {
-                    i--;
                     continue;
                 }
                 var meta = pool.ComponentType.ToMeta();

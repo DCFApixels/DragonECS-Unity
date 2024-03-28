@@ -58,11 +58,13 @@ namespace DCFApixels.DragonECS
         private EcsWorld _world;
 
         [SerializeField]
+        private bool _deleteEntiityWithDestroy = false;
+        [SerializeField]
         private ScriptableEntityTemplate[] _scriptableTemplates;
         [SerializeField]
         private MonoEntityTemplate[] _monoTemplates;
 
-        private bool _isConnected = false;
+        private bool _isConnectInvoked = false;
 
         #region Properties
         public entlong Entity
@@ -101,7 +103,7 @@ namespace DCFApixels.DragonECS
 
             if (entity.TryUnpack(out int newEntityID, out EcsWorld world))
             {
-                _isConnected = true;
+                _isConnectInvoked = true;
                 _entity = entity;
                 _world = world;
                 var goConnects = world.GetPool<GameObjectConnect>();
@@ -123,11 +125,11 @@ namespace DCFApixels.DragonECS
         }
         public void Disconnect()
         {
-            if (_isConnected == false)
+            if (_isConnectInvoked == false)
             {
                 return;
             }
-            _isConnected = false;
+            _isConnectInvoked = false;
             if (_entity.TryGetID(out int oldEntityID) && _world != null)
             {
                 var unityGameObjects = _world.GetPool<GameObjectConnect>();
@@ -155,7 +157,12 @@ namespace DCFApixels.DragonECS
         #region UnityEvents
         private void OnDestroy()
         {
+            entlong ent = _entity;
             Disconnect();
+            if (_deleteEntiityWithDestroy && ent.TryUnpack(out int id, out EcsWorld world))
+            {
+                world.DelEntity(id);
+            }
         }
         #endregion
 
@@ -191,7 +198,15 @@ namespace DCFApixels.DragonECS
 
         private static void Autoset(EcsEntityConnect target)
         {
-            var result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
+            IEnumerable<MonoEntityTemplate> result;
+            if (target.MonoTemplates != null && target.MonoTemplates.Count() > 0)
+            {
+                result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
+            }
+            else
+            {
+                result = GetTemplatesFor(target.transform);
+            }
 
             target._monoTemplates = result.ToArray();
             EditorUtility.SetDirty(target);

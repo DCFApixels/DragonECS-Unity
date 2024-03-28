@@ -14,7 +14,14 @@ namespace DCFApixels.DragonECS
         private bool _created;
 
         #region Properties
-        public EcsEntityConnect Connect => _connect;
+        public EcsEntityConnect Connect
+        {
+            get { return _connect; }
+        }
+        public EcsWorldProviderBase World
+        {
+            get { return _world; }
+        }
         #endregion
 
         #region UnityEvents
@@ -27,7 +34,6 @@ namespace DCFApixels.DragonECS
         }
         private void Start()
         {
-
             CreateEntity();
         }
         #endregion
@@ -35,7 +41,11 @@ namespace DCFApixels.DragonECS
         #region Methods
         private void AutoResolveWorldProviderDependensy()
         {
-            _world = EcsDefaultWorldSingletonProvider.Instance;
+            _world = AutoGetWorldProvider();
+        }
+        protected virtual EcsWorldProviderBase AutoGetWorldProvider()
+        {
+            return EcsDefaultWorldSingletonProvider.Instance;
         }
         public void ManualStart()
         {
@@ -57,9 +67,14 @@ namespace DCFApixels.DragonECS
             }
             _created = true;
         }
+
         private void InitConnect(EcsEntityConnect connect, EcsWorld world)
         {
-            connect.ConnectWith(world.NewEntityLong(), true);
+            connect.ConnectWith(CreateEntity(world), true);
+        }
+        protected virtual entlong CreateEntity(EcsWorld world)
+        {
+            return world.NewEntityLong();
         }
         #endregion
 
