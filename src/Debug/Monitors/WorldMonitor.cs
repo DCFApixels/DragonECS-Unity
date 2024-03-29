@@ -73,8 +73,14 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             if (Application.isPlaying)
             {
-                UnityEngine.Object.Destroy(_monitor.gameObject);
-                UnityEngine.Object.Destroy(_entityMonitorsPoolRoot.gameObject);
+                if (_monitor != null)
+                {
+                    UnityEngine.Object.Destroy(_monitor.gameObject);
+                }
+                if (_entityMonitorsPoolRoot != null)
+                {
+                    UnityEngine.Object.Destroy(_entityMonitorsPoolRoot.gameObject);
+                }
             }
             _monitor = null;
             _entityMonitorsPoolRoot = null;
