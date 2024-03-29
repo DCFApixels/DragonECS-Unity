@@ -264,8 +264,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     continue;
                 }
                 var meta = pool.ComponentType.ToMeta();
-
-                genericMenu.AddItem(new GUIContent(meta.Name, meta.Description), false, OnAddComponent, pool);
+                string name = meta.Group.Name + meta.Name;
+                genericMenu.AddItem(new GUIContent(name, meta.Description), false, OnAddComponent, pool);
             }
             return new WorldData(genericMenu, world.PoolsCount);
         }
