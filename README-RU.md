@@ -26,7 +26,9 @@
   - [Debug Сервис](#debug-сервис)
   - [Визуальная отладка](#визуальная-отладка)
 - [Шаблоны](#шаблоны)
-- [Связь с GameObject](#связь-с-gameObject)
+- [Связь с GameObject](#связь-с-gameobject)
+- [World Provider](#world-provider)
+- [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
 
 </br>
 
@@ -285,6 +287,8 @@ connect.Disconnect();
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/55c11f1c-c0e0-435c-af9b-4c06678491a6">   
 </p>
 
+</br>
+
 # World Provider
 `EcsWorldProvider` - это `ScriptableObject` обертка над `EcsWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity. Для простых случаев достаточно будет использовать синглтон версию провайдера `EcsDefaultWorldSingletonProvider`.
 
@@ -301,3 +305,32 @@ connect.Disconnect();
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/d01a671a-69e9-44b9-9ad1-e58d0e8857d7">   
 </p>
+
+</br>
+
+# FixedUpdate LateUpdate 
+```c#
+using DCFApixels.DragonECS;
+using UnityEngine;
+public class EcsRoot : MonoBehaviour
+{
+    private EcsPipeline _pipeline;
+    //...
+    private void Update()
+    {
+        // Стандартный Run из фреймворка.
+        _pipeline.Run();
+    }
+    private void FixedUpdate()
+    {
+        // Специальный Run для трансляции FixedUpdate.
+        _pipeline.FixedRun();
+    }
+    private void LateUpdate()
+    {
+        // Специальный Run для трансляции LateUpdate.
+        _pipeline.LateRun();
+    }
+    // ...
+}
+```
