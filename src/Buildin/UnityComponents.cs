@@ -43,7 +43,7 @@ namespace DCFApixels.DragonECS
         {
             get { return UnityComponentConsts.BaseGroup; }
         }
-        public sealed override void Apply(int worldID, int entityID)
+        public sealed override void Apply(short worldID, int entityID)
         {
             EcsWorld.GetPoolInstance<EcsPool<UnityComponent<T>>>(worldID).TryAddOrGet(entityID) = component;
         }

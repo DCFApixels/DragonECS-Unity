@@ -46,7 +46,7 @@ namespace DCFApixels.DragonECS
         public virtual void OnGizmos(Transform transform, GizmosMode mode) { }
         public virtual void OnValidate(UnityEngine.Object obj) { }
 
-        public abstract void Apply(int worldID, int entityID);
+        public abstract void Apply(short worldID, int entityID);
         #endregion
     }
     [Serializable]
@@ -80,7 +80,7 @@ namespace DCFApixels.DragonECS
     public abstract class ComponentTemplate<T> : ComponentTemplateBase<T>
         where T : struct, IEcsComponent
     {
-        public override void Apply(int worldID, int entityID)
+        public override void Apply(short worldID, int entityID)
         {
             EcsWorld.GetPoolInstance<EcsPool<T>>(worldID).TryAddOrGet(entityID) = component;
         }
@@ -88,7 +88,7 @@ namespace DCFApixels.DragonECS
     public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>
     where T : struct, IEcsTagComponent
     {
-        public override void Apply(int worldID, int entityID)
+        public override void Apply(short worldID, int entityID)
         {
             EcsWorld.GetPoolInstance<EcsTagPool<T>>(worldID).Set(entityID, true);
         }

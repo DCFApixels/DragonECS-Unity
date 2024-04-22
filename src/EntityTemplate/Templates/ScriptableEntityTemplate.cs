@@ -24,7 +24,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Methods
-        public void Apply(int worldID, int entityID)
+        public void Apply(short worldID, int entityID)
         {
             foreach (var item in _components)
             {
