@@ -60,9 +60,9 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private bool _deleteEntiityWithDestroy = false;
         [SerializeField]
-        private ScriptableEntityTemplate[] _scriptableTemplates;
+        private ScriptableEntityTemplateBase[] _scriptableTemplates;
         [SerializeField]
-        private MonoEntityTemplate[] _monoTemplates;
+        private MonoEntityTemplateBase[] _monoTemplates;
 
         private bool _isConnectInvoked = false;
 
@@ -82,11 +82,11 @@ namespace DCFApixels.DragonECS
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _entity.IsAlive; }
         }
-        public IEnumerable<ScriptableEntityTemplate> ScriptableTemplates
+        public IEnumerable<ScriptableEntityTemplateBase> ScriptableTemplates
         {
             get { return _scriptableTemplates; }
         }
-        public IEnumerable<MonoEntityTemplate> MonoTemplates
+        public IEnumerable<MonoEntityTemplateBase> MonoTemplates
         {
             get { return _monoTemplates; }
         }
@@ -198,7 +198,7 @@ namespace DCFApixels.DragonECS
 
         private static void Autoset(EcsEntityConnect target)
         {
-            IEnumerable<MonoEntityTemplate> result;
+            IEnumerable<MonoEntityTemplateBase> result;
             if (target.MonoTemplates != null && target.MonoTemplates.Count() > 0)
             {
                 result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
@@ -211,15 +211,15 @@ namespace DCFApixels.DragonECS
             target._monoTemplates = result.ToArray();
             EditorUtility.SetDirty(target);
         }
-        private static IEnumerable<MonoEntityTemplate> GetTemplatesFor(Transform parent)
+        private static IEnumerable<MonoEntityTemplateBase> GetTemplatesFor(Transform parent)
         {
-            IEnumerable<MonoEntityTemplate> result = parent.GetComponents<MonoEntityTemplate>();
+            IEnumerable<MonoEntityTemplateBase> result = parent.GetComponents<MonoEntityTemplateBase>();
             for (int i = 0; i < parent.childCount; i++)
             {
                 var child = parent.GetChild(i);
                 if (child.TryGetComponent<EcsEntityConnect>(out _))
                 {
-                    return Enumerable.Empty<MonoEntityTemplate>();
+                    return Enumerable.Empty<MonoEntityTemplateBase>();
                 }
                 result = result.Concat(GetTemplatesFor(child));
             }

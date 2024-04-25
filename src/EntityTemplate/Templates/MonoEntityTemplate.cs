@@ -4,9 +4,14 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    public abstract class MonoEntityTemplateBase : MonoBehaviour, ITemplate
+    {
+        public abstract void Apply(short worldID, int entityID);
+    }
+
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(MonoEntityTemplate), 30)]
-    public class MonoEntityTemplate : MonoBehaviour, ITemplateInternal
+    public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]
         private IComponentTemplate[] _components;
@@ -25,7 +30,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Methods
-        public void Apply(short worldID, int entityID)
+        public override void Apply(short worldID, int entityID)
         {
             foreach (var item in _components)
             {

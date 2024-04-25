@@ -4,8 +4,13 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    public abstract class ScriptableEntityTemplateBase : ScriptableObject, ITemplate
+    {
+        public abstract void Apply(short worldID, int entityID);
+    }
+
     [CreateAssetMenu(fileName = nameof(ScriptableEntityTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptableEntityTemplate), order = 1)]
-    public class ScriptableEntityTemplate : ScriptableObject, ITemplateInternal
+    public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]
         private IComponentTemplate[] _components;
@@ -24,7 +29,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Methods
-        public void Apply(short worldID, int entityID)
+        public override void Apply(short worldID, int entityID)
         {
             foreach (var item in _components)
             {
