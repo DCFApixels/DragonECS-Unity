@@ -58,7 +58,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 }
             }
 #else
-            foreach (var item in targets) item.DrawGizmos();
+            foreach (var item in Process) item.DrawGizmos();
 #endif
         }
 
@@ -91,7 +91,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 }
             }
 #else
-            foreach (var item in targets) item.LateRun();
+            foreach (var item in Process) item.LateRun();
 #endif
         }
 
@@ -123,7 +123,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 }
             }
 #else
-            foreach (var item in targets) item.FixedRun();
+            foreach (var item in Process) item.FixedRun();
 #endif
         }
 
