@@ -5,7 +5,9 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+#if UNITY_EDITOR
     [InitializeOnLoad]
+#endif
     public class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];

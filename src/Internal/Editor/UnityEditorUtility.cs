@@ -1,5 +1,4 @@
-﻿#if UNITY_EDITOR
-using DCFApixels.DragonECS.Unity.Internal;
+﻿using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
@@ -9,16 +8,8 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [InitializeOnLoad]
-    internal static class UnityEditorUtility
+    internal static partial class UnityEditorUtility
     {
-        static UnityEditorUtility()
-        {
-            colorBoxeStyles = new SparseArray<GUIStyle>();
-        }
-        private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
-        private static GUIContent _singletonContent = null;
-
         #region TransformFieldName
         public static string TransformToUpperName(string name)
         {
@@ -104,6 +95,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
+    }
+}
+
+
+#if UNITY_EDITOR
+namespace DCFApixels.DragonECS.Unity.Editors
+{
+    [InitializeOnLoad]
+    internal static partial class UnityEditorUtility
+    {
+        static UnityEditorUtility()
+        {
+            colorBoxeStyles = new SparseArray<GUIStyle>();
+        }
+        private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
+        private static GUIContent _singletonContent = null;
+
+        
         #region Label
         public static GUIContent GetLabelTemp()
         {
