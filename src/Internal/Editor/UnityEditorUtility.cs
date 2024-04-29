@@ -112,7 +112,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
         private static GUIContent _singletonContent = null;
 
-        
+
         #region Label
         public static GUIContent GetLabelTemp()
         {
