@@ -43,22 +43,54 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void OnGUI()
         {
             float labelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth *= 2f;
+            EditorGUIUtility.labelWidth = 0f;
 
+            float checkBoxWidth = 20f;
 
-            GUILayout.Label("Settings", EditorStyles.whiteLargeLabel);
+            GUILayout.Space(20f);
+            using (new EcsGUI.ColorScope(Color.white * 0.5f))
+                GUILayout.BeginVertical(EditorStyles.helpBox);
+            //using (new EcsGUI.ColorScope(Color.white * 1.2f))
+                GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
+            Rect rect = GUILayoutUtility.GetLastRect();
+            rect.xMin += 9f;
+            GUI.Label(rect, "Settings", EditorStyles.whiteLargeLabel);
+
             EditorGUI.BeginChangeCheck();
             Settings settings = new Settings();
-            settings.IsShowHidden = EditorGUILayout.Toggle(nameof(SettingsPrefs.IsShowHidden), SettingsPrefs.instance.IsShowHidden);
-            settings.IsShowInterfaces = EditorGUILayout.Toggle(nameof(SettingsPrefs.IsShowInterfaces), SettingsPrefs.instance.IsShowInterfaces);
-            settings.IsShowRuntimeComponents = EditorGUILayout.Toggle(nameof(SettingsPrefs.IsShowRuntimeComponents), SettingsPrefs.instance.IsShowRuntimeComponents);
+
+            GUILayout.BeginHorizontal();
+            settings.IsShowHidden = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowHidden, GUILayout.Width(checkBoxWidth));
+            GUILayout.Label(nameof(SettingsPrefs.IsShowHidden), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            settings.IsShowInterfaces = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
+            GUILayout.Label(nameof(SettingsPrefs.IsShowInterfaces), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            settings.IsShowRuntimeComponents = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
+            GUILayout.Label(nameof(SettingsPrefs.IsShowRuntimeComponents), GUILayout.ExpandWidth(false));
+            GUILayout.EndHorizontal();
+
             if (EditorGUI.EndChangeCheck())
             {
                 SettingsPrefs.instance.IsShowHidden = settings.IsShowHidden;
                 SettingsPrefs.instance.IsShowInterfaces = settings.IsShowInterfaces;
                 SettingsPrefs.instance.IsShowRuntimeComponents = settings.IsShowRuntimeComponents;
             }
-            GUILayout.Label("Scripting Define Symbols", EditorStyles.whiteLargeLabel);
+            GUILayout.EndVertical();
+
+
+            GUILayout.Space(20f);
+            using (new EcsGUI.ColorScope(Color.white * 0.5f))
+                GUILayout.BeginVertical(EditorStyles.helpBox);
+            //using (new EcsGUI.ColorScope(Color.white * 1.2f))
+                GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
+            rect = GUILayoutUtility.GetLastRect();
+            rect.xMin += 9f;
+            GUI.Label(rect, "Scripting Define Symbols", EditorStyles.whiteLargeLabel);
             if (_defineSymbols == null)
             {
                 InitDefines();
@@ -66,8 +98,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.BeginChangeCheck();
             for (int i = 0; i < _defineSymbols.Count; i++)
             {
+                GUILayout.BeginHorizontal();
                 var symbol = _defineSymbols[i];
-                symbol.isOn = EditorGUILayout.Toggle(symbol.name, symbol.isOn);
+                symbol.isOn = EditorGUILayout.Toggle(symbol.isOn, GUILayout.Width(checkBoxWidth));
+                if(symbol.name == "DEBUG")
+                {
+                    GUILayout.Label(symbol.name + " (Build Olny)", GUILayout.ExpandWidth(false));
+                }
+                else
+                {
+                    GUILayout.Label(symbol.name, GUILayout.ExpandWidth(false));
+                }
+                GUILayout.EndHorizontal();
             }
             if (EditorGUI.EndChangeCheck()) { }
             if (GUILayout.Button("Apply"))
@@ -82,6 +124,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, symbolsString);
                 InitDefines();
             }
+            GUILayout.EndVertical();
 
             EditorGUIUtility.labelWidth = labelWidth;
         }
