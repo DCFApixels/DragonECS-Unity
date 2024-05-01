@@ -28,7 +28,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 nameof(EcsConsts.DISABLE_DEBUG),
                 nameof(EcsConsts.ENABLE_DUMMY_SPAN),
                 nameof(EcsConsts.DISABLE_CATH_EXCEPTIONS),
-                nameof(EcsConsts.DISABLE_DRAGONECS_DEBUGGER),
                 "DEBUG",
             };
             for (int i = 0; i < _defineSymbols.Count; i++)
