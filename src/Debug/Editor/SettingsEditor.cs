@@ -22,6 +22,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
             _defineSymbols = new List<DefineSymbolsInfo>()
             {
+                nameof(EcsConsts.DISABLE_POOLS_EVENTS),
                 nameof(EcsConsts.ENABLE_DRAGONECS_DEBUGGER),
                 nameof(EcsConsts.ENABLE_DRAGONECS_ASSERT_CHEKS),
                 nameof(EcsConsts.REFLECTION_DISABLED),
