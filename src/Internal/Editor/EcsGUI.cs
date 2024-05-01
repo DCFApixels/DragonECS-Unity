@@ -399,12 +399,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
 
-                    if (string.IsNullOrEmpty(meta.Description) == false)
+                    if (string.IsNullOrEmpty(meta.Description.Text) == false)
                     {
                         Rect tooltipIconRect = TooltipIconRect;
                         tooltipIconRect.center = removeButtonRect.center;
                         tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                        EcsGUI.DescriptionIcon(tooltipIconRect, meta.Description);
+                        EcsGUI.DescriptionIcon(tooltipIconRect, meta.Description.Text);
                     }
 
                     GUILayout.EndVertical();

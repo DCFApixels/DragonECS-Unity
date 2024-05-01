@@ -36,7 +36,7 @@ namespace DCFApixels.DragonECS
         public virtual string Name { get { return string.Empty; } }
         public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
         public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
-        public virtual string Description { get { return string.Empty; } }
+        public virtual MetaDescription Description { get { return MetaDescription.Empty; } }
         public virtual IReadOnlyCollection<string> Tags { get { return Array.Empty<string>(); } }
         #endregion
 
@@ -60,7 +60,7 @@ namespace DCFApixels.DragonECS
         public override Type Type { get { return typeof(T); } }
         public override string Name { get { return Meta.Name; } }
         public override MetaGroup Group { get { return Meta.Group; } }
-        public override string Description { get { return Meta.Description; } }
+        public override MetaDescription Description { get { return Meta.Description; } }
         public override IReadOnlyCollection<string> Tags { get { return Meta.Tags; } }
         public override MetaColor Color { get { return Meta.Color; } }
         #endregion

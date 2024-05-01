@@ -8,9 +8,9 @@ namespace DCFApixels.DragonECS
     internal static class UnityComponentConsts
     {
         private const string UNITY_COMPONENT_NAME = "UnityComponent";
-        public static readonly MetaGroup BaseGroup = new MetaGroupRef(UNITY_COMPONENT_NAME);
-        public static readonly MetaGroup ColliderGroup = new MetaGroupRef($"{UNITY_COMPONENT_NAME}/Collider/");
-        public static readonly MetaGroup JointGroup = new MetaGroupRef($"{UNITY_COMPONENT_NAME}/Joint/");
+        public static readonly MetaGroup BaseGroup = new MetaGroup(UNITY_COMPONENT_NAME);
+        public static readonly MetaGroup ColliderGroup = new MetaGroup($"{UNITY_COMPONENT_NAME}/Collider/");
+        public static readonly MetaGroup JointGroup = new MetaGroup($"{UNITY_COMPONENT_NAME}/Joint/");
     }
     [Serializable]
     [MetaColor(255 / 3, 255, 0)]

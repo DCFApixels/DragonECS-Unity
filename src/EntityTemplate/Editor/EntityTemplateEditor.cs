@@ -44,7 +44,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
                 string name = meta.Name;
-                string description = meta.Description;
+                string description = meta.Description.Text;
                 MetaGroup group = meta.Group;
 
                 if (group.Name.Length > 0)
@@ -157,7 +157,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
             string name = meta.Name;
-            string description = meta.Description;
+            string description = meta.Description.Text;
             Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
             //GUIContent label = new GUIContent(name);
