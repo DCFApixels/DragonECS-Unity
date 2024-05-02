@@ -175,9 +175,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Color componentColor = color32;
             Texture2D texture2D = CreateTexture(2, 2, componentColor);
             result.hover.background = texture2D;
+            result.hover.scaledBackgrounds = Array.Empty<Texture2D>();
             result.focused.background = texture2D;
+            result.focused.scaledBackgrounds = Array.Empty<Texture2D>();
             result.active.background = texture2D;
+            result.active.scaledBackgrounds = Array.Empty<Texture2D>();
             result.normal.background = texture2D;
+            result.normal.scaledBackgrounds = Array.Empty<Texture2D>();
             return result;
         }
         private static Texture2D CreateTexture(int width, int height, Color color)
