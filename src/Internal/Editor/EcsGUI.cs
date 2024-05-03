@@ -114,7 +114,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             using (new ColorScope(new Color(1f, 1f, 1f, 0.8f)))
             {
-                DrawIcon(position, Icons.Instance._helpIcon, 0, description);
+                DrawIcon(position, Icons.Instance.HelpIcon, 0, description);
             }
         }
         public static bool CloseButton(Rect position)
@@ -124,30 +124,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var (hover, click) = IconButtonGeneric(position);
                 if (hover)
                 {
-                    DrawIcon(position, Icons.Instance._closeIconOn, -4f, null);
+                    DrawIcon(position, Icons.Instance.CloseIconOn, -4f, null);
                 }
                 else
                 {
-                    DrawIcon(position, Icons.Instance._closeIcon, 0, null);
+                    DrawIcon(position, Icons.Instance.CloseIcon, 0, null);
                 }
                 return click;
             }
         }
         public static bool AutosetCascadeButton(Rect position)
         {
-            return IconButton(position, Icons.Instance._auotsetCascadeIcon, 0f, "Autoset Cascade");
+            return IconButton(position, Icons.Instance.AutosetCascadeIcon, 0f, "Autoset Cascade");
         }
         public static bool AutosetButton(Rect position)
         {
-            return IconButton(position, Icons.Instance._auotsetIcon, 1f, "Autoset");
+            return IconButton(position, Icons.Instance.AuotsetIcon, 1f, "Autoset");
         }
         public static bool UnlinkButton(Rect position)
         {
-            return IconButton(position, Icons.Instance._unlinkIcon, 1f, "Unlink Entity");
+            return IconButton(position, Icons.Instance.UnlinkIcon, 1f, "Unlink Entity");
         }
         public static bool DelEntityButton(Rect position)
         {
-            return IconButton(position, Icons.Instance._closeIcon, 0f, "Delete Entity");
+            return IconButton(position, Icons.Instance.CloseIcon, 0f, "Delete Entity");
         }
         public static void EntityBar(Rect position, EntityStatus status, int id, short gen, short world)
         {
