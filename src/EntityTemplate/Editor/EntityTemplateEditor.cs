@@ -161,7 +161,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
             //GUIContent label = new GUIContent(name);
-            GUIContent label = UnityEditorUtility.GetLabel(name);
             bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
             float padding = EditorGUIUtility.standardVerticalSpacing;
             Color alphaPanelColor = panelColor;
@@ -171,6 +170,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
+
+
 
             #region Draw Component Block 
             bool isRemoveComponent = false;
@@ -186,12 +187,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (isEmpty)
             {
+                GUIContent label = UnityEditorUtility.GetLabel(name);
                 GUILayout.Label(label);
                 EditorGUI.BeginProperty(GUILayoutUtility.GetLastRect(), label, componentRefProp);
                 EditorGUI.EndProperty();
             }
             else
             {
+                GUIContent label = UnityEditorUtility.GetLabel(name);
                 EditorGUILayout.PropertyField(componentProperty, label, true);
             }
             if (isRemoveComponent)

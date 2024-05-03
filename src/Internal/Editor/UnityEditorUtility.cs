@@ -110,6 +110,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             colorBoxeStyles = new SparseArray<GUIStyle>();
         }
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
+        private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
 
 
@@ -135,14 +136,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static GUIContent GetLabel(Texture image, string tooltip = null)
         {
-            if (_singletonContent == null)
+            if (_singletonIconContent == null)
             {
-                _singletonContent = new GUIContent();
+                _singletonIconContent = new GUIContent();
             }
-            _singletonContent.text = string.Empty;
-            _singletonContent.image = image;
-            _singletonContent.tooltip = tooltip;
-            return _singletonContent;
+            _singletonIconContent.text = string.Empty;
+            _singletonIconContent.image = image;
+            _singletonIconContent.tooltip = tooltip;
+            return _singletonIconContent;
         }
         #endregion
 
