@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 2ce72fefbf3696f4fb3861773bd997df
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: 
+    - _helpIcon: {fileID: 2800000, guid: e135cf23a5d53ce48a75e163b41e39d5, type: 3}
+    - _closeIcon: {fileID: 2800000, guid: 8a708e50662813d4a99c107e6431a60b, type: 3}
+    - _closeIconOn: {fileID: 2800000, guid: 6a1d402595b00c24db2ba647fed93a5c, type: 3}
+    - _unlinkIcon: {fileID: 2800000, guid: 5baead89a941e034e9f44d63617d3246, type: 3}
+    - _auotsetIcon: {fileID: 2800000, guid: d01e651682f48b548b597714f47e14b9, type: 3}
+    - _auotsetCascadeIcon: {fileID: 2800000, guid: 8f9fb2a8877577940971d81a98aeaaaa, type: 3}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -130,6 +130,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //    
         //    return result;
         //}
+        public static void DrawIcon(Rect position, Texture icon, float iconPadding, string description)
+        {
+            GUI.Label(position, UnityEditorUtility.GetLabel(string.Empty, description));
+            //GUI.DrawTexture(RectUtility.AddPadding(position, iconPadding), UnityEditorUtility.GetLabel(icon, description));
+            GUI.DrawTexture(RectUtility.AddPadding(position, iconPadding), icon);
+        }
         public static (bool, bool) IconButtonGeneric(Rect position)
         {
             Color dc = GUI.color;
@@ -172,15 +178,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //return click;
 
             bool result = GUI.Button(position, UnityEditorUtility.GetLabel(string.Empty));
-            GUI.Label(RectUtility.AddPadding(position, iconPadding), UnityEditorUtility.GetLabel(icon, description));
+            DrawIcon(position, icon, iconPadding, description);
             return result;
         }
         public static void DescriptionIcon(Rect position, string description)
         {
             using (new ColorScope(new Color(1f, 1f, 1f, 0.8f)))
             {
-                GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d__Help").image, description);
-                GUI.Label(position, descriptionLabel, EditorStyles.boldLabel);
+                //GUIContent descriptionLabel = UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d__Help").image, description);
+                //GUI.Label(position, descriptionLabel, EditorStyles.boldLabel);
+
+                DrawIcon(position, Icons.Instance._helpIcon, 0, description);
+                //GUIContent descriptionLabel = UnityEditorUtility.GetLabel(Icons.Instance._helpIcon, description);
+                //GUI.Label(position, descriptionLabel, EditorStyles.boldLabel);
             }
         }
         public static bool CloseButton(Rect position)
@@ -190,33 +200,44 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var (hover, click) = IconButtonGeneric(position);
                 if (hover)
                 {
-                    Rect rect = RectUtility.AddPadding(position, -4f);
-                    GUI.DrawTexture(rect, EditorGUIUtility.IconContent("P4_DeletedLocal@2x").image);
+                    //Rect rect = RectUtility.AddPadding(position, -4f);
+                    //GUI.DrawTexture(rect, EditorGUIUtility.IconContent("P4_DeletedLocal@2x").image);
+                   
+                    DrawIcon(position, Icons.Instance._closeIconOn, -4f, null);
+                    //GUI.Label(rect, Icons.Instance._closeIconOn);
                 }
                 else
                 {
-                    GUI.DrawTexture(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image);
+                    //GUI.DrawTexture(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image);
+                    
+                    DrawIcon(position, Icons.Instance._closeIcon, 0, null);
+                    //GUI.Label(position, Icons.Instance._closeIcon);
                 }
                 return click;
             }
         }
         public static bool AutosetCascadeButton(Rect position)
         {
-            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image, 0f, "Autoset Cascade");
+            //return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_restore@2x").image, 0f, "Autoset Cascade");
+            return IconButton(position, Icons.Instance._auotsetCascadeIcon, 0f, "Autoset Cascade");
         }
         public static bool AutosetButton(Rect position)
         {
-            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_max@2x").image, 1f, "Autoset");
+            //return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_max@2x").image, 1f, "Autoset");
+            return IconButton(position, Icons.Instance._auotsetIcon, 1f, "Autoset");
         }
         public static bool UnlinkButton(Rect position)
         {
-            bool result = GUI.Button(position, UnityEditorUtility.GetLabel(string.Empty));
-            GUI.Label(RectUtility.Move(position, 0, -1f), UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d_Unlinked").image, "Unlink Entity"));
-            return result;
+            //bool result = GUI.Button(position, UnityEditorUtility.GetLabel(string.Empty));
+            //GUI.Label(RectUtility.Move(position, 0, -1f), UnityEditorUtility.GetLabel(EditorGUIUtility.IconContent("d_Unlinked").image, "Unlink Entity"));
+            //GUI.Label(RectUtility.Move(position, 0, -1f), SettingsPrefs.instance._unlinkIcon);
+            //return result;
+            return IconButton(position, Icons.Instance._unlinkIcon, 1f, "Unlink Entity");
         }
         public static bool DelEntityButton(Rect position)
         {
-            return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image, 0f, "Delete Entity");
+            //return IconButton(position, EditorGUIUtility.IconContent("d_winbtn_win_close").image, 0f, "Delete Entity");
+            return IconButton(position, Icons.Instance._closeIcon, 0f, "Delete Entity");
         }
         public static void EntityBar(Rect position, EntityStatus status, int id, short gen, short world)
         {
