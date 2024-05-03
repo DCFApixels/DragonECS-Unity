@@ -1,10 +1,11 @@
-#if UNITY_EDITOR
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity.Editors
+namespace DCFApixels.DragonECS.Unity.Internal
 {
-    public class Icons : Config<Icons>
+    internal class Icons : Config<Icons>
     {
+        //Thank f*cking balls, everything inside #if UNITY_EDITOR is not serialized in the release build
+#if UNITY_EDITOR
         [SerializeField]
         private Texture _helpIcon;
         [SerializeField]
@@ -17,13 +18,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private Texture _auotsetIcon;
         [SerializeField]
         private Texture _auotsetCascadeIcon;
-
         internal Texture HelpIcon { get { return _helpIcon; } }
         internal Texture CloseIcon { get { return _closeIcon; } }
         internal Texture CloseIconOn { get { return _closeIconOn; } }
         internal Texture UnlinkIcon { get { return _unlinkIcon; } }
         internal Texture AuotsetIcon { get { return _auotsetIcon; } }
         internal Texture AutosetCascadeIcon { get { return _auotsetCascadeIcon; } }
+#endif
     }
 }
-#endif
