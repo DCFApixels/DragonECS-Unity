@@ -1,9 +1,9 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace DCFApixels
+namespace DCFApixels.DragonECS.Unity.Internal
 {
-    public abstract class Config<TSelf> : ScriptableObject where TSelf : ScriptableObject
+    internal abstract class Config<TSelf> : ScriptableObject where TSelf : ScriptableObject
     {
         private static object _lock = new object();
         private static TSelf _instance;
