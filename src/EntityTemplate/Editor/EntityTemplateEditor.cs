@@ -195,7 +195,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             else
             {
                 GUIContent label = UnityEditorUtility.GetLabel(name);
-                EditorGUILayout.PropertyField(componentProperty, label, true);
+                if(componentProperty.propertyType == SerializedPropertyType.Generic)
+                {
+                    EditorGUILayout.PropertyField(componentProperty, label, true);
+                }
+                else
+                {
+                    Rect r = RectUtility.AddPadding(GUILayoutUtility.GetRect(label, EditorStyles.objectField), 0, 20f, 0, 0);
+                    EditorGUI.PropertyField(r, componentProperty, label, true);
+                }
             }
             if (isRemoveComponent)
             {
