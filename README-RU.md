@@ -222,7 +222,7 @@ class SomeComponentTemplate : IComponentTemplate
     public Type Type { get { return typeof(SomeComponent); } }
     public void Apply(int worldID, int entityID)
     {
-        EcsWorld.GetPoolInstance<EcsPool<SomeComponent>>(worldID).TryAddOrGet(entityID);
+        EcsWorld.GetPoolInstance<EcsPool<SomeComponent>>(worldID).TryAddOrGet(entityID) = component;
     }
     public object GetRaw() { return component; }
     public void SetRaw(object raw) { component = (SomeComponent)raw; }
