@@ -195,7 +195,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             else
             {
                 GUIContent label = UnityEditorUtility.GetLabel(name);
-                if(componentProperty.propertyType == SerializedPropertyType.Generic)
+                if (componentProperty.propertyType == SerializedPropertyType.Generic)
                 {
                     EditorGUILayout.PropertyField(componentProperty, label, true);
                 }

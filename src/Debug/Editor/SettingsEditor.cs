@@ -51,7 +51,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (new EcsGUI.ColorScope(Color.white * 0.5f))
                 GUILayout.BeginVertical(EditorStyles.helpBox);
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
-                GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
+            GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
             Rect rect = GUILayoutUtility.GetLastRect();
             rect.xMin += 9f;
             GUI.Label(rect, "Settings", EditorStyles.whiteLargeLabel);
@@ -87,7 +87,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (new EcsGUI.ColorScope(Color.white * 0.5f))
                 GUILayout.BeginVertical(EditorStyles.helpBox);
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
-                GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
+            GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
             rect = GUILayoutUtility.GetLastRect();
             rect.xMin += 9f;
             GUI.Label(rect, "Scripting Define Symbols", EditorStyles.whiteLargeLabel);
@@ -101,7 +101,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginHorizontal();
                 var symbol = _defineSymbols[i];
                 symbol.isOn = EditorGUILayout.Toggle(symbol.isOn, GUILayout.Width(checkBoxWidth));
-                if(symbol.name == "DEBUG")
+                if (symbol.name == "DEBUG")
                 {
                     GUILayout.Label(symbol.name + " (Build Olny)", GUILayout.ExpandWidth(false));
                 }
