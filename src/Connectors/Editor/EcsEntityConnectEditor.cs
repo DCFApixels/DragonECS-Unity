@@ -42,7 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             bool isConnected = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
             EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
-            EcsGUI.Layout.EntityBar(status, id, gen, worldID);
+            EcsGUI.Layout.EntityBarForAlive(status, id, gen, worldID);
         }
 
         private void DrawTemplates()

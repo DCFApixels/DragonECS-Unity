@@ -112,9 +112,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
-
+        private static GUIStyle _inputFieldCenterAnhor = null;
 
         #region Label
+        public static GUIStyle GetInputFieldCenterAnhor()
+        {
+            if (_inputFieldCenterAnhor == null)
+            {
+                GUIStyle style = new GUIStyle(EditorStyles.numberField);
+                style.alignment = TextAnchor.MiddleCenter;
+                style.font = EditorStyles.boldFont;
+                _inputFieldCenterAnhor = style;
+            }
+            return _inputFieldCenterAnhor;
+        }
         public static GUIContent GetLabelTemp()
         {
             if (_singletonContent == null)

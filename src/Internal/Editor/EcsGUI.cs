@@ -9,33 +9,47 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal static class EcsGUI
     {
+        #region Scores
+        public struct LabelWidthScore : IDisposable
+        {
+            private readonly float _value;
+            public LabelWidthScore(float value)
+            {
+                _value = EditorGUIUtility.labelWidth;
+                EditorGUIUtility.labelWidth = value;
+            }
+            public void Dispose()
+            {
+                EditorGUIUtility.labelWidth = _value;
+            }
+        }
         public struct ColorScope : IDisposable
         {
-            private readonly Color _oldColor;
-            public ColorScope(Color color)
+            private readonly Color _value;
+            public ColorScope(Color value)
             {
-                _oldColor = GUI.color;
-                GUI.color = color;
+                _value = GUI.color;
+                GUI.color = value;
             }
             public void Dispose()
             {
-                GUI.color = _oldColor;
+                GUI.color = _value;
             }
         }
-
         public struct ContentColorScope : IDisposable
         {
-            private readonly Color _oldColor;
-            public ContentColorScope(Color color)
+            private readonly Color _value;
+            public ContentColorScope(Color value)
             {
-                _oldColor = GUI.contentColor;
-                GUI.contentColor = color;
+                _value = GUI.contentColor;
+                GUI.contentColor = value;
             }
             public void Dispose()
             {
-                GUI.contentColor = _oldColor;
+                GUI.contentColor = _value;
             }
         }
+        #endregion
 
         internal readonly static Color GrayColor = new Color32(100, 100, 100, 255);
         internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);
@@ -149,51 +163,82 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return IconButton(position, Icons.Instance.CloseIcon, 0f, "Delete Entity");
         }
-        public static void EntityBar(Rect position, EntityStatus status, int id, short gen, short world)
+
+
+        public static void EntityBarForAlive(Rect position, EntityStatus status, int id, short gen, short world)
         {
-            var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(position, 3f);
-
-            Color w = Color.gray;
-            w.a = 0.6f;
-            Color b = Color.black;
-            b.a = 0.55f;
-            EditorGUI.DrawRect(entityInfoRect, w);
-
-            var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(entityInfoRect, 0.4f);
-            var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
-
-            idRect = RectUtility.AddPadding(idRect, 2, 1, 0, 0);
-            genRect = RectUtility.AddPadding(genRect, 1, 1, 0, 0);
-            worldRect = RectUtility.AddPadding(worldRect, 1, 2, 0, 0);
-            EditorGUI.DrawRect(idRect, b);
-            EditorGUI.DrawRect(genRect, b);
-            EditorGUI.DrawRect(worldRect, b);
-
-
-            GUIStyle style = new GUIStyle(EditorStyles.numberField);
-            style.alignment = TextAnchor.MiddleCenter;
-            style.font = EditorStyles.boldFont;
-            if (status == EntityStatus.Alive)
+            EntityBar(position, status != EntityStatus.Alive, status, id, gen, world);
+        }
+        public static void EntityBar(Rect position, int id, short gen, short world)
+        {
+            EntityBar_Internal(position, false, id, gen, world);
+        }
+        public static void EntityBar(Rect position)
+        {
+            EntityBar_Internal(position, true);
+        }
+        public static void EntityBar(Rect position, bool isPlaceholder, EntityStatus status, int id = 0, short gen = 0, short world = 0)
+        {
+            using (new LabelWidthScore(0f))
             {
-                Color statusColor = EcsGUI.GreenColor;
-                statusColor.a = 0.6f;
-                EditorGUI.DrawRect(statusRect, statusColor);
+                var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(position, 3f);
 
-                EditorGUI.IntField(idRect, id, style);
-                EditorGUI.IntField(genRect, gen, style);
-                EditorGUI.IntField(worldRect, world, style);
-            }
-            else
-            {
-                Color statusColor = status == EntityStatus.Undefined ? new Color32(200, 200, 200, 255) : EcsGUI.RedColor;
-                statusColor.a = 0.6f;
-                EditorGUI.DrawRect(statusRect, statusColor);
-
-                using (new EditorGUI.DisabledScope(true))
+                Color statusColor;
+                switch (status)
                 {
-                    GUI.Label(idRect, "Entity ID", style);
-                    GUI.Label(genRect, "Generation", style);
-                    GUI.Label(worldRect, "World ID", style);
+                    case EntityStatus.NotAlive:
+                        statusColor = EcsGUI.RedColor;
+                        break;
+                    case EntityStatus.Alive:
+                        statusColor = EcsGUI.GreenColor;
+                        break;
+                    default:
+                        statusColor = new Color32(200, 200, 200, 255);
+                        break;
+                }
+
+                statusColor.a = 0.6f;
+                EditorGUI.DrawRect(statusRect, statusColor);
+
+                EntityBar_Internal(entityInfoRect, isPlaceholder, id, gen, world);
+            }
+        }
+        private static void EntityBar_Internal(Rect position, bool isPlaceHolder, int id = 0, short gen = 0, short world = 0)
+        {
+            using (new LabelWidthScore(0f))
+            {
+                Color w = Color.gray;
+                w.a = 0.6f;
+                Color b = Color.black;
+                b.a = 0.55f;
+                EditorGUI.DrawRect(position, w);
+
+                var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(position, 0.4f);
+                var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
+
+                idRect = RectUtility.AddPadding(idRect, 2, 1, 0, 0);
+                genRect = RectUtility.AddPadding(genRect, 1, 1, 0, 0);
+                worldRect = RectUtility.AddPadding(worldRect, 1, 2, 0, 0);
+                EditorGUI.DrawRect(idRect, b);
+                EditorGUI.DrawRect(genRect, b);
+                EditorGUI.DrawRect(worldRect, b);
+
+                GUIStyle style = UnityEditorUtility.GetInputFieldCenterAnhor();
+
+                if (isPlaceHolder)
+                {
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        GUI.Label(idRect, "Entity ID", style);
+                        GUI.Label(genRect, "Generation", style);
+                        GUI.Label(worldRect, "World ID", style);
+                    }
+                }
+                else
+                {
+                    EditorGUI.IntField(idRect, id, style);
+                    EditorGUI.IntField(genRect, gen, style);
+                    EditorGUI.IntField(worldRect, world, style);
                 }
             }
         }
@@ -235,12 +280,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorGUILayout.IntField("Leaked Entites", leakedEntitesCount, EditorStyles.boldLabel);
                 }
             }
-            public static void EntityBar(EntityStatus status, int id, short gen, short world)
+            public static void EntityBarForAlive(EntityStatus status, int id, short gen, short world)
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;
-                EcsGUI.EntityBar(GUILayoutUtility.GetRect(width, height), status, id, gen, world);
+                EcsGUI.EntityBarForAlive(GUILayoutUtility.GetRect(width, height), status, id, gen, world);
             }
+            public static void EntityBar(EntityStatus status, bool isPlaceholder, int id, short gen, short world)
+            {
+                float width = EditorGUIUtility.currentViewWidth;
+                float height = EntityBarHeight;
+                EcsGUI.EntityBar(GUILayoutUtility.GetRect(width, height), isPlaceholder, status, id, gen, world);
+            }
+            public static void EntityBar(int id, short gen, short world)
+            {
+                float width = EditorGUIUtility.currentViewWidth;
+                float height = EntityBarHeight;
+                EcsGUI.EntityBar(GUILayoutUtility.GetRect(width, height), id, gen, world);
+            }
+            public static void EntityBar()
+            {
+                float width = EditorGUIUtility.currentViewWidth;
+                float height = EntityBarHeight;
+                EcsGUI.EntityBar(GUILayoutUtility.GetRect(width, height));
+            }
+
             public static bool AddComponentButtons()
             {
                 return EcsGUI.AddComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f));

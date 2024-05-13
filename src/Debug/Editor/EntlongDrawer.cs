@@ -18,7 +18,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var (labelRect, barRect) = RectUtility.HorizontalSliceLeft(position, EditorGUIUtility.labelWidth * 0.65f);
 
                 EditorGUI.LabelField(labelRect, label);
-                EcsGUI.EntityBar(barRect, EcsGUI.EntityStatus.Alive, slotInfo.id, slotInfo.gen, slotInfo.world);
+                bool isAlive = EcsWorld.GetWorld(slotInfo.world).IsAlive(slotInfo.id, slotInfo.gen);
+                EcsGUI.EntityBar(barRect, false, isAlive ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive, slotInfo.id, slotInfo.gen, slotInfo.world);
             }
         }
     }
