@@ -16,10 +16,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private GenericMenu _genericMenu;
         private bool _isInit = false;
 
-        private static AutoColorMode AutoColorMode
+        private static ComponentColorMode AutoColorMode
         {
-            get { return SettingsPrefs.instance.AutoColorMode; }
-            set { SettingsPrefs.instance.AutoColorMode = value; }
+            get { return SettingsPrefs.instance.ComponentColorMode; }
+            set { SettingsPrefs.instance.ComponentColorMode = value; }
         }
 
         #region Init
@@ -208,10 +208,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 switch (AutoColorMode)
                 {
-                    case AutoColorMode.Name:
+                    case ComponentColorMode.Auto:
                         panelColor = meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
                         break;
-                    case AutoColorMode.Rainbow:
+                    case ComponentColorMode.Rainbow:
                         Color hsv = Color.HSVToRGB(1f / (Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE)) * index, 1, 1);
                         panelColor = hsv.Desaturate(0.48f) / 1.18f;
                         break;

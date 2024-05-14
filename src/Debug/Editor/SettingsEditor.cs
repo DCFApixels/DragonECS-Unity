@@ -61,27 +61,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.BeginHorizontal();
             settings.IsShowHidden = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowHidden, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowHidden), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             settings.IsShowInterfaces = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowInterfaces), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             settings.IsShowRuntimeComponents = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowRuntimeComponents), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
-            settings.AutoColorMode = (AutoColorMode)EditorGUILayout.EnumPopup(nameof(SettingsPrefs.AutoColorMode), SettingsPrefs.instance.AutoColorMode);
+            settings.AutoColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.ComponentColorMode)), SettingsPrefs.instance.ComponentColorMode);
 
             if (EditorGUI.EndChangeCheck())
             {
                 SettingsPrefs.instance.IsShowHidden = settings.IsShowHidden;
                 SettingsPrefs.instance.IsShowInterfaces = settings.IsShowInterfaces;
                 SettingsPrefs.instance.IsShowRuntimeComponents = settings.IsShowRuntimeComponents;
-                SettingsPrefs.instance.AutoColorMode = settings.AutoColorMode;
+                SettingsPrefs.instance.ComponentColorMode = settings.AutoColorMode;
             }
             GUILayout.EndVertical();
 
@@ -147,7 +147,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public bool IsShowHidden;
             public bool IsShowInterfaces;
             public bool IsShowRuntimeComponents;
-            public AutoColorMode AutoColorMode;
+            public ComponentColorMode AutoColorMode;
         }
     }
 }

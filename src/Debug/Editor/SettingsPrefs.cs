@@ -4,10 +4,10 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal enum AutoColorMode
+    internal enum ComponentColorMode
     {
         Generic = 0,
-        Name = 1,
+        Auto = 1,
         Rainbow = 2,
     }
     [FilePath(EcsConsts.AUTHOR + "/" + EcsConsts.FRAMEWORK_NAME + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
@@ -61,13 +61,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
         [SerializeField]
-        private AutoColorMode _autoColorMode = AutoColorMode.Name;
-        public AutoColorMode AutoColorMode
+        private ComponentColorMode _componentColorMode = ComponentColorMode.Auto;
+        public ComponentColorMode ComponentColorMode
         {
-            get => _autoColorMode;
+            get => _componentColorMode;
             set
             {
-                _autoColorMode = value;
+                _componentColorMode = value;
                 Save(false);
             }
         }
