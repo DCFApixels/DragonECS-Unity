@@ -16,6 +16,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private GenericMenu _genericMenu;
         private bool _isInit = false;
 
+        private static AutoColorMode AutoColorMode
+        {
+            get { return SettingsPrefs.instance.AutoColorMode; }
+            set { SettingsPrefs.instance.AutoColorMode = value; }
+        }
+
         #region Init
         private void Init()
         {
@@ -42,6 +48,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
             foreach (var dummy in componentTemplateDummies)
             {
+                if (dummy.Type.GetCustomAttribute<SerializableAttribute>() == null)
+                {
+                    Debug.LogWarning($"Type {dummy.Type.Name} does not have the [Serializable] attribute");
+                    continue;
+                }
                 ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
                 string name = meta.Name;
                 string description = meta.Description.Text;
@@ -112,7 +123,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
-                DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
+                DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
             }
             GUILayout.EndVertical();
         }
@@ -132,37 +143,85 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawComponentData(SerializedProperty componentRefProp, int index)
+        private void DrawComponentData(SerializedProperty componentRefProp, int total, int index)
         {
             IComponentTemplate template = componentRefProp.managedReferenceValue as IComponentTemplate;
             if (template == null || componentRefProp.managedReferenceValue == null)
             {
-                DrawDamagedComponent(componentRefProp, index);
+                DrawDamagedComponent_Replaced(componentRefProp, index);
+                return;
+            }
+
+            Type componentType;
+            SerializedProperty componentProperty = componentRefProp;
+            try
+            {
+                ComponentTemplateBase customTemplate = componentProperty.managedReferenceValue as ComponentTemplateBase;
+                if (customTemplate != null)
+                {
+                    componentProperty = componentRefProp.FindPropertyRelative("component");
+                    componentType = customTemplate.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
+                }
+                else
+                {
+                    componentType = componentProperty.managedReferenceValue.GetType();
+                }
+
+                if (componentType == null || componentProperty == null)
+                {
+                    throw new NullReferenceException();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, serializedObject.targetObject);
+                DrawDamagedComponent(index, "Damaged component template.");
                 return;
             }
 
 
-            Type componentType;
-            SerializedProperty componentProperty = componentRefProp;
-            ComponentTemplateBase customInitializer = componentProperty.managedReferenceValue as ComponentTemplateBase;
-            if (customInitializer != null)
-            {
-                componentProperty = componentRefProp.FindPropertyRelative("component");
-                componentType = customInitializer.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
-            }
-            else
-            {
-                componentType = componentProperty.managedReferenceValue.GetType(); ;
-            }
+            //сюда попадают уже валидные компоненты
+
 
             ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
             string name = meta.Name;
             string description = meta.Description.Text;
-            Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
-            //GUIContent label = new GUIContent(name);
             bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
+            var propsCounter = componentProperty.Copy();
+            int lastDepth = propsCounter.depth;
+            bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
+            int propCount = next ? -1 : 0;
+            while (next)
+            {
+                propCount++;
+                next = propsCounter.Next(false);
+            }
             float padding = EditorGUIUtility.standardVerticalSpacing;
+
+            Color panelColor;
+            if (meta.IsCustomColor)
+            {
+                panelColor = meta.Color.ToUnityColor();
+            }
+            else
+            {
+                switch (AutoColorMode)
+                {
+                    case AutoColorMode.Name:
+                        panelColor = meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
+                        break;
+                    case AutoColorMode.Rainbow:
+                        Color hsv = Color.HSVToRGB(1f / (Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE)) * index, 1, 1);
+                        panelColor = hsv.Desaturate(0.48f) / 1.18f;
+                        break;
+                    default:
+                        panelColor = index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
+                        break;
+                }
+            }
+            panelColor = panelColor.Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
@@ -171,24 +230,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
-
-
             #region Draw Component Block 
-            bool isRemoveComponent = false;
             removeButtonRect.yMin = removeButtonRect.yMax;
             removeButtonRect.yMax += RemoveButtonRect.height;
             removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
             removeButtonRect.center += Vector2.up * padding * 2f;
 
-            if (EcsGUI.CloseButton(removeButtonRect))
-            {
-                isRemoveComponent = true;
-            }
+            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
 
-            if (isEmpty)
+            if (propCount <= 0)
             {
                 GUIContent label = UnityEditorUtility.GetLabel(name);
-                GUILayout.Label(label);
+                EditorGUILayout.LabelField(name);
+                Rect emptyPos = GUILayoutUtility.GetLastRect();
+                emptyPos.xMin += EditorGUIUtility.labelWidth;
+                if (isEmpty)
+                {
+                    using (new EcsGUI.ContentColorScope(1f, 1f, 1f, 0.4f))
+                    {
+                        GUI.Label(emptyPos, "empty");
+                    }
+                }
                 EditorGUI.BeginProperty(GUILayoutUtility.GetLastRect(), label, componentRefProp);
                 EditorGUI.EndProperty();
             }
@@ -226,19 +288,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
             }
         }
-
-        private void DrawDamagedComponent(SerializedProperty componentRefProp, int index)
+        private void DrawDamagedComponent_Replaced(SerializedProperty componentRefProp, int index)
         {
+            DrawDamagedComponent(index, $"Damaged component template. If the problem occurred after renaming a component or initializer. use MovedFromAttrubute");
+        }
+        private void DrawDamagedComponent(int index, string message)
+        {
+            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
+
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.HelpBox($"Damaged component. If the problem occurred after renaming a component or initializer. use MovedFromAttrubute", MessageType.Warning);
+            float padding = EditorGUIUtility.standardVerticalSpacing;
 
-            Rect lastrect = GUILayoutUtility.GetLastRect();
-            Rect removeButtonRect = RemoveButtonRect;
-            removeButtonRect.center = new Vector2(lastrect.xMax + removeButtonRect.width, lastrect.yMin + removeButtonRect.height / 2f);
+            removeButtonRect.yMin = removeButtonRect.yMax;
+            removeButtonRect.yMax += RemoveButtonRect.height;
+            removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
+            removeButtonRect.center += Vector2.up * padding * 2f;
 
-            GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
-            if (GUI.Button(removeButtonRect, "x", _removeButtonStyle))
+            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
+
+            EditorGUILayout.HelpBox(message, MessageType.Warning);
+
+            if (isRemoveComponent)
             {
                 OnRemoveComponentAt(index);
             }

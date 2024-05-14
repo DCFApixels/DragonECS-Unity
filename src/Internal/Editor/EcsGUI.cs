@@ -39,6 +39,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public struct ContentColorScope : IDisposable
         {
             private readonly Color _value;
+            public ContentColorScope(float r, float g, float b, float a = 1f) : this(new Color(r, g, b, a)) { }
             public ContentColorScope(Color value)
             {
                 _value = GUI.contentColor;

@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
@@ -29,7 +30,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 nameof(EcsConsts.DISABLE_DEBUG),
                 nameof(EcsConsts.ENABLE_DUMMY_SPAN),
                 nameof(EcsConsts.DISABLE_CATH_EXCEPTIONS),
-                "DEBUG",
             };
             for (int i = 0; i < _defineSymbols.Count; i++)
             {
@@ -74,11 +74,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label(nameof(SettingsPrefs.IsShowRuntimeComponents), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
+            settings.AutoColorMode = (AutoColorMode)EditorGUILayout.EnumPopup(nameof(SettingsPrefs.AutoColorMode), SettingsPrefs.instance.AutoColorMode);
+
             if (EditorGUI.EndChangeCheck())
             {
                 SettingsPrefs.instance.IsShowHidden = settings.IsShowHidden;
                 SettingsPrefs.instance.IsShowInterfaces = settings.IsShowInterfaces;
                 SettingsPrefs.instance.IsShowRuntimeComponents = settings.IsShowRuntimeComponents;
+                SettingsPrefs.instance.AutoColorMode = settings.AutoColorMode;
             }
             GUILayout.EndVertical();
 
@@ -144,6 +147,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public bool IsShowHidden;
             public bool IsShowInterfaces;
             public bool IsShowRuntimeComponents;
+            public AutoColorMode AutoColorMode;
         }
     }
 }
