@@ -1,23 +1,27 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
     internal static class UnityComponentConsts
     {
-        private const string UNITY_COMPONENT_NAME = "UnityComponent";
+        internal const string UNITY_COMPONENT_NAME = "UnityComponent";
         public static readonly MetaGroup BaseGroup = new MetaGroup(UNITY_COMPONENT_NAME);
         public static readonly MetaGroup ColliderGroup = new MetaGroup($"{UNITY_COMPONENT_NAME}/Collider/");
         public static readonly MetaGroup JointGroup = new MetaGroup($"{UNITY_COMPONENT_NAME}/Joint/");
     }
     [Serializable]
     [MetaColor(255 / 3, 255, 0)]
+    [MetaDescription(EcsConsts.AUTHOR, "Component-reference to Unity object for EcsPool")]
+    [MetaGroup(UnityComponentConsts.UNITY_COMPONENT_NAME)]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
     {
         public T obj;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public UnityComponent(T obj)
         {
             this.obj = obj;
@@ -30,6 +34,10 @@ namespace DCFApixels.DragonECS
         {
             throw new NotImplementedException();
         }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator T(UnityComponent<T> a) { return a.obj; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static implicit operator UnityComponent<T>(T a) { return new UnityComponent<T>(a); }
     }
 
     #region Unity Component Templates

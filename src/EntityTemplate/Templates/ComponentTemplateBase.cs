@@ -57,12 +57,12 @@ namespace DCFApixels.DragonECS
         protected T component;
 
         #region Properties
-        public override Type Type { get { return typeof(T); } }
+        public sealed override Type Type { get { return typeof(T); } }
         public override string Name { get { return Meta.Name; } }
+        public override MetaColor Color { get { return Meta.Color; } }
         public override MetaGroup Group { get { return Meta.Group; } }
         public override MetaDescription Description { get { return Meta.Description; } }
         public override IReadOnlyCollection<string> Tags { get { return Meta.Tags; } }
-        public override MetaColor Color { get { return Meta.Color; } }
         #endregion
 
         #region Methods
@@ -129,7 +129,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Type interfaceType = typeof(IComponentTemplate);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var targetTypes = assembly.GetTypes().Where(type => !type.IsGenericType && !(type.IsAbstract || type.IsInterface) && type.GetCustomAttribute<SerializableAttribute>() != null);
+                var targetTypes = assembly.GetTypes().Where(type => !type.IsGenericType && !(type.IsAbstract || type.IsInterface) /*&& type.GetCustomAttribute<SerializableAttribute>() != null*/);
 
                 types.AddRange(targetTypes.Where(type => interfaceType.IsAssignableFrom(type)));
 

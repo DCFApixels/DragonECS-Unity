@@ -29,7 +29,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 nameof(EcsConsts.DISABLE_DEBUG),
                 nameof(EcsConsts.ENABLE_DUMMY_SPAN),
                 nameof(EcsConsts.DISABLE_CATH_EXCEPTIONS),
-                "DEBUG",
             };
             for (int i = 0; i < _defineSymbols.Count; i++)
             {
@@ -61,24 +60,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.BeginHorizontal();
             settings.IsShowHidden = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowHidden, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowHidden), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             settings.IsShowInterfaces = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowInterfaces), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
             settings.IsShowRuntimeComponents = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(nameof(SettingsPrefs.IsShowRuntimeComponents), GUILayout.ExpandWidth(false));
+            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
             GUILayout.EndHorizontal();
+
+            settings.AutoColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.ComponentColorMode)), SettingsPrefs.instance.ComponentColorMode);
 
             if (EditorGUI.EndChangeCheck())
             {
                 SettingsPrefs.instance.IsShowHidden = settings.IsShowHidden;
                 SettingsPrefs.instance.IsShowInterfaces = settings.IsShowInterfaces;
                 SettingsPrefs.instance.IsShowRuntimeComponents = settings.IsShowRuntimeComponents;
+                SettingsPrefs.instance.ComponentColorMode = settings.AutoColorMode;
             }
             GUILayout.EndVertical();
 
@@ -144,6 +146,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public bool IsShowHidden;
             public bool IsShowInterfaces;
             public bool IsShowRuntimeComponents;
+            public ComponentColorMode AutoColorMode;
         }
     }
 }

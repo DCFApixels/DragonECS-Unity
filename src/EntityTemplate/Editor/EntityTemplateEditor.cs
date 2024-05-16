@@ -9,12 +9,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal abstract class EntityTemplateEditorBase : Editor
     {
-        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 19f, 19f);
-        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 19f, 19f);
+        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
-        private GUIStyle _removeButtonStyle;
         private GenericMenu _genericMenu;
         private bool _isInit = false;
+
+        private static ComponentColorMode AutoColorMode
+        {
+            get { return SettingsPrefs.instance.ComponentColorMode; }
+            set { SettingsPrefs.instance.ComponentColorMode = value; }
+        }
 
         #region Init
         private void Init()
@@ -22,26 +26,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (_genericMenu == null) { _isInit = false; }
             if (_isInit) { return; }
 
-            var tmpstylebase = UnityEditorUtility.GetStyle(new Color(0.9f, 0f, 0.22f), 0.5f);
-            var tmpStyle = UnityEditorUtility.GetStyle(new Color(1f, 0.5f, 0.7f), 0.5f);
-
-            _removeButtonStyle = new GUIStyle(EditorStyles.linkLabel);
-            _removeButtonStyle.alignment = TextAnchor.MiddleCenter;
-
-            _removeButtonStyle.normal = tmpstylebase.normal;
-            _removeButtonStyle.hover = tmpStyle.normal;
-            _removeButtonStyle.active = tmpStyle.normal;
-            _removeButtonStyle.focused = tmpStyle.normal;
-
-            _removeButtonStyle.padding = new RectOffset(0, 0, 0, 0);
-            _removeButtonStyle.margin = new RectOffset(0, 0, 0, 0);
-            _removeButtonStyle.border = new RectOffset(0, 0, 0, 0);
-
             _genericMenu = new GenericMenu();
 
             var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
             foreach (var dummy in componentTemplateDummies)
             {
+                if (dummy.Type.GetCustomAttribute<SerializableAttribute>() == null)
+                {
+                    Debug.LogWarning($"Type {dummy.Type.Name} does not have the [Serializable] attribute");
+                    continue;
+                }
                 ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
                 string name = meta.Name;
                 string description = meta.Description.Text;
@@ -112,7 +106,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
             for (int i = 0; i < componentsProp.arraySize; i++)
             {
-                DrawComponentData(componentsProp.GetArrayElementAtIndex(i), i);
+                DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
             }
             GUILayout.EndVertical();
         }
@@ -132,37 +126,56 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawComponentData(SerializedProperty componentRefProp, int index)
+        private void DrawComponentData(SerializedProperty componentRefProp, int total, int index)
         {
             IComponentTemplate template = componentRefProp.managedReferenceValue as IComponentTemplate;
             if (template == null || componentRefProp.managedReferenceValue == null)
             {
-                DrawDamagedComponent(componentRefProp, index);
+                DrawDamagedComponent_Replaced(componentRefProp, index);
+                return;
+            }
+
+            Type componentType;
+            SerializedProperty componentProperty = componentRefProp;
+            try
+            {
+                ComponentTemplateBase customTemplate = componentProperty.managedReferenceValue as ComponentTemplateBase;
+                if (customTemplate != null)
+                {
+                    componentProperty = componentRefProp.FindPropertyRelative("component");
+                    componentType = customTemplate.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
+                }
+                else
+                {
+                    componentType = componentProperty.managedReferenceValue.GetType();
+                }
+
+                if (componentType == null || componentProperty == null)
+                {
+                    throw new NullReferenceException();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, serializedObject.targetObject);
+                DrawDamagedComponent(index, "Damaged component template.");
                 return;
             }
 
 
-            Type componentType;
-            SerializedProperty componentProperty = componentRefProp;
-            ComponentTemplateBase customInitializer = componentProperty.managedReferenceValue as ComponentTemplateBase;
-            if (customInitializer != null)
-            {
-                componentProperty = componentRefProp.FindPropertyRelative("component");
-                componentType = customInitializer.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
-            }
-            else
-            {
-                componentType = componentProperty.managedReferenceValue.GetType(); ;
-            }
+            //сюда попадают уже валидные компоненты
+
 
             ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
             string name = meta.Name;
             string description = meta.Description.Text;
-            Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
-            //GUIContent label = new GUIContent(name);
-            bool isEmpty = componentType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
+            int propCount = EcsGUI.GetChildPropertiesCount(componentProperty, componentType, out bool isEmpty);
+
             float padding = EditorGUIUtility.standardVerticalSpacing;
+
+            Color panelColor = EcsGUI.SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
@@ -171,26 +184,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
-
-
             #region Draw Component Block 
-            bool isRemoveComponent = false;
             removeButtonRect.yMin = removeButtonRect.yMax;
-            removeButtonRect.yMax += RemoveButtonRect.height;
-            removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
+            removeButtonRect.yMax += HeadIconsRect.height;
+            removeButtonRect.xMin = removeButtonRect.xMax - HeadIconsRect.width;
             removeButtonRect.center += Vector2.up * padding * 2f;
 
-            if (EcsGUI.CloseButton(removeButtonRect))
-            {
-                isRemoveComponent = true;
-            }
+            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
 
-            if (isEmpty)
+            if (propCount <= 0)
             {
-                GUIContent label = UnityEditorUtility.GetLabel(name);
-                GUILayout.Label(label);
-                EditorGUI.BeginProperty(GUILayoutUtility.GetLastRect(), label, componentRefProp);
-                EditorGUI.EndProperty();
+                EcsGUI.Layout.DrawEmptyComponentProperty(componentRefProp, name, isEmpty);
             }
             else
             {
@@ -211,7 +215,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             if (string.IsNullOrEmpty(description) == false)
             {
-                Rect tooltipIconRect = TooltipIconRect;
+                Rect tooltipIconRect = HeadIconsRect;
                 tooltipIconRect.center = removeButtonRect.center;
                 tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
                 EcsGUI.DescriptionIcon(tooltipIconRect, description);
@@ -226,19 +230,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
             }
         }
-
-        private void DrawDamagedComponent(SerializedProperty componentRefProp, int index)
+        private void DrawDamagedComponent_Replaced(SerializedProperty componentRefProp, int index)
         {
+            DrawDamagedComponent(index, $"Damaged component template. If the problem occurred after renaming a component or initializer. use MovedFromAttrubute");
+        }
+        private void DrawDamagedComponent(int index, string message)
+        {
+            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
+
             GUILayout.BeginHorizontal();
 
-            EditorGUILayout.HelpBox($"Damaged component. If the problem occurred after renaming a component or initializer. use MovedFromAttrubute", MessageType.Warning);
+            float padding = EditorGUIUtility.standardVerticalSpacing;
 
-            Rect lastrect = GUILayoutUtility.GetLastRect();
-            Rect removeButtonRect = RemoveButtonRect;
-            removeButtonRect.center = new Vector2(lastrect.xMax + removeButtonRect.width, lastrect.yMin + removeButtonRect.height / 2f);
+            removeButtonRect.yMin = removeButtonRect.yMax;
+            removeButtonRect.yMax += HeadIconsRect.height;
+            removeButtonRect.xMin = removeButtonRect.xMax - HeadIconsRect.width;
+            removeButtonRect.center += Vector2.up * padding * 2f;
 
-            GUILayout.Label("", GUILayout.Width(removeButtonRect.width));
-            if (GUI.Button(removeButtonRect, "x", _removeButtonStyle))
+            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
+
+            EditorGUILayout.HelpBox(message, MessageType.Warning);
+
+            if (isRemoveComponent)
             {
                 OnRemoveComponentAt(index);
             }

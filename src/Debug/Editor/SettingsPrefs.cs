@@ -4,8 +4,14 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [FilePath(EcsConsts.FRAMEWORK_NAME + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
-    public class SettingsPrefs : ScriptableSingleton<SettingsPrefs>
+    internal enum ComponentColorMode
+    {
+        Generic = 0,
+        Auto = 1,
+        Rainbow = 2,
+    }
+    [FilePath(EcsConsts.AUTHOR + "/" + EcsConsts.FRAMEWORK_NAME + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
+    internal class SettingsPrefs : ScriptableSingleton<SettingsPrefs>
     {
         [SerializeField]
         private bool _isShowInterfaces = false;
@@ -49,6 +55,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
             set
             {
                 _poolsToggle = value;
+                Save(false);
+            }
+        }
+
+
+        [SerializeField]
+        private ComponentColorMode _componentColorMode = ComponentColorMode.Auto;
+        public ComponentColorMode ComponentColorMode
+        {
+            get => _componentColorMode;
+            set
+            {
+                _componentColorMode = value;
                 Save(false);
             }
         }
