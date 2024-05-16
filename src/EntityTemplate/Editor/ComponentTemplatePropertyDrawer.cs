@@ -28,6 +28,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
         private float Padding => EditorGUIUtility.standardVerticalSpacing;
+        private float SingleLineWithPadding => EditorGUIUtility.singleLineHeight + Padding * 4f;
 
         private const float DamagedComponentHeight = 18f * 2f;
 
@@ -162,7 +163,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             string name = meta.Name;
             string description = meta.Description.Text;
 
-            int propCount = EcsGUI.GetChildPropertiesCount(componentProperty, componentType, out bool isEmpty);
+            int propCount = EcsGUI.GetChildPropertiesCount(componentProperty);
 
             Color panelColor = EcsGUI.SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
@@ -187,12 +188,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (propCount <= 0)
             {
-                label.text = $"{label.text} ({name})";
-                EcsGUI.DrawEmptyComponentProperty(paddingPosition, componentRefProp, label.text, isEmpty);
+                EcsGUI.DrawEmptyComponentProperty(paddingPosition, componentRefProp, label, false);
             }
             else
             {
-                label.text = $"{label.text} ({name})";
                 if (componentProperty.propertyType == SerializedPropertyType.Generic)
                 {
                     EditorGUI.PropertyField(paddingPosition, componentProperty, label, true);
@@ -203,6 +202,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorGUI.PropertyField(r, componentProperty, label, true);
                 }
             }
+            if (string.IsNullOrEmpty(label.text))
+            {
+                EditorGUI.indentLevel++;
+                EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
+                EditorGUI.indentLevel--;
+            }
+            else
+            {
+                GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
+            }
+
+
             if (isRemoveComponent)
             {
                 componentRefProp.managedReferenceValue = null;
