@@ -15,7 +15,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             bool isAlive = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
             using (new EditorGUI.DisabledScope(!isAlive))
             {
-                if (GUILayout.Button("Delete Entity"))
+                if (GUILayout.Button("Delete Entity", GUILayout.Height(36f)))
                 {
                     world.DelEntity(id);
                 }

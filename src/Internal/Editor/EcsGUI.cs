@@ -26,6 +26,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public struct ColorScope : IDisposable
         {
             private readonly Color _value;
+            public ColorScope(float r, float g, float b, float a = 1f) : this(new Color(r, g, b, a)) { }
             public ColorScope(Color value)
             {
                 _value = GUI.color;
@@ -50,7 +51,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUI.contentColor = _value;
             }
         }
+        private static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
+        private static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
+        private static ColorScope SetColor(Color value) => new ColorScope(value);
+        private static ColorScope SetColor(float r, float g, float b, float a = 1f) => new ColorScope(r, g, b, a);
+        private static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
+        private static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
+        private static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
         #endregion
+
         private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         internal readonly static Color GrayColor = new Color32(100, 100, 100, 255);
@@ -119,8 +128,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region small elems
         public static void DrawIcon(Rect position, Texture icon, float iconPadding, string description)
         {
-            GUI.Label(position, UnityEditorUtility.GetLabel(string.Empty, description));
-            GUI.DrawTexture(RectUtility.AddPadding(position, iconPadding), icon);
+            using (SetColor(GUI.enabled ? GUI.color : GUI.color * new Color(1f, 1f, 1f, 0.4f)))
+            {
+                GUI.Label(position, UnityEditorUtility.GetLabel(string.Empty, description));
+                GUI.DrawTexture(RectUtility.AddPadding(position, iconPadding), icon);
+            }
         }
         public static (bool, bool) IconButtonGeneric(Rect position)
         {
@@ -259,6 +271,51 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
+        internal static int GetChildPropertiesCount(SerializedProperty property, Type type, out bool isEmpty)
+        {
+            int result = GetChildPropertiesCount(property);
+            isEmpty = result <= 0 && type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
+            return result;
+        }
+        internal static int GetChildPropertiesCount(SerializedProperty property)
+        {
+            var propsCounter = property.Copy();
+            int lastDepth = propsCounter.depth;
+            bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
+            int result = next ? -1 : 0;
+            while (next)
+            {
+                result++;
+                next = propsCounter.Next(false);
+            }
+            return result;
+        }
+        public static Color SelectPanelColor(ITypeMeta meta, int index, int total)
+        {
+            Color panelColor;
+            if (meta.IsCustomColor)
+            {
+                panelColor = meta.Color.ToUnityColor();
+            }
+            else
+            {
+                switch (AutoColorMode)
+                {
+                    case ComponentColorMode.Auto:
+                        panelColor = meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
+                        break;
+                    case ComponentColorMode.Rainbow:
+                        int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
+                        Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
+                        panelColor = hsv.Desaturate(0.48f) / 1.18f;
+                        break;
+                    default:
+                        panelColor = index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
+                        break;
+                }
+            }
+            return panelColor;
+        }
         public static bool AddComponentButtons(Rect position)
         {
             position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
@@ -352,7 +409,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 if (isWithFoldout == false || IsShowRuntimeComponents)
                 {
-                    if (EcsGUI.Layout.AddComponentButtons())
+                    if (AddComponentButtons())
                     {
                         GenericMenu genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
                         RuntimeComponentsUtility.CurrentEntityID = entityID;

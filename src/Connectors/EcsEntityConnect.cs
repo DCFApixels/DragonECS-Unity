@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEditor;
 using UnityEngine;
+#region UNITY_EDITOR
+using UnityEditor;
+#endregion
 
 namespace DCFApixels.DragonECS
 {
@@ -172,6 +174,7 @@ namespace DCFApixels.DragonECS
         internal void Autoset_Editor()
         {
             Autoset(this);
+
         }
         [ContextMenu("Autoset Cascade")]
         internal void AutosetCascade_Editor()

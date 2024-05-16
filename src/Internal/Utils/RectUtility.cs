@@ -4,7 +4,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal static class RectUtility
     {
-        public static (Rect, Rect) HorizontalSliceLerp(Rect rect, float t)
+        public static (Rect, Rect) HorizontalSliceLerp(in this Rect rect, float t)
         {
             Rect l = rect;
             Rect r = rect;
@@ -12,7 +12,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             r.xMin += rect.width * t;
             return (l, r);
         }
-        public static (Rect, Rect) HorizontalSliceLeft(Rect rect, float with)
+        public static (Rect, Rect) HorizontalSliceLeft(in this Rect rect, float with)
         {
             Rect l = rect;
             Rect r = rect;
@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             r.xMin += with;
             return (l, r);
         }
-        public static (Rect, Rect) HorizontalSliceRight(Rect rect, float with)
+        public static (Rect, Rect) HorizontalSliceRight(in this Rect rect, float with)
         {
             Rect l = rect;
             Rect r = rect;
@@ -29,7 +29,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             return (l, r);
         }
 
-        public static (Rect, Rect) VerticalSliceTop(Rect rect, float height)
+        public static (Rect, Rect) VerticalSliceTop(in this Rect rect, float height)
         {
             Rect t = rect;
             Rect b = rect;
@@ -37,7 +37,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             b.yMin += height;
             return (t, b);
         }
-        public static (Rect, Rect) VerticalSliceBottom(Rect rect, float height)
+        public static (Rect, Rect) VerticalSliceBottom(in this Rect rect, float height)
         {
             Rect t = rect;
             Rect b = rect;
@@ -46,28 +46,30 @@ namespace DCFApixels.DragonECS.Unity.Internal
             return (t, b);
         }
 
-        public static Rect AddPadding(Rect rect, float verticalHorizontal)
+        public static Rect AddPadding(in this Rect rect, float verticalHorizontal)
         {
             return AddPadding(rect, verticalHorizontal, verticalHorizontal, verticalHorizontal, verticalHorizontal);
         }
-        public static Rect AddPadding(Rect rect, float horizontal, float vertical)
+        public static Rect AddPadding(in this Rect rect, float horizontal, float vertical)
         {
             return AddPadding(rect, horizontal, horizontal, vertical, vertical);
         }
-        public static Rect AddPadding(Rect rect, float left, float right, float top, float bottom)
+        public static Rect AddPadding(in this Rect rect, float left, float right, float top, float bottom)
         {
-            rect.xMin += left;
-            rect.xMax -= right;
-            rect.yMin += top;
-            rect.yMax -= bottom;
+            Rect result = rect;
+            result.xMin += left;
+            result.xMax -= right;
+            result.yMin += top;
+            result.yMax -= bottom;
+            return result;
+        }
+        public static Rect Move(in this Rect rect, Vector2 addVector)
+        {
+            Rect result = rect;
+            result.center += addVector;
             return rect;
         }
-        public static Rect Move(Rect rect, Vector2 addVector)
-        {
-            rect.center += addVector;
-            return rect;
-        }
-        public static Rect Move(Rect rect, float addX, float addY)
+        public static Rect Move(in this Rect rect, float addX, float addY)
         {
             return Move(rect, new Vector2(addX, addY));
         }
