@@ -294,29 +294,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static Color SelectPanelColor(ITypeMeta meta, int index, int total)
         {
-            Color panelColor;
-            if (meta.IsCustomColor)
+            var trueMeta = meta.Type.ToMeta();
+            if (trueMeta.IsCustomColor || meta.Color != trueMeta.Color)
             {
-                panelColor = meta.Color.ToUnityColor();
+                return meta.Color.ToUnityColor();
             }
             else
             {
                 switch (AutoColorMode)
                 {
                     case ComponentColorMode.Auto:
-                        panelColor = meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
-                        break;
+                        return meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
                     case ComponentColorMode.Rainbow:
                         int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
                         Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
-                        panelColor = hsv.Desaturate(0.48f) / 1.18f;
-                        break;
+                        return hsv.Desaturate(0.48f) / 1.18f;
                     default:
-                        panelColor = index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
-                        break;
+                        return index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
                 }
             }
-            return panelColor;
         }
         public static bool AddComponentButtons(Rect position)
         {

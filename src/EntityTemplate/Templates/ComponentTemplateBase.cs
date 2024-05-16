@@ -33,9 +33,7 @@ namespace DCFApixels.DragonECS
     {
         #region Properties
         public abstract Type Type { get; }
-        public virtual bool IsCustomName { get { return false; } }
         public virtual string Name { get { return string.Empty; } }
-        public virtual bool IsCustomColor { get { return false; } }
         public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
         public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
         public virtual MetaDescription Description { get { return MetaDescription.Empty; } }
@@ -59,10 +57,8 @@ namespace DCFApixels.DragonECS
         protected T component;
 
         #region Properties
-        public override Type Type { get { return typeof(T); } }
-        public override bool IsCustomName { get { return Meta.IsCustomName; } }
+        public sealed override Type Type { get { return typeof(T); } }
         public override string Name { get { return Meta.Name; } }
-        public override bool IsCustomColor { get { return Meta.IsCustomColor; } }
         public override MetaColor Color { get { return Meta.Color; } }
         public override MetaGroup Group { get { return Meta.Group; } }
         public override MetaDescription Description { get { return Meta.Description; } }

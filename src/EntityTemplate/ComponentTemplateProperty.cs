@@ -7,7 +7,7 @@ namespace DCFApixels.DragonECS
     [Serializable]
     public struct ComponentTemplateProperty : IEquatable<ComponentTemplateProperty>
     {
-        [SerializeReference, ComponentTemplateReference]
+        [SerializeReference]
         private IComponentTemplate _template;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ComponentTemplateProperty(IComponentTemplate template)
@@ -41,23 +41,22 @@ namespace DCFApixels.DragonECS
         public void OnValidate(UnityEngine.Object obj) { _template.OnValidate(obj); }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRaw(object raw) { _template.SetRaw(raw); }
-        public bool Equals(ComponentTemplateProperty other)
-        {
-            return _template == other._template;
-        }
-        public override bool Equals(object obj)
-        {
-            return obj is ComponentTemplateProperty other && Equals(other);
-        }
-        public override int GetHashCode()
-        {
-            return _template.GetHashCode();
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Equals(ComponentTemplateProperty other) { return _template == other._template; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public override int GetHashCode() { return _template.GetHashCode(); }
+        public override bool Equals(object obj) { return obj is ComponentTemplateProperty other && Equals(other); }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(ComponentTemplateProperty a, ComponentTemplateProperty b) { return a._template == b._template; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(ComponentTemplateProperty a, ComponentTemplateProperty b) { return a._template != b._template; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(ComponentTemplateProperty a, Null? b) { return a.IsNull; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Null? a, ComponentTemplateProperty b) { return b.IsNull; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(ComponentTemplateProperty a, Null? b) { return !a.IsNull; }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Null? a, ComponentTemplateProperty b) { return !b.IsNull; }
         public readonly struct Null { }
     }
