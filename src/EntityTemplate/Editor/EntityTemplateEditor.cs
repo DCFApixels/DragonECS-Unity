@@ -194,19 +194,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (propCount <= 0)
             {
-                GUIContent label = UnityEditorUtility.GetLabel(name);
-                EditorGUILayout.LabelField(name);
-                Rect emptyPos = GUILayoutUtility.GetLastRect();
-                emptyPos.xMin += EditorGUIUtility.labelWidth;
-                if (isEmpty)
-                {
-                    using (new EcsGUI.ContentColorScope(1f, 1f, 1f, 0.4f))
-                    {
-                        GUI.Label(emptyPos, "empty");
-                    }
-                }
-                EditorGUI.BeginProperty(GUILayoutUtility.GetLastRect(), label, componentRefProp);
-                EditorGUI.EndProperty();
+                EcsGUI.Layout.DrawEmptyComponentProperty(componentRefProp, name, isEmpty);
             }
             else
             {

@@ -335,11 +335,33 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return AddClearComponentButton.None;
         }
 
+        public static void DrawEmptyComponentProperty(Rect position, SerializedProperty property, string name, bool isDisplayEmpty)
+        {
+            DrawEmptyComponentProperty(position, property, UnityEditorUtility.GetLabel(name), isDisplayEmpty);
+        }
+        public static void DrawEmptyComponentProperty(Rect position, SerializedProperty property, GUIContent label, bool isDisplayEmpty)
+        {
+            EditorGUI.LabelField(position, label);
+            if (isDisplayEmpty)
+            {
+                using (SetContentColor(1f, 1f, 1f, 0.4f))
+                {
+                    GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, 0), "empty");
+                }
+            }
+            EditorGUI.BeginProperty(position, label, property);
+            EditorGUI.EndProperty();
+        }
+
         public static class Layout
         {
-            public static void DrawEmptyComponentProperty(bool isDisplayEmpty)
+            public static void DrawEmptyComponentProperty(SerializedProperty property, string name, bool isDisplayEmpty)
             {
-
+                EcsGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabel(name), EditorStyles.label), property, name, isDisplayEmpty);
+            }
+            public static void DrawEmptyComponentProperty(SerializedProperty property, GUIContent label, bool isDisplayEmpty)
+            {
+                EcsGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(label, EditorStyles.label), property, label, isDisplayEmpty);
             }
             public static void DrawWorldBaseInfo(EcsWorld world)
             {

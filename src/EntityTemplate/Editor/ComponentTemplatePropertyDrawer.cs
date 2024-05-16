@@ -188,18 +188,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (propCount <= 0)
             {
                 label.text = $"{label.text} ({name})";
-                EditorGUI.LabelField(paddingPosition, label);
-                Rect emptyPos = paddingPosition;
-                emptyPos.xMin += EditorGUIUtility.labelWidth;
-                if (isEmpty)
-                {
-                    using (new EcsGUI.ContentColorScope(1f, 1f, 1f, 0.4f))
-                    {
-                        GUI.Label(emptyPos, "empty");
-                    }
-                }
-                EditorGUI.BeginProperty(paddingPosition, label, componentRefProp);
-                EditorGUI.EndProperty();
+                EcsGUI.DrawEmptyComponentProperty(paddingPosition, componentRefProp, label.text, isEmpty);
             }
             else
             {
