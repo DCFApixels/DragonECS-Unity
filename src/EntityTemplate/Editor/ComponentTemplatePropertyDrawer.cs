@@ -7,9 +7,23 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-
+    [CustomPropertyDrawer(typeof(ComponentTemplateProperty), true)]
+    internal class ComponentTemplatePropertyDrawer : PropertyDrawer
+    {
+        private ComponentTemplateReferenceDrawer _drawer = new ComponentTemplateReferenceDrawer();
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            property.Next(true);
+            return _drawer.GetPropertyHeight(property, label);
+        }
+        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        {
+            property.Next(true);
+            _drawer.OnGUI(position, property, label);
+        }
+    }
     [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
-    public class ComponentTemplateReferenceDrawer : PropertyDrawer
+    internal class ComponentTemplateReferenceDrawer : PropertyDrawer
     {
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
@@ -19,6 +33,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static bool _isInit;
         private static GenericMenu _genericMenu;
+
         #region Init
         private static void Init()
         {
@@ -64,7 +79,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             IComponentTemplate template = property.managedReferenceValue as IComponentTemplate;
@@ -90,19 +104,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return DamagedComponentHeight;
             }
 
-            var propsCounter = property.Copy();
-            int lastDepth = propsCounter.depth;
-            bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
-            int propCount = next ? -1 : 0;
-            while (next)
-            {
-                propCount++;
-                next = propsCounter.Next(false);
-            }
-            bool isEmpty = propCount <= 0;
+            int propCount = EcsGUI.GetChildPropertiesCount(property);
 
-            
-            return (isEmpty ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(property, label)) + Padding * 4f;
+            return (propCount <= 0 ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(property, label)) + Padding * 4f;
         }
 
 
@@ -167,7 +171,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
             EditorGUI.BeginChangeCheck();
-            GUI.Box(position, "", UnityEditorUtility.GetStyle(alphaPanelColor));
+            EditorGUI.DrawRect(position, alphaPanelColor);
 
             Rect paddingPosition = RectUtility.AddPadding(position, Padding * 2f);
 
@@ -233,7 +237,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawSelectionPopup(Rect position, SerializedProperty componentRefProp, GUIContent label)
         {
             EditorGUI.LabelField(position, label);
-            //Rect buttonRect = RectUtility.AddPadding(position, EditorGUIUtility.labelWidth, 20f, 0f, 0f);
             Rect buttonRect = RectUtility.AddPadding(position, EditorGUIUtility.labelWidth, 0f, 0f, 0f);
             if (GUI.Button(buttonRect, "Select"))
             {

@@ -9,11 +9,11 @@ namespace DCFApixels.DragonECS
     {
         [SerializeReference, ComponentTemplateReference]
         private IComponentTemplate _template;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ComponentTemplateProperty(IComponentTemplate template)
         {
             _template = template;
         }
-
         public IComponentTemplate Template
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,10 +41,13 @@ namespace DCFApixels.DragonECS
         public void OnValidate(UnityEngine.Object obj) { _template.OnValidate(obj); }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetRaw(object raw) { _template.SetRaw(raw); }
-
         public bool Equals(ComponentTemplateProperty other)
         {
             return _template == other._template;
+        }
+        public override bool Equals(object obj)
+        {
+            return obj is ComponentTemplateProperty other && Equals(other);
         }
         public override int GetHashCode()
         {
@@ -52,16 +55,12 @@ namespace DCFApixels.DragonECS
         }
         public static bool operator ==(ComponentTemplateProperty a, ComponentTemplateProperty b) { return a._template == b._template; }
         public static bool operator !=(ComponentTemplateProperty a, ComponentTemplateProperty b) { return a._template != b._template; }
-
         public static bool operator ==(ComponentTemplateProperty a, Null? b) { return a.IsNull; }
         public static bool operator ==(Null? a, ComponentTemplateProperty b) { return b.IsNull; }
-
         public static bool operator !=(ComponentTemplateProperty a, Null? b) { return !a.IsNull; }
         public static bool operator !=(Null? a, ComponentTemplateProperty b) { return !b.IsNull; }
-
         public readonly struct Null { }
     }
-
 
     public sealed class ComponentTemplateReferenceAttribute : PropertyAttribute { }
 }

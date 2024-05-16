@@ -4,6 +4,8 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
+using UnityComponent = UnityEngine.Component;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -339,6 +341,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
+            public static void DrawEmptyComponentProperty(bool isDisplayEmpty)
+            {
+
+            }
             public static void DrawWorldBaseInfo(EcsWorld world)
             {
                 bool isNull = world == null || world.IsDestroyed || world.id == 0;
@@ -436,30 +442,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (meta.IsHidden == false || IsShowHidden)
                 {
                     object data = pool.GetRaw(entityID);
-                    //Color panelColor = meta.Color.ToUnityColor().Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
-                    Color panelColor;
-                    if (meta.IsCustomColor)
-                    {
-                        panelColor = meta.Color.ToUnityColor();
-                    }
-                    else
-                    {
-                        switch (AutoColorMode)
-                        {
-                            case ComponentColorMode.Auto:
-                                panelColor = meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
-                                break;
-                            case ComponentColorMode.Rainbow:
-                                Color hsv = Color.HSVToRGB(1f / (Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE)) * index, 1, 1);
-                                panelColor = hsv.Desaturate(0.48f) / 1.18f;
-                                break;
-                            default:
-                                panelColor = index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
-                                break;
-                        }
-                    }
-                    panelColor = panelColor.Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+                    Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
                     float padding = EditorGUIUtility.standardVerticalSpacing;
                     Rect removeButtonRect = GUILayoutUtility.GetLastRect();
@@ -472,7 +456,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     removeButtonRect.yMax += RemoveButtonRect.height;
                     removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
                     removeButtonRect.center += Vector2.up * padding * 2f;
-                    if (EcsGUI.CloseButton(removeButtonRect))
+                    if (CloseButton(removeButtonRect))
                     {
                         isRemoveComponent = true;
                     }
@@ -497,7 +481,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         Rect tooltipIconRect = TooltipIconRect;
                         tooltipIconRect.center = removeButtonRect.center;
                         tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                        EcsGUI.DescriptionIcon(tooltipIconRect, meta.Description.Text);
+                        DescriptionIcon(tooltipIconRect, meta.Description.Text);
                     }
 
                     GUILayout.EndVertical();
@@ -509,7 +493,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 outData = data;
                 Type type = data == null ? typeof(void) : data.GetType();
 
-                bool isUnityObject = typeof(UnityEngine.Object).IsAssignableFrom(fieldType);
+                bool isUnityObject = typeof(UnityObject).IsAssignableFrom(fieldType);
 
                 if (isUnityObject == false && data == null)
                 {
@@ -546,12 +530,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (isUnityObject)
                     {
                         EditorGUI.BeginChangeCheck();
-                        var uobj = (UnityEngine.Object)data;
+                        var uobj = (UnityObject)data;
 
-                        bool isComponent = (typeof(UnityEngine.Component)).IsAssignableFrom(fieldType);
+                        bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldType);
                         if (isComponent)
                         {
-                            uobj = EditorGUILayout.ObjectField(label, uobj, typeof(UnityEngine.Object), true);
+                            uobj = EditorGUILayout.ObjectField(label, uobj, typeof(UnityObject), true);
                         }
                         else
                         {
