@@ -82,6 +82,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            if(property.propertyType == SerializedPropertyType.ManagedReference == false)
+            {
+                return EditorGUI.GetPropertyHeight(property, label);
+            }
             IComponentTemplate template = property.managedReferenceValue as IComponentTemplate;
             if (template == null || property.managedReferenceValue == null)
             {
@@ -114,6 +118,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override void OnGUI(Rect position, SerializedProperty componentRefProp, GUIContent label)
         {
+            if (componentRefProp.propertyType == SerializedPropertyType.ManagedReference == false)
+            {
+                EditorGUI.PropertyField(position, componentRefProp, label, true);
+                return;
+            }
+
             Init();
             var counter = componentRefProp.Copy();
 
