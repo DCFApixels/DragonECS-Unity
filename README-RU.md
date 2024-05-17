@@ -208,7 +208,9 @@ struct SomeTagComponent : IEcsTagComponent { /*...*/ }
 class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```
 
-* Полная реализация:
+<details>
+<summary>* Полная реализация:</summary>
+
 ```c#
 [Serializable] 
 struct SomeComponent : IEcsComponent { /*...*/ }
@@ -227,6 +229,8 @@ class SomeComponentTemplate : IComponentTemplate
     public void OnValidate(UnityEngine.Object obj) { /*...*/ }
 }
 ```
+
+</details>
 
 В раскрывающемся при нажатии	`Add Component` меню выбора компонента поддердивается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
@@ -286,6 +290,8 @@ connect.Disconnect();
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/55c11f1c-c0e0-435c-af9b-4c06678491a6">   
 </p>
+
+> На панели внизу есть вспомогательные кнопки: 1) Автоматическое заполнение массива шаблонов. 2) Каскадный вызов автозаполнения для всех дочерних коннектов в иерархии.
 
 </br>
 
