@@ -191,14 +191,13 @@ int e = _world.NewEntity(someSamplate);
 -----
 
 ## Шаблон компонента
-Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это классы реализующие `IComponentTemplate`. 
+Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это типы реализующие `IComponentTemplate`. 
 
 * Упрощенная реализация:
 ```c#
-// Обязательно добавить [Serializable] к компоненту и к шаблону
+// Обязательно добавить [Serializable] к ттипу компонента
 [Serializable]
 struct SomeComponent : IEcsComponent { /*...*/ }
-[Serializable]
 class SomeComponentTemplate : ComponentTemplate<SomeComponent> { }
 ```
 
@@ -206,7 +205,6 @@ class SomeComponentTemplate : ComponentTemplate<SomeComponent> { }
 ```c#
 [Serializable]
 struct SomeTagComponent : IEcsTagComponent { /*...*/ }
-[Serializable]
 class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```
 
@@ -214,7 +212,6 @@ class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```c#
 [Serializable] 
 struct SomeComponent : IEcsComponent { /*...*/ }
-[Serializable]
 class SomeComponentTemplate : IComponentTemplate
 {
     [SerializeField]
@@ -231,12 +228,15 @@ class SomeComponentTemplate : IComponentTemplate
 }
 ```
 
-Чтобы компонент можно было добавить в шаблон, нужно реализовать шаблон компонента. 
+В раскрывающемся при нажатии	`Add Component` меню выбора компонента поддердивается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
+Компоненты в инспектрре по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в настройках фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
+
+Если у компонента есть мета-атрибут `[MetaDescription]`, то рядом с крестиком удаления компонента будет иконка подсказки, при наведении курсора отобразится в виде подсказки информация из `[MetaDescription]`.
 </br>
 
 # Связь с GameObject
-Связываются сущности и GameObject-ы с помощью коннектов. Коннекты со стороны GameObject - `EcsEntityConnect`, со стороны сущности - `GameObjectConnect`. `EcsEntityConnect` - ключевой коннект, `GameObjectConnect` - создается/удаляется автоматически.
+Связываются сущности и GameObject-ы с помощью коннектов. Коннекты со стороны GameObject - `EcsEntityConnect`, со стороны сущности - `GameObjectConnect`. `EcsEntityConnect` - управляющий коннект, `GameObjectConnect` - создается/удаляется автоматически.
 ```c#
 EcsEntityConnect connect = /*...*/;
 entlong entity = _world.NewEntityLong();
