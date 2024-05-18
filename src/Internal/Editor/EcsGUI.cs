@@ -288,7 +288,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             while (next)
             {
                 result++;
-                next = propsCounter.Next(false);
+                next = propsCounter.Next(true);
             }
             return result;
         }
