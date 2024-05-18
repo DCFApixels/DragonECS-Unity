@@ -284,7 +284,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var propsCounter = property.Copy();
             int lastDepth = propsCounter.depth;
             bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
-            int result = next ? -1 : 0;
+            int result = 0;
             while (next)
             {
                 result++;
