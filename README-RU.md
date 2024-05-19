@@ -29,6 +29,7 @@
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
+- [FAQ](#faq)
 
 </br>
 
@@ -340,3 +341,9 @@ public class EcsRoot : MonoBehaviour
     // ...
 }
 ```
+
+</br>
+
+# FAQ
+## Не отображатеся EcsEntityConncet или другие компоненты
+Такое может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
