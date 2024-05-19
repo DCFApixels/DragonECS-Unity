@@ -320,12 +320,16 @@ EcsPipeline pipeline = EcsPipeline.New()
     //...
     .BuildAndInit();
 ```
+
+<details>
+<summary>Пример реализации провайдера для своего типа мира</summary>
+
 ```c#
-//Пример создания своего провайдера для пробрасывания мира своего типа
+//Пример реализации своего провайдера для пробрасывания мира своего типа
 [CreateAssetMenu(fileName = nameof(EcsMyWorldProvider), menuName = EcsConsts.FRAMEWORK_NAME + "/WorldProviders/" + nameof(EcsMyWorldProvider), order = 1)]
 public class EcsMyWorldProvider : EcsWorldProvider<EcsMyWorld> { }
 
-//Пример создания синглтон версии для мира своего типа
+//Пример реализации синглтон версии для мира своего типа
 public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 {
     private static EcsMyWorldSingletonProvider _instance;
@@ -339,6 +343,8 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
     }
 }
 ```
+
+</details>
 
 <details>
 <summary>Создать ассет провайдера: Asset > Create > DragonECS > WorldProviders > Выбрать тип мира.</summary>
