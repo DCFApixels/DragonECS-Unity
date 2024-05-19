@@ -297,8 +297,48 @@ connect.Disconnect();
 </br>
 
 # World Provider
-`EcsWorldProvider` - это `ScriptableObject` обертка над `EcsWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity. Для простых случаев достаточно будет использовать синглтон версию провайдера `EcsDefaultWorldSingletonProvider`.
+`EcsWorldProvider<TWorld>` - это `ScriptableObject` обертка над `TWorld`, предназначенная для пробрасывания экземпляра мира и настройки через инспектор Unity. Для простых случаев достаточно будет использовать синглтон версию провайдера `EcsDefaultWorldSingletonProvider`. 
 
+```c#
+// Синглтон провайдер создается автоматически в папке "Assets/Resource".
+EcsDefaultWorldSingletonProvider provider = EcsDefaultWorldSingletonProvider.Instance;
+// ...
+
+EcsDefaultWorld world = new EcsDefaultWorld();
+// Устанавливаем экземпляр мира в провайдер.
+provider.Set(world);
+
+// ...
+
+//Получаем экземпляр мира, если провайдер был пуст, то он создаст новый мир.
+EcsDefaultWorld world = provider.Get();
+
+EcsPipeline pipeline = EcsPipeline.New()
+    //...
+    // Внедряем в системы полученный из провайдера мир.
+    .Inject(world)
+    //...
+    .BuildAndInit();
+```
+```c#
+//Пример создания своего провайдера для пробрасывания мира своего типа
+[CreateAssetMenu(fileName = nameof(EcsMyWorldProvider), menuName = EcsConsts.FRAMEWORK_NAME + "/WorldProviders/" + nameof(EcsMyWorldProvider), order = 1)]
+public class EcsMyWorldProvider : EcsWorldProvider<EcsMyWorld> { }
+
+//Пример создания синглтон версии для мира своего типа
+public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
+{
+    private static EcsMyWorldSingletonProvider _instance;
+    public static EcsMyWorldSingletonProvider Instance
+    {
+        get
+        {
+            if (_instance == null) { _instance = FindOrCreateSingleton<EcsMyWorldSingletonProvider>("SingletonMyWorld"); }
+            return _instance;
+        }
+    }
+}
+```
 
 <details>
 <summary>Создать ассет провайдера: Asset > Create > DragonECS > WorldProviders > Выбрать тип мира.</summary>
