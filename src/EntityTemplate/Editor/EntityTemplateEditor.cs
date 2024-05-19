@@ -71,10 +71,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         return;
                     }
                 }
-
-                componentsProp.InsertArrayElementAtIndex(0);
-
-                componentsProp.GetArrayElementAtIndex(0).managedReferenceValue = ((IComponentTemplate)obj).Clone();
+                int index = componentsProp.arraySize;
+                componentsProp.InsertArrayElementAtIndex(index);
+                componentsProp.GetArrayElementAtIndex(index).managedReferenceValue = ((IComponentTemplate)obj).Clone();
 
                 serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(this.target);
@@ -104,10 +103,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
             DrawTop(target);
             GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
-            for (int i = 0; i < componentsProp.arraySize; i++)
+            for (int i = componentsProp.arraySize - 1; i >= 0; i--)
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
             }
+
             GUILayout.EndVertical();
         }
         private void DrawTop(ITemplateInternal target)
