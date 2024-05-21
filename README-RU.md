@@ -6,6 +6,7 @@
 <img alt="Version" src="https://img.shields.io/github/package-json/v/DCFApixels/DragonECS-Unity?color=%23ff4e85&style=for-the-badge">
 <img alt="GitHub" src="https://img.shields.io/github/license/DCFApixels/DragonECS-Unity?color=ff4e85&style=for-the-badge">
 <a href="https://discord.gg/kqmJjExuCf"><img alt="Discord" src="https://img.shields.io/discord/1111696966208999525?color=%2300b269&label=Discord&logo=Discord&logoColor=%23ffffff&style=for-the-badge"></a>
+<a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=IbDcH43vhfArb30luGMP1TMXB3GCHzxm&authKey=s%2FJfqvv46PswFq68irnGhkLrMR6y9tf%2FUn2mogYizSOGiS%2BmB%2B8Ar9I%2Fnr%2Bs4oS%2B&noverify=0&group_code=949562781"><img alt="QQ" src="https://img.shields.io/badge/QQ-JOIN-00b269?logo=tencentqq&style=for-the-badge"></a>
 </p>
 
 # Интеграция с Unity для [DragonECS](https://github.com/DCFApixels/DragonECS)
@@ -238,6 +239,24 @@ class SomeComponentTemplate : IComponentTemplate
 Компоненты в инспектрре по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в настройках фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
 
 Если у компонента есть мета-атрибут `[MetaDescription]`, то рядом с крестиком удаления компонента будет иконка подсказки, при наведении курсора отобразится в виде подсказки информация из `[MetaDescription]`.
+
+</br>
+
+При необходимости создания кастомного шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
+```c#
+// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTempalte
+// и отображает шаблон компонента аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
+[SerializeReference, ComponentTemplateReference]
+private IComponentTempalte _someComponent1;
+
+// Обертка над IComponentTempalte, которая работает аналогично примеру с атрибутом ComponentTemplateReference.
+private ComponentTemplateProperty _someComponent2;
+
+// Все это работает и для массивов.
+[SerializeReference, ComponentTemplateReference]
+private IComponentTempalte[] _components;
+```
+
 </br>
 
 # Связь с GameObject
