@@ -82,7 +82,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if(property.propertyType == SerializedPropertyType.ManagedReference == false)
+            if (property.propertyType == SerializedPropertyType.ManagedReference == false)
             {
                 return EditorGUI.GetPropertyHeight(property, label);
             }

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using UnityEngine;
 #region UNITY_EDITOR
 using UnityEditor;
+using DCFApixels.DragonECS.Unity.Internal;
 #endregion
 
 namespace DCFApixels.DragonECS
@@ -52,12 +53,15 @@ namespace DCFApixels.DragonECS
         }
     }
 
+    [SelectionBase]
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
     public class EcsEntityConnect : MonoBehaviour
     {
         private entlong _entity;
         private EcsWorld _world;
+
+        private static SparseArray<EcsEntityConnect> _connectedEntities = new SparseArray<EcsEntityConnect>();
 
         [SerializeField]
         private bool _deleteEntiityWithDestroy = false;
@@ -108,6 +112,7 @@ namespace DCFApixels.DragonECS
                 _isConnectInvoked = true;
                 _entity = entity;
                 _world = world;
+                _connectedEntities.Add(GetInstanceID(), this);
                 var goConnects = world.GetPool<GameObjectConnect>();
                 if (goConnects.Has(newEntityID))
                 {
@@ -136,6 +141,7 @@ namespace DCFApixels.DragonECS
             {
                 var unityGameObjects = _world.GetPool<GameObjectConnect>();
                 unityGameObjects.TryDel(oldEntityID);
+                _connectedEntities.Remove(GetInstanceID());
             }
             _world = null;
             _entity = entlong.NULL;
@@ -161,10 +167,35 @@ namespace DCFApixels.DragonECS
         {
             entlong ent = _entity;
             Disconnect();
-            if (_deleteEntiityWithDestroy && ent.TryUnpack(out int id, out EcsWorld world))
+
+
+            if (_deleteEntiityWithDestroy == false)
             {
-                world.DelEntity(id);
+                return;
             }
+            ent.UnpackUnchecked(out int e, out short gen, out short worldID);
+            var world = EcsWorld.GetWorld(worldID);
+            if (world != null && world.IsAlive(e, gen))
+            {
+                world.DelEntity(e);
+            }
+
+
+            //if (_deleteEntiityWithDestroy && ent.TryUnpack(out int id, out EcsWorld world))
+            //{
+            //    world.DelEntity(id);
+            //}
+        }
+        #endregion
+
+        #region Other
+        public static EcsEntityConnect GetConnectByInstanceID(int instanceID)
+        {
+            return _connectedEntities[instanceID];
+        }
+        public static bool TryGetConnectByInstanceID(int instanceID, out EcsEntityConnect conncet)
+        {
+            return _connectedEntities.TryGetValue(instanceID, out conncet);
         }
         #endregion
 

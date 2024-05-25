@@ -71,6 +71,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         return;
                     }
                 }
+
                 int index = componentsProp.arraySize;
                 componentsProp.InsertArrayElementAtIndex(index);
                 componentsProp.GetArrayElementAtIndex(index).managedReferenceValue = ((IComponentTemplate)obj).Clone();
@@ -107,7 +108,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
             }
-
             GUILayout.EndVertical();
         }
         private void DrawTop(ITemplateInternal target)
