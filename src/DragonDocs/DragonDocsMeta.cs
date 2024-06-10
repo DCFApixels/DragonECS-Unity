@@ -12,6 +12,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [NonSerialized] private bool _isInitSourceType = false;
 
         [DataMember, SerializeField] internal string _assemblyQualifiedName = string.Empty;
+        [DataMember, SerializeField] internal EcsMemberType _memberType = EcsMemberType.Undefined;
 
         [DataMember, SerializeField] internal string _name = string.Empty;
         [DataMember, SerializeField] internal bool _isCustomName = false;
@@ -23,9 +24,14 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [DataMember, SerializeField] internal string _group = string.Empty;
         [DataMember, SerializeField] internal string[] _tags = Array.Empty<string>();
 
+
         public string AssemblyQualifiedName
         {
             get { return _assemblyQualifiedName; }
+        }
+        public EcsMemberType EcsMemberType
+        {
+            get { return _memberType; }
         }
         public string Name
         {
@@ -53,7 +59,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
         }
         public string Group
         {
-            get { return _description; }
+            get { return _group; }
         }
         public ReadOnlySpan<string> Tags
         {
@@ -64,13 +70,23 @@ namespace DCFApixels.DragonECS.Unity.Docs
         {
             _sourceType = meta.Type;
             _assemblyQualifiedName = meta.Type.AssemblyQualifiedName;
+            _memberType = meta.EcsMemberType;
 
             _name = meta.Name;
             _isCustomName = meta.IsCustomName;
             _color = meta.Color;
             _isCustomColor = meta.IsCustomColor;
             _autor = meta.Description.Author;
-            _description = meta.Description.Text;
+
+
+            if (meta.Description.IsHasAutor)
+            {
+                _description = $"{meta.Description.Text}\r\n  - {meta.Description.Author}";
+            }
+            else
+            {
+                _description = meta.Description.Text;
+            }
 
             _group = meta.Group.Name;
             _tags = new string[meta.Tags.Count];

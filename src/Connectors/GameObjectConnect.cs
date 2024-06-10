@@ -7,6 +7,8 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [MetaColor(MetaColor.Cyan)]
+    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
     public readonly struct GameObjectConnect : IEcsComponent, IEcsComponentLifecycle<GameObjectConnect>
     {
         public readonly EcsEntityConnect Connect;

@@ -53,11 +53,14 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             GUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
 
 
-            ButtonsScrolPosition = GUILayout.BeginScrollView(ButtonsScrolPosition, EditorStyles.helpBox, GUILayout.Width(_buttonsWidth));
+            ButtonsScrolPosition = GUILayout.BeginScrollView(ButtonsScrolPosition, UnityEditorUtility.GetStyle(Color.black, 0.1f), GUILayout.Width(_buttonsWidth));
             var selectedGroupInfo = DrawGroups();
             GUILayout.EndScrollView();
 
             DrawDragger();
+
+            GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
+
 
             DataScrolPosition = GUILayout.BeginScrollView(DataScrolPosition, UnityEditorUtility.GetStyle(Color.black, 0.2f), GUILayout.ExpandWidth(true));
             DrawSelectedGroupMeta(selectedGroupInfo);
@@ -99,16 +102,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 GUILayout.TextArea(meta.Name, EditorStyles.boldLabel);
 
                 Rect lastRect = GUILayoutUtility.GetLastRect();
-                if (string.IsNullOrEmpty(meta.Description))
-                {
-                    using (EcsGUI.SetContentColor(1f, 1f, 1f, 0.4f))
-                    {
-                        Rect pos = lastRect;
-                        pos.xMin = Mathf.Max(EditorGUIUtility.labelWidth, pos.xMax - 42f);
-                        GUI.Label(pos, "empty");
-                    }
-                }
-                else
+                if (string.IsNullOrEmpty(meta.Description) == false)
                 {
                     Rect lineRect = lastRect;
                     lineRect.yMin = lineRect.yMax;
@@ -120,7 +114,25 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                     GUILayout.TextArea(meta.Description, EditorStyles.wordWrappedLabel);
                 }
-                
+
+                if (meta._tags.Length > 0)
+                {
+                    Rect lineRect = GUILayoutUtility.GetLastRect();
+                    lineRect.yMin = lineRect.yMax;
+                    lineRect.yMax += 1f;
+                    lineRect.y += 5f;
+                    EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
+
+                    GUILayout.Space(3f);
+
+                    var tagsstring = string.Join(',', meta._tags);
+                    using (EcsGUI.SetAlpha(0.5f))
+                    {
+                        GUILayout.TextArea(tagsstring, EditorStyles.wordWrappedMiniLabel);
+                    }
+                }
+
+
                 GUILayout.Space(1f);
                 GUILayout.EndVertical();
             }
@@ -215,31 +227,36 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         {
             const float DRAG_RESIZE_WIDTH = 4f;
 
-            Rect rect;
+            Rect rect = GUILayoutUtility.GetLastRect(); 
             float m = DRAG_RESIZE_WIDTH;
             if (_dragState != DragState.None)
             {
-                m *= 200f;
+                m *= 2f;
             }
-            rect = GUILayoutUtility.GetLastRect();
             rect.xMin = rect.xMax;
-            rect.xMax = rect.xMax + m;
+            rect.x -= m / 2f;
+            rect.width = m;
+
+            EditorGUI.DrawRect(rect.AddPadding(1f, 0), new Color(0,0,0,0.5f));
 
             Event current = Event.current;
             switch (current.type)
             {
                 case EventType.MouseDown:
-                    
                     if (EcsGUI.HitTest(rect))
                     {
                         _buttonsWidthDragStartPos = current.mousePosition;
                         _buttonsWidthDragStartValue = _buttonsWidth;
                         _dragState = DragState.Init;
+                        current.Use();
                     }
                     break;
                 case EventType.MouseUp:
-                    _dragState = DragState.None;
-                    current.Use();
+                    if(_dragState != DragState.None)
+                    {
+                        _dragState = DragState.None;
+                        current.Use();
+                    }
                     break;
                 case EventType.MouseDrag:
                     {

@@ -56,6 +56,9 @@ namespace DCFApixels.DragonECS
     [SelectionBase]
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
+    [MetaColor(MetaColor.Cyan)]
+    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
     public class EcsEntityConnect : MonoBehaviour
     {
         private entlong _entity;

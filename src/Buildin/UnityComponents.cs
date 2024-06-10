@@ -15,8 +15,8 @@ namespace DCFApixels.DragonECS
     }
     [Serializable]
     [MetaColor(255 / 3, 255, 0)]
-    [MetaDescription(EcsConsts.AUTHOR, "Component-reference to Unity object for EcsPool")]
     [MetaGroup(UnityComponentConsts.UNITY_COMPONENT_NAME)]
+    [MetaDescription(EcsConsts.AUTHOR, "Component-reference to Unity object for EcsPool")]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
     {

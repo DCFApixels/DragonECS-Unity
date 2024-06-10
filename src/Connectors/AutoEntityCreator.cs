@@ -4,6 +4,9 @@ namespace DCFApixels.DragonECS
 {
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(AutoEntityCreator), 30)]
+    [MetaColor(MetaColor.Cyan)]
+    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
     public class AutoEntityCreator : MonoBehaviour
     {
         [SerializeField]

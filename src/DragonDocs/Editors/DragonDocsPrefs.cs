@@ -67,7 +67,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
             _infos = groups.ToArray();
 
-            //_isInitInfos = true;
+            _isInitInfos = true;
         }
 
         private void AddInfo(List<MetaGroupInfo> infos, string path, int startIndex, int length)

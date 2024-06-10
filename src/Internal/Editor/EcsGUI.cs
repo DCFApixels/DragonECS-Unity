@@ -67,7 +67,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUI.backgroundColor = _value;
             }
         }
-        public struct IndentLevelScope : IDisposable 
+        public struct IndentLevelScope : IDisposable
         {
             private readonly int _value;
             public IndentLevelScope(int value)
@@ -87,6 +87,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static BackgroundColorScope SetBackgroundColor(float r, float g, float b, float a = 1f) => new BackgroundColorScope(r, g, b, a);
         public static ColorScope SetColor(Color value) => new ColorScope(value);
         public static ColorScope SetColor(float r, float g, float b, float a = 1f) => new ColorScope(r, g, b, a);
+        public static ColorScope SetAlpha(float a) => new ColorScope(GUI.color * new Color(1, 1, 1, a));
         public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
         public static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
         public static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);

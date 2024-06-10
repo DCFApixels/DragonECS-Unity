@@ -9,6 +9,9 @@ namespace DCFApixels.DragonECS
         public abstract void Apply(short worldID, int entityID);
     }
 
+    [MetaColor(MetaColor.Cyan)]
+    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
     [CreateAssetMenu(fileName = nameof(ScriptableEntityTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptableEntityTemplate), order = 1)]
     public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateInternal
     {
