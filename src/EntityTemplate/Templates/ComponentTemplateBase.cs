@@ -37,7 +37,7 @@ namespace DCFApixels.DragonECS
         public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
         public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
         public virtual MetaDescription Description { get { return MetaDescription.Empty; } }
-        public virtual IReadOnlyCollection<string> Tags { get { return Array.Empty<string>(); } }
+        public virtual IReadOnlyList<string> Tags { get { return Array.Empty<string>(); } }
         #endregion
 
         #region Methods
@@ -62,7 +62,7 @@ namespace DCFApixels.DragonECS
         public override MetaColor Color { get { return Meta.Color; } }
         public override MetaGroup Group { get { return Meta.Group; } }
         public override MetaDescription Description { get { return Meta.Description; } }
-        public override IReadOnlyCollection<string> Tags { get { return Meta.Tags; } }
+        public override IReadOnlyList<string> Tags { get { return Meta.Tags; } }
         #endregion
 
         #region Methods

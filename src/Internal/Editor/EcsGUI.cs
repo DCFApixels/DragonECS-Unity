@@ -53,13 +53,43 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUI.contentColor = _value;
             }
         }
-        private static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
-        private static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
-        private static ColorScope SetColor(Color value) => new ColorScope(value);
-        private static ColorScope SetColor(float r, float g, float b, float a = 1f) => new ColorScope(r, g, b, a);
-        private static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
-        private static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
-        private static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
+        public struct BackgroundColorScope : IDisposable
+        {
+            private readonly Color _value;
+            public BackgroundColorScope(float r, float g, float b, float a = 1f) : this(new Color(r, g, b, a)) { }
+            public BackgroundColorScope(Color value)
+            {
+                _value = GUI.backgroundColor;
+                GUI.backgroundColor = value;
+            }
+            public void Dispose()
+            {
+                GUI.backgroundColor = _value;
+            }
+        }
+        public struct IndentLevelScope : IDisposable 
+        {
+            private readonly int _value;
+            public IndentLevelScope(int value)
+            {
+                _value = EditorGUI.indentLevel;
+                EditorGUI.indentLevel = value;
+            }
+            public void Dispose()
+            {
+                EditorGUI.indentLevel = _value;
+            }
+        }
+        public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
+        public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
+        public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
+        public static BackgroundColorScope SetBackgroundColor(Color value) => new BackgroundColorScope(value);
+        public static BackgroundColorScope SetBackgroundColor(float r, float g, float b, float a = 1f) => new BackgroundColorScope(r, g, b, a);
+        public static ColorScope SetColor(Color value) => new ColorScope(value);
+        public static ColorScope SetColor(float r, float g, float b, float a = 1f) => new ColorScope(r, g, b, a);
+        public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
+        public static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
+        public static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
         #endregion
 
         private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -295,16 +325,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static Color SelectPanelColor(ITypeMeta meta, int index, int total)
         {
             var trueMeta = meta.Type.ToMeta();
-            if (trueMeta.IsCustomColor || meta.Color != trueMeta.Color)
+            bool isCustomColor = trueMeta.IsCustomColor || meta.Color != trueMeta.Color;
+            return SelectPanelColor(meta.Color, isCustomColor, index, total);
+        }
+        public static Color SelectPanelColor(MetaColor color, bool isCustomColor, int index, int total)
+        {
+            if (isCustomColor)
             {
-                return meta.Color.ToUnityColor();
+                return color.ToUnityColor();
             }
             else
             {
                 switch (AutoColorMode)
                 {
                     case ComponentColorMode.Auto:
-                        return meta.Color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
+                        return color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
                     case ComponentColorMode.Rainbow:
                         int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
                         Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
