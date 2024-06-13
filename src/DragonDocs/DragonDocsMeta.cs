@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [DataMember, SerializeField] internal string _name = string.Empty;
         [DataMember, SerializeField] internal bool _isCustomName = false;
         [DataMember, SerializeField] internal string _typeName = string.Empty;
-        [DataMember, SerializeField] internal MetaColor _color = MetaColor.BlackColor;
+        [DataMember, SerializeField] internal Color32 _color = new Color32(0, 0, 0, 255);
         [DataMember, SerializeField] internal bool _isCustomColor = false;
         [DataMember, SerializeField] internal string _autor = string.Empty;
         [DataMember, SerializeField] internal string _description = string.Empty;
@@ -48,7 +48,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
         {
             get { return _typeName; }
         }
-        public MetaColor Color
+        public Color32 Color
         {
             get { return _color; }
         }
@@ -86,7 +86,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
             _name = meta.Name;
             _isCustomName = meta.IsCustomName;
             _typeName = meta.TypeName;
-            _color = meta.Color;
+            _color = meta.Color.ToUnityColor32();
             _isCustomColor = meta.IsCustomColor;
             _autor = meta.Description.Author;
 

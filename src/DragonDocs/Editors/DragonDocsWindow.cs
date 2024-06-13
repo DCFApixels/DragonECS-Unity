@@ -136,7 +136,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
             GUILayout.Label("");
             EditorGUI.BeginChangeCheck();
-            _searchingSampleEnter = EditorGUILayout.TextField(_searchingSampleEnter, EditorStyles.toolbarTextField, GUILayout.ExpandHeight(true), GUILayout.MaxWidth(200f));
+            _searchingSampleEnter = EditorGUILayout.TextField(_searchingSampleEnter, EditorStyles.toolbarSearchField, GUILayout.ExpandHeight(true), GUILayout.MaxWidth(200f));
             if (EditorGUI.EndChangeCheck())
             {
                 _searchingSampleChanged = true;
@@ -233,7 +233,6 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                     i++;
                 }
             }
-
             if (iMax <= 0)
             {
                 GUILayout.Label(info.Length <= 0 ? "empty group" : "there are hidden items", EditorStyles.centeredGreyMiniLabel, GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
@@ -244,7 +243,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         {
             using (EcsGUI.SetIndentLevel(0))
             {
-                Color panelColor = EcsGUI.SelectPanelColor(meta.Color, meta.IsCustomColor, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+                Color panelColor = EcsGUI.SelectPanelColor(meta.Color.ToMetaColor(), meta.IsCustomColor, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
                 Color alphaPanelColor = panelColor;
                 alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 

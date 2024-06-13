@@ -12,5 +12,15 @@ namespace DCFApixels.DragonECS
         {
             return new Color32(self.R, self.G, self.B, self.A);
         }
+
+        public static MetaColor ToMetaColor(this Color self)
+        {
+            return new MetaColor((byte)(self.r * 255), (byte)(self.g * 255), (byte)(self.b * 255), (byte)(self.a * 255));
+        }
+
+        public static MetaColor ToMetaColor(this Color32 self)
+        {
+            return new MetaColor(self.r, self.g, self.b, self.a);
+        }
     }
 }

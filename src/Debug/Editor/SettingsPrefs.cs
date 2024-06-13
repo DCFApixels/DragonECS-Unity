@@ -101,7 +101,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void AutoSave()
         {
             Save(true);
-            Debug.Log("AutoSave");
         }
     }
 }
