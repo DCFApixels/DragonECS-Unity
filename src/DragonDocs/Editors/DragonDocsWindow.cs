@@ -142,7 +142,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 _searchingSampleChanged = true;
             }
             if ((_searchingSampleChanged && Event.current.keyCode == KeyCode.Return) ||
-                EcsGUI.Layout.IconButton(Icons.Instance.SearchIcon, 3f, null, EditorStyles.toolbarButton, GUILayout.ExpandHeight(true), GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
+                EcsGUI.Layout.IconButton(Icons.Instance.SearchIcon, 1f, null, EditorStyles.toolbarButton, GUILayout.ExpandHeight(true), GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
             {
                 Searh();
             }
