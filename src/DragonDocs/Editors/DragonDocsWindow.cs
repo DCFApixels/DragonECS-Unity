@@ -57,12 +57,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         {
             Event current = Event.current;
             DragonDocs docs = DragonDocsPrefs.instance.Docs;
-            var metas = docs.Metas;
             if (docs == null || docs.Metas.IsEmpty)
             {
                 docs = DragonDocs.Generate();
                 DragonDocsPrefs.instance.Save(docs);
             }
+            var metas = docs.Metas;
             var infos = DragonDocsPrefs.instance.Infos;
             if (_searchingHideMetaMap.Length < metas.Length)
             {
