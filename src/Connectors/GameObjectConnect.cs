@@ -1,5 +1,6 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using DCFApixels.DragonECS.Unity;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -7,8 +8,8 @@ using UnityEditor;
 namespace DCFApixels.DragonECS
 {
     [MetaColor(MetaColor.Cyan)]
-    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.COMPONENTS_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "This component is automatically added if an entity is connected to one of the EcsEntityConnect. It also contains a reference to the connected EcsEntityConnect.")]
     public readonly struct GameObjectConnect : IEcsComponent, IEcsComponentLifecycle<GameObjectConnect>
     {
         public readonly EcsEntityConnect Connect;

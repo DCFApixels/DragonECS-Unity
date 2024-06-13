@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DCFApixels.DragonECS.Unity;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -14,9 +15,9 @@ namespace DCFApixels.DragonECS
         public static readonly MetaGroup JointGroup = new MetaGroup($"{UNITY_COMPONENT_NAME}/Joint/");
     }
     [Serializable]
-    [MetaColor(255 / 3, 255, 0)]
-    [MetaGroup(UnityComponentConsts.UNITY_COMPONENT_NAME)]
-    [MetaDescription(EcsConsts.AUTHOR, "Component-reference to Unity object for EcsPool")]
+    [MetaColor(MetaColor.Cyan)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.COMPONENTS_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "Component-reference to Unity object for EcsPool.")]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
     {

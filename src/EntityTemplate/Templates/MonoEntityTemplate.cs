@@ -1,4 +1,5 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
+﻿using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using UnityEngine;
 
@@ -12,8 +13,8 @@ namespace DCFApixels.DragonECS
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(MonoEntityTemplate), 30)]
     [MetaColor(MetaColor.Cyan)]
-    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]

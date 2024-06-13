@@ -80,6 +80,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 EditorGUI.indentLevel = _value;
             }
         }
+        public struct AlignmentScope : IDisposable
+        {
+            private readonly GUIStyle _target;
+            private readonly TextAnchor _value;
+            public AlignmentScope(GUIStyle target, TextAnchor value)
+            {
+                _target = target;
+                _value = _target.alignment;
+                _target.alignment = value;
+            }
+            public void Dispose()
+            {
+                _target.alignment = _value;
+            }
+        }
+        #endregion
+
+        public static AlignmentScope SetAlignment(GUIStyle target, TextAnchor value) => new AlignmentScope(target, value);
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
         public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
         public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
@@ -91,7 +109,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
         public static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
         public static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
-        #endregion
+
+
 
         private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -161,6 +180,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region small elems
         public static void DrawIcon(Rect position, Texture icon, float iconPadding, string description)
         {
+            if(position.width != position.height)
+            {
+                Vector2 center = position.center;
+                float size = Mathf.Min(position.width, position.height);
+                position.height = size;
+                position.width = size;
+                position.center = center;
+            }
             using (SetColor(GUI.enabled ? GUI.color : GUI.color * new Color(1f, 1f, 1f, 0.4f)))
             {
                 GUI.Label(position, UnityEditorUtility.GetLabel(string.Empty, description));
@@ -389,8 +416,41 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.EndProperty();
         }
 
+
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
         public static class Layout
         {
+            public static bool IconButton(Texture icon, params GUILayoutOption[] options)
+            {
+                bool result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), options);
+                DrawIcon(GUILayoutUtility.GetLastRect(), icon, 0, null);
+                return result;
+            }
+            public static bool IconButton(Texture icon, float iconPadding = 0, string description = null)
+            {
+                bool result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty));
+                DrawIcon(GUILayoutUtility.GetLastRect(), icon, iconPadding, description);
+                return result;
+            }
+            public static bool IconButton(Texture icon, float iconPadding = 0, string description = null, GUIStyle style = null, params GUILayoutOption[] options)
+            {
+                bool result;
+                if(style == null)
+                {
+                    result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), options);
+                }
+                else
+                {
+                    result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), style, options);
+                }
+                DrawIcon(GUILayoutUtility.GetLastRect(), icon, iconPadding, description);
+                return result;
+            }
+
             public static void DrawEmptyComponentProperty(SerializedProperty property, string name, bool isDisplayEmpty)
             {
                 EcsGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabel(name), EditorStyles.label), property, name, isDisplayEmpty);

@@ -12,10 +12,11 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [NonSerialized] private bool _isInitSourceType = false;
 
         [DataMember, SerializeField] internal string _assemblyQualifiedName = string.Empty;
-        [DataMember, SerializeField] internal EcsMemberType _memberType = EcsMemberType.Undefined;
+        //[DataMember, SerializeField] internal EcsMemberType _memberType = EcsMemberType.Undefined;
 
         [DataMember, SerializeField] internal string _name = string.Empty;
         [DataMember, SerializeField] internal bool _isCustomName = false;
+        [DataMember, SerializeField] internal string _typeName = string.Empty;
         [DataMember, SerializeField] internal MetaColor _color = MetaColor.BlackColor;
         [DataMember, SerializeField] internal bool _isCustomColor = false;
         [DataMember, SerializeField] internal string _autor = string.Empty;
@@ -24,15 +25,17 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [DataMember, SerializeField] internal string _group = string.Empty;
         [DataMember, SerializeField] internal string[] _tags = Array.Empty<string>();
 
+        [DataMember, SerializeField] internal bool _isHidden = false;
+
 
         public string AssemblyQualifiedName
         {
             get { return _assemblyQualifiedName; }
         }
-        public EcsMemberType EcsMemberType
-        {
-            get { return _memberType; }
-        }
+        //public EcsMemberType EcsMemberType
+        //{
+        //    get { return _memberType; }
+        //}
         public string Name
         {
             get { return _name; }
@@ -40,6 +43,10 @@ namespace DCFApixels.DragonECS.Unity.Docs
         public bool IsCustomName
         {
             get { return _isCustomName; }
+        }
+        public string TypeName
+        {
+            get { return _typeName; }
         }
         public MetaColor Color
         {
@@ -65,15 +72,20 @@ namespace DCFApixels.DragonECS.Unity.Docs
         {
             get { return _tags; }
         }
+        public bool IsHidden
+        {
+            get { return _isHidden; }
+        }
 
         public DragonDocsMeta(TypeMeta meta)
         {
             _sourceType = meta.Type;
             _assemblyQualifiedName = meta.Type.AssemblyQualifiedName;
-            _memberType = meta.EcsMemberType;
+            //_memberType = meta.EcsMemberType;
 
             _name = meta.Name;
             _isCustomName = meta.IsCustomName;
+            _typeName = meta.TypeName;
             _color = meta.Color;
             _isCustomColor = meta.IsCustomColor;
             _autor = meta.Description.Author;
@@ -94,6 +106,8 @@ namespace DCFApixels.DragonECS.Unity.Docs
             {
                 _tags[i] = meta.Tags[i];
             }
+
+            _isHidden = meta.IsHidden;
         }
 
         public bool TryGetSourceType(out Type type)
@@ -111,11 +125,8 @@ namespace DCFApixels.DragonECS.Unity.Docs
 
         int IComparable<DragonDocsMeta>.CompareTo(DragonDocsMeta other)
         {
-            //    int c = string.Compare(_group, other._group);
-            //    //return c == 0 ? c : string.Compare(_name, other._name);
-            //    return c;
-            int c = string.Compare(_name, other._name);
-            return c == 0 ? c : string.Compare(_group, other._group);
+            int c = string.Compare(_group, other._group);
+            return c == 0 ? string.Compare(_name, other._name) : c;
         }
     }
 }

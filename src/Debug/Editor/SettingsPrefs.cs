@@ -14,14 +14,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class SettingsPrefs : ScriptableSingleton<SettingsPrefs>
     {
         [SerializeField]
+        private bool _isUseCustomNames = true;
+        public bool IsUseCustomNames
+        {
+            get => _isUseCustomNames;
+            set
+            {
+                if (_isUseCustomNames != value)
+                {
+                    _isUseCustomNames = value;
+                    AutoSave();
+                }
+            }
+        }
+        [SerializeField]
         private bool _isShowInterfaces = false;
         public bool IsShowInterfaces
         {
             get => _isShowInterfaces;
             set
             {
-                _isShowInterfaces = value;
-                Save(false);
+                if (_isShowInterfaces != value)
+                {
+                    _isShowInterfaces = value;
+                    AutoSave();
+                }
             }
         }
         [SerializeField]
@@ -31,8 +48,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get => _isShowHidden;
             set
             {
-                _isShowHidden = value;
-                Save(false);
+                if (_isShowHidden != value)
+                {
+                    _isShowHidden = value;
+                    AutoSave();
+                }
             }
         }
         [SerializeField]
@@ -42,23 +62,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get => _isShowRuntimeComponents;
             set
             {
-                _isShowRuntimeComponents = value;
-                Save(false);
+                if (_isShowRuntimeComponents != value)
+                {
+                    _isShowRuntimeComponents = value;
+                    AutoSave();
+                }
             }
         }
 
-        [SerializeField]
-        private bool _poolsToggle = false;
-        public bool PoolsToggle
-        {
-            get => _poolsToggle;
-            set
-            {
-                _poolsToggle = value;
-                Save(false);
-            }
-        }
-
+        //[SerializeField]
+        //private bool _poolsToggle = false;
+        //public bool PoolsToggle
+        //{
+        //    get => _poolsToggle;
+        //    set
+        //    {
+        //        _isChanged = _poolsToggle != value;
+        //        _poolsToggle = value;
+        //        AutoSave();
+        //    }
+        //}
 
         [SerializeField]
         private ComponentColorMode _componentColorMode = ComponentColorMode.Auto;
@@ -67,9 +90,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get => _componentColorMode;
             set
             {
-                _componentColorMode = value;
-                Save(false);
+                if (_componentColorMode != value)
+                {
+                    _componentColorMode = value;
+                    AutoSave();
+                }
             }
+        }
+
+        private void AutoSave()
+        {
+            Save(true);
+            Debug.Log("AutoSave");
         }
     }
 }

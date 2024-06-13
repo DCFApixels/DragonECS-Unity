@@ -4,8 +4,10 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
-    [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     internal class WorldMonitor : MonoBehaviour
     {
         private EcsWorld _world;
@@ -19,8 +21,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
     }
 
-    [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     internal class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener
     {
         private EcsWorld _world;

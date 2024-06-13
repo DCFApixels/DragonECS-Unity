@@ -1,22 +1,29 @@
 ﻿using DCFApixels.DragonECS.RunnersCore;
+using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Internal;
 
 namespace DCFApixels.DragonECS
 {
     [MetaName(nameof(DrawGizmos))]
-    [MetaColor(MetaColor.Orange)]
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "The process to run when EcsPipeline.DrawGizmos() is called.")]
     public interface IEcsGizmosProcess : IEcsProcess
     {
         public void DrawGizmos();
     }
     [MetaName(nameof(LateRun))]
-    [MetaColor(MetaColor.Orange)]
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "The process to run when EcsPipeline.LateRun() is called.")]
     public interface IEcsLateRunProcess : IEcsProcess
     {
         public void LateRun();
     }
     [MetaName(nameof(FixedRun))]
-    [MetaColor(MetaColor.Orange)]
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "The process to run when EcsPipeline.FixedRun() is called.")]
     public interface IEcsFixedRunProcess : IEcsProcess
     {
         public void FixedRun();
@@ -40,8 +47,10 @@ namespace DCFApixels.DragonECS
 }
 namespace DCFApixels.DragonECS.Unity.Internal
 {
-
-    [MetaColor(MetaColor.Orange)]
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     public class EcsLateGizmosRunner : EcsRunner<IEcsGizmosProcess>, IEcsGizmosProcess
     {
 #if DEBUG && !DISABLE_DEBUG
@@ -74,7 +83,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
 #endif
     }
 
-    [MetaColor(MetaColor.Orange)]
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     public class EcsLateRunRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
     {
 #if DEBUG && !DISABLE_DEBUG
@@ -106,7 +118,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
 #endif
     }
-    [MetaColor(MetaColor.Orange)]
+
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     public class EcsFixedRunRunner : EcsRunner<IEcsFixedRunProcess>, IEcsFixedRunProcess
     {
 #if DEBUG && !DISABLE_DEBUG

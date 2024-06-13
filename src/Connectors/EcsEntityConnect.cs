@@ -5,6 +5,7 @@ using UnityEngine;
 #region UNITY_EDITOR
 using UnityEditor;
 using DCFApixels.DragonECS.Unity.Internal;
+using DCFApixels.DragonECS.Unity;
 #endregion
 
 namespace DCFApixels.DragonECS
@@ -57,8 +58,8 @@ namespace DCFApixels.DragonECS
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
     [MetaColor(MetaColor.Cyan)]
-    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Responsible for connecting the entity and GameObject using the EcsEntityConnect.ConnectWith method.")]
     public class EcsEntityConnect : MonoBehaviour
     {
         private entlong _entity;

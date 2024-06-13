@@ -9,19 +9,19 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
     [FilePath(EcsConsts.AUTHOR + "/" + EcsConsts.FRAMEWORK_NAME + "/" + nameof(DragonDocsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     internal class DragonDocsPrefs : ScriptableSingleton<DragonDocsPrefs>
     {
-        [SerializeField] private DragonDocs _docs;
-        [SerializeField] private bool[] _isExpands;
+        [SerializeField] private DragonDocs m_docs;
+        [SerializeField] private bool[] m_isExpands;
 
         [NonSerialized] private bool _isInitInfos = false;
         [NonSerialized] private MetaGroupInfo[] _infos = null;
 
         public DragonDocs Docs
         {
-            get { return _docs; }
+            get { return m_docs; }
         }
         public Span<bool> IsExpands
         {
-            get { return new Span<bool>(_isExpands, 0, _docs.Metas.Length); }
+            get { return new Span<bool>(m_isExpands, 0, m_docs.Metas.Length); }
         }
         public ReadOnlySpan<MetaGroupInfo> Infos
         {
@@ -36,7 +36,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         {
             if (_isInitInfos) { return; }
             ReadOnlySpan<DragonDocsMeta> metas;
-            if (_docs == null || (metas = _docs.Metas).IsEmpty)
+            if (m_docs == null || (metas = m_docs.Metas).IsEmpty)
             {
                 _infos = Array.Empty<MetaGroupInfo>();
                 _isInitInfos = true;
@@ -53,7 +53,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 {
                     if (string.IsNullOrEmpty(groupPath))
                     {
-                        groups.Add(new MetaGroupInfo("<ROOT>", "<ROOT>", startIndex, i - startIndex, 0));
+                        groups.Add(new MetaGroupInfo("", "<OTHER>", startIndex, i - startIndex, 0));
                     }
                     else
                     {
@@ -73,12 +73,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         private void AddInfo(List<MetaGroupInfo> infos, string path, int startIndex, int length)
         {
             MetaGroupInfo lastInfo = infos[infos.Count - 1];
-            if (lastInfo.Depth == 0) { lastInfo = new MetaGroupInfo("", "", 0, 0, 0); }
-            int depth = 1;
+            //if (lastInfo.Depth == 0) { lastInfo = new MetaGroupInfo("", "", 0, 0, 0); }
+            int depth = 0;
             int lastSeparatorIndex = 0;
             int i = 0;
             int nameLength = 0;
-            if(lastInfo.Path.Length <= path.Length)
+            //if(lastInfo.Path.Length <= path.Length)
             {
                 for (int j = 0, jMax = lastInfo.Path.Length; j < jMax; j++)
                 {
@@ -123,11 +123,11 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
         public void Save(DragonDocs docs)
         {
-            _docs = docs;
-            if(_isExpands == null || _isExpands.Length != docs.Metas.Length)
+            m_docs = docs;
+            if(m_isExpands == null || m_isExpands.Length != docs.Metas.Length)
             {
-                Array.Resize(ref _isExpands, docs.Metas.Length);
-                _isExpands[0] = true;
+                Array.Resize(ref m_isExpands, docs.Metas.Length);
+                m_isExpands[0] = true;
             }
             _isInitInfos = false;
             _infos = null;

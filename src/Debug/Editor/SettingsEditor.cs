@@ -41,6 +41,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private void OnGUI()
         {
+            var prefs = SettingsPrefs.instance;
             float labelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
 
@@ -55,38 +56,35 @@ namespace DCFApixels.DragonECS.Unity.Editors
             rect.xMin += 9f;
             GUI.Label(rect, "Settings", EditorStyles.whiteLargeLabel);
 
-            EditorGUI.BeginChangeCheck();
-            Settings settings = new Settings();
-
-            GUILayout.BeginHorizontal();
-            settings.IsShowHidden = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowHidden, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            settings.IsShowInterfaces = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
-
-            GUILayout.BeginHorizontal();
-            settings.IsShowRuntimeComponents = EditorGUILayout.Toggle(SettingsPrefs.instance.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
-            GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
-            GUILayout.EndHorizontal();
-
-            settings.AutoColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.ComponentColorMode)), SettingsPrefs.instance.ComponentColorMode);
-
-            if (EditorGUI.EndChangeCheck())
+            //using (prefs.DisableAutoSave())
             {
-                SettingsPrefs.instance.IsShowHidden = settings.IsShowHidden;
-                SettingsPrefs.instance.IsShowInterfaces = settings.IsShowInterfaces;
-                SettingsPrefs.instance.IsShowRuntimeComponents = settings.IsShowRuntimeComponents;
-                SettingsPrefs.instance.ComponentColorMode = settings.AutoColorMode;
+                GUILayout.BeginHorizontal();
+                prefs.IsShowHidden = EditorGUILayout.Toggle(prefs.IsShowHidden, GUILayout.Width(checkBoxWidth));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                prefs.IsShowInterfaces = EditorGUILayout.Toggle(prefs.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                prefs.IsShowRuntimeComponents = EditorGUILayout.Toggle(prefs.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                prefs.IsUseCustomNames = EditorGUILayout.Toggle(prefs.IsUseCustomNames, GUILayout.Width(checkBoxWidth));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsUseCustomNames)), GUILayout.ExpandWidth(false));
+                GUILayout.EndHorizontal();
+
+                prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
             }
+
             GUILayout.EndVertical();
 
-
             GUILayout.Space(20f);
-            using (new EcsGUI.ColorScope(Color.white * 0.5f))
+            using (EcsGUI.SetColor(Color.white * 0.5f))
                 GUILayout.BeginVertical(EditorStyles.helpBox);
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
             GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
@@ -140,13 +138,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 this.isOn = isOn;
             }
             public static implicit operator DefineSymbolsInfo(string a) => new DefineSymbolsInfo(a, false);
-        }
-        private struct Settings
-        {
-            public bool IsShowHidden;
-            public bool IsShowInterfaces;
-            public bool IsShowRuntimeComponents;
-            public ComponentColorMode AutoColorMode;
         }
     }
 }

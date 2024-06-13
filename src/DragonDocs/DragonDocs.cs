@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
     public class DragonDocs
     {
         [DataMember, SerializeField] 
-        private readonly DragonDocsMeta[] _metas;
+        private DragonDocsMeta[] _metas;
         
         public ReadOnlySpan<DragonDocsMeta> Metas
         {
@@ -42,7 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (memberType.IsAssignableFrom(type) || Attribute.GetCustomAttributes(type, metaAttributeType, false).Length > 1)
+                    if ((type.IsInterface == false && type.IsAbstract == false && memberType.IsAssignableFrom(type)) || Attribute.GetCustomAttributes(type, metaAttributeType, false).Length > 1)
                     {
                         result.Add(type);
                     }

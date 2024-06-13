@@ -3,8 +3,10 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
-    [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     internal class PipelineMonitor : MonoBehaviour
     {
         private EcsPipeline _pipeline;
@@ -18,8 +20,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
     }
 
-    [MetaTags(MetaTags.HIDDEN)]
     [MetaColor(MetaColor.Gray)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaTags(MetaTags.HIDDEN)]
     internal class PipelineMonitorSystem : IEcsInit, IEcsPipelineMember, IEcsDestroy
     {
         private PipelineMonitor _monitor;

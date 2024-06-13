@@ -1,4 +1,5 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
+﻿using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using UnityEngine;
 
@@ -10,8 +11,8 @@ namespace DCFApixels.DragonECS
     }
 
     [MetaColor(MetaColor.Cyan)]
-    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, nameof(ScriptableObject) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     [CreateAssetMenu(fileName = nameof(ScriptableEntityTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptableEntityTemplate), order = 1)]
     public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateInternal
     {

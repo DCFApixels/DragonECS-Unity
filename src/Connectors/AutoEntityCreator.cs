@@ -1,3 +1,4 @@
+using DCFApixels.DragonECS.Unity;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
@@ -5,8 +6,8 @@ namespace DCFApixels.DragonECS
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(AutoEntityCreator), 30)]
     [MetaColor(MetaColor.Cyan)]
-    [MetaGroup(EcsConsts.FRAMEWORK_GROUP, EcsUnityConsts.UNITY_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Automatically creates an entity in the selected world and connects it to EcsEntityConnect.")]
     public class AutoEntityCreator : MonoBehaviour
     {
         [SerializeField]
