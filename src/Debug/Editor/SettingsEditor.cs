@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
+using UnityEditor.Build;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -19,7 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private List<DefineSymbolsInfo> _defineSymbols = null;
         private void InitDefines()
         {
-            string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
+            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
             _defineSymbols = new List<DefineSymbolsInfo>()
             {
                 nameof(EcsConsts.DISABLE_POOLS_EVENTS),
