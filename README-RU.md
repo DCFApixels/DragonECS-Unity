@@ -30,6 +30,7 @@
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
+- [Документация проекта](#документация-проекта)
 - [FAQ](#faq)
 
 </br>
@@ -197,16 +198,16 @@ int e = _world.NewEntity(someSamplate);
 
 * Упрощенная реализация:
 ```c#
-// Обязательно добавить [Serializable] к ттипу компонента
+// Обязательно добавить [Serializable] к типу компонента.
 [Serializable]
-struct SomeComponent : IEcsComponent { /*...*/ }
+struct SomeComponent : IEcsComponent { /* ... */ }
 class SomeComponentTemplate : ComponentTemplate<SomeComponent> { }
 ```
 
-* Упрощенная реализация для компонентов-тегов:
 ```c#
+// Тоже самое но для компонентов-тегов.
 [Serializable]
-struct SomeTagComponent : IEcsTagComponent { /*...*/ }
+struct SomeTagComponent : IEcsTagComponent { }
 class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```
 
@@ -215,7 +216,7 @@ class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 
 ```c#
 [Serializable] 
-struct SomeComponent : IEcsComponent { /*...*/ }
+struct SomeComponent : IEcsComponent { /* ... */ }
 class SomeComponentTemplate : IComponentTemplate
 {
     [SerializeField]
@@ -234,11 +235,13 @@ class SomeComponentTemplate : IComponentTemplate
 
 </details>
 
-В раскрывающемся при нажатии	`Add Component` меню выбора компонента поддердивается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
+В раскрывающемся при нажатии `Add Component` меню выбора компонента поддерживается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
 Компоненты в инспектрре по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в настройках фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
 
-Если у компонента есть мета-атрибут `[MetaDescription]`, то рядом с крестиком удаления компонента будет иконка подсказки, при наведении курсора отобразится в виде подсказки информация из `[MetaDescription]`.
+Если редактор смог автоматически определить связанный с компонентом скрипт, то слева от крестика удаления компонента будет иконка файла. Клик по иконке выделит файл скрипта в папке проекта, двойной клик откроет скрип для редактирования. Связанный файл ищется по сопоставлению имени типа и имени файла скрипта. 
+
+Если у компонента есть мета-атрибут `[MetaDescription]`, то слева от крестика удаления компонента будет иконка подсказки, при наведении курсора покажется информация из `[MetaDescription]`.
 
 </br>
 
@@ -406,6 +409,16 @@ public class EcsRoot : MonoBehaviour
     // ...
 }
 ```
+
+</br>
+
+# Документация проекта
+В интеграции так же есть окно документации проекта на основе Мета-Атрибутов. Открывается окно тут `Tools -> DragonECS -> Documentation`. Документация формируется при первом открытии окна и при нажатии кнопки `Update`.
+
+</br>
+
+# Окно настроек
+В окне настроек есть несколько настроек интеграции, включая возможность менять режимы отображения компонентов в инспекторе. Внизу расположены удобные переключатели для используемых в фреймворке define директив процессора.
 
 </br>
 
