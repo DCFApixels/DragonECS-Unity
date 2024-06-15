@@ -120,11 +120,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (scriptsAssets.TryGetValue(type, out script) == false)
             {
                 script = null;
-                var guids = AssetDatabase.FindAssets($"{type.Name} t:MonoScript");
+                string name = type.Name;
+                int indexOf = name.LastIndexOf('`');
+                if(indexOf >= 0)
+                {
+                    name = name.Substring(0, indexOf);
+                }
+                var guids = AssetDatabase.FindAssets($"{name} t:MonoScript");
                 for (var i = 0; i < guids.Length; i++)
                 {
                     MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guids[i]));
-                    if (textAsset != null && textAsset.name == type.Name)
+                    if (textAsset != null && textAsset.name == name)
                     {
                         script = textAsset;
                         break;
