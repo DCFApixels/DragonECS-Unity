@@ -181,10 +181,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.yMax += HeadIconsRect.height;
             optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * padding * 2f;
-            if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
-            {
-                componentProperty.isExpanded = !componentProperty.isExpanded;
-            }
+            bool cancelExpanded = EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp;
 
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
@@ -196,6 +193,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 OnRemoveComponentAt(index);
                 return;
+            }
+            //Canceling isExpanded
+            if (cancelExpanded)
+            {
+                componentProperty.isExpanded = !componentProperty.isExpanded;
             }
             //Edit script button
             if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))

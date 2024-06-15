@@ -203,6 +203,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (EcsGUI.CloseButton(optionButton))
             {
                 componentRefProp.managedReferenceValue = null;
+                return;
             }
             //Edit script button
             if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))

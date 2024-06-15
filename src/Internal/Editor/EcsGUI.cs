@@ -224,43 +224,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        public readonly ref struct ScriptAssetButtonCommand
-        {
-            public enum Command
-            {
-                None = 0,
-                OneClick = 1,
-                DoubleClick = 2,
-            }
-            public readonly Command command;
-            public ScriptAssetButtonCommand(Command command)
-            {
-                this.command = command;
-            }
-            public void Execute(MonoScript script)
-            {
-                switch (command)
-                {
-                    case Command.OneClick:
-                        EditorGUIUtility.PingObject(script);
-                        break;
-                    case Command.DoubleClick:
-                        AssetDatabase.OpenAsset(script);
-                        break;
-                }
-            }
-        }
-        public static ScriptAssetButtonCommand ScriptAssetButton(Rect position, MonoScript script)
+        public static void ScriptAssetButton(Rect position, MonoScript script)
         {
             var current = Event.current;
-
             var hover = IconHoverScan(position, current);
-
             using (new ColorScope(new Color(1f, 1f, 1f, hover ? 1f : 0.8f)))
             {
                 DrawIcon(position, Icons.Instance.FileIcon, hover ? 1f : 2f, "One click - Ping File. Double click - Edit Script");
             }
-
             if (hover)
             {
                 if (current.type == EventType.MouseUp)
@@ -272,7 +243,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     AssetDatabase.OpenAsset(script);
                 }
             }
-            return default;
         }
         public static bool CloseButton(Rect position, string description = null)
         {
@@ -481,6 +451,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
+            public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
+            {
+                EcsGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);
+            }
             public static bool IconButton(Texture icon, params GUILayoutOption[] options)
             {
                 bool result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), options);
@@ -646,7 +620,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
                     {
                         optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                        ScriptAssetButton(optionButton, script);
+                        EcsGUI.ScriptAssetButton(optionButton, script);
                     }
                     //Description icon
                     if (string.IsNullOrEmpty(meta.Description.Text) == false)

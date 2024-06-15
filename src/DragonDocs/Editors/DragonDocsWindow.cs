@@ -251,6 +251,10 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                 GUILayout.BeginHorizontal();
                 GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
+                if (meta.TryGetSourceType(out System.Type targetType) && UnityEditorUtility.TryGetScriptAsset(targetType, out MonoScript script))
+                {
+                    EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(19f));
+                }
                 if (meta.IsCustomName)
                 {
                     using (EcsGUI.SetAlpha(0.64f)) using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
