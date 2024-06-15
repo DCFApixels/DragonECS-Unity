@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.Internal;
-using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 

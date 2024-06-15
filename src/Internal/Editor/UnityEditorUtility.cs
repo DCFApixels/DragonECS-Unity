@@ -94,7 +94,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return b.ToString();
         }
         #endregion
-
     }
 }
 
@@ -113,6 +112,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
+
+        private static Dictionary<Type, MonoScript> scriptsAssets = new Dictionary<Type, MonoScript>(256);
+
+        internal static bool TryGetScriptAsset(Type type, out MonoScript script)
+        {
+            if (scriptsAssets.TryGetValue(type, out script) == false)
+            {
+                script = null;
+                var guids = AssetDatabase.FindAssets($"{type.Name} t:MonoScript");
+                for (var i = 0; i < guids.Length; i++)
+                {
+                    MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guids[i]));
+                    if (textAsset != null && textAsset.name == type.Name)
+                    {
+                        script = textAsset;
+                        break;
+                    }
+                }
+                scriptsAssets.Add(type, script);
+            }
+            return script != null;
+        }
 
         #region Label
         public static GUIStyle GetInputFieldCenterAnhor()

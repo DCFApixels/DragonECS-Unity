@@ -4,8 +4,9 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
+using static PlasticGui.WebApi.Responses.CloudOrganizationHelpActionsResponse;
 using UnityComponent = UnityEngine.Component;
+using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -118,8 +119,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);
         internal readonly static Color RedColor = new Color32(255, 0, 75, 255);
 
-        private static readonly Rect RemoveButtonRect = new Rect(0f, 0f, 19f, 19f);
-        private static readonly Rect TooltipIconRect = new Rect(0f, 0f, 19f, 19f);
+        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
         public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
 
@@ -180,7 +180,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region small elems
         public static void DrawIcon(Rect position, Texture icon, float iconPadding, string description)
         {
-            if(position.width != position.height)
+            if (position.width != position.height)
             {
                 Vector2 center = position.center;
                 float size = Mathf.Min(position.width, position.height);
@@ -196,13 +196,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static (bool, bool) IconButtonGeneric(Rect position)
         {
-            Color dc = GUI.color;
-            GUI.color = Color.clear; //Хак чтобы сделать реакцию от курсора мыши без лага
-            bool result = GUI.Button(position, "", EditorStyles.miniButtonMid);
-            GUI.color = dc;
-
-            var current = Event.current;
-            return (GUI.enabled && HitTest(position, current), result);
+            using (SetAlpha(0))
+            {
+                bool result = GUI.Button(position, string.Empty, EditorStyles.miniButtonMid);
+                var current = Event.current;
+                return (GUI.enabled && HitTest(position, current), result);
+            }
+        }
+        public static bool IconHoverScan(Rect position, Event current)
+        {
+            using (Disable) using (SetAlpha(0))
+            {
+                GUI.Button(position, string.Empty, EditorStyles.miniButtonMid);
+                return HitTest(position, current);
+            }
         }
         public static bool IconButton(Rect position, Texture icon, float iconPadding, string description)
         {
@@ -217,18 +224,41 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 DrawIcon(position, Icons.Instance.HelpIcon, 0, description);
             }
         }
-        public static bool CloseButton(Rect position)
+        public static void ScriptAssetButton(Rect position, MonoScript script)
+        {
+            var current = Event.current;
+
+            var hover = IconHoverScan(position, current);
+
+            using (new ColorScope(new Color(1f, 1f, 1f, hover ? 1f : 0.8f)))
+            {
+                DrawIcon(position, Icons.Instance.FileIcon, hover ? 1f : 2f, "One click - Ping File. Double click - Edit Script");
+            }
+
+            if (hover)
+            {
+                if (current.type == EventType.MouseUp)
+                {
+                    EditorGUIUtility.PingObject(script);
+                }
+                else if (current.type == EventType.MouseDown && current.clickCount >= 2)
+                {
+                    AssetDatabase.OpenAsset(script);
+                }
+            }
+        }
+        public static bool CloseButton(Rect position, string description = null)
         {
             using (new ColorScope(new Color(1f, 1f, 1f, 0.8f)))
             {
                 var (hover, click) = IconButtonGeneric(position);
                 if (hover)
                 {
-                    DrawIcon(position, Icons.Instance.CloseIconOn, -4f, null);
+                    DrawIcon(position, Icons.Instance.CloseIconOn, -4f, description);
                 }
                 else
                 {
-                    DrawIcon(position, Icons.Instance.CloseIcon, 0, null);
+                    DrawIcon(position, Icons.Instance.CloseIcon, 0, description);
                 }
                 return click;
             }
@@ -560,17 +590,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
                     float padding = EditorGUIUtility.standardVerticalSpacing;
-                    Rect removeButtonRect = GUILayoutUtility.GetLastRect();
+                    Rect optionButton = GUILayoutUtility.GetLastRect();
 
                     GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
 
                     bool isRemoveComponent = false;
-                    removeButtonRect.yMin = removeButtonRect.yMax;
-                    removeButtonRect.yMax += RemoveButtonRect.height;
-                    removeButtonRect.xMin = removeButtonRect.xMax - RemoveButtonRect.width;
-                    removeButtonRect.center += Vector2.up * padding * 2f;
-                    if (CloseButton(removeButtonRect))
+                    optionButton.yMin = optionButton.yMax;
+                    optionButton.yMax += HeadIconsRect.height;
+                    optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+                    optionButton.center += Vector2.up * padding * 2f;
+                    if (CloseButton(optionButton))
                     {
                         isRemoveComponent = true;
                     }
@@ -590,12 +620,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
 
+
+                    if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+                    {
+                        optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                        EcsGUI.ScriptAssetButton(optionButton, script);
+                    }
                     if (string.IsNullOrEmpty(meta.Description.Text) == false)
                     {
-                        Rect tooltipIconRect = TooltipIconRect;
-                        tooltipIconRect.center = removeButtonRect.center;
-                        tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                        DescriptionIcon(tooltipIconRect, meta.Description.Text);
+                        optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                        DescriptionIcon(optionButton, meta.Description.Text);
                     }
 
                     GUILayout.EndVertical();

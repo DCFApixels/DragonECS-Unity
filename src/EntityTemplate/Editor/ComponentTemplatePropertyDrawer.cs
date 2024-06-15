@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using static PlasticGui.WebApi.Responses.CloudOrganizationHelpActionsResponse;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -187,14 +188,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Rect paddingPosition = RectUtility.AddPadding(position, Padding * 2f);
 
             #region Draw Component Block 
-            Rect removeButtonRect = position;
-            removeButtonRect.center -= new Vector2(0, removeButtonRect.height);
-            removeButtonRect.yMin = removeButtonRect.yMax;
-            removeButtonRect.yMax += HeadIconsRect.height;
-            removeButtonRect.xMin = removeButtonRect.xMax - HeadIconsRect.width;
-            removeButtonRect.center += Vector2.up * Padding * 1f;
+            Rect optionButton = position;
+            optionButton.center -= new Vector2(0, optionButton.height);
+            optionButton.yMin = optionButton.yMax;
+            optionButton.yMax += HeadIconsRect.height;
+            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+            optionButton.center += Vector2.up * Padding * 1f;
 
-            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
+            bool isRemoveComponent = EcsGUI.CloseButton(optionButton);
 
             if (propCount <= 0)
             {
@@ -228,12 +229,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 componentRefProp.managedReferenceValue = null;
             }
+
+            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.ScriptAssetButton(optionButton, script);
+            }
             if (string.IsNullOrEmpty(description) == false)
             {
-                Rect tooltipIconRect = HeadIconsRect;
-                tooltipIconRect.center = removeButtonRect.center;
-                tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                EcsGUI.DescriptionIcon(tooltipIconRect, description);
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.DescriptionIcon(optionButton, description);
             }
             #endregion
 

@@ -69,6 +69,12 @@ namespace DCFApixels.DragonECS.Unity.Internal
             result.center += addVector;
             return result;
         }
+        public static Rect MoveTo(in this Rect rect, Vector2 center)
+        {
+            Rect result = rect;
+            result.center = center;
+            return result;
+        }
         public static Rect Move(in this Rect rect, float addX, float addY)
         {
             return Move(rect, new Vector2(addX, addY));

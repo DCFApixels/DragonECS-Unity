@@ -46,10 +46,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     name = group.Name + name;
                 }
 
-                if (string.IsNullOrEmpty(description) == false)
-                {
-                    name = $"{name} [i]";
-                }
                 _genericMenu.AddItem(new GUIContent(name, description), false, OnAddComponent, dummy);
             }
 
@@ -179,18 +175,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-            Rect removeButtonRect = GUILayoutUtility.GetLastRect();
+            Rect optionButton = GUILayoutUtility.GetLastRect();
 
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
             #region Draw Component Block 
-            removeButtonRect.yMin = removeButtonRect.yMax;
-            removeButtonRect.yMax += HeadIconsRect.height;
-            removeButtonRect.xMin = removeButtonRect.xMax - HeadIconsRect.width;
-            removeButtonRect.center += Vector2.up * padding * 2f;
+            optionButton.yMin = optionButton.yMax;
+            optionButton.yMax += HeadIconsRect.height;
+            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+            optionButton.center += Vector2.up * padding * 2f;
 
-            bool isRemoveComponent = EcsGUI.CloseButton(removeButtonRect);
+            bool isRemoveComponent = EcsGUI.CloseButton(optionButton);
 
             if (propCount <= 0)
             {
@@ -213,12 +209,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 OnRemoveComponentAt(index);
             }
+
+            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.ScriptAssetButton(optionButton, script);
+            }
             if (string.IsNullOrEmpty(description) == false)
             {
-                Rect tooltipIconRect = HeadIconsRect;
-                tooltipIconRect.center = removeButtonRect.center;
-                tooltipIconRect.center -= Vector2.right * tooltipIconRect.width;
-                EcsGUI.DescriptionIcon(tooltipIconRect, description);
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.DescriptionIcon(optionButton, description);
             }
             #endregion
 

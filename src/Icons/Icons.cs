@@ -28,6 +28,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private Texture _labelIconType;
         [SerializeField]
         private Texture _labelIconMeta;
+        [SerializeField]
+        private Texture _fileIcon;
 
         internal Texture HelpIcon { get { return _helpIcon; } }
         internal Texture CloseIcon { get { return _closeIcon; } }
@@ -40,6 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         internal Texture VisibilityIconOff { get { return _visibilityIconOff; } }
         internal Texture LabelIconType { get { return _labelIconType; } }
         internal Texture LabelIconMeta { get { return _labelIconMeta; } }
+        internal Texture FileIcon { get { return _fileIcon; } }
 #endif
     }
 }
