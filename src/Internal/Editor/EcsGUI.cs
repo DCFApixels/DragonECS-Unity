@@ -599,12 +599,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     optionButton.yMax += HeadIconsRect.height;
                     optionButton.xMin = optionButton.xMax - 64;
                     optionButton.center += Vector2.up * padding * 2f;
+                    //Canceling isExpanded
                     if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
                     {
                         ref bool isExpanded = ref expandMatrix.Down();
                         isExpanded = !isExpanded;
                     }
-
 
                     GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
@@ -634,7 +634,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         pool.SetRaw(entityID, resultData);
                     }
-
 
                     GUILayout.EndVertical();
                 }

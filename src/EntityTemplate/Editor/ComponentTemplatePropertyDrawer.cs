@@ -192,6 +192,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.yMax += HeadIconsRect.height;
             optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * Padding * 1f;
+            //Canceling isExpanded
             if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
             {
                 componentProperty.isExpanded = !componentProperty.isExpanded;
@@ -217,6 +218,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                 EcsGUI.DescriptionIcon(optionButton, description);
             }
+
 
             if (propCount <= 0)
             {
