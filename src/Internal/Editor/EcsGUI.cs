@@ -223,7 +223,34 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 DrawIcon(position, Icons.Instance.HelpIcon, 0, description);
             }
         }
-        public static void ScriptAssetButton(Rect position, MonoScript script)
+
+        public readonly ref struct ScriptAssetButtonCommand
+        {
+            public enum Command
+            {
+                None = 0,
+                OneClick = 1,
+                DoubleClick = 2,
+            }
+            public readonly Command command;
+            public ScriptAssetButtonCommand(Command command)
+            {
+                this.command = command;
+            }
+            public void Execute(MonoScript script)
+            {
+                switch (command)
+                {
+                    case Command.OneClick:
+                        EditorGUIUtility.PingObject(script);
+                        break;
+                    case Command.DoubleClick:
+                        AssetDatabase.OpenAsset(script);
+                        break;
+                }
+            }
+        }
+        public static ScriptAssetButtonCommand ScriptAssetButton(Rect position)
         {
             var current = Event.current;
 
@@ -238,13 +265,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (current.type == EventType.MouseUp)
                 {
-                    EditorGUIUtility.PingObject(script);
+                    //EditorGUIUtility.PingObject(script);
+                    return new ScriptAssetButtonCommand(ScriptAssetButtonCommand.Command.OneClick);
                 }
                 else if (current.type == EventType.MouseDown && current.clickCount >= 2)
                 {
-                    AssetDatabase.OpenAsset(script);
+                    //AssetDatabase.OpenAsset(script);
+                    return new ScriptAssetButtonCommand(ScriptAssetButtonCommand.Command.DoubleClick);
                 }
             }
+            return default;
         }
         public static bool CloseButton(Rect position, string description = null)
         {
@@ -587,49 +617,53 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     object data = pool.GetRaw(entityID);
 
                     Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+                    
+                    Type componentType = pool.ComponentType;
+                    ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
 
                     float padding = EditorGUIUtility.standardVerticalSpacing;
                     Rect optionButton = GUILayoutUtility.GetLastRect();
+                    optionButton.yMin = optionButton.yMax;
+                    optionButton.yMax += HeadIconsRect.height;
+                    optionButton.xMin = optionButton.xMax - 64;
+                    optionButton.center += Vector2.up * padding * 2f;
+                    //EditorGUI.DrawRect(optionButton, Color.black);
+                    if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+                    {
+                        ref bool isExpanded = ref expandMatrix.Down();
+                        isExpanded = !isExpanded;
+                    }
+
 
                     GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
 
-                    bool isRemoveComponent = false;
-                    optionButton.yMin = optionButton.yMax;
-                    optionButton.yMax += HeadIconsRect.height;
+                    //Close button
                     optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-                    optionButton.center += Vector2.up * padding * 2f;
                     if (CloseButton(optionButton))
                     {
-                        isRemoveComponent = true;
+                        pool.Del(entityID);
+                        return;
                     }
-
-                    Type componentType = pool.ComponentType;
-                    ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
-                    bool changed = DrawRuntimeData(componentType, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData);
-                    if (changed || isRemoveComponent)
-                    {
-                        if (isRemoveComponent)
-                        {
-                            pool.Del(entityID);
-                        }
-                        else
-                        {
-                            pool.SetRaw(entityID, resultData);
-                        }
-                    }
-
-
+                    //Edit script button
                     if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
                     {
                         optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                        EcsGUI.ScriptAssetButton(optionButton, script);
+                        ScriptAssetButton(optionButton).Execute(script);
                     }
+                    //Description icon
                     if (string.IsNullOrEmpty(meta.Description.Text) == false)
                     {
                         optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                         DescriptionIcon(optionButton, meta.Description.Text);
                     }
+
+
+                    if (DrawRuntimeData(componentType, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
+                    {
+                        pool.SetRaw(entityID, resultData);
+                    }
+
 
                     GUILayout.EndVertical();
                 }

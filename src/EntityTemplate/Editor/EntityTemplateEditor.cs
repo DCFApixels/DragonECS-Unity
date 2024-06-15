@@ -4,6 +4,7 @@ using System;
 using System.Reflection;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -176,17 +177,39 @@ namespace DCFApixels.DragonECS.Unity.Editors
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
             Rect optionButton = GUILayoutUtility.GetLastRect();
+            optionButton.yMin = optionButton.yMax;
+            optionButton.yMax += HeadIconsRect.height;
+            optionButton.xMin = optionButton.xMax - 64;
+            optionButton.center += Vector2.up * padding * 2f;
+            //EditorGUI.DrawRect(optionButton, Color.black);
+            if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+            {
+                componentProperty.isExpanded = !componentProperty.isExpanded;
+            }
 
             EditorGUI.BeginChangeCheck();
             GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
             #region Draw Component Block 
-            optionButton.yMin = optionButton.yMax;
-            optionButton.yMax += HeadIconsRect.height;
+            //Close button
             optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-            optionButton.center += Vector2.up * padding * 2f;
-
-            bool isRemoveComponent = EcsGUI.CloseButton(optionButton);
+            if (EcsGUI.CloseButton(optionButton))
+            {
+                OnRemoveComponentAt(index);
+                return;
+            }
+            //Edit script button
+            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.ScriptAssetButton(optionButton).Execute(script);
+            }
+            //Description icon
+            if (string.IsNullOrEmpty(description) == false)
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.DescriptionIcon(optionButton, description);
+            }
 
             if (propCount <= 0)
             {
@@ -204,21 +227,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     Rect r = RectUtility.AddPadding(GUILayoutUtility.GetRect(label, EditorStyles.objectField), 0, 20f, 0, 0);
                     EditorGUI.PropertyField(r, componentProperty, label, true);
                 }
-            }
-            if (isRemoveComponent)
-            {
-                OnRemoveComponentAt(index);
-            }
-
-            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.ScriptAssetButton(optionButton, script);
-            }
-            if (string.IsNullOrEmpty(description) == false)
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.DescriptionIcon(optionButton, description);
             }
             #endregion
 

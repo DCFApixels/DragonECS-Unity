@@ -39,6 +39,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _ptr--;
         }
 
+        public ref bool Peek()
+        {
+            int _ptr = this._ptr + 1;
+            if (_ptr >= _count)
+            {
+                if (_count >= _flags.Length)
+                {
+                    Array.Resize(ref _flags, _flags.Length << 1);
+                }
+                _flags[_count++] = _ptr <= 1 ? TOP_DEFAULT : DEFAULT;
+            }
+            return ref _flags[_ptr];
+        }
+
         public ref bool Down()
         {
             _ptr++;

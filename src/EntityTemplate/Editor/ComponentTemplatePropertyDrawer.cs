@@ -186,15 +186,37 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Rect paddingPosition = RectUtility.AddPadding(position, Padding * 2f);
 
-            #region Draw Component Block 
             Rect optionButton = position;
             optionButton.center -= new Vector2(0, optionButton.height);
             optionButton.yMin = optionButton.yMax;
             optionButton.yMax += HeadIconsRect.height;
-            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+            optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * Padding * 1f;
+            //EditorGUI.DrawRect(optionButton, Color.black);
+            if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+            {
+                componentProperty.isExpanded = !componentProperty.isExpanded;
+            }
 
-            bool isRemoveComponent = EcsGUI.CloseButton(optionButton);
+            #region Draw Component Block 
+            //Close button
+            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+            if (EcsGUI.CloseButton(optionButton))
+            {
+                componentRefProp.managedReferenceValue = null;
+            }
+            //Edit script button
+            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.ScriptAssetButton(optionButton).Execute(script);
+            }
+            //Description icon
+            if (string.IsNullOrEmpty(description) == false)
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                EcsGUI.DescriptionIcon(optionButton, description);
+            }
 
             if (propCount <= 0)
             {
@@ -224,21 +246,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
 
-            if (isRemoveComponent)
-            {
-                componentRefProp.managedReferenceValue = null;
-            }
-
-            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.ScriptAssetButton(optionButton, script);
-            }
-            if (string.IsNullOrEmpty(description) == false)
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.DescriptionIcon(optionButton, description);
-            }
             #endregion
 
             if (EditorGUI.EndChangeCheck())
