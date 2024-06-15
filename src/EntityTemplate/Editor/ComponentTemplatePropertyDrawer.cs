@@ -192,7 +192,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.yMax += HeadIconsRect.height;
             optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * Padding * 1f;
-            //EditorGUI.DrawRect(optionButton, Color.black);
             if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
             {
                 componentProperty.isExpanded = !componentProperty.isExpanded;
@@ -209,7 +208,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
             {
                 optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.ScriptAssetButton(optionButton).Execute(script);
+                EcsGUI.ScriptAssetButton(optionButton, script);
             }
             //Description icon
             if (string.IsNullOrEmpty(description) == false)

@@ -250,7 +250,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
-        public static ScriptAssetButtonCommand ScriptAssetButton(Rect position)
+        public static ScriptAssetButtonCommand ScriptAssetButton(Rect position, MonoScript script)
         {
             var current = Event.current;
 
@@ -265,13 +265,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (current.type == EventType.MouseUp)
                 {
-                    //EditorGUIUtility.PingObject(script);
-                    return new ScriptAssetButtonCommand(ScriptAssetButtonCommand.Command.OneClick);
+                    EditorGUIUtility.PingObject(script);
                 }
                 else if (current.type == EventType.MouseDown && current.clickCount >= 2)
                 {
-                    //AssetDatabase.OpenAsset(script);
-                    return new ScriptAssetButtonCommand(ScriptAssetButtonCommand.Command.DoubleClick);
+                    AssetDatabase.OpenAsset(script);
                 }
             }
             return default;
@@ -627,7 +625,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     optionButton.yMax += HeadIconsRect.height;
                     optionButton.xMin = optionButton.xMax - 64;
                     optionButton.center += Vector2.up * padding * 2f;
-                    //EditorGUI.DrawRect(optionButton, Color.black);
                     if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
                     {
                         ref bool isExpanded = ref expandMatrix.Down();
@@ -649,7 +646,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
                     {
                         optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                        ScriptAssetButton(optionButton).Execute(script);
+                        ScriptAssetButton(optionButton, script);
                     }
                     //Description icon
                     if (string.IsNullOrEmpty(meta.Description.Text) == false)
