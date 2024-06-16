@@ -28,7 +28,7 @@ Versioning semantics - [Open](https://gist.github.com/DCFApixels/e53281d4628b19f
 ## Environment
 Requirements:
 + Dependency: [DragonECS](https://github.com/DCFApixels/DragonECS)
-+ Minimum version of C# 7.3;
++ Minimum version of C# 8.0;
 + Minimum version of Unity 2021.2.0;
 
 Tested with:
