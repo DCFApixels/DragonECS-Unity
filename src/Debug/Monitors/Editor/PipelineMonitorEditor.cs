@@ -85,9 +85,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
 
                 GUILayout.BeginHorizontal();
-                GUILayout.Label("<");
-                GUILayout.Label($"{markerSystem.name}", EditorStyles.boldLabel);
-                GUILayout.Label(">", GUILayout.ExpandWidth(false));
+                using (var scope = EcsGUI.SetAlignment(GUI.skin.label))
+                {
+
+                    scope.Target.alignment = TextAnchor.UpperLeft;
+                    GUILayout.Label("<", GUILayout.ExpandWidth(true));
+                    scope.Target.alignment = TextAnchor.UpperRight;
+                    using (EcsGUI.SetAlpha(0.64f))
+                    {
+                        GUILayout.Label($"{markerSystem.layerNameSpace}", GUILayout.ExpandWidth(false));
+                    }
+
+                    EcsGUI.Layout.RemoveDefaultSpacingDouble();
+
+                    scope.Target.alignment = TextAnchor.UpperLeft;
+                    using (EcsGUI.SetFontStyle(scope.Target, FontStyle.Bold))
+                    {
+                        GUILayout.Label($"{markerSystem.layerName}", GUILayout.ExpandWidth(false));
+                    }
+                    scope.Target.alignment = TextAnchor.UpperRight;
+                    GUILayout.Label(">", GUILayout.ExpandWidth(true));
+                }
                 GUILayout.EndHorizontal();
                 return;
             }

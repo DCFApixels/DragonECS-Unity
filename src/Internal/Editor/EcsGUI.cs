@@ -20,10 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _value = EditorGUIUtility.labelWidth;
                 EditorGUIUtility.labelWidth = value;
             }
-            public void Dispose()
-            {
-                EditorGUIUtility.labelWidth = _value;
-            }
+            public void Dispose() { EditorGUIUtility.labelWidth = _value; }
         }
         public struct ColorScope : IDisposable
         {
@@ -34,10 +31,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _value = GUI.color;
                 GUI.color = value;
             }
-            public void Dispose()
-            {
-                GUI.color = _value;
-            }
+            public void Dispose() { GUI.color = _value; }
         }
         public struct ContentColorScope : IDisposable
         {
@@ -48,10 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _value = GUI.contentColor;
                 GUI.contentColor = value;
             }
-            public void Dispose()
-            {
-                GUI.contentColor = _value;
-            }
+            public void Dispose() { GUI.contentColor = _value; }
         }
         public struct BackgroundColorScope : IDisposable
         {
@@ -62,10 +53,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _value = GUI.backgroundColor;
                 GUI.backgroundColor = value;
             }
-            public void Dispose()
-            {
-                GUI.backgroundColor = _value;
-            }
+            public void Dispose() { GUI.backgroundColor = _value; }
         }
         public struct IndentLevelScope : IDisposable
         {
@@ -75,29 +63,67 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _value = EditorGUI.indentLevel;
                 EditorGUI.indentLevel = value;
             }
-            public void Dispose()
-            {
-                EditorGUI.indentLevel = _value;
-            }
+            public void Dispose() { EditorGUI.indentLevel = _value; }
         }
         public struct AlignmentScope : IDisposable
         {
-            private readonly GUIStyle _target;
+            public readonly GUIStyle Target;
             private readonly TextAnchor _value;
             public AlignmentScope(GUIStyle target, TextAnchor value)
             {
-                _target = target;
-                _value = _target.alignment;
-                _target.alignment = value;
+                Target = target;
+                _value = Target.alignment;
+                Target.alignment = value;
             }
-            public void Dispose()
+            public AlignmentScope(GUIStyle target)
             {
-                _target.alignment = _value;
+                Target = target;
+                _value = Target.alignment;
             }
+            public void Dispose() { Target.alignment = _value; }
+        }
+        public struct FontSizeScope : IDisposable
+        {
+            public readonly GUIStyle Target;
+            private readonly int _value;
+            public FontSizeScope(GUIStyle target, int value)
+            {
+                Target = target;
+                _value = Target.fontSize;
+                Target.fontSize = value;
+            }
+            public FontSizeScope(GUIStyle target)
+            {
+                Target = target;
+                _value = Target.fontSize;
+            }
+            public void Dispose() { Target.fontSize = _value; }
+        }
+        public struct FontStyleScope : IDisposable
+        {
+            public readonly GUIStyle Target;
+            private readonly FontStyle _value;
+            public FontStyleScope(GUIStyle target, FontStyle value)
+            {
+                Target = target;
+                _value = Target.fontStyle;
+                Target.fontStyle = value;
+            }
+            public FontStyleScope(GUIStyle target)
+            {
+                Target = target;
+                _value = Target.fontStyle;
+            }
+            public void Dispose() { Target.fontStyle = _value; }
         }
         #endregion
 
+        public static FontStyleScope SetFontStyle(GUIStyle target, FontStyle value) => new FontStyleScope(target, value);
+        public static FontStyleScope SetFontStyle(GUIStyle target) => new FontStyleScope(target);
+        public static FontSizeScope SetFontSize(GUIStyle target, int value) => new FontSizeScope(target, value);
+        public static FontSizeScope SetFontSize(GUIStyle target) => new FontSizeScope(target);
         public static AlignmentScope SetAlignment(GUIStyle target, TextAnchor value) => new AlignmentScope(target, value);
+        public static AlignmentScope SetAlignment(GUIStyle target) => new AlignmentScope(target);
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
         public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
         public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
@@ -451,6 +477,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
+            public static void RemoveDefaultSpacingDouble()
+            {
+                GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
+            }
+            public static void RemoveDefaultSpacing()
+            {
+                GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -1f);
+            }
             public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
             {
                 EcsGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);

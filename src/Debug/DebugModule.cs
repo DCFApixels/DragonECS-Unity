@@ -1,10 +1,11 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
+﻿using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Internal;
 
 namespace DCFApixels.DragonECS
 {
     public sealed class DebugModule : IEcsModule
     {
-        public const string DEBUG_LAYER = nameof(DEBUG_LAYER);
+        public const string DEBUG_LAYER = EcsUnityConsts.DEBUG_LAYER;
         public EcsWorld[] _worlds;
         public DebugModule(params EcsWorld[] worlds)
         {
