@@ -477,14 +477,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static class Layout
         {
-            public static void RemoveDefaultSpacingDouble()
-            {
-                GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
-            }
-            public static void RemoveDefaultSpacing()
-            {
-                GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -1f);
-            }
             public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
             {
                 EcsGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);

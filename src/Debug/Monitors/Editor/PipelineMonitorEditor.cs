@@ -96,7 +96,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         GUILayout.Label($"{markerSystem.layerNameSpace}", GUILayout.ExpandWidth(false));
                     }
 
-                    EcsGUI.Layout.RemoveDefaultSpacingDouble();
+                    GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -4f);
 
                     scope.Target.alignment = TextAnchor.UpperLeft;
                     using (EcsGUI.SetFontStyle(scope.Target, FontStyle.Bold))
