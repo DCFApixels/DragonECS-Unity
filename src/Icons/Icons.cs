@@ -7,29 +7,29 @@ namespace DCFApixels.DragonECS.Unity.Internal
         //Everything inside #if UNITY_EDITOR is not serialized in the release build
 #if UNITY_EDITOR
         [SerializeField]
-        private Texture _helpIcon;
+        private Texture _helpIcon = null;
         [SerializeField]
-        private Texture _closeIcon;
+        private Texture _closeIcon = null;
         [SerializeField]
-        private Texture _closeIconOn;
+        private Texture _closeIconOn = null;
         [SerializeField]
-        private Texture _unlinkIcon;
+        private Texture _unlinkIcon = null;
         [SerializeField]
-        private Texture _auotsetIcon;
+        private Texture _auotsetIcon = null;
         [SerializeField]
-        private Texture _auotsetCascadeIcon;
+        private Texture _auotsetCascadeIcon = null;
         [SerializeField]
-        private Texture _searchIcon;
+        private Texture _searchIcon = null;
         [SerializeField]
-        private Texture _visibilityIconOn;
+        private Texture _visibilityIconOn = null;
         [SerializeField]
-        private Texture _visibilityIconOff;
+        private Texture _visibilityIconOff = null;
         [SerializeField]
-        private Texture _labelIconType;
+        private Texture _labelIconType = null;
         [SerializeField]
-        private Texture _labelIconMeta;
+        private Texture _labelIconMeta = null;
         [SerializeField]
-        private Texture _fileIcon;
+        private Texture _fileIcon = null;
 
         internal Texture HelpIcon { get { return _helpIcon; } }
         internal Texture CloseIcon { get { return _closeIcon; } }

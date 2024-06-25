@@ -11,8 +11,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomEditor(typeof(PipelineMonitor))]
     internal class PipelineMonitorEditor : Editor
     {
-        private MetaColorAttribute _fakeDebugColorAttribute = new MetaColorAttribute(190, 190, 190);
-        private Type _debugColorAttributeType = typeof(MetaColorAttribute);
         private GUIStyle _headerStyle;
         private GUIStyle _interfacesStyle;
         private Color _interfaceColor = new Color(0.96f, 1f, 0.16f);
