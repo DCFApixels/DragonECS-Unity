@@ -1,4 +1,7 @@
-﻿using System;
+﻿using DCFApixels.DragonECS.Unity.Internal;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
@@ -6,8 +9,26 @@ namespace DCFApixels.DragonECS
     [CreateAssetMenu(fileName = nameof(EcsPipelineTemplateSO), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsPipelineTemplateSO), order = 1)]
     public class EcsPipelineTemplateSO : ScriptableObject, IEcsModule
     {
-        private string[] _layers;
+        private static string[] _defaultLayers = new string[]
+        {
+            EcsConsts.PRE_BEGIN_LAYER,
+            EcsConsts.BEGIN_LAYER,
+            EcsConsts.BASIC_LAYER,
+            EcsConsts.END_LAYER,
+            EcsConsts.POST_END_LAYER,
+        };
+
+        [SerializeField]
+        private string[] _layers = _defaultLayers.ToArray();
+
+        [SerializeField]
         private SystemRecord[] _systems;
+
+        [SerializeField]
+        [SerializeReference]
+        [ReferenceButton]
+        private IEcsModule[] _modules;
+
         void IEcsModule.Import(EcsPipeline.Builder b)
         {
             b.Layers.MergeWith(_layers);
@@ -53,9 +74,64 @@ namespace DCFApixels.DragonECS
             }
         }
 
+        public void Validate()
+        {
+            ValidateLayers();
+            ValidateSystems();
+        }
+        private void ValidateLayers()
+        {
+            Dictionary<string, int> builtinLayerIndexes = new Dictionary<string, int>();
+            foreach (var item in _defaultLayers)
+            {
+                builtinLayerIndexes.Add(item, -1);
+            }
+
+            List<string> newLayers = _layers.Distinct().ToList();
+
+            for (int i = 0; i < newLayers.Count; i++)
+            {
+                var layer = newLayers[i];
+                if (builtinLayerIndexes.ContainsKey(layer))
+                {
+                    builtinLayerIndexes[layer] = i;
+                }
+            }
+
+            int lastNewLayersCount = newLayers.Count;
+            foreach (var pair in builtinLayerIndexes)
+            {
+                if(pair.Value < 0)
+                {
+                    newLayers.Add(pair.Key);
+                }
+            }
+            for (int i = lastNewLayersCount; i < newLayers.Count; i++)
+            {
+                builtinLayerIndexes[newLayers[i]] = i;
+            }
+
+            {
+                int i = 0;
+                foreach (var pair in builtinLayerIndexes.OrderBy(o => o.Value))
+                {
+                    newLayers[pair.Value] = _defaultLayers[i];
+                    i++;
+                }
+            }
+
+            _layers = newLayers.ToArray();
+        }
+        private void ValidateSystems()
+        {
+
+        }
+
+        [Serializable]
         public struct SystemRecord
         {
             [SerializeReference]
+            [ReferenceButton]
             public IEcsProcess system;
             public string layer;
             public int sortOrder;

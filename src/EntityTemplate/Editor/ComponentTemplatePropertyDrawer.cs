@@ -61,10 +61,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     name = group.Name + name;
                 }
 
-                if (string.IsNullOrEmpty(description) == false)
-                {
-                    name = $"{name} [i]";
-                }
                 _genericMenu.AddItem(new GUIContent(name, description), false, SelectComponent, dummy);
             }
 
