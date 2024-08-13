@@ -145,8 +145,8 @@ namespace DCFApixels.DragonECS
             {
                 var unityGameObjects = _world.GetPool<GameObjectConnect>();
                 unityGameObjects.TryDel(oldEntityID);
-                _connectedEntities.Remove(GetInstanceID());
             }
+            _connectedEntities.Remove(GetInstanceID());
             _world = null;
             _entity = entlong.NULL;
         }
