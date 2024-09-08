@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.Build;
 using UnityEngine;
@@ -21,16 +22,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void InitDefines()
         {
             string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
-            _defineSymbols = new List<DefineSymbolsInfo>()
-            {
-                nameof(EcsConsts.DISABLE_POOLS_EVENTS),
-                nameof(EcsConsts.ENABLE_DRAGONECS_DEBUGGER),
-                nameof(EcsConsts.ENABLE_DRAGONECS_ASSERT_CHEKS),
-                nameof(EcsConsts.REFLECTION_DISABLED),
-                nameof(EcsConsts.DISABLE_DEBUG),
-                nameof(EcsConsts.ENABLE_DUMMY_SPAN),
-                nameof(EcsConsts.DISABLE_CATH_EXCEPTIONS),
-            };
+            _defineSymbols = new List<DefineSymbolsInfo>(typeof(EcsDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false)));
             for (int i = 0; i < _defineSymbols.Count; i++)
             {
                 var symbol = _defineSymbols[i];

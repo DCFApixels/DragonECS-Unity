@@ -22,7 +22,7 @@ namespace DCFApixels.DragonECS
         private string[] _layers = _defaultLayers.ToArray();
 
         [SerializeField]
-        private SystemRecord[] _systems;
+        private Record[] _systems;
 
         [SerializeField]
         [SerializeReference]
@@ -34,17 +34,9 @@ namespace DCFApixels.DragonECS
             b.Layers.MergeWith(_layers);
             foreach (var s in _systems)
             {
-                if (s.system == null) { continue; }
+                if (s.target == null) { continue; }
 
-                int? sortOrder = s.isCustomSortOrder ? s.sortOrder : default(int?);
-                if (s.isUnique)
-                {
-                    b.AddUnique(s.system, s.layer, sortOrder);
-                }
-                else
-                {
-                    b.Add(s.system, s.layer, sortOrder);
-                }
+                b.Add(s.target, s.parameters);
             }
         }
 
@@ -53,11 +45,11 @@ namespace DCFApixels.DragonECS
             EcsPipelineTemplate result = new EcsPipelineTemplate();
             result.layers = new string[_layers.Length];
             Array.Copy(_layers, result.layers, _layers.Length);
-            result.systems = new EcsPipelineTemplate.SystemRecord[_systems.Length];
+            result.systems = new EcsPipelineTemplate.AddCommand[_systems.Length];
             for (int i = 0; i < result.systems.Length; i++)
             {
                 ref var s = ref _systems[i];
-                result.systems[i] = new EcsPipelineTemplate.SystemRecord(s.system, s.layer, s.NullableSortOrder, s.isUnique);
+                result.systems[i] = new EcsPipelineTemplate.AddCommand(s.target, s.parameters);
             }
             return result;
         }
@@ -66,11 +58,11 @@ namespace DCFApixels.DragonECS
         {
             _layers = new string[template.layers.Length];
             Array.Copy(template.layers, _layers, template.layers.Length);
-            _systems = new SystemRecord[template.systems.Length];
+            _systems = new Record[template.systems.Length];
             for (int i = 0; i < _systems.Length; i++)
             {
                 ref var s = ref template.systems[i];
-                _systems[i] = new SystemRecord(s.system, s.layer, s.NullableSortOrder, s.isUnique);
+                _systems[i] = new Record(s.target, s.parameters);
             }
         }
 
@@ -128,23 +120,16 @@ namespace DCFApixels.DragonECS
         }
 
         [Serializable]
-        public struct SystemRecord
+        public struct Record
         {
             [SerializeReference]
             [ReferenceButton]
-            public IEcsProcess system;
-            public string layer;
-            public int sortOrder;
-            public bool isCustomSortOrder;
-            public bool isUnique;
-            public int? NullableSortOrder { get { return isCustomSortOrder ? sortOrder : default(int?); } }
-            public SystemRecord(IEcsProcess system, string layer, int? sortOrder, bool isUnique)
+            public object target;
+            public AddParams parameters;
+            public Record(object target, AddParams parameters)
             {
-                this.system = system;
-                this.layer = layer;
-                this.sortOrder = sortOrder.HasValue ? sortOrder.Value : 0;
-                isCustomSortOrder = sortOrder.HasValue;
-                this.isUnique = isUnique;
+                this.target = target;
+                this.parameters = parameters;
             }
         }
     }
