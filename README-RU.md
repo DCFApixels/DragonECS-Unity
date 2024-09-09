@@ -11,14 +11,35 @@
 
 # Интеграция с Unity для [DragonECS](https://github.com/DCFApixels/DragonECS)
 
-| Languages: | [Русский](https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md) | [English(WIP)](https://github.com/DCFApixels/DragonECS-Unity) |
-| :--- | :--- | :--- |
+<table>
+  <tr></tr>
+  <tr>
+    <td colspan="3">Readme Languages:</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td nowrap width="100">
+      <a href="https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md">
+        <img src="https://github.com/user-attachments/assets/3c699094-f8e6-471d-a7c1-6d2e9530e721"></br>
+        <span>Русский</span>
+      </a>  
+    </td>
+    <td nowrap width="100">
+      <a href="https://github.com/DCFApixels/DragonECS-Unity">
+        <img src="https://github.com/user-attachments/assets/30528cb5-f38e-49f0-b23e-d001844ae930"></br>
+        <span>English(WIP)</span>
+      </a>  
+    </td>
+  </tr>
+</table>
+
+</br>
 
 Расширение добавит набор инструментов для отладки и связи с движком Unity.
 
 > [!WARNING]
 > Проект в стадии разработки. API может меняться.  
-> Readme еще не завершен
+> Readme еще не завершен, если есть не ясные моменты, вопросы можно задать тут [Обратная связь](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D0%BD%D0%B0%D1%8F-%D1%81%D0%B2%D1%8F%D0%B7%D1%8C)
 
 # Оглавление
 - [Установка](#установка)
@@ -137,25 +158,25 @@ EcsDebug.Break();
 </br>
 
 # Шаблоны
-Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовавыть интерфейс  `ITemplateNode`. 
+Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовывать интерфейс  `ITemplateNode`. 
 ```c#
-ITemplateNode someSamplate = /*...*/;
+ITemplateNode someTemplate = /*...*/;
 //...
 foreach (var e in _world.Where(out Aspect a))
 {
     // Применение шаблона сущности.
-    someSamplate.Apply(e, _world.id);
+    someTemplate.Apply(e, _world.id);
 }
 ```
 ```c#
 // Применение шаблона сразу при создании сущности.
-int e = _world.NewEntity(someSamplate);
+int e = _world.NewEntity(someTemplate);
 ```
 По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
 
 ## ScriptableEntityTemplate
 Хранится как отдельный ассет. Наследуется от `ScriptableObject`.
-Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
+Действия чтобы создать `ScriptableEntityTemplate` ассет: 
 
 <details>
 <summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate.</summary>
@@ -252,9 +273,9 @@ class SomeComponentTemplate : IComponentTemplate
 </br>
 
 ### Применение шаблонов компонентов вне стандартных шаблонов сущностей
-При необходимости создания кастомного шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
+При необходимости создания пользовательского шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
 ```c#
-// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTempalte
+// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTemplate
 // и отображает шаблон компонента аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
 [SerializeReference, ComponentTemplateReference]
 private IComponentTempalte _someComponent1;
@@ -439,4 +460,4 @@ public class EcsRoot : MonoBehaviour
 
 # FAQ
 ## Не могу повесить EcsEntityConncet или другие компоненты
-Такое может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
+Такое иногда может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
