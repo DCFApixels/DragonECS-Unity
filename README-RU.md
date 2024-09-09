@@ -5,20 +5,41 @@
 <p align="center">
 <img alt="Version" src="https://img.shields.io/github/package-json/v/DCFApixels/DragonECS-Unity?color=%23ff4e85&style=for-the-badge">
 <img alt="GitHub" src="https://img.shields.io/github/license/DCFApixels/DragonECS-Unity?color=ff4e85&style=for-the-badge">
-<a href="https://discord.gg/kqmJjExuCf"><img alt="Discord" src="https://img.shields.io/discord/1111696966208999525?color=%2300b269&label=Discord&logo=Discord&logoColor=%23ffffff&style=for-the-badge"></a>
-<a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=IbDcH43vhfArb30luGMP1TMXB3GCHzxm&authKey=s%2FJfqvv46PswFq68irnGhkLrMR6y9tf%2FUn2mogYizSOGiS%2BmB%2B8Ar9I%2Fnr%2Bs4oS%2B&noverify=0&group_code=949562781"><img alt="QQ" src="https://img.shields.io/badge/QQ-JOIN-00b269?logo=tencentqq&style=for-the-badge"></a>
+<a href="https://discord.gg/kqmJjExuCf"><img alt="Discord" src="https://img.shields.io/badge/Discord-JOIN-00b269?logo=discord&logoColor=%23ffffff&style=for-the-badge"></a>
+<a href="http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=IbDcH43vhfArb30luGMP1TMXB3GCHzxm&authKey=s%2FJfqvv46PswFq68irnGhkLrMR6y9tf%2FUn2mogYizSOGiS%2BmB%2B8Ar9I%2Fnr%2Bs4oS%2B&noverify=0&group_code=949562781"><img alt="QQ" src="https://img.shields.io/badge/QQ-JOIN-00b269?logo=tencentqq&logoColor=%23ffffff&style=for-the-badge"></a>
 </p>
 
 # Интеграция с Unity для [DragonECS](https://github.com/DCFApixels/DragonECS)
 
-| Languages: | [Русский](https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md) | [English(WIP)](https://github.com/DCFApixels/DragonECS-Unity) |
-| :--- | :--- | :--- |
+<table>
+  <tr></tr>
+  <tr>
+    <td colspan="3">Readme Languages:</td>
+  </tr>
+  <tr></tr>
+  <tr>
+    <td nowrap width="100">
+      <a href="https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md">
+        <img src="https://github.com/user-attachments/assets/3c699094-f8e6-471d-a7c1-6d2e9530e721"></br>
+        <span>Русский</span>
+      </a>  
+    </td>
+    <td nowrap width="100">
+      <a href="https://github.com/DCFApixels/DragonECS-Unity">
+        <img src="https://github.com/user-attachments/assets/30528cb5-f38e-49f0-b23e-d001844ae930"></br>
+        <span>English(WIP)</span>
+      </a>  
+    </td>
+  </tr>
+</table>
 
-Расширение добавит набор инструментов для дебага и связи с движком Unity.
+</br>
+
+Расширение добавит набор инструментов для отладки и связи с движком Unity.
 
 > [!WARNING]
 > Проект в стадии разработки. API может меняться.  
-> Readme еще не завершен
+> Readme еще не завершен, если есть не ясные моменты, вопросы можно задать тут [Обратная связь](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D0%BD%D0%B0%D1%8F-%D1%81%D0%B2%D1%8F%D0%B7%D1%8C)
 
 # Оглавление
 - [Установка](#установка)
@@ -30,6 +51,8 @@
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
+- [Документация проекта](#документация-проекта)
+- [Окно настроек](#окно-настроек)
 - [FAQ](#faq)
 
 </br>
@@ -39,10 +62,10 @@
 ## Окружение
 Обязательные требования:
 + Зависимость: [DragonECS](https://github.com/DCFApixels/DragonECS)
-+ Минимальная версия C# 7.3;
++ Минимальная версия C# 8.0;
 + Минимальная версия Unity 2021.2.0;
 
-Протестированно:
+Протестировано:
 + **Unity:** Минимальная версия 2021.2.0;
 
 ## Установка для Unity
@@ -51,7 +74,7 @@
 ```
 https://github.com/DCFApixels/DragonECS-Unity.git
 ```
-* ### В виде иходников
+* ### В виде исходников
 Фреймворк так же может быть добавлен в проект в виде исходников.
 
 </br>
@@ -71,17 +94,17 @@ _pipeline = EcsPipeline.New()
     .BuildAndInit();
 ```
 ## Debug Сервис
-`UnityDebugService`- реализация [Debug-сервиса для `EcsDebug`](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#ecsdebug). В редакторе по умолчанию автоматически инициализируется и связывает `EcsDebug.Print` с консолью юнити, `EcsProfilerMarker` c профайлером и т.д.
+`UnityDebugService`- реализация [Debug-сервиса для `EcsDebug`](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#ecsdebug). В редакторе по умолчанию автоматически инициализируется и связывает `EcsDebug.Print` с консолью Unity, `EcsProfilerMarker` c профайлером и т.д.
 ```c#
 //Ручная активация.
 UnityDebugService.Activate();
 
-//Выведет сообщение в консоле Unity.
+//Выведет сообщение в консоли Unity.
 EcsDebug.Print(); 
 
 var someMarker = new EcsProfilerMarker("SomeMarker");
 someMarker.Begin();
-//время выполнения этого участка будет отражено в профайлере юнити.
+//время выполнения этого участка будет отражено в профайлере Unity.
 someMarker.End();
 
 //Остановка игрового режима.
@@ -106,7 +129,7 @@ EcsDebug.Break();
 -----
 
 * ### `PipelineProcessMonitor` 
-Отображает в виде матрицы процессы и сситемы. Системы отображабтся в порядке их выполнения. Точка в пересечении системы и процесса означает что эта система является частью этого процесса.
+Отображает в виде матрицы процессы и системы. Системы отображаются в порядке их выполнения. Точка в пересечении системы и процесса означает что эта система является частью этого процесса.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c1a7960a-d65a-4f22-9597-fd863ff2b00c">   
@@ -124,7 +147,7 @@ EcsDebug.Break();
 -----
 
 * ### `EntityMonitor`
-Показывает состояние сущности мира. На кажду сущность в мире создается отдельынй монитор. Все мониторы сущностей помещаются в монитор мира.
+Показывает состояние сущности мира. На каждую сущность в мире создается отдельный монитор. Все мониторы сущностей помещаются в монитор мира.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1">   
@@ -135,25 +158,25 @@ EcsDebug.Break();
 </br>
 
 # Шаблоны
-Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовавыть интерфейс  `ITemplateNode`. 
+Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовывать интерфейс  `ITemplateNode`. 
 ```c#
-ITemplateNode someSamplate = /*...*/;
+ITemplateNode someTemplate = /*...*/;
 //...
 foreach (var e in _world.Where(out Aspect a))
 {
     // Применение шаблона сущности.
-    someSamplate.Apply(e, _world.id);
+    someTemplate.Apply(e, _world.id);
 }
 ```
 ```c#
 // Применение шаблона сразу при создании сущности.
-int e = _world.NewEntity(someSamplate);
+int e = _world.NewEntity(someTemplate);
 ```
 По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
 
 ## ScriptableEntityTemplate
-Хранится как отдельынй ассет. Наследуется от `ScriptableObject`.
-Дейсвия чтобы создать `ScriptableEntityTemplate` ассет: 
+Хранится как отдельный ассет. Наследуется от `ScriptableObject`.
+Действия чтобы создать `ScriptableEntityTemplate` ассет: 
 
 <details>
 <summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate.</summary>
@@ -173,7 +196,7 @@ int e = _world.NewEntity(someSamplate);
 -----
 
 ## MonoEntityTemplate
-Крепится к GameObject. Наследуется от `MonoBehaviour`. 
+Крепится к `GameObject`. Наследуется от `MonoBehaviour`. 
 
 <details>
 <summary>Повесить компонент: Add Component > DragonECS > MonoEntityTemplate.</summary>
@@ -193,20 +216,22 @@ int e = _world.NewEntity(someSamplate);
 -----
 
 ## Шаблон компонента
+
+### Реализация
 Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это типы реализующие `IComponentTemplate`. 
 
 * Упрощенная реализация:
 ```c#
-// Обязательно добавить [Serializable] к ттипу компонента
+// Обязательно добавить [Serializable] к типу компонента.
 [Serializable]
-struct SomeComponent : IEcsComponent { /*...*/ }
+struct SomeComponent : IEcsComponent { /* ... */ }
 class SomeComponentTemplate : ComponentTemplate<SomeComponent> { }
 ```
 
-* Упрощенная реализация для компонентов-тегов:
 ```c#
+// Тоже самое но для компонентов-тегов.
 [Serializable]
-struct SomeTagComponent : IEcsTagComponent { /*...*/ }
+struct SomeTagComponent : IEcsTagComponent { }
 class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```
 
@@ -215,7 +240,7 @@ class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 
 ```c#
 [Serializable] 
-struct SomeComponent : IEcsComponent { /*...*/ }
+struct SomeComponent : IEcsComponent { /* ... */ }
 class SomeComponentTemplate : IComponentTemplate
 {
     [SerializeField]
@@ -233,18 +258,24 @@ class SomeComponentTemplate : IComponentTemplate
 ```
 
 </details>
+</br>
 
-В раскрывающемся при нажатии	`Add Component` меню выбора компонента поддердивается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
-Компоненты в инспектрре по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в настройках фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
+### Кастомизирование отображения
+В раскрывающемся при нажатии `Add Component` меню выбора компонента поддерживается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
-Если у компонента есть мета-атрибут `[MetaDescription]`, то рядом с крестиком удаления компонента будет иконка подсказки, при наведении курсора отобразится в виде подсказки информация из `[MetaDescription]`.
+Компоненты в инспекторе по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в [окне настроек](#окно-настроек) фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
+
+Если редактор смог автоматически определить связанный с компонентом скрипт, то слева от крестика удаления компонента будет иконка файла. Клик по иконке выделит файл скрипта в папке проекта, двойной клик откроет скрип для редактирования. Связанный файл ищется по сопоставлению имени типа и имени файла скрипта. 
+
+Если у компонента есть мета-атрибут `[MetaDescription]`, то слева от крестика удаления компонента будет иконка подсказки, при наведении курсора покажется информация из `[MetaDescription]`.
 
 </br>
 
-При необходимости создания кастомного шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
+### Применение шаблонов компонентов вне стандартных шаблонов сущностей
+При необходимости создания пользовательского шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
 ```c#
-// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTempalte
+// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTemplate
 // и отображает шаблон компонента аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
 [SerializeReference, ComponentTemplateReference]
 private IComponentTempalte _someComponent1;
@@ -266,11 +297,11 @@ EcsEntityConnect connect = /*...*/;
 entlong entity = _world.NewEntityLong();
 
 // Связывание сущности с GameObject.
-// Автоматически добавляется GameObjectConnect в сущность.
-// Автоматическки применяются шаблоны.
+// Автоматически добавляется GameObjectConnect в сущность
+// и применяются шаблоны.
 connect.ConnectWith(entity);
 
-// Или создать без применения шаблнов.
+// Или создать без применения шаблонов.
 connect.ConnectWith(entity, false);
 
 // Отвязать.
@@ -296,7 +327,7 @@ connect.Disconnect();
 
 ---
 
-`AutoEntityCreator` автоматический создает сущность и связывает с GameObject. В инспекторе ему нужно указать `EcsEntityConnect` с которым связывать сущность и [Провайдер мира](#world-provider) в котормо создать сущность.
+`AutoEntityCreator` автоматический создает сущность и связывает с GameObject. В инспекторе ему нужно указать `EcsEntityConnect` с которым связывать сущность и [Провайдер мира](#world-provider) в котором создать сущность.
 
 <details>
 <summary>Повесить компонент: Add Component > DragonECS > AutoEntityCreator.</summary>
@@ -409,6 +440,24 @@ public class EcsRoot : MonoBehaviour
 
 </br>
 
+# Документация проекта
+В интеграции так же есть окно документации проекта на основе Мета-Атрибутов. Открыть документацию: `Tools > DragonECS > Documentation`. Документация формируется при первом открытии окна и при нажатии кнопки `Update`.
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/f5795823-aeae-45df-8e25-db64df837513">   
+</p>
+
+</br>
+
+# Окно настроек
+В окне настроек есть несколько опций, включая возможность менять режимы отображения компонентов в инспекторе. Внизу расположены удобные переключатели для используемых в фреймворке define значения для директив процессора. Открыть документацию: `Tools > DragonECS > Settings`.
+
+<p align="center">
+<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
+</p>
+
+</br>
+
 # FAQ
 ## Не могу повесить EcsEntityConncet или другие компоненты
-Такое может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
+Такое иногда может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
