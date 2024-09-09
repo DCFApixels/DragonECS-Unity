@@ -57,20 +57,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void OnAddComponent(object obj)
         {
             Type componentType = obj.GetType();
+            IComponentTemplate cmptmp = (IComponentTemplate)obj;
             if (this.target is ITemplateInternal target)
             {
                 SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
-                for (int i = 0; i < componentsProp.arraySize; i++)
+                if (cmptmp.IsUnique)
                 {
-                    if (componentsProp.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+                    for (int i = 0, iMax = componentsProp.arraySize; i < iMax; i++)
                     {
-                        return;
+                        if (componentsProp.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+                        {
+                            return;
+                        }
                     }
                 }
 
                 int index = componentsProp.arraySize;
                 componentsProp.InsertArrayElementAtIndex(index);
-                componentsProp.GetArrayElementAtIndex(index).managedReferenceValue = ((IComponentTemplate)obj).Clone();
+                componentsProp.GetArrayElementAtIndex(index).managedReferenceValue = cmptmp.Clone();
 
                 serializedObject.ApplyModifiedProperties();
                 EditorUtility.SetDirty(this.target);

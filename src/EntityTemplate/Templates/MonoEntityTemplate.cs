@@ -19,18 +19,12 @@ namespace DCFApixels.DragonECS
     {
         [SerializeReference]
         private IComponentTemplate[] _components;
-        //[SerializeField]
-        //private EntityTemplateInheritanceMatrix _inheritanceMatrix;
 
         #region Properties
         string ITemplateInternal.ComponentsPropertyName
         {
             get { return nameof(_components); }
         }
-        //EntityTemplateInheritanceMatrix ITemplateInternal.InheritanceMatrix
-        //{
-        //    get { return _inheritanceMatrix; }
-        //}
         #endregion
 
         #region Methods

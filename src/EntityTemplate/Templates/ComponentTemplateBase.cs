@@ -12,6 +12,7 @@ namespace DCFApixels.DragonECS
     {
         #region Properties
         Type Type { get; }
+        bool IsUnique { get; }
         #endregion
 
         #region Methods
@@ -39,6 +40,7 @@ namespace DCFApixels.DragonECS
         public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
         public virtual MetaDescription Description { get { return MetaDescription.Empty; } }
         public virtual IReadOnlyList<string> Tags { get { return Array.Empty<string>(); } }
+        public virtual bool IsUnique { get { return true; } }
         #endregion
 
         #region Methods
