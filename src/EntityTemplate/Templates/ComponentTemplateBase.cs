@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using static DCFApixels.DragonECS.IComponentTemplate;
 
@@ -50,11 +51,14 @@ namespace DCFApixels.DragonECS
         #endregion
     }
     [Serializable]
+    [StructLayout(LayoutKind.Sequential)]
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase
     {
         protected static TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
         [SerializeField]
         protected T component;
+        [SerializeField]
+        private byte _offset; // Fucking Unity drove me crazy with the error "Cannot get managed reference index with out bounds offset". This workaround helps avoid that error.
 
         #region Properties
         public sealed override Type Type { get { return typeof(T); } }
@@ -66,14 +70,8 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Methods
-        public override object GetRaw()
-        {
-            return component;
-        }
-        public override void SetRaw(object raw)
-        {
-            component = (T)raw;
-        }
+        public sealed override object GetRaw() { return component; }
+        public sealed override void SetRaw(object raw) { component = (T)raw; }
         #endregion
     }
 
@@ -86,7 +84,7 @@ namespace DCFApixels.DragonECS
         }
     }
     public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>
-    where T : struct, IEcsTagComponent
+        where T : struct, IEcsTagComponent
     {
         public override void Apply(short worldID, int entityID)
         {
