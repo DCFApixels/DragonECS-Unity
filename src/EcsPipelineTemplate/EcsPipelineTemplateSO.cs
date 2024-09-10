@@ -93,7 +93,7 @@ namespace DCFApixels.DragonECS
             int lastNewLayersCount = newLayers.Count;
             foreach (var pair in builtinLayerIndexes)
             {
-                if(pair.Value < 0)
+                if (pair.Value < 0)
                 {
                     newLayers.Add(pair.Key);
                 }

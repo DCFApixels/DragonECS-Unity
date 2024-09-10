@@ -1,5 +1,4 @@
-﻿using DCFApixels.DragonECS.PoolsCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
@@ -10,9 +9,9 @@ namespace DCFApixels.DragonECS.Unity.Docs
     [DataContract]
     public class DragonDocs
     {
-        [DataMember, SerializeField] 
+        [DataMember, SerializeField]
         private DragonDocsMeta[] _metas;
-        
+
         public ReadOnlySpan<DragonDocsMeta> Metas
         {
             get { return new ReadOnlySpan<DragonDocsMeta>(_metas); }

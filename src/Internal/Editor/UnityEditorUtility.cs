@@ -122,7 +122,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 script = null;
                 string name = type.Name;
                 int indexOf = name.LastIndexOf('`');
-                if(indexOf >= 0)
+                if (indexOf >= 0)
                 {
                     name = name.Substring(0, indexOf);
                 }

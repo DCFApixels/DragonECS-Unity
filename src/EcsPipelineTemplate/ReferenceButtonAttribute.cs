@@ -55,7 +55,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         var splitedGroup = group.Splited;
 
                         Item parent = root;
-                        if(splitedGroup.Count > 0)
+                        if (splitedGroup.Count > 0)
                         {
                             int i = 1;
                             foreach (var subgroup in splitedGroup)
@@ -105,7 +105,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 public Key(MetaGroup group, int length)
                 {
                     Group = group;
-                    Length = length; 
+                    Length = length;
                 }
                 public bool Equals(Key other)
                 {

@@ -496,7 +496,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public static bool IconButton(Texture icon, float iconPadding = 0, string description = null, GUIStyle style = null, params GUILayoutOption[] options)
             {
                 bool result;
-                if(style == null)
+                if (style == null)
                 {
                     result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), options);
                 }
@@ -615,7 +615,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     object data = pool.GetRaw(entityID);
 
                     Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
-                    
+
                     Type componentType = pool.ComponentType;
                     ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
 

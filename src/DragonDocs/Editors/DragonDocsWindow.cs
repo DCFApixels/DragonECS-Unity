@@ -72,7 +72,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 System.Array.Resize(ref _searchingHideGroupMap, DragonDocsPrefs.instance.Infos.Length);
             }
 
-            if(_selectedIndex < 0 || _selectedIndex  >= infos.Length)
+            if (_selectedIndex < 0 || _selectedIndex >= infos.Length)
             {
                 _selectedIndex = 0;
             }
@@ -153,7 +153,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
         private void Searh()
         {
-            _searchingSample = _searchingSampleEnter; 
+            _searchingSample = _searchingSampleEnter;
             _searchingSampleChanged = false;
             DragonDocs docs = DragonDocsPrefs.instance.Docs;
             var metas = docs.Metas;
@@ -332,7 +332,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                         clippingDepth = int.MaxValue;
                     }
 
-                    if(_searchingSample.Length == 0)
+                    if (_searchingSample.Length == 0)
                     {
                         EditorGUI.indentLevel = groupInfo.Depth;
                     }

@@ -25,10 +25,10 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         }
         public ReadOnlySpan<MetaGroupInfo> Infos
         {
-            get 
+            get
             {
                 InitInfos();
-                return new ReadOnlySpan<MetaGroupInfo>(_infos); 
+                return new ReadOnlySpan<MetaGroupInfo>(_infos);
             }
         }
 
@@ -124,7 +124,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         public void Save(DragonDocs docs)
         {
             m_docs = docs;
-            if(m_isExpands == null || m_isExpands.Length != docs.Metas.Length)
+            if (m_isExpands == null || m_isExpands.Length != docs.Metas.Length)
             {
                 Array.Resize(ref m_isExpands, docs.Metas.Length);
                 m_isExpands[0] = true;
