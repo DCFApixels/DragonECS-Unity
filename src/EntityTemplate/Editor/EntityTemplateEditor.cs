@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
-        private GenericMenu _genericMenu;
+        private ComponentDropDown _componentDropDown;
         private bool _isInit = false;
 
         private static ComponentColorMode AutoColorMode
@@ -23,41 +23,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Init
         private void Init()
         {
-            if (_genericMenu == null) { _isInit = false; }
+            if (_componentDropDown == null) { _isInit = false; }
             if (_isInit) { return; }
 
-            _genericMenu = new GenericMenu();
+            _componentDropDown = new ComponentDropDown();
 
-            var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
-            foreach (var dummy in componentTemplateDummies)
-            {
-                if (dummy.Type.GetCustomAttribute<SerializableAttribute>() == null)
-                {
-                    Debug.LogWarning($"Type {dummy.Type.Name} does not have the [Serializable] attribute");
-                    continue;
-                }
-                ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
-                string name = meta.Name;
-                string description = meta.Description.Text;
-                MetaGroup group = meta.Group;
-
-                if (group.Name.Length > 0)
-                {
-                    name = group.Name + name;
-                }
-
-                _genericMenu.AddItem(new GUIContent(name, description), false, OnAddComponent, dummy);
-            }
+            _componentDropDown.OnSelected += OnAddComponent;
 
             _isInit = true;
         }
         #endregion
 
         #region Add/Remove
-        private void OnAddComponent(object obj)
+        private void OnAddComponent(ComponentDropDown.Item item)
         {
-            Type componentType = obj.GetType();
-            IComponentTemplate cmptmp = (IComponentTemplate)obj;
+            Type componentType = item.Obj.GetType();
+            IComponentTemplate cmptmp = item.Obj;
             if (this.target is ITemplateInternal target)
             {
                 SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
@@ -112,11 +93,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private void DrawTop(ITemplateInternal target)
         {
-            switch (EcsGUI.Layout.AddClearComponentButtons())
+            switch (EcsGUI.Layout.AddClearComponentButtons(out Rect rect))
             {
                 case EcsGUI.AddClearComponentButton.AddComponent:
                     Init();
-                    _genericMenu.ShowAsContext();
+                    _componentDropDown.Show(rect);
                     break;
                 case EcsGUI.AddClearComponentButton.Clear:
                     Init();

@@ -33,47 +33,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private const float DamagedComponentHeight = 18f * 2f;
 
         private static bool _isInit;
-        private static GenericMenu _genericMenu;
+        private static ComponentDropDown _componentDropDown;
 
         #region Init
         private static void Init()
         {
-            if (_genericMenu == null) { _isInit = false; }
+            if (_componentDropDown == null) { _isInit = false; }
             if (_isInit) { return; }
 
-            _genericMenu = new GenericMenu();
+            _componentDropDown = new ComponentDropDown();
 
-            var componentTemplateDummies = ComponentTemplateTypeCache.Dummies;
-            foreach (var dummy in componentTemplateDummies)
-            {
-                if (dummy.Type.GetCustomAttribute<SerializableAttribute>() == null)
-                {
-                    Debug.LogWarning($"Type {dummy.Type.Name} does not have the [Serializable] attribute");
-                    continue;
-                }
-                ITypeMeta meta = dummy is ITypeMeta metaOverride ? metaOverride : dummy.Type.ToMeta();
-                string name = meta.Name;
-                string description = meta.Description.Text;
-                MetaGroup group = meta.Group;
-
-                if (group.Name.Length > 0)
-                {
-                    name = group.Name + name;
-                }
-
-                _genericMenu.AddItem(new GUIContent(name, description), false, SelectComponent, dummy);
-            }
+            _componentDropDown.OnSelected += SelectComponent;
 
             _isInit = true;
         }
         [ThreadStatic]
         private static SerializedProperty currentProperty;
-        private static void SelectComponent(object dummy)
+        private static void SelectComponent(ComponentDropDown.Item item)
         {
-            currentProperty.managedReferenceValue = ((IComponentTemplate)dummy).Clone();
+            currentProperty.managedReferenceValue = item.Obj.Clone();
             currentProperty.isExpanded = false;
             currentProperty.serializedObject.ApplyModifiedProperties();
         }
+
         #endregion
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -260,7 +242,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (GUI.Button(buttonRect, "Select"))
             {
                 currentProperty = componentRefProp;
-                _genericMenu.ShowAsContext();
+                _componentDropDown.Show(buttonRect);
             }
         }
         private void DrawDamagedComponent(Rect position, string message)

@@ -70,6 +70,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
+        #region ReferenceDropDown
         private class ReferenceDropDown : AdvancedDropdown
         {
             public readonly Type[] PredicateTypes;
@@ -100,7 +101,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (isAssignable)
                     {
                         ITypeMeta meta = type.ToMeta();
-                        string name = meta.Name;
                         string description = meta.Description.Text;
                         MetaGroup group = meta.Group;
                         var splitedGroup = group.Splited;
@@ -123,7 +123,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             }
                         }
 
-                        var leafItem = new Item(type, name, increment++);
+                        var leafItem = new Item(type, meta.Name, increment++);
                         parent.AddChild(leafItem);
                     }
                 }
@@ -165,7 +165,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         return false;
                     }
                     IEnumerator<string> splitedEnum = Group.Splited.GetEnumerator();
-                    IEnumerator<string> splitedEnumOther = Group.Splited.GetEnumerator();
+                    IEnumerator<string> splitedEnumOther = other.Group.Splited.GetEnumerator();
                     for (int i = 0; i < Length; i++)
                     {
                         splitedEnum.MoveNext();
@@ -195,50 +195,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     };
                 }
             }
-
-            //private readonly struct Key : IEquatable<Key>
-            //{
-            //    public readonly string FullName;
-            //    public readonly int Length;
-            //    public Key(string fullName, int length)
-            //    {
-            //        FullName = fullName;
-            //        Length = length;
-            //    }
-            //    public bool Equals(Key other)
-            //    {
-            //        if (Length != other.Length)
-            //        {
-            //            return false;
-            //        }
-            //        for (int i = 0; i < Length; i++)
-            //        {
-            //            if (FullName[i] != other.FullName[i])
-            //            {
-            //                return false;
-            //            }
-            //        }
-            //        return true;
-            //    }
-            //    public override bool Equals(object obj)
-            //    {
-            //        return obj is Key key && Equals(key);
-            //    }
-            //    public override int GetHashCode()
-            //    {
-            //        unchecked
-            //        {
-            //            int state = Length;
-            //            state ^= state << 13;
-            //            state ^= state >> 17;
-            //            state ^= state << 5;
-            //            return FullName.GetHashCode() ^ state;
-            //        };
-            //    }
-            //}
             #endregion
-
         }
+        #endregion
 
         #region Init
         private static void Init()
@@ -344,19 +303,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 [MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.SYSTEMS_GROUP)]
 [System.Serializable] public class TestSystem0 : IEcsProcess { }
-[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.SYSTEMS_GROUP)]
 [System.Serializable] public class TestSystem1 : IEcsProcess { }
-[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.SYSTEMS_GROUP)]
 [System.Serializable] public class TestSystem2 : IEcsProcess { }
-[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.SYSTEMS_GROUP)]
 [System.Serializable] public class TestSystem3 : IEcsProcess { }
 [MetaGroup(EcsConsts.PACK_GROUP)]
 [System.Serializable] public class TestSystem4 : IEcsProcess { }
 [MetaGroup(EcsConsts.PACK_GROUP)]
 [System.Serializable] public class TestSystem7 : IEcsProcess { }
-[MetaGroup(EcsConsts.PACK_GROUP)]
+[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.AUTHOR)]
 [System.Serializable] public class TestSystem8 : IEcsProcess { }
+[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.AUTHOR)]
 [System.Serializable] public class _TestSystemX : IEcsProcess { }
+[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.AUTHOR)]
 [System.Serializable] public class TestSystem9 : IEcsProcess { }
+[MetaGroup(EcsConsts.PACK_GROUP, EcsConsts.AUTHOR)]
 [System.Serializable] public class TestSystem5 : IEcsProcess { }
 [System.Serializable] public class TestSystem6 : IEcsProcess { }

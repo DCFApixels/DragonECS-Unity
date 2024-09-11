@@ -1,6 +1,7 @@
 ﻿using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEditor;
@@ -272,9 +273,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public struct WorldData
         {
-            public GenericMenu addComponentGenericMenu;
+            public RuntimeComponentDropDown addComponentGenericMenu;
             public int poolsCount;
-            public WorldData(GenericMenu addComponentGenericMenu, int poolsCount)
+            public WorldData(RuntimeComponentDropDown addComponentGenericMenu, int poolsCount)
             {
                 this.addComponentGenericMenu = addComponentGenericMenu;
                 this.poolsCount = poolsCount;
@@ -283,7 +284,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //world id
         private static Dictionary<EcsWorld, WorldData> _worldDatas = new Dictionary<EcsWorld, WorldData>();
 
-        public static GenericMenu GetAddComponentGenericMenu(EcsWorld world)
+        public static RuntimeComponentDropDown GetAddComponentGenericMenu(EcsWorld world)
         {
             if (_worldDatas.TryGetValue(world, out WorldData data))
             {
@@ -305,20 +306,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static WorldData CreateWorldData(EcsWorld world)
         {
-            GenericMenu genericMenu = new GenericMenu();
+            IEnumerable<IEcsPool> pools = world.AllPools.ToArray().Where(o => o.IsNullOrDummy() == false);
+            RuntimeComponentDropDown genericMenu = new RuntimeComponentDropDown(pools);
 
-            var pools = world.AllPools;
-            for (int i = 0; i < pools.Length; i++)
-            {
-                var pool = pools[i];
-                if (pool.IsNullOrDummy())
-                {
-                    continue;
-                }
-                var meta = pool.ComponentType.ToMeta();
-                string name = meta.Group.Name + meta.Name;
-                genericMenu.AddItem(new GUIContent(name, meta.Description.Text), false, OnAddComponent, pool);
-            }
+            //var pools = world.AllPools;
+            //for (int i = 0; i < pools.Length; i++)
+            //{
+            //    var pool = pools[i];
+            //    if (pool.IsNullOrDummy())
+            //    {
+            //        continue;
+            //    }
+            //    var meta = pool.ComponentType.ToMeta();
+            //    string name = meta.Group.Name + meta.Name;
+            //    genericMenu.AddItem(new GUIContent(name, meta.Description.Text), false, OnAddComponent, pool);
+            //}
             return new WorldData(genericMenu, world.PoolsCount);
         }
 

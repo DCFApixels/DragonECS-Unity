@@ -431,15 +431,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
-        public static bool AddComponentButtons(Rect position)
+        public static bool AddComponentButton(Rect position, out Rect dropDownRect)
         {
-            position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
-            return GUI.Button(position, "Add Component");
+            dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
+            return GUI.Button(dropDownRect, "Add Component");
         }
-        public static AddClearComponentButton AddClearComponentButtons(Rect position)
+        public static AddClearComponentButton AddClearComponentButtons(Rect position, out Rect dropDownRect)
         {
             position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
             var (left, right) = RectUtility.HorizontalSliceLerp(position, 0.75f);
+
+            dropDownRect = left;
 
             if (GUI.Button(left, "Add Component"))
             {
@@ -559,13 +561,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             #endregion
 
-            public static bool AddComponentButtons()
+            public static bool AddComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f));
+                return EcsGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
             }
-            public static AddClearComponentButton AddClearComponentButtons()
+            public static AddClearComponentButton AddClearComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f));
+                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout = true)
             {
@@ -587,11 +589,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 if (isWithFoldout == false || IsShowRuntimeComponents)
                 {
-                    if (AddComponentButtons())
+                    if (AddComponentButtons(out Rect dropDownRect))
                     {
-                        GenericMenu genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
+                        RuntimeComponentDropDown genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
                         RuntimeComponentsUtility.CurrentEntityID = entityID;
-                        genericMenu.ShowAsContext();
+                        genericMenu.Show(dropDownRect);
                     }
 
                     GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
@@ -600,7 +602,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     int i = 0;
                     foreach (var componentTypeID in componentTypeIDs)
                     {
-                        var pool = world.GetPoolInstance(componentTypeID);
+                        var pool = world.FindPoolInstance(componentTypeID);
                         {
                             DrawRuntimeComponent(componentTypeIDs.Length, i++, entityID, pool);
                         }
