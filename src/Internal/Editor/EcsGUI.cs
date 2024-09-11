@@ -125,6 +125,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static AlignmentScope SetAlignment(GUIStyle target, TextAnchor value) => new AlignmentScope(target, value);
         public static AlignmentScope SetAlignment(GUIStyle target) => new AlignmentScope(target);
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
+        public static IndentLevelScope UpIndentLevel() => new IndentLevelScope(EditorGUI.indentLevel + 1);
         public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
         public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
         public static BackgroundColorScope SetBackgroundColor(Color value) => new BackgroundColorScope(value);

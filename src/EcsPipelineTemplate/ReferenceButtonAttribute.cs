@@ -1,11 +1,20 @@
 ﻿using DCFApixels.DragonECS;
+using System;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
-    internal sealed class ReferenceButtonAttribute : PropertyAttribute { }
+    internal sealed class ReferenceButtonAttribute : PropertyAttribute
+    {
+        public readonly Type[] predicateTypes;
+        public ReferenceButtonAttribute() : this(Array.Empty<Type>()) { }
+        public ReferenceButtonAttribute(params Type[] predicateTypes)
+        {
+            this.predicateTypes = predicateTypes;
+            Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
+        }
+    }
 }
-
 
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -25,15 +34,48 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static bool _isInit;
 
         private static Type[] _serializableTypes;
-        private static Dictionary<Type, ReferenceDropDown> _predicatTypesMenus = new Dictionary<Type, ReferenceDropDown>();
+        private static Dictionary<PredicateTypesKey, ReferenceDropDown> _predicatTypesMenus = new Dictionary<PredicateTypesKey, ReferenceDropDown>();
+        private ReferenceButtonAttribute TargetAttribute => (ReferenceButtonAttribute)attribute;
+
+        #region PredicateTypesKey
+        private readonly struct PredicateTypesKey : IEquatable<PredicateTypesKey>
+        {
+            public readonly Type[] types;
+            public PredicateTypesKey(Type[] types)
+            {
+                this.types = types;
+            }
+            public bool Equals(PredicateTypesKey other)
+            {
+                if (types.Length != other.types.Length) { return false; }
+                for (int i = 0; i < types.Length; i++)
+                {
+                    if (types[i] != other.types[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            public override bool Equals(object obj)
+            {
+                return obj is PredicateTypesKey key && Equals(key);
+            }
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(types);
+            }
+            public static implicit operator PredicateTypesKey(Type[] types) { return new PredicateTypesKey(types); }
+            public static implicit operator Type[](PredicateTypesKey key) { return key.types; }
+        }
+        #endregion
 
         private class ReferenceDropDown : AdvancedDropdown
         {
-            public readonly Type PredicateType;
-            public ReferenceDropDown(Type predicateType) : base(new AdvancedDropdownState())
+            public readonly Type[] PredicateTypes;
+            public ReferenceDropDown(Type[] predicateTypes) : base(new AdvancedDropdownState())
             {
-                PredicateType = predicateType;
-
+                PredicateTypes = predicateTypes;
                 minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * 30);
             }
             protected override AdvancedDropdownItem BuildRoot()
@@ -46,7 +88,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 foreach (var type in _serializableTypes)
                 {
-                    if (PredicateType.IsAssignableFrom(type))
+                    bool isAssignable = false;
+                    foreach (Type predicateTypes in PredicateTypes)
+                    {
+                        if (predicateTypes.IsAssignableFrom(type))
+                        {
+                            isAssignable = true;
+                            break;
+                        }
+                    }
+                    if (isAssignable)
                     {
                         ITypeMeta meta = type.ToMeta();
                         string name = meta.Name;
@@ -208,14 +259,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _isInit = true;
         }
 
-        private static ReferenceDropDown GetReferenceDropDown(Type predicatType)
+        private static ReferenceDropDown GetReferenceDropDown(Type[] predicatTypes)
         {
             Init();
-            if (_predicatTypesMenus.TryGetValue(predicatType, out ReferenceDropDown menu) == false)
+            if (_predicatTypesMenus.TryGetValue(predicatTypes, out ReferenceDropDown menu) == false)
             {
-                menu = new ReferenceDropDown(predicatType);
+                menu = new ReferenceDropDown(predicatTypes);
                 menu.OnSelected += SelectComponent;
-                _predicatTypesMenus.Add(predicatType, menu);
+                _predicatTypesMenus.Add(predicatTypes, menu);
             }
 
             return menu;
@@ -276,7 +327,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (GUI.Button(buttonRect, obj == null ? "Select..." : obj.GetMeta().Name, EditorStyles.layerMaskField))
             {
                 currentProperty = property;
-                GetReferenceDropDown(fieldInfo.FieldType).Show(buttonRect);
+                if (TargetAttribute.predicateTypes.Length == 0)
+                {
+                    GetReferenceDropDown(new Type[1] { fieldInfo.FieldType }).Show(buttonRect);
+                }
+                else
+                {
+                    GetReferenceDropDown(TargetAttribute.predicateTypes).Show(buttonRect);
+                }
             }
         }
     }

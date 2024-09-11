@@ -24,11 +24,6 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private Record[] _systems;
 
-        [SerializeField]
-        [SerializeReference]
-        [ReferenceButton]
-        private IEcsModule[] _modules;
-
         void IEcsModule.Import(EcsPipeline.Builder b)
         {
             b.Layers.MergeWith(_layers);
@@ -123,7 +118,7 @@ namespace DCFApixels.DragonECS
         public struct Record
         {
             [SerializeReference]
-            [ReferenceButton]
+            [ReferenceButton(typeof(IEcsModule), typeof(IEcsProcess))]
             public object target;
             public AddParams parameters;
             public Record(object target, AddParams parameters)

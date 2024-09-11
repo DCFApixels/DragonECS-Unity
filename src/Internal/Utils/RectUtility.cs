@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using System.Runtime.CompilerServices;
+using UnityEditor;
+using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
@@ -45,6 +47,36 @@ namespace DCFApixels.DragonECS.Unity.Internal
             b.yMin = b.yMax - height;
             return (t, b);
         }
+
+        #region DebugRect
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static unsafe float AsFloat(uint value) => *(float*)&value;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static float Q32ToFloat(uint value) => AsFloat((value >> 9) | 0x3F80_0000) - 1f;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static uint NextXorShiftState(uint state)
+        {
+            unchecked
+            {
+                state ^= state << 13;
+                state ^= state >> 17;
+                state ^= state << 5;
+                return state;
+            };
+        }
+        public static void DebugRect_Editor(params Rect[] rects)
+        {
+            uint colorState = NextXorShiftState(3136587146);
+            foreach (var rect in rects)
+            {
+                colorState = NextXorShiftState(colorState);
+                Color color = Color.HSVToRGB(Q32ToFloat(colorState), 1, 1);
+                color.a = 0.3f;
+                GUI.Box(rect, "", EditorStyles.selectionRect);
+                EditorGUI.DrawRect(rect, color);
+            }
+        }
+        #endregion
 
         public static Rect AddPadding(in this Rect rect, float verticalHorizontal)
         {
