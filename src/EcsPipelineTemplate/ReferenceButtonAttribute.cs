@@ -247,6 +247,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             currentProperty.serializedObject.ApplyModifiedProperties();
+
+            EcsGUI.Changed = true;
         }
         #endregion
 

@@ -12,10 +12,65 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal static class EcsGUI
     {
         #region Scores
-        public struct LabelWidthScore : IDisposable
+        private static int _changedCounter = 0;
+        private static bool _changed = false;
+
+        public static int ChangedCounter => _changedCounter;
+        public static bool Changed
+        {
+            get
+            {
+                _changed = _changed || GUI.changed;
+                return _changed;
+            }
+            set
+            {
+                _changed = _changed || GUI.changed || value;
+                GUI.changed = _changed;
+            }
+        }
+        public readonly struct CheckChangedScope : IDisposable
+        {
+            private readonly bool _value;
+            public CheckChangedScope(bool value)
+            {
+                _value = value;
+                _changedCounter++;
+                _changed = false;
+            }
+            public static CheckChangedScope New() { return new CheckChangedScope(Changed); }
+            public void Dispose()
+            {
+                Changed = Changed || _value;
+                _changedCounter--;
+                //if(_changedCounter <= 0 && Event.current.type == EventType.Repaint)
+                if (_changedCounter <= 0)
+                {
+                    _changedCounter = 0;
+                    _changed = false;
+                }
+            }
+        }
+
+        public struct VerticalLayoutScope : IDisposable
+        {
+            public static VerticalLayoutScope New() { GUILayout.BeginVertical(); return new VerticalLayoutScope(); }
+            public void Dispose() { GUILayout.EndVertical(); }
+        }
+        public struct HorizontalLayoutScope : IDisposable
+        {
+            public static HorizontalLayoutScope New() { GUILayout.BeginVertical(); return new HorizontalLayoutScope(); }
+            public void Dispose() { GUILayout.EndVertical(); }
+        }
+        public struct ScrollViewLayoutScope : IDisposable
+        {
+            public ScrollViewLayoutScope(ref Vector2 pos) { pos = GUILayout.BeginScrollView(pos); }
+            public void Dispose() { GUILayout.EndScrollView(); }
+        }
+        public readonly struct LabelWidthScope : IDisposable
         {
             private readonly float _value;
-            public LabelWidthScore(float value)
+            public LabelWidthScope(float value)
             {
                 _value = EditorGUIUtility.labelWidth;
                 EditorGUIUtility.labelWidth = value;
@@ -116,13 +171,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public void Dispose() { Target.fontStyle = _value; }
         }
-        #endregion
 
+        public static CheckChangedScope CheckChanged() => CheckChangedScope.New();
+        public static ScrollViewLayoutScope SetScrollViewLayout(ref Vector2 pos) => new ScrollViewLayoutScope(ref pos);
+        public static HorizontalLayoutScope SetHorizontalLayout() => HorizontalLayoutScope.New();
+        public static VerticalLayoutScope SetVerticalLayout() => VerticalLayoutScope.New();
         public static FontStyleScope SetFontStyle(GUIStyle target, FontStyle value) => new FontStyleScope(target, value);
+        public static FontStyleScope SetFontStyle(FontStyle value) => new FontStyleScope(GUI.skin.label, value);
         public static FontStyleScope SetFontStyle(GUIStyle target) => new FontStyleScope(target);
         public static FontSizeScope SetFontSize(GUIStyle target, int value) => new FontSizeScope(target, value);
         public static FontSizeScope SetFontSize(GUIStyle target) => new FontSizeScope(target);
         public static AlignmentScope SetAlignment(GUIStyle target, TextAnchor value) => new AlignmentScope(target, value);
+        public static AlignmentScope SetAlignment(TextAnchor value) => new AlignmentScope(GUI.skin.label, value);
         public static AlignmentScope SetAlignment(GUIStyle target) => new AlignmentScope(target);
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
         public static IndentLevelScope UpIndentLevel() => new IndentLevelScope(EditorGUI.indentLevel + 1);
@@ -136,8 +196,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
         public static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
         public static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
-
-
+        #endregion
 
         private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
@@ -320,7 +379,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static void EntityBar(Rect position, bool isPlaceholder, EntityStatus status, int id = 0, short gen = 0, short world = 0)
         {
-            using (new LabelWidthScore(0f))
+            using (new LabelWidthScope(0f))
             {
                 var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(position, 3f);
 
@@ -346,7 +405,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private static void EntityBar_Internal(Rect position, bool isPlaceHolder, int id = 0, short gen = 0, short world = 0)
         {
-            using (new LabelWidthScore(0f))
+            using (new LabelWidthScope(0f))
             {
                 Color w = Color.gray;
                 w.a = 0.6f;
@@ -385,13 +444,122 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        internal static int GetChildPropertiesCount(SerializedProperty property, Type type, out bool isEmpty)
+        #region DrawTypeMetaBlock
+        private static float DrawTypeMetaBlockPadding => EditorGUIUtility.standardVerticalSpacing;
+        private static float SingleLineWithPadding => EditorGUIUtility.singleLineHeight + DrawTypeMetaBlockPadding * 4f;
+        public static float GetTypeMetaBlockHeight(float contentHeight)
+        {
+            return DrawTypeMetaBlockPadding * 2 + contentHeight;
+        }
+        public static void DrawTypeMetaBlock(ref Rect position, SerializedProperty property, ITypeMeta meta)
+        {
+            if (meta == null)
+            {
+                return;
+            }
+            GUIContent label = UnityEditorUtility.GetLabel(property.displayName);
+
+
+            var counter = property.Copy();
+            int positionCountr = int.MaxValue;
+            int depth = -1;
+            while (counter.NextVisibleDepth(false, ref depth))
+            {
+                positionCountr--;
+            }
+
+            //var counter = property.Copy();
+            //int positionCountr = int.MaxValue;
+            //while (counter.NextVisible(false))
+            //{
+            //    positionCountr--;
+            //}
+
+            string name = meta.Name;
+            string description = meta.Description.Text;
+
+            Color panelColor = EcsGUI.SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+
+            Color alphaPanelColor = panelColor;
+            alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+
+
+            EditorGUI.BeginChangeCheck();
+            EditorGUI.DrawRect(position, alphaPanelColor);
+
+            Rect paddingPosition = RectUtility.AddPadding(position, DrawTypeMetaBlockPadding * 2f);
+
+            Rect optionButton = position;
+            optionButton.center -= new Vector2(0, optionButton.height);
+            optionButton.yMin = optionButton.yMax;
+            optionButton.yMax += HeadIconsRect.height;
+            optionButton.xMin = optionButton.xMax - 64;
+            optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
+            //Canceling isExpanded
+            if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+            {
+                property.isExpanded = !property.isExpanded;
+            }
+
+            //Close button
+            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+            if (CloseButton(optionButton))
+            {
+                property.ResetValues();
+                return;
+            }
+            //Edit script button
+            if (UnityEditorUtility.TryGetScriptAsset(meta.Type, out MonoScript script))
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                ScriptAssetButton(optionButton, script);
+            }
+            //Description icon
+            if (string.IsNullOrEmpty(description) == false)
+            {
+                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                DescriptionIcon(optionButton, description);
+            }
+
+            //if (string.IsNullOrEmpty(label.text))
+            //{
+            //    EditorGUI.indentLevel++;
+            //    EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
+            //    EditorGUI.indentLevel--;
+            //}
+            //else
+            //{
+            //    GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
+            //}
+
+            position = paddingPosition;
+        }
+        #endregion
+
+        #region NextDepth/GetChildPropertiesCount
+        internal static bool NextVisibleDepth(this SerializedProperty property, bool child, ref int depth)
+        {
+            if (depth < 0)
+            {
+                depth = property.depth;
+            }
+            return property.NextVisible(child) && property.depth >= depth;
+        }
+        internal static bool NextDepth(this SerializedProperty property, bool child, ref int depth)
+        {
+            if (depth < 0)
+            {
+                depth = property.depth;
+            }
+            return property.Next(child) && property.depth >= depth;
+        }
+        internal static int GetChildPropertiesCount(this SerializedProperty property, Type type, out bool isEmpty)
         {
             int result = GetChildPropertiesCount(property);
             isEmpty = result <= 0 && type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Length <= 0;
             return result;
         }
-        internal static int GetChildPropertiesCount(SerializedProperty property)
+        internal static int GetChildPropertiesCount(this SerializedProperty property)
         {
             var propsCounter = property.Copy();
             int lastDepth = propsCounter.depth;
@@ -404,6 +572,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             return result;
         }
+        #endregion
+
+        #region SelectPanelColor
         public static Color SelectPanelColor(ITypeMeta meta, int index, int total)
         {
             var trueMeta = meta.Type.ToMeta();
@@ -431,6 +602,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
+        #endregion
+
+        #region Other Elements
         public static bool AddComponentButton(Rect position, out Rect dropDownRect)
         {
             dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
@@ -471,7 +645,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.BeginProperty(position, label, property);
             EditorGUI.EndProperty();
         }
+        #endregion
 
+        #region SerializeReferenceFixer
+
+        #endregion
 
 
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -116,6 +116,115 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static Dictionary<Type, MonoScript> scriptsAssets = new Dictionary<Type, MonoScript>(256);
 
+        internal static void ResetValues(this SerializedProperty property, bool isExpand = false)
+        {
+            property.isExpanded = isExpand;
+            switch (property.propertyType)
+            {
+                case SerializedPropertyType.Generic:
+                    try
+                    //TODO хз как с этим работать, но это говно постоянно кидает 
+                    //InvalidOperationException: The operation is not possible when moved past all properties (Next returned false)
+                    //и не дает инструментов и шансов этого избежать
+                    {
+                        while (property.Next(true))
+                        {
+                            property.ResetValues(isExpand);
+                        }
+                    }
+                    catch (Exception) { }
+                    break;
+                case SerializedPropertyType.Integer:
+                    property.intValue = default;
+                    break;
+                case SerializedPropertyType.Boolean:
+                    property.boolValue = default;
+                    break;
+                case SerializedPropertyType.Float:
+                    property.floatValue = default;
+                    break;
+                case SerializedPropertyType.String:
+                    property.stringValue = string.Empty;
+                    break;
+                case SerializedPropertyType.Color:
+                    property.colorValue = default;
+                    break;
+                case SerializedPropertyType.ObjectReference:
+                    property.objectReferenceValue = null;
+                    break;
+                case SerializedPropertyType.LayerMask:
+                    property.intValue = default;
+                    break;
+                case SerializedPropertyType.Enum:
+                    property.enumValueIndex = default;
+                    break;
+                case SerializedPropertyType.Vector2:
+                    property.vector2Value = default;
+                    break;
+                case SerializedPropertyType.Vector3:
+                    property.vector3Value = default;
+                    break;
+                case SerializedPropertyType.Vector4:
+                    property.vector4Value = default;
+                    break;
+                case SerializedPropertyType.Rect:
+                    property.rectValue = default;
+                    break;
+                case SerializedPropertyType.ArraySize:
+                    property.ClearArray();
+                    break;
+                case SerializedPropertyType.Character:
+                    property.intValue = default;
+                    break;
+                case SerializedPropertyType.AnimationCurve:
+                    property.animationCurveValue = new AnimationCurve();
+                    break;
+                case SerializedPropertyType.Bounds:
+                    property.boundsValue = default;
+                    break;
+                case SerializedPropertyType.Gradient:
+#if UNITY_2022_1_OR_NEWER
+                    property.gradientValue = new Gradient();;
+           
+#else
+                    Debug.LogWarning($"Unsupported SerializedPropertyType: {property.propertyType}");
+#endif
+                    break;
+                case SerializedPropertyType.Quaternion:
+                    property.quaternionValue = Quaternion.identity;
+                    break;
+                case SerializedPropertyType.ExposedReference:
+                    property.objectReferenceValue = null;
+                    break;
+                case SerializedPropertyType.FixedBufferSize:
+                    for (int i = 0, iMax = property.fixedBufferSize; i < iMax; i++)
+                    {
+                        property.GetFixedBufferElementAtIndex(i).intValue = default;
+                    }
+                    break;
+                case SerializedPropertyType.Vector2Int:
+                    property.vector2IntValue = default;
+                    break;
+                case SerializedPropertyType.Vector3Int:
+                    property.vector3IntValue = default;
+                    break;
+                case SerializedPropertyType.RectInt:
+                    property.rectIntValue = default;
+                    break;
+                case SerializedPropertyType.BoundsInt:
+                    property.boundsIntValue = default;
+                    break;
+                case SerializedPropertyType.ManagedReference:
+                    property.managedReferenceValue = default;
+                    break;
+                case SerializedPropertyType.Hash128:
+                    property.hash128Value = default;
+                    break;
+                default:
+                    Debug.LogWarning($"Unsupported SerializedPropertyType: {property.propertyType}");
+                    break;
+            }
+        }
         internal static bool TryGetScriptAsset(Type type, out MonoScript script)
         {
             if (scriptsAssets.TryGetValue(type, out script) == false)

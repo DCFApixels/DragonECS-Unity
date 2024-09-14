@@ -35,6 +35,7 @@ namespace DCFApixels.DragonECS
     {
         #region Properties
         public abstract Type Type { get; }
+        public virtual ITypeMeta BaseMeta { get { return null; } }
         public virtual string Name { get { return string.Empty; } }
         public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
         public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
@@ -63,6 +64,7 @@ namespace DCFApixels.DragonECS
         private byte _offset; // Fucking Unity drove me crazy with the error "Cannot get managed reference index with out bounds offset". This workaround helps avoid that error.
 
         #region Properties
+        public sealed override ITypeMeta BaseMeta { get { return Meta; } }
         public sealed override Type Type { get { return typeof(T); } }
         public override string Name { get { return Meta.Name; } }
         public override MetaColor Color { get { return Meta.Color; } }

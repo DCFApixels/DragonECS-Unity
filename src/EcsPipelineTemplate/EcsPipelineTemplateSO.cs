@@ -19,15 +19,26 @@ namespace DCFApixels.DragonECS
         };
 
         [SerializeField]
+        [ArrayElement]
         private string[] _layers = _defaultLayers.ToArray();
 
         [SerializeField]
-        private Record[] _systems;
+        [ArrayElement]
+        private Record[] _records;
+
+        public ReadOnlySpan<string> Layers
+        {
+            get { return _layers; }
+        }
+        public ReadOnlySpan<Record> Records
+        {
+            get { return _records; }
+        }
 
         void IEcsModule.Import(EcsPipeline.Builder b)
         {
             b.Layers.MergeWith(_layers);
-            foreach (var s in _systems)
+            foreach (var s in _records)
             {
                 if (s.target == null) { continue; }
 
@@ -40,10 +51,10 @@ namespace DCFApixels.DragonECS
             EcsPipelineTemplate result = new EcsPipelineTemplate();
             result.layers = new string[_layers.Length];
             Array.Copy(_layers, result.layers, _layers.Length);
-            result.systems = new EcsPipelineTemplate.AddCommand[_systems.Length];
+            result.systems = new EcsPipelineTemplate.AddCommand[_records.Length];
             for (int i = 0; i < result.systems.Length; i++)
             {
-                ref var s = ref _systems[i];
+                ref var s = ref _records[i];
                 result.systems[i] = new EcsPipelineTemplate.AddCommand(s.target, s.parameters);
             }
             return result;
@@ -53,21 +64,23 @@ namespace DCFApixels.DragonECS
         {
             _layers = new string[template.layers.Length];
             Array.Copy(template.layers, _layers, template.layers.Length);
-            _systems = new Record[template.systems.Length];
-            for (int i = 0; i < _systems.Length; i++)
+            _records = new Record[template.systems.Length];
+            for (int i = 0; i < _records.Length; i++)
             {
                 ref var s = ref template.systems[i];
-                _systems[i] = new Record(s.target, s.parameters);
+                _records[i] = new Record(s.target, s.parameters);
             }
         }
 
-        public void Validate()
+        public bool Validate()
         {
-            ValidateLayers();
-            ValidateSystems();
+            bool resutl = ValidateLayers();
+            resutl |= ValidateSystems();
+            return resutl;
         }
-        private void ValidateLayers()
+        private bool ValidateLayers()
         {
+            bool result = false;
             Dictionary<string, int> builtinLayerIndexes = new Dictionary<string, int>();
             foreach (var item in _defaultLayers)
             {
@@ -102,16 +115,21 @@ namespace DCFApixels.DragonECS
                 int i = 0;
                 foreach (var pair in builtinLayerIndexes.OrderBy(o => o.Value))
                 {
-                    newLayers[pair.Value] = _defaultLayers[i];
+                    if (newLayers[pair.Value] != _defaultLayers[i])
+                    {
+                        newLayers[pair.Value] = _defaultLayers[i];
+                        result = true;
+                    }
                     i++;
                 }
             }
 
             _layers = newLayers.ToArray();
+            return result;
         }
-        private void ValidateSystems()
+        private bool ValidateSystems()
         {
-
+            return false;
         }
 
         [Serializable]

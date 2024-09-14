@@ -11,6 +11,7 @@ namespace DCFApixels.DragonECS
     public class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
+
         static UnityDebugService()
         {
             Activate();
@@ -28,22 +29,30 @@ namespace DCFApixels.DragonECS
                 return;
             }
 
+            string msg = AutoConvertObjectToString(v);
             bool hasTag = string.IsNullOrEmpty(tag) == false;
             if (hasTag)
             {
-                log = $"[{tag}] {v}";
                 string taglower = tag.ToLower();
-                if (taglower.Contains("warning"))
+                switch (taglower)
                 {
-                    Debug.LogWarning(log);
-                    return;
+                    case "pass":
+                        log = $"[<color=#00ff00>{tag}</color>] {msg}";
+                        Debug.Log(log);
+                        break;
+                    case "warning":
+                        log = $"[<color=#ffff00>{tag}</color>] {msg}";
+                        Debug.LogWarning(log);
+                        break;
+                    case "error":
+                        log = $"[<color=#ff4028>{tag}</color>] {msg}";
+                        Debug.LogError(log);
+                        break;
+                    default:
+                        log = $"[{tag}] {msg}";
+                        Debug.Log(log);
+                        break;
                 }
-                if (taglower.Contains("error"))
-                {
-                    Debug.LogError(log);
-                    return;
-                }
-                Debug.Log(log);
                 return;
             }
             Debug.Log(v);
