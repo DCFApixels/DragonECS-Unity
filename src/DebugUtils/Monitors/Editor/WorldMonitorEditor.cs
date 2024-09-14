@@ -5,11 +5,9 @@ using UnityEditor;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(WorldMonitor))]
-    internal class WorldMonitorEditor : Editor
+    internal class WorldMonitorEditor : ExtendedEditor<WorldMonitor>
     {
-        private WorldMonitor Target => (WorldMonitor)target;
-
-        public override void OnInspectorGUI()
+        protected override void DrawCustom()
         {
             EcsGUI.Layout.DrawWorldBaseInfo(Target.World);
         }

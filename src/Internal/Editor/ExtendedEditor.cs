@@ -25,7 +25,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isStaticInit = false;
         private bool _isInit = false;
 
-        protected float SingleLineHeight
+        protected float OneLineHeight
         {
             get => EditorGUIUtility.singleLineHeight;
         }
@@ -33,6 +33,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get => EditorGUIUtility.standardVerticalSpacing;
         }
+        protected bool IsShowInterfaces
+        {
+            get { return SettingsPrefs.instance.IsShowInterfaces; }
+            set { SettingsPrefs.instance.IsShowInterfaces = value; }
+        }
+        protected bool IsShowHidden
+        {
+            get { return SettingsPrefs.instance.IsShowHidden; }
+            set { SettingsPrefs.instance.IsShowHidden = value; }
+        }
+        protected bool IsMultipleTargets => targets.Length > 1;
 
         protected virtual bool IsStaticInit { get { return _isStaticInit; } }
         protected virtual bool IsInit { get { return _isInit; } }
@@ -53,7 +64,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public sealed override void OnInspectorGUI()
         {
-            using (EcsGUI.CheckChanged())
+            using (EcsGUI.CheckChanged(serializedObject))
             {
                 StaticInit();
                 Init();
@@ -73,7 +84,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return serializedObject.FindProperty(name);
         }
     }
-    internal abstract class ExtendedEditor<T> : ExtendedEditor where T : UnityObject
+    internal abstract class ExtendedEditor<T> : ExtendedEditor
     {
 
         public T Target
@@ -132,7 +143,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get => EditorGUIUtility.standardVerticalSpacing;
         }
-
+        protected bool IsShowInterfaces
+        {
+            get { return SettingsPrefs.instance.IsShowInterfaces; }
+            set { SettingsPrefs.instance.IsShowInterfaces = value; }
+        }
+        protected bool IsShowHidden
+        {
+            get { return SettingsPrefs.instance.IsShowHidden; }
+            set { SettingsPrefs.instance.IsShowHidden = value; }
+        }
         protected virtual bool IsStaticInit { get { return _isStaticInit; } }
         protected virtual bool IsInit { get { return _isInit; } }
         protected void StaticInit()
@@ -152,7 +172,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (EcsGUI.CheckChanged())
+            using (EcsGUI.CheckChanged(property.serializedObject))
             {
                 StaticInit();
                 Init();

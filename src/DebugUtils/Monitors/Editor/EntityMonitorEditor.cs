@@ -6,14 +6,12 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(EntityMonitor))]
-    internal class EntityMonitorEditor : Editor
+    internal class EntityMonitorEditor : ExtendedEditor<EntityMonitor>
     {
-        private EntityMonitor Target => (EntityMonitor)target;
-
-        public override void OnInspectorGUI()
+        protected override void DrawCustom()
         {
             bool isAlive = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
-            using (new EditorGUI.DisabledScope(!isAlive))
+            using (EcsGUI.SetEnable(isAlive))
             {
                 if (GUILayout.Button("Delete Entity", GUILayout.Height(36f)))
                 {

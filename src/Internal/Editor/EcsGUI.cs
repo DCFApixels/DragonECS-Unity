@@ -1,8 +1,11 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using UnityEditor;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityComponent = UnityEngine.Component;
 using UnityObject = UnityEngine.Object;
@@ -14,6 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Scores
         private static int _changedCounter = 0;
         private static bool _changed = false;
+        private static bool _delayedChanged = false;
 
         public static int ChangedCounter => _changedCounter;
         public static bool Changed
@@ -21,12 +25,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get
             {
                 _changed = _changed || GUI.changed;
+                GUI.changed = _changed;
                 return _changed;
             }
             set
             {
-                _changed = _changed || GUI.changed || value;
+                _changed = Changed || value;
                 GUI.changed = _changed;
+            }
+        }
+        public static bool DelayedChanged
+        {
+            get
+            {
+                return _delayedChanged;
+            }
+            set
+            {
+                _delayedChanged = DelayedChanged || value;
+                Changed = _delayedChanged;
             }
         }
         public readonly struct CheckChangedScope : IDisposable
@@ -47,25 +64,33 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (_changedCounter <= 0)
                 {
                     _changedCounter = 0;
-                    _changed = false;
+                    _changed = _delayedChanged;
+                    _delayedChanged = false;
                 }
             }
         }
-
-        public struct VerticalLayoutScope : IDisposable
+        public readonly struct CheckChangedScopeWithAutoApply : IDisposable
         {
-            public static VerticalLayoutScope New() { GUILayout.BeginVertical(); return new VerticalLayoutScope(); }
-            public void Dispose() { GUILayout.EndVertical(); }
+            private readonly CheckChangedScope _scope;
+            private readonly SerializedObject _serializedObject;
+            public CheckChangedScopeWithAutoApply(SerializedObject serializedObject)
+            {
+                _scope = CheckChangedScope.New();
+                _serializedObject = serializedObject;
+            }
+            public void Dispose()
+            {
+                if (Changed)
+                {
+                    _serializedObject.ApplyModifiedProperties();
+                }
+                _scope.Dispose();
+            }
         }
-        public struct HorizontalLayoutScope : IDisposable
+        public struct ScrollViewScope : IDisposable
         {
-            public static HorizontalLayoutScope New() { GUILayout.BeginVertical(); return new HorizontalLayoutScope(); }
-            public void Dispose() { GUILayout.EndVertical(); }
-        }
-        public struct ScrollViewLayoutScope : IDisposable
-        {
-            public ScrollViewLayoutScope(ref Vector2 pos) { pos = GUILayout.BeginScrollView(pos); }
-            public void Dispose() { GUILayout.EndScrollView(); }
+            public ScrollViewScope(Rect position, ref Vector2 pos, Rect viewRect) { pos = GUI.BeginScrollView(position, pos, viewRect); }
+            public void Dispose() { GUI.EndScrollView(); }
         }
         public readonly struct LabelWidthScope : IDisposable
         {
@@ -172,10 +197,41 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public void Dispose() { Target.fontStyle = _value; }
         }
 
+
+        public static partial class Layout
+        {
+            public struct VerticalScope : IDisposable
+            {
+                public VerticalScope(GUILayoutOption[] options) { GUILayout.BeginVertical(options); }
+                public VerticalScope(GUIStyle style, GUILayoutOption[] options) { GUILayout.BeginVertical(style, options); }
+                public void Dispose() { GUILayout.EndVertical(); }
+            }
+            public struct HorizontalScope : IDisposable
+            {
+                public HorizontalScope(GUILayoutOption[] options) { GUILayout.BeginHorizontal(options); }
+                public HorizontalScope(GUIStyle style, GUILayoutOption[] options) { GUILayout.BeginHorizontal(style, options); }
+                public void Dispose() { GUILayout.EndHorizontal(); }
+            }
+            public struct ScrollViewScope : IDisposable
+            {
+                public ScrollViewScope(ref Vector2 pos, GUILayoutOption[] options) { pos = GUILayout.BeginScrollView(pos, options); }
+                public ScrollViewScope(ref Vector2 pos, GUIStyle style, GUILayoutOption[] options) { pos = GUILayout.BeginScrollView(pos, style, options); }
+                public void Dispose() { GUILayout.EndScrollView(); }
+            }
+
+            public static ScrollViewScope BeginScrollView(ref Vector2 pos) => new ScrollViewScope(ref pos, Array.Empty<GUILayoutOption>());
+            public static HorizontalScope BeginHorizontal() => new HorizontalScope(Array.Empty<GUILayoutOption>());
+            public static VerticalScope BeginVertical() => new VerticalScope(Array.Empty<GUILayoutOption>());
+            public static ScrollViewScope BeginScrollView(ref Vector2 pos, params GUILayoutOption[] options) => new ScrollViewScope(ref pos, options);
+            public static HorizontalScope BeginHorizontal(params GUILayoutOption[] options) => new HorizontalScope(options);
+            public static VerticalScope BeginVertical(params GUILayoutOption[] options) => new VerticalScope(options);
+            public static ScrollViewScope BeginScrollView(ref Vector2 pos, GUIStyle style, params GUILayoutOption[] options) => new ScrollViewScope(ref pos, style, options);
+            public static HorizontalScope BeginHorizontal(GUIStyle style, params GUILayoutOption[] options) => new HorizontalScope(style, options);
+            public static VerticalScope BeginVertical(GUIStyle style, params GUILayoutOption[] options) => new VerticalScope(style, options);
+        }
         public static CheckChangedScope CheckChanged() => CheckChangedScope.New();
-        public static ScrollViewLayoutScope SetScrollViewLayout(ref Vector2 pos) => new ScrollViewLayoutScope(ref pos);
-        public static HorizontalLayoutScope SetHorizontalLayout() => HorizontalLayoutScope.New();
-        public static VerticalLayoutScope SetVerticalLayout() => VerticalLayoutScope.New();
+        public static CheckChangedScopeWithAutoApply CheckChanged(SerializedObject serializedObject) => new CheckChangedScopeWithAutoApply(serializedObject);
+        public static ScrollViewScope BeginScrollView(Rect position, ref Vector2 pos, Rect viewRect) => new ScrollViewScope(position, ref pos, viewRect);
         public static FontStyleScope SetFontStyle(GUIStyle target, FontStyle value) => new FontStyleScope(target, value);
         public static FontStyleScope SetFontStyle(FontStyle value) => new FontStyleScope(GUI.skin.label, value);
         public static FontStyleScope SetFontStyle(GUIStyle target) => new FontStyleScope(target);
@@ -196,6 +252,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);
         public static EditorGUI.DisabledScope Disable => new EditorGUI.DisabledScope(true);
         public static EditorGUI.DisabledScope SetEnable(bool value) => new EditorGUI.DisabledScope(!value);
+        public static LabelWidthScope SetLabelWidth(float value) => new LabelWidthScope(value);
         #endregion
 
         private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -207,6 +264,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
         public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
+
+        private static Type[] _serializableTypes;
+
+
+        static EcsGUI()
+        {
+            InitSerializableTypes();
+        }
+        private static void InitSerializableTypes()
+        {
+            List<Type> types = new List<Type>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetTypes = assembly.GetTypes().Where(type =>
+                    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
+                    type.IsSubclassOf(typeof(UnityObject)) == false &&
+                    type.GetCustomAttribute<SerializableAttribute>() != null);
+
+                types.AddRange(targetTypes);
+            }
+            _serializableTypes = types.ToArray();
+        }
 
         #region Properties
         private static ComponentColorMode AutoColorMode
@@ -223,6 +302,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get { return SettingsPrefs.instance.IsShowRuntimeComponents; }
             set { SettingsPrefs.instance.IsShowRuntimeComponents = value; }
+        }
+        private static float OneLineHeight
+        {
+            get => EditorGUIUtility.singleLineHeight;
+        }
+        private static float Spacing
+        {
+            get => EditorGUIUtility.standardVerticalSpacing;
         }
         #endregion
 
@@ -379,7 +466,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static void EntityBar(Rect position, bool isPlaceholder, EntityStatus status, int id = 0, short gen = 0, short world = 0)
         {
-            using (new LabelWidthScope(0f))
+            using (SetLabelWidth(0f))
             {
                 var (entityInfoRect, statusRect) = RectUtility.VerticalSliceBottom(position, 3f);
 
@@ -405,7 +492,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private static void EntityBar_Internal(Rect position, bool isPlaceHolder, int id = 0, short gen = 0, short world = 0)
         {
-            using (new LabelWidthScope(0f))
+            using (SetLabelWidth(0f))
             {
                 Color w = Color.gray;
                 w.a = 0.6f;
@@ -451,11 +538,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return DrawTypeMetaBlockPadding * 2 + contentHeight;
         }
-        public static void DrawTypeMetaBlock(ref Rect position, SerializedProperty property, ITypeMeta meta)
+        public static bool DrawTypeMetaBlock(ref Rect position, SerializedProperty property, ITypeMeta meta)
         {
             if (meta == null)
             {
-                return;
+                return false;
             }
             GUIContent label = UnityEditorUtility.GetLabel(property.displayName);
 
@@ -483,56 +570,58 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Color alphaPanelColor = panelColor;
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.DrawRect(position, alphaPanelColor);
-
-            Rect paddingPosition = RectUtility.AddPadding(position, DrawTypeMetaBlockPadding * 2f);
-
-            Rect optionButton = position;
-            optionButton.center -= new Vector2(0, optionButton.height);
-            optionButton.yMin = optionButton.yMax;
-            optionButton.yMax += HeadIconsRect.height;
-            optionButton.xMin = optionButton.xMax - 64;
-            optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
-            //Canceling isExpanded
-            if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+            using (CheckChanged())
             {
-                property.isExpanded = !property.isExpanded;
-            }
+                EditorGUI.DrawRect(position, alphaPanelColor);
 
-            //Close button
-            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-            if (CloseButton(optionButton))
-            {
-                property.ResetValues();
-                return;
-            }
-            //Edit script button
-            if (UnityEditorUtility.TryGetScriptAsset(meta.Type, out MonoScript script))
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                ScriptAssetButton(optionButton, script);
-            }
-            //Description icon
-            if (string.IsNullOrEmpty(description) == false)
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                DescriptionIcon(optionButton, description);
-            }
+                Rect paddingPosition = RectUtility.AddPadding(position, DrawTypeMetaBlockPadding * 2f);
 
-            //if (string.IsNullOrEmpty(label.text))
-            //{
-            //    EditorGUI.indentLevel++;
-            //    EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
-            //    EditorGUI.indentLevel--;
-            //}
-            //else
-            //{
-            //    GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
-            //}
+                Rect optionButton = position;
+                optionButton.center -= new Vector2(0, optionButton.height);
+                optionButton.yMin = optionButton.yMax;
+                optionButton.yMax += HeadIconsRect.height;
+                optionButton.xMin = optionButton.xMax - 64;
+                optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
+                //Canceling isExpanded
+                if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+                {
+                    property.isExpanded = !property.isExpanded;
+                }
 
-            position = paddingPosition;
+                //Close button
+                optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+                if (CloseButton(optionButton))
+                {
+                    property.ResetValues();
+                    return true;
+                }
+                //Edit script button
+                if (UnityEditorUtility.TryGetScriptAsset(meta.Type, out MonoScript script))
+                {
+                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                    ScriptAssetButton(optionButton, script);
+                }
+                //Description icon
+                if (string.IsNullOrEmpty(description) == false)
+                {
+                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                    DescriptionIcon(optionButton, description);
+                }
+
+                //if (string.IsNullOrEmpty(label.text))
+                //{
+                //    EditorGUI.indentLevel++;
+                //    EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
+                //    EditorGUI.indentLevel--;
+                //}
+                //else
+                //{
+                //    GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
+                //}
+
+                position = paddingPosition;
+            }
+            return false;
         }
         #endregion
 
@@ -647,7 +736,220 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        #region SerializeReferenceFixer
+        #region SerializeReference utils
+
+        private static Dictionary<PredicateTypesKey, ReferenceDropDown> _predicatTypesMenus = new Dictionary<PredicateTypesKey, ReferenceDropDown>();
+        [ThreadStatic]
+        private static SerializedProperty _currentProperty;
+
+        #region Init
+        private static ReferenceDropDown GetReferenceDropDown(Type[] predicatTypes)
+        {
+            if (_predicatTypesMenus.TryGetValue(predicatTypes, out ReferenceDropDown menu) == false)
+            {
+                menu = new ReferenceDropDown(predicatTypes);
+                menu.OnSelected += SelectComponent;
+                _predicatTypesMenus.Add(predicatTypes, menu);
+            }
+
+            return menu;
+        }
+        private static void SelectComponent(ReferenceDropDown.Item item)
+        {
+            Type type = item.Type;
+            if (type == null)
+            {
+                _currentProperty.managedReferenceValue = null;
+            }
+            else
+            {
+                _currentProperty.managedReferenceValue = Activator.CreateInstance(type);
+                _currentProperty.isExpanded = true;
+            }
+
+            _currentProperty.serializedObject.ApplyModifiedProperties();
+            DelayedChanged = true;
+        }
+        #endregion
+
+        #region PredicateTypesKey
+        private readonly struct PredicateTypesKey : IEquatable<PredicateTypesKey>
+        {
+            public readonly Type[] types;
+            public PredicateTypesKey(Type[] types)
+            {
+                this.types = types;
+            }
+            public bool Equals(PredicateTypesKey other)
+            {
+                if (types.Length != other.types.Length) { return false; }
+                for (int i = 0; i < types.Length; i++)
+                {
+                    if (types[i] != other.types[i])
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            public override bool Equals(object obj)
+            {
+                return obj is PredicateTypesKey key && Equals(key);
+            }
+            public override int GetHashCode()
+            {
+                return HashCode.Combine(types);
+            }
+            public static implicit operator PredicateTypesKey(Type[] types) { return new PredicateTypesKey(types); }
+            public static implicit operator Type[](PredicateTypesKey key) { return key.types; }
+        }
+        #endregion
+
+        #region ReferenceDropDown
+        private class ReferenceDropDown : AdvancedDropdown
+        {
+            public readonly Type[] PredicateTypes;
+            public ReferenceDropDown(Type[] predicateTypes) : base(new AdvancedDropdownState())
+            {
+                PredicateTypes = predicateTypes;
+                minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * 30);
+            }
+            protected override AdvancedDropdownItem BuildRoot()
+            {
+                int increment = 0;
+                var root = new Item(null, "Select Type", increment++);
+                root.AddChild(new Item(null, "<NULL>", increment++));
+
+                Dictionary<Key, Item> dict = new Dictionary<Key, Item>();
+
+                foreach (var type in _serializableTypes)
+                {
+                    bool isAssignable = false;
+                    foreach (Type predicateTypes in PredicateTypes)
+                    {
+                        if (predicateTypes.IsAssignableFrom(type))
+                        {
+                            isAssignable = true;
+                            break;
+                        }
+                    }
+                    if (isAssignable)
+                    {
+                        ITypeMeta meta = type.ToMeta();
+                        string description = meta.Description.Text;
+                        MetaGroup group = meta.Group;
+                        var splitedGroup = group.Splited;
+
+                        Item parent = root;
+                        if (splitedGroup.Count > 0)
+                        {
+                            int i = 1;
+                            foreach (var subgroup in splitedGroup)
+                            {
+                                Key key = new Key(group, i);
+                                if (dict.TryGetValue(key, out Item item) == false)
+                                {
+                                    item = new Item(null, subgroup, increment++);
+                                    parent.AddChild(item);
+                                    dict.Add(key, item);
+                                }
+                                parent = item;
+                                i++;
+                            }
+                        }
+
+                        var leafItem = new Item(type, meta.Name, increment++);
+                        parent.AddChild(leafItem);
+                    }
+                }
+                return root;
+            }
+
+            protected override void ItemSelected(AdvancedDropdownItem item)
+            {
+                base.ItemSelected(item);
+                OnSelected((Item)item);
+            }
+
+            public event Action<Item> OnSelected = delegate { };
+
+            public class Item : AdvancedDropdownItem
+            {
+                public readonly Type Type;
+                public Item(Type type, string name, int id) : base(name)
+                {
+                    Type = type;
+                    this.id = id;
+                }
+            }
+
+            #region Key
+            private readonly struct Key : IEquatable<Key>
+            {
+                public readonly MetaGroup Group;
+                public readonly int Length;
+                public Key(MetaGroup group, int length)
+                {
+                    Group = group;
+                    Length = length;
+                }
+                public bool Equals(Key other)
+                {
+                    if (Length != other.Length)
+                    {
+                        return false;
+                    }
+                    IEnumerator<string> splitedEnum = Group.Splited.GetEnumerator();
+                    IEnumerator<string> splitedEnumOther = other.Group.Splited.GetEnumerator();
+                    for (int i = 0; i < Length; i++)
+                    {
+                        splitedEnum.MoveNext();
+                        splitedEnumOther.MoveNext();
+                        if (splitedEnum.Current != splitedEnumOther.Current)
+                        {
+                            return false;
+                        }
+                    }
+                    return true;
+                }
+                public override bool Equals(object obj)
+                {
+                    return obj is Key key && Equals(key);
+                }
+                public override int GetHashCode()
+                {
+                    unchecked
+                    {
+                        int state = Length;
+                        state ^= state << 13;
+                        state ^= state >> 17;
+                        state ^= state << 5;
+                        var x = Group.Splited.GetEnumerator();
+                        x.MoveNext();
+                        return x.Current.GetHashCode() ^ state;
+                    };
+                }
+            }
+            #endregion
+        }
+        #endregion
+
+        public static void DrawSelectReferenceButton(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, bool isHideButtonIfNotNull)
+        {
+            object obj = property.hasMultipleDifferentValues ? null : property.managedReferenceValue;
+            if (!isHideButtonIfNotNull || obj == null)
+            {
+                if (GUI.Button(position, obj == null ? "Select..." : obj.GetMeta().Name, EditorStyles.layerMaskField))
+                {
+                    _currentProperty = property;
+                    GetReferenceDropDown(sortedPredicateTypes).Show(position);
+                }
+            }
+            else
+            {
+                GUI.Label(position, obj == null ? "Select..." : obj.GetMeta().Name);
+            }
+        }
 
         #endregion
 
@@ -656,7 +958,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
 
-        public static class Layout
+        public static partial class Layout
         {
             public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
             {

@@ -51,11 +51,11 @@ namespace DCFApixels.DragonECS
             EcsPipelineTemplate result = new EcsPipelineTemplate();
             result.layers = new string[_layers.Length];
             Array.Copy(_layers, result.layers, _layers.Length);
-            result.systems = new EcsPipelineTemplate.AddCommand[_records.Length];
-            for (int i = 0; i < result.systems.Length; i++)
+            result.records = new EcsPipelineTemplate.Record[_records.Length];
+            for (int i = 0; i < result.records.Length; i++)
             {
                 ref var s = ref _records[i];
-                result.systems[i] = new EcsPipelineTemplate.AddCommand(s.target, s.parameters);
+                result.records[i] = new EcsPipelineTemplate.Record(s.target, s.parameters);
             }
             return result;
         }
@@ -64,10 +64,10 @@ namespace DCFApixels.DragonECS
         {
             _layers = new string[template.layers.Length];
             Array.Copy(template.layers, _layers, template.layers.Length);
-            _records = new Record[template.systems.Length];
+            _records = new Record[template.records.Length];
             for (int i = 0; i < _records.Length; i++)
             {
-                ref var s = ref template.systems[i];
+                ref var s = ref template.records[i];
                 _records[i] = new Record(s.target, s.parameters);
             }
         }
@@ -136,7 +136,7 @@ namespace DCFApixels.DragonECS
         public struct Record
         {
             [SerializeReference]
-            [ReferenceButton(typeof(IEcsModule), typeof(IEcsProcess))]
+            [ReferenceButton(true, typeof(IEcsModule), typeof(IEcsProcess))]
             public object target;
             public AddParams parameters;
             public Record(object target, AddParams parameters)

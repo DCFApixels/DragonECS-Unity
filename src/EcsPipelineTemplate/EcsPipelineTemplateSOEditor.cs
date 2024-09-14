@@ -8,6 +8,7 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomPropertyDrawer(typeof(EcsPipelineTemplateSO.Record))]
+    //[CustomPropertyDrawer(typeof(EcsPipelineTemplate.Record))]
     internal class EcsPipelineTemplateSORecordDrawer : ExtendedPropertyDrawer
     {
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
@@ -85,7 +86,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             CreateLists();
         }
-
         private void CreateLists()
         {
             _reorderableLayersList = new ReorderableList(serializedObject, _layersProp, true, false, true, true);
@@ -151,15 +151,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (EcsGUI.CheckChanged())
             {
                 var prop = _recordsProp.GetArrayElementAtIndex(index);
-                var mrProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.target));
-                ITypeMeta meta = mrProp.managedReferenceValue == null ? null : mrProp.managedReferenceValue.GetMeta();
-                EcsGUI.DrawTypeMetaBlock(ref rect, prop, meta);
+
+                var targetProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.target));
+                var paramsProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.parameters));
+
+                bool isNull = targetProp.managedReferenceValue == null;
+                ITypeMeta meta = isNull ? null : targetProp.managedReferenceValue.GetMeta();
+
+                if (EcsGUI.DrawTypeMetaBlock(ref rect, prop, meta))
+                {
+                    return;
+                }
                 EditorGUI.PropertyField(rect, prop, true);
             }
         }
         private float OnReorderableRecordsListElementHeight(int index)
         {
-            return EcsGUI.GetTypeMetaBlockHeight(EditorGUI.GetPropertyHeight(_recordsProp.GetArrayElementAtIndex(index)));
+            float result;
+            result = EditorGUI.GetPropertyHeight(_recordsProp.GetArrayElementAtIndex(index));
+            return EcsGUI.GetTypeMetaBlockHeight(result);
         }
 
         private void OnReorderableRecordsListAdd(ReorderableList list)
@@ -202,7 +212,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawLayoutNameList(SerializedProperty layersProp)
         {
-            using (EcsGUI.SetVerticalLayout())
+            using (EcsGUI.Layout.BeginVertical())
             {
                 GUILayout.Label(UnityEditorUtility.GetLabel(layersProp.displayName), EditorStyles.boldLabel);
                 _reorderableLayersList.DoLayoutList();
@@ -210,7 +220,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private void DrawRecordList(SerializedProperty recordsProp)
         {
-            using (EcsGUI.SetVerticalLayout())
+            using (EcsGUI.Layout.BeginVertical())
             {
                 GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
                 _reorderableRecordsList.DoLayoutList();

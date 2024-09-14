@@ -7,12 +7,11 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal abstract class EntityTemplateEditorBase : Editor
+    internal abstract class EntityTemplateEditorBase<T> : ExtendedEditor<ITemplateInternal>
     {
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
         private ComponentDropDown _componentDropDown;
-        private bool _isInit = false;
 
         private static ComponentColorMode AutoColorMode
         {
@@ -21,16 +20,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
         #region Init
-        private void Init()
+        protected override bool IsInit => _componentDropDown != null;
+        protected override void OnInit()
         {
-            if (_componentDropDown == null) { _isInit = false; }
-            if (_isInit) { return; }
-
             _componentDropDown = new ComponentDropDown();
-
             _componentDropDown.OnSelected += OnAddComponent;
-
-            _isInit = true;
         }
         #endregion
 
@@ -167,60 +161,65 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.center += Vector2.up * padding * 2f;
             bool cancelExpanded = EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp;
 
-            EditorGUI.BeginChangeCheck();
-            GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
+            using (EcsGUI.CheckChanged())
+            {
+                //EditorGUI.BeginChangeCheck();
 
-            #region Draw Component Block 
-            //Close button
-            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-            if (EcsGUI.CloseButton(optionButton))
-            {
-                OnRemoveComponentAt(index);
-                return;
-            }
-            //Canceling isExpanded
-            if (cancelExpanded)
-            {
-                componentProperty.isExpanded = !componentProperty.isExpanded;
-            }
-            //Edit script button
-            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.ScriptAssetButton(optionButton, script);
-            }
-            //Description icon
-            if (string.IsNullOrEmpty(description) == false)
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.DescriptionIcon(optionButton, description);
-            }
+                GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
 
-            if (propCount <= 0)
-            {
-                EcsGUI.Layout.DrawEmptyComponentProperty(componentRefProp, name, isEmpty);
-            }
-            else
-            {
-                GUIContent label = UnityEditorUtility.GetLabel(name);
-                if (componentProperty.propertyType == SerializedPropertyType.Generic)
+                #region Draw Component Block 
+                //Close button
+                optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+                if (EcsGUI.CloseButton(optionButton))
                 {
-                    EditorGUILayout.PropertyField(componentProperty, label, true);
+                    OnRemoveComponentAt(index);
+                    return;
+                }
+                //Canceling isExpanded
+                if (cancelExpanded)
+                {
+                    componentProperty.isExpanded = !componentProperty.isExpanded;
+                }
+                //Edit script button
+                if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+                {
+                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                    EcsGUI.ScriptAssetButton(optionButton, script);
+                }
+                //Description icon
+                if (string.IsNullOrEmpty(description) == false)
+                {
+                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                    EcsGUI.DescriptionIcon(optionButton, description);
+                }
+
+                if (propCount <= 0)
+                {
+                    EcsGUI.Layout.DrawEmptyComponentProperty(componentRefProp, name, isEmpty);
                 }
                 else
                 {
-                    Rect r = RectUtility.AddPadding(GUILayoutUtility.GetRect(label, EditorStyles.objectField), 0, 20f, 0, 0);
-                    EditorGUI.PropertyField(r, componentProperty, label, true);
+                    GUIContent label = UnityEditorUtility.GetLabel(name);
+                    if (componentProperty.propertyType == SerializedPropertyType.Generic)
+                    {
+                        EditorGUILayout.PropertyField(componentProperty, label, true);
+                    }
+                    else
+                    {
+                        Rect r = RectUtility.AddPadding(GUILayoutUtility.GetRect(label, EditorStyles.objectField), 0, 20f, 0, 0);
+                        EditorGUI.PropertyField(r, componentProperty, label, true);
+                    }
                 }
-            }
-            #endregion
+                #endregion
 
-            GUILayout.EndVertical();
+                GUILayout.EndVertical();
 
-            if (EditorGUI.EndChangeCheck())
-            {
-                componentProperty.serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
+                //if (EditorGUI.EndChangeCheck())
+                if (EcsGUI.Changed)
+                {
+                    componentProperty.serializedObject.ApplyModifiedProperties();
+                    EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
+                }
             }
         }
         private void DrawDamagedComponent_Replaced(SerializedProperty componentRefProp, int index)
@@ -254,19 +253,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
-    internal class EntityTemplatePresetEditor : EntityTemplateEditorBase
+    internal class EntityTemplatePresetEditor : EntityTemplateEditorBase<ScriptableEntityTemplate>
     {
-        public override void OnInspectorGUI()
+        protected override void DrawCustom()
         {
-            Draw((ITemplateInternal)target);
+            Draw(Target);
         }
     }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
-    internal class EntityTemplateEditor : EntityTemplateEditorBase
+    internal class EntityTemplateEditor : EntityTemplateEditorBase<MonoEntityTemplate>
     {
-        public override void OnInspectorGUI()
+        protected override void DrawCustom()
         {
-            Draw((ITemplateInternal)target);
+            Draw(Target);
         }
     }
 }

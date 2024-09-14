@@ -7,24 +7,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(EcsEntityConnect))]
     [CanEditMultipleObjects]
-    internal class EcsEntityConnectEditor : Editor
+    internal class EcsEntityConnectEditor : ExtendedEditor<EcsEntityConnect>
     {
-        private bool _isInit = false;
-        private EcsEntityConnect Target => (EcsEntityConnect)target;
-        private bool IsMultipleTargets => targets.Length > 1;
-
-        private void Init()
+        protected override void DrawCustom()
         {
-            if (_isInit)
-            {
-                return;
-            }
-            _isInit = true;
-        }
-
-        public override void OnInspectorGUI()
-        {
-            Init();
             EcsEntityConnect[] targets = new EcsEntityConnect[this.targets.Length];
             for (int i = 0; i < targets.Length; i++)
             {
@@ -47,16 +33,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawTemplates()
         {
-            EditorGUI.BeginChangeCheck();
-            var iterator = serializedObject.GetIterator();
-            iterator.NextVisible(true);
-            while (iterator.NextVisible(false))
+            using (EcsGUI.CheckChanged())
             {
-                EditorGUILayout.PropertyField(iterator, true);
-            }
-            if (EditorGUI.EndChangeCheck())
-            {
-                serializedObject.ApplyModifiedProperties();
+                var iterator = serializedObject.GetIterator();
+                iterator.NextVisible(true);
+                while (iterator.NextVisible(false))
+                {
+                    EditorGUILayout.PropertyField(iterator, true);
+                }
+
+                if (EcsGUI.Changed)
+                {
+                    serializedObject.ApplyModifiedProperties();
+                }
             }
         }
 
@@ -65,8 +54,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             float height = EcsGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
-            rect = RectUtility.AddPadding(rect, 2f, 0f);
-            var (_, buttonRect) = RectUtility.HorizontalSliceRight(rect, height);
+            rect = rect.AddPadding(2f, 0f);
+            var (_, buttonRect) = rect.HorizontalSliceRight(height);
             if (EcsGUI.AutosetCascadeButton(buttonRect))
             {
                 foreach (var target in targets)
@@ -82,9 +71,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     target.Autoset_Editor();
                 }
             }
-            using (new EditorGUI.DisabledScope(!Application.isPlaying))
+            using (EcsGUI.SetEnable(Application.isPlaying))
             {
-                buttonRect = RectUtility.Move(buttonRect, -height, 0);
+                buttonRect = buttonRect.Move(-height, 0);
                 if (EcsGUI.DelEntityButton(buttonRect))
                 {
                     foreach (var target in targets)
@@ -92,7 +81,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         target.DeleteEntity_Editor();
                     }
                 }
-                buttonRect = RectUtility.Move(buttonRect, -height, 0);
+                buttonRect = buttonRect.Move(-height, 0);
                 if (EcsGUI.UnlinkButton(buttonRect))
                 {
                     foreach (var target in targets)

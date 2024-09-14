@@ -7,20 +7,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(AutoEntityCreator))]
     [CanEditMultipleObjects]
-    internal class AutoEntityCreatorEditor : Editor
+    internal class AutoEntityCreatorEditor : ExtendedEditor<AutoEntityCreator>
     {
-        private AutoEntityCreator Target => (AutoEntityCreator)target;
-
-        public override void OnInspectorGUI()
+        protected override void DrawCustom()
         {
-            EditorGUI.BeginChangeCheck();
             var iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
             while (iterator.NextVisible(false))
             {
                 EditorGUILayout.PropertyField(iterator, true);
             }
-            if (EditorGUI.EndChangeCheck())
+            if (EcsGUI.Changed)
             {
                 serializedObject.ApplyModifiedProperties();
             }
@@ -33,9 +30,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             float height = EcsGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
-            rect = RectUtility.AddPadding(rect, 2f, 0f);
-            var (left, autosetCascadeRect) = RectUtility.HorizontalSliceRight(rect, height);
-            var (_, autosetRect) = RectUtility.HorizontalSliceRight(left, height);
+            rect = rect.AddPadding(2f, 0f);
+            var (left, autosetCascadeRect) = rect.HorizontalSliceRight(height);
+            var (_, autosetRect) = rect.HorizontalSliceRight(height);
 
             if (EcsGUI.AutosetCascadeButton(autosetCascadeRect))
             {

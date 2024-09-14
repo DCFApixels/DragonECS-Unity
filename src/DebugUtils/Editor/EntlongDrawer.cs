@@ -2,19 +2,18 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using UnityEditor;
 using UnityEngine;
-using static UnityEditor.EditorGUI;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomPropertyDrawer(typeof(entlong))]
-    internal class EntlongDrawer : PropertyDrawer
+    internal class EntlongDrawer : ExtendedPropertyDrawer
     {
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (new DisabledScope(false))
+            using (EcsGUI.Disable)
             {
                 EntitySlotInfo slotInfo = new EntitySlotInfo(property.FindPropertyRelative("_full").longValue);
-                var (labelRect, barRect) = RectUtility.HorizontalSliceLeft(position, EditorGUIUtility.labelWidth * 0.65f);
+                var (labelRect, barRect) = position.HorizontalSliceLeft(EditorGUIUtility.labelWidth * 0.65f);
 
                 EditorGUI.LabelField(labelRect, label);
                 bool isAlive = EcsWorld.GetWorld(slotInfo.world).IsAlive(slotInfo.id, slotInfo.gen);

@@ -23,30 +23,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
     }
     [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
-    internal class ComponentTemplateReferenceDrawer : PropertyDrawer
+    internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateReferenceAttribute>
     {
-        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
-
-        private float Padding => EditorGUIUtility.standardVerticalSpacing;
-        private float SingleLineWithPadding => EditorGUIUtility.singleLineHeight + Padding * 4f;
-
         private const float DamagedComponentHeight = 18f * 2f;
-
-        private static bool _isInit;
+        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
         private static ComponentDropDown _componentDropDown;
 
+        private float SingleLineWithPadding => OneLineHeight + Padding * 4f;
+        private float Padding => Spacing;
+        protected override bool IsInit => _componentDropDown != null;
+
         #region Init
-        private static void Init()
+        protected override void OnStaticInit()
         {
-            if (_componentDropDown == null) { _isInit = false; }
-            if (_isInit) { return; }
-
             _componentDropDown = new ComponentDropDown();
-
             _componentDropDown.OnSelected += SelectComponent;
-
-            _isInit = true;
         }
+
         [ThreadStatic]
         private static SerializedProperty currentProperty;
         private static void SelectComponent(ComponentDropDown.Item item)
@@ -93,8 +86,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
 
-
-        public override void OnGUI(Rect position, SerializedProperty componentRefProp, GUIContent label)
+        protected override void DrawCustom(Rect position, SerializedProperty componentRefProp, GUIContent label)
         {
             if (componentRefProp.propertyType == SerializedPropertyType.ManagedReference == false)
             {

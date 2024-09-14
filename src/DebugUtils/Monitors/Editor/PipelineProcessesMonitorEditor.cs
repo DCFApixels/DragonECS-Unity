@@ -9,34 +9,16 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomEditor(typeof(PipelineProcessMonitor))]
-    internal class PipelineProcessesMonitorEditor : Editor
+    internal class PipelineProcessesMonitorEditor : ExtendedEditor<PipelineProcessMonitor>
     {
         private static Type SYSTEM_INTERFACE_TYPE = typeof(IEcsProcess);
 
-        private bool _isInit = false;
         private List<ProcessData> _processList = new List<ProcessData>();
         private Dictionary<Type, int> _processeIndexes = new Dictionary<Type, int>();
         private SystemData[] _systemsList;
 
-        private PipelineProcessMonitor Target => (PipelineProcessMonitor)target;
-        private bool IsShowInterfaces
+        protected override void OnInit()
         {
-            get { return SettingsPrefs.instance.IsShowInterfaces; }
-            set { SettingsPrefs.instance.IsShowInterfaces = value; }
-        }
-        private bool IsShowHidden
-        {
-            get { return SettingsPrefs.instance.IsShowHidden; }
-            set { SettingsPrefs.instance.IsShowHidden = value; }
-        }
-
-        private void Init()
-        {
-            if (_isInit)
-            {
-                return;
-            }
-
             _processList.Clear();
             _processeIndexes.Clear();
             IEnumerable<IEcsProcess> fileretSystems = Target.Pipeline.AllSystems;
@@ -70,22 +52,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
             }
-            _isInit = true;
         }
         private Vector2 _position;
         private Vector2 _cellsize = new Vector2(EditorGUIUtility.singleLineHeight, EditorGUIUtility.singleLineHeight);
         private Vector2 _nameCellSize = new Vector2(200f, 200f);
 
         private (TypeMeta system, TypeMeta process) _selectedPointMeta = default;
-        public override void OnInspectorGUI()
+
+        protected override void DrawCustom()
         {
-            EditorGUI.BeginChangeCheck();
-            IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
-            if (EditorGUI.EndChangeCheck())
+            using (EcsGUI.CheckChanged())
             {
-                _isInit = false;
+                IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
+                if (EcsGUI.Changed)
+                {
+                    Init();
+                }
             }
-            Init();
+
 
             GUILayout.Label("", GUILayout.ExpandWidth(true), GUILayout.Height(400f));
             Rect rect = GUILayoutUtility.GetLastRect();
