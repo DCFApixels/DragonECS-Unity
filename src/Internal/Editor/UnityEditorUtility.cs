@@ -118,6 +118,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         internal static void ResetValues(this SerializedProperty property, bool isExpand = false)
         {
+            ResetValues_Internal(property.Copy(), isExpand, property.depth);
+        }
+        private static void ResetValues_Internal(SerializedProperty property, bool isExpand, int depth)
+        {
             property.isExpanded = isExpand;
             switch (property.propertyType)
             {
@@ -127,9 +131,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     //InvalidOperationException: The operation is not possible when moved past all properties (Next returned false)
                     //и не дает инструментов и шансов этого избежать
                     {
-                        while (property.Next(true))
+                        bool x = true;
+                        while (property.Next(x) && property.depth > depth)
                         {
-                            property.ResetValues(isExpand);
+                            ResetValues_Internal(property, isExpand, property.depth);
+                            x = false;
                         }
                     }
                     catch (Exception) { }
