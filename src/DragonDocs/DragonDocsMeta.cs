@@ -25,6 +25,8 @@ namespace DCFApixels.DragonECS.Unity.Docs
         [DataMember, SerializeField] internal string _group = string.Empty;
         [DataMember, SerializeField] internal string[] _tags = Array.Empty<string>();
 
+        [DataMember, SerializeField] internal string _metaID = string.Empty;
+
         [DataMember, SerializeField] internal bool _isHidden = false;
 
 
@@ -72,6 +74,10 @@ namespace DCFApixels.DragonECS.Unity.Docs
         {
             get { return _tags; }
         }
+        public string MetaID
+        {
+            get { return _metaID; }
+        }
         public bool IsHidden
         {
             get { return _isHidden; }
@@ -106,6 +112,8 @@ namespace DCFApixels.DragonECS.Unity.Docs
             {
                 _tags[i] = meta.Tags[i];
             }
+
+            _metaID = meta.MetaID;
 
             _isHidden = meta.IsHidden;
         }

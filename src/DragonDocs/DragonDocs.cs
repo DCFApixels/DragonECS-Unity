@@ -32,16 +32,16 @@ namespace DCFApixels.DragonECS.Unity.Docs
             Array.Sort(array);
             return new DragonDocs(array);
         }
+
         private static List<Type> GetTypes()
         {
             Type metaAttributeType = typeof(EcsMetaAttribute);
-            Type memberType = typeof(IEcsMember);
             List<Type> result = new List<Type>(512);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if ((type.IsInterface == false && type.IsAbstract == false && memberType.IsAssignableFrom(type)) || Attribute.GetCustomAttributes(type, metaAttributeType, false).Length > 1)
+                    if (TypeMeta.IsHasMeta(type))
                     {
                         result.Add(type);
                     }

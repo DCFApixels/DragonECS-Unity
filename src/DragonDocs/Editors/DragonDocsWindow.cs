@@ -246,58 +246,76 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 Color alphaPanelColor = panelColor;
                 alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-                GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
-                GUILayout.Space(1f);
+                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor)))
+                {
+                    GUILayout.Space(1f);
 
-                GUILayout.BeginHorizontal();
-                GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
-                if (meta.TryGetSourceType(out System.Type targetType) && UnityEditorUtility.TryGetScriptAsset(targetType, out MonoScript script))
-                {
-                    EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(19f));
-                }
-                if (meta.IsCustomName)
-                {
-                    using (EcsGUI.SetAlpha(0.64f)) using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
+                    //draw title block
+                    using (EcsGUI.Layout.BeginHorizontal())
                     {
-                        GUILayout.TextArea(IsUseCustomNames ? meta.TypeName : meta.Name, GUI.skin.label);
+                        GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
+                        if (meta.TryGetSourceType(out System.Type targetType) && UnityEditorUtility.TryGetScriptAsset(targetType, out MonoScript script))
+                        {
+                            EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(19f));
+                        }
+                        if (meta.IsCustomName)
+                        {
+                            using (EcsGUI.SetAlpha(0.64f)) using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
+                            {
+                                GUILayout.TextArea(IsUseCustomNames ? meta.TypeName : meta.Name, GUI.skin.label);
+                            }
+                        }
                     }
-                }
-                GUILayout.EndHorizontal();
 
-                Rect lastRect = GUILayoutUtility.GetLastRect();
-                if (string.IsNullOrEmpty(meta.Description) == false)
-                {
-                    Rect lineRect = lastRect;
-                    lineRect.yMin = lineRect.yMax;
-                    lineRect.yMax += 1f;
-                    lineRect.y += 5f;
-                    EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
-
-                    GUILayout.Space(7f);
-
-                    GUILayout.TextArea(meta.Description, EditorStyles.wordWrappedLabel);
-                }
-
-                if (meta._tags.Length > 0)
-                {
-                    Rect lineRect = GUILayoutUtility.GetLastRect();
-                    lineRect.yMin = lineRect.yMax;
-                    lineRect.yMax += 1f;
-                    lineRect.y += 5f;
-                    EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
-
-                    GUILayout.Space(3f);
-
-                    var tagsstring = string.Join(',', meta._tags);
-                    using (EcsGUI.SetAlpha(0.5f))
+                    //draw description block
+                    Rect lastRect = GUILayoutUtility.GetLastRect();
+                    if (string.IsNullOrEmpty(meta.Description) == false)
                     {
-                        GUILayout.TextArea(tagsstring, EditorStyles.wordWrappedMiniLabel);
+                        Rect lineRect = lastRect;
+                        lineRect.yMin = lineRect.yMax;
+                        lineRect.yMax += 1f;
+                        lineRect.y += 5f;
+                        EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
+
+                        GUILayout.Space(7f);
+
+                        GUILayout.TextArea(meta.Description, EditorStyles.wordWrappedLabel);
                     }
+
+                    //footer line
+                    if (string.IsNullOrEmpty(meta.MetaID) == false || meta._tags.Length > 0)
+                    {
+                        Rect lineRect = GUILayoutUtility.GetLastRect();
+                        lineRect.yMin = lineRect.yMax;
+                        lineRect.yMax += 1f;
+                        lineRect.y += 5f;
+                        EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
+
+                        GUILayout.Space(3f);
+                    }
+
+                    //draw metaid block
+                    if (string.IsNullOrEmpty(meta.MetaID) == false)
+                    {
+                        using (EcsGUI.SetAlpha(0.5f))
+                        {
+                            GUILayout.TextArea(meta.MetaID, EditorStyles.wordWrappedMiniLabel);
+                        }
+                        //EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
+                    }
+
+                    //draw tags block
+                    if (meta._tags.Length > 0)
+                    {
+                        var tagsstring = string.Join(',', meta._tags);
+                        using (EcsGUI.SetAlpha(0.5f))
+                        {
+                            GUILayout.TextArea(tagsstring, EditorStyles.wordWrappedMiniLabel);
+                        }
+                    }
+
+                    GUILayout.Space(1f);
                 }
-
-
-                GUILayout.Space(1f);
-                GUILayout.EndVertical();
             }
         }
 
