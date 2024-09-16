@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,72 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    internal class SystemsDropDown : MetaObjectsDropDown<Type>
+    {
+        public SystemsDropDown()
+        {
+            Type[] predicateTypes = new Type[] { typeof(IEcsModule), typeof(IEcsProcess) };
+            IEnumerable<(Type, ITypeMeta)> itemMetaPairs = UnityEditorUtility._serializableTypes.Where(o =>
+            {
+                foreach (Type predicateTypes in predicateTypes)
+                {
+                    if (predicateTypes.IsAssignableFrom(o))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }).Select(o => (o, (ITypeMeta)o.ToMeta()));
+            Setup(itemMetaPairs);
+        }
+
+        private SerializedProperty _arrayProperty;
+        private SerializedProperty _fieldProperty;
+
+        public void OpenForArray(Rect position, SerializedProperty arrayProperty)
+        {
+            _arrayProperty = arrayProperty;
+            _fieldProperty = null;
+            Show(position);
+        }
+        public void OpenForField(Rect position, SerializedProperty fieldProperty)
+        {
+            _arrayProperty = null;
+            _fieldProperty = fieldProperty;
+            Show(position);
+        }
+
+        protected override void ItemSelected(Item item)
+        {
+            base.ItemSelected(item);
+
+            Type type = item.Obj;
+
+            if (_arrayProperty != null)
+            {
+                int index = _arrayProperty.arraySize;
+                _arrayProperty.arraySize += 1;
+                _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
+                _fieldProperty.Next(true);//Смещение чтобы перейти к полю Traget внутри рекорда
+            }
+
+            if (_fieldProperty != null)
+            {
+                if (type == null)
+                {
+                    _fieldProperty.managedReferenceValue = null;
+                }
+                else
+                {
+                    _fieldProperty.managedReferenceValue = Activator.CreateInstance(type);
+                    _fieldProperty.isExpanded = true;
+                }
+
+                _fieldProperty.serializedObject.ApplyModifiedProperties();
+                EcsGUI.DelayedChanged = true;
+            }
+        }
+    }
     internal class ComponentDropDown : MetaObjectsDropDown<IComponentTemplate>
     {
         public ComponentDropDown()
@@ -27,6 +94,59 @@ namespace DCFApixels.DragonECS.Unity.Editors
             });
             Setup(itemMetaPairs);
         }
+
+        private bool _isCheckUnique;
+        private SerializedProperty _arrayProperty;
+        private SerializedProperty _fieldProperty;
+
+        public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
+        {
+            _isCheckUnique = isCheckUnique;
+            _arrayProperty = arrayProperty;
+            _fieldProperty = null;
+            Show(position);
+        }
+        public void OpenForField(Rect position, SerializedProperty fieldProperty)
+        {
+            _isCheckUnique = false;
+            _arrayProperty = null;
+            _fieldProperty = fieldProperty;
+            Show(position);
+        }
+
+        protected override void ItemSelected(Item item)
+        {
+            base.ItemSelected(item);
+
+            Type componentType = item.Obj.GetType();
+            IComponentTemplate cmptmp = item.Obj;
+
+            if (_arrayProperty != null)
+            {
+                int index = _arrayProperty.arraySize;
+                if (_isCheckUnique)
+                {
+                    if (cmptmp.IsUnique)
+                    {
+                        for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
+                        {
+                            if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+                _arrayProperty.arraySize += 1;
+                _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
+            }
+
+            if (_fieldProperty != null)
+            {
+                _fieldProperty.managedReferenceValue = cmptmp.Clone();
+                _fieldProperty.serializedObject.ApplyModifiedProperties();
+            }
+        }
     }
     internal class RuntimeComponentDropDown : MetaObjectsDropDown<IEcsPool>
     {
@@ -37,6 +157,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return (pool, (ITypeMeta)pool.ComponentType.GetMeta());
             });
             Setup(itemMetaPairs);
+        }
+
+        private int _entityID;
+
+        public void Open(Rect position, int entityID)
+        {
+            _entityID = entityID;
+            Show(position);
+        }
+
+        protected override void ItemSelected(Item item)
+        {
+            IEcsPool pool = item.Obj;
+            if (pool.World.IsUsed(_entityID) == false)
+            {
+                return;
+            }
+            if (pool.Has(_entityID) == false)
+            {
+                pool.AddRaw(_entityID, Activator.CreateInstance(pool.ComponentType));
+            }
+            else
+            {
+                Debug.LogWarning($"Entity({_entityID}) already has component {EcsDebugUtility.GetGenericTypeName(pool.ComponentType)}.");
+            }
         }
     }
     internal class MetaObjectsDropDown<T> : AdvancedDropdown
@@ -49,7 +194,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * 30);
 
         }
-        protected void Setup(IEnumerable<(T, ITypeMeta)> itemMetaPairs, string name = "Select Type", bool isContainsNull = true)
+        protected void Setup(IEnumerable<(T, ITypeMeta)> itemMetaPairs, string name = "Select Type...", bool isContainsNull = true)
         {
             _name = name;
             _isContainsNull = isContainsNull;
@@ -103,8 +248,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override void ItemSelected(AdvancedDropdownItem item)
         {
             base.ItemSelected(item);
-            OnSelected((Item)item);
+            var tType = (Item)item;
+            ItemSelected(tType);
+            OnSelected(tType);
         }
+        protected virtual void ItemSelected(Item item) { }
+
 
         public event Action<Item> OnSelected = delegate { };
 

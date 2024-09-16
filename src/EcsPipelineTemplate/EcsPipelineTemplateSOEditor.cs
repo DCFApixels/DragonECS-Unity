@@ -8,7 +8,6 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomPropertyDrawer(typeof(EcsPipelineTemplateSO.Record))]
-    //[CustomPropertyDrawer(typeof(EcsPipelineTemplate.Record))]
     internal class EcsPipelineTemplateSORecordDrawer : ExtendedPropertyDrawer
     {
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
@@ -28,8 +27,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 Rect subPosition = position;
                 int depth = -1;
-                property.Next(true);
                 float height = 0f;
+
+                property.Next(true);
                 do
                 {
                     subPosition.y += height;
@@ -71,7 +71,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private SerializedProperty _recordsProp;
         private ReorderableList _reorderableLayersList;
         private ReorderableList _reorderableRecordsList;
-
+        private SystemsDropDown _systemsDropDown;
 
         protected override bool IsInit
         {
@@ -94,13 +94,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _reorderableLayersList.drawElementCallback += OnReorderableLayersListDrawElement;
             _reorderableLayersList.onReorderCallback += OnReorderableListReorder;
 
-            _reorderableRecordsList = new ReorderableList(serializedObject, _recordsProp, true, false, true, true);
+            _reorderableRecordsList = new ReorderableList(serializedObject, _recordsProp, true, false, false, false);
             _reorderableRecordsList.onAddCallback += OnReorderableRecordsListAdd;
             _reorderableRecordsList.onRemoveCallback += OnReorderableListRemove;
-            _reorderableRecordsList.drawElementCallback += OnReorderableRecordsListDrawElement;
+            _reorderableRecordsList.drawElementCallback += OnReorderableListDrawEmptyElement;
+            _reorderableRecordsList.drawElementBackgroundCallback += OnReorderableRecordsListDrawElement;
+            _reorderableRecordsList.drawNoneElementCallback += OnReorderableRecordsListDrawNoneElement;
             _reorderableRecordsList.elementHeightCallback += OnReorderableRecordsListElementHeight;
             _reorderableRecordsList.onReorderCallback += OnReorderableListReorder;
+            _reorderableRecordsList.showDefaultBackground = false;
+            _reorderableRecordsList.footerHeight = 0f;
+            _reorderableRecordsList.headerHeight = 0f;
+            _reorderableRecordsList.elementHeight = 0f;
+
+            _systemsDropDown = new SystemsDropDown();
         }
+
+        private void OnReorderableRecordsListDrawNoneElement(Rect rect)
+        {
+
+        }
+
+        private void OnReorderableListDrawEmptyElement(Rect rect, int index, bool isActive, bool isFocused) { }
 
         private void OnReorderableListReorder(ReorderableList list)
         {
@@ -148,17 +163,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region _reorderableRecordsList
         private void OnReorderableRecordsListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
+            if (index < 0) { return; }
+            rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
             using (EcsGUI.CheckChanged())
             {
-                var prop = _recordsProp.GetArrayElementAtIndex(index);
-
+                if (Event.current.type == EventType.Used)
+                {
+                    return;
+                }
+                //EcsDebug.PrintPass(index);
+                SerializedProperty prop = _recordsProp.GetArrayElementAtIndex(index);
                 var targetProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.target));
-                var paramsProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.parameters));
 
                 bool isNull = targetProp.managedReferenceValue == null;
                 ITypeMeta meta = isNull ? null : targetProp.managedReferenceValue.GetMeta();
 
-                if (EcsGUI.DrawTypeMetaBlock(ref rect, prop, meta))
+                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _recordsProp, index, prop, meta))
                 {
                     return;
                 }
@@ -169,7 +189,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             float result;
             result = EditorGUI.GetPropertyHeight(_recordsProp.GetArrayElementAtIndex(index));
-            return EcsGUI.GetTypeMetaBlockHeight(result);
+            return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
         }
 
         private void OnReorderableRecordsListAdd(ReorderableList list)
@@ -183,20 +203,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom()
         {
-            using (EcsGUI.CheckChanged())
+            EcsGUI.Changed = GUILayout.Button("Validate");
+
+            DrawLayoutNameList(_layersProp);
+            DrawRecordList(_recordsProp);
+
+            if (EcsGUI.Changed)
             {
-                EditorGUI.BeginChangeCheck();
-
-                DrawLayoutNameList(_layersProp);
-                DrawRecordList(_recordsProp);
-
-                EcsGUI.Changed = GUILayout.Button("Validate");
-                if (EcsGUI.Changed)
-                {
-                    serializedObject.ApplyModifiedProperties();
-                    Validate();
-                    Repaint();
-                }
+                serializedObject.ApplyModifiedProperties();
+                Validate();
+                Repaint();
             }
         }
 
@@ -220,9 +236,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private void DrawRecordList(SerializedProperty recordsProp)
         {
-            using (EcsGUI.Layout.BeginVertical())
+            GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
-                GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
+                switch (EcsGUI.Layout.AddClearSystemButtons(out Rect dropDownRect))
+                {
+                    case EcsGUI.AddClearButton.Add:
+                        _systemsDropDown.OpenForArray(dropDownRect, recordsProp);
+                        break;
+                    case EcsGUI.AddClearButton.Clear:
+                        recordsProp.ClearArray();
+                        recordsProp.serializedObject.ApplyModifiedProperties();
+                        break;
+                }
                 _reorderableRecordsList.DoLayoutList();
                 //EditorGUILayout.PropertyField(recordsProp, UnityEditorUtility.GetLabel(recordsProp.displayName));
             }

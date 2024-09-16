@@ -2,10 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -108,13 +110,37 @@ namespace DCFApixels.DragonECS.Unity.Editors
         static UnityEditorUtility()
         {
             colorBoxeStyles = new SparseArray<GUIStyle>();
+
+            #region InitSerializableTypes
+            List<Type> types = new List<Type>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var targetTypes = assembly.GetTypes().Where(type =>
+                    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
+                    type.IsSubclassOf(typeof(UnityObject)) == false &&
+                    type.GetCustomAttribute<SerializableAttribute>() != null);
+
+                types.AddRange(targetTypes);
+            }
+            _serializableTypes = types.ToArray();
+            //Array.Sort(_serializableTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
+
+            //_noHiddenSerializableTypes = _serializableTypes.Where(o => {
+            //    var atr = o.GetCustomAttribute<MetaTagsAttribute>();
+            //    return atr != null && atr.Tags.Contains(MetaTags.HIDDEN);
+            //}).ToArray();
+            #endregion
         }
+        internal static readonly Type[] _serializableTypes;
+        //private static Type[] _noHiddenSerializableTypes;
+
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
 
         private static Dictionary<Type, MonoScript> scriptsAssets = new Dictionary<Type, MonoScript>(256);
+
 
         internal static void ResetValues(this SerializedProperty property, bool isExpand = false)
         {
@@ -156,7 +182,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     property.colorValue = default;
                     break;
                 case SerializedPropertyType.ObjectReference:
-                    property.objectReferenceValue = null;
+                    property.objectReferenceValue = default;
                     break;
                 case SerializedPropertyType.LayerMask:
                     property.intValue = default;
@@ -200,7 +226,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     property.quaternionValue = Quaternion.identity;
                     break;
                 case SerializedPropertyType.ExposedReference:
-                    property.objectReferenceValue = null;
+                    property.objectReferenceValue = default;
                     break;
                 case SerializedPropertyType.FixedBufferSize:
                     for (int i = 0, iMax = property.fixedBufferSize; i < iMax; i++)
@@ -423,39 +449,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             IEnumerable<IEcsPool> pools = world.AllPools.ToArray().Where(o => o.IsNullOrDummy() == false);
             RuntimeComponentDropDown genericMenu = new RuntimeComponentDropDown(pools);
-
-            //var pools = world.AllPools;
-            //for (int i = 0; i < pools.Length; i++)
-            //{
-            //    var pool = pools[i];
-            //    if (pool.IsNullOrDummy())
-            //    {
-            //        continue;
-            //    }
-            //    var meta = pool.ComponentType.ToMeta();
-            //    string name = meta.Group.Name + meta.Name;
-            //    genericMenu.AddItem(new GUIContent(name, meta.Description.Text), false, OnAddComponent, pool);
-            //}
             return new WorldData(genericMenu, world.PoolsCount);
-        }
-
-        public static int CurrentEntityID = 0;
-
-        private static void OnAddComponent(object userData)
-        {
-            IEcsPool pool = (IEcsPool)userData;
-            if (pool.World.IsUsed(CurrentEntityID) == false)
-            {
-                return;
-            }
-            if (pool.Has(CurrentEntityID) == false)
-            {
-                pool.AddRaw(CurrentEntityID, Activator.CreateInstance(pool.ComponentType));
-            }
-            else
-            {
-                Debug.LogWarning($"Entity({CurrentEntityID}) already has component {EcsDebugUtility.GetGenericTypeName(pool.ComponentType)}.");
-            }
         }
 
         private class Listener : IEcsWorldEventListener

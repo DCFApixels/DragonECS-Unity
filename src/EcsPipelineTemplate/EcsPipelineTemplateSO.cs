@@ -137,7 +137,8 @@ namespace DCFApixels.DragonECS
         {
             [SerializeReference]
             [ReferenceButton(true, typeof(IEcsModule), typeof(IEcsProcess))]
-            public object target;
+            [ArrayElement]
+            public object target;// нельзя менять поярдок полей, иначе это поломает отрисовку в инспекторе изза применения property.Next(bool);
             public AddParams parameters;
             public Record(object target, AddParams parameters)
             {

@@ -163,7 +163,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * Padding * 1f;
             //Canceling isExpanded
-            if (EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+            if (EcsGUI.ClickTest(optionButton))
             {
                 componentProperty.isExpanded = !componentProperty.isExpanded;
             }

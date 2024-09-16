@@ -86,7 +86,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
     internal abstract class ExtendedEditor<T> : ExtendedEditor
     {
-
         public T Target
         {
             get
@@ -124,7 +123,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private IEnumerable<Attribute> Attributes
+        protected IEnumerable<Attribute> Attributes
         {
             get
             {

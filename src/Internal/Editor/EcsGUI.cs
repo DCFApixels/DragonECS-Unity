@@ -2,7 +2,6 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -265,28 +264,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
 
-        private static Type[] _serializableTypes;
-
-
-        static EcsGUI()
-        {
-            InitSerializableTypes();
-        }
-        private static void InitSerializableTypes()
-        {
-            List<Type> types = new List<Type>();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var targetTypes = assembly.GetTypes().Where(type =>
-                    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
-                    type.IsSubclassOf(typeof(UnityObject)) == false &&
-                    type.GetCustomAttribute<SerializableAttribute>() != null);
-
-                types.AddRange(targetTypes);
-            }
-            _serializableTypes = types.ToArray();
-        }
-
         #region Properties
         private static ComponentColorMode AutoColorMode
         {
@@ -314,14 +291,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region enums
-        public enum AddClearComponentButton : byte
+        public enum AddClearButton : byte
         {
             None = 0,
-            AddComponent,
-            Clear,
+            Add = 1,
+            Clear = 2,
         }
         [Flags]
-        public enum EntityStatus
+        public enum EntityStatus : byte
         {
             NotAlive = 0,
             Alive = 1 << 0,
@@ -329,7 +306,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        #region HitTest
+        #region HitTest/ClickTest
         internal static bool HitTest(Rect rect)
         {
             return HitTest(rect, Event.current.mousePosition);
@@ -346,6 +323,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal static bool HitTest(Rect rect, Vector2 point, int offset)
         {
             return point.x >= rect.xMin - (float)offset && point.x < rect.xMax + (float)offset && point.y >= rect.yMin - (float)offset && point.y < rect.yMax + (float)offset;
+        }
+        internal static bool ClickTest(Rect rect)
+        {
+            Event evt = Event.current;
+            return ClickTest(rect, evt);
+        }
+        internal static bool ClickTest(Rect rect, Event evt)
+        {
+            return HitTest(rect, evt.mousePosition) && evt.type == EventType.MouseUp;
         }
         #endregion
 
@@ -538,14 +524,42 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return DrawTypeMetaBlockPadding * 2 + contentHeight;
         }
+        public static bool DrawTypeMetaElementBlock(ref Rect position, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementProperty, ITypeMeta meta)
+        {
+            var result = DrawTypeMetaBlock_Internal(ref position, elementProperty, meta);
+            if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
+            {
+                arrayProperty.DeleteArrayElementAtIndex(elementIndex);
+            }
+            return result != DrawTypeMetaBlockResult.None;
+        }
         public static bool DrawTypeMetaBlock(ref Rect position, SerializedProperty property, ITypeMeta meta)
         {
+            var result = DrawTypeMetaBlock_Internal(ref position, property, meta);
+            if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
+            {
+                property.ResetValues();
+            }
+            return result.HasFlag(DrawTypeMetaBlockResult.Drop);
+        }
+
+        private enum DrawTypeMetaBlockResult
+        {
+            None = 0,
+            Drop = 1 << 0,
+            CloseButtonClicked = 1 << 1,
+        }
+        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty property, ITypeMeta meta)
+        {
+            Color alphaPanelColor;
             if (meta == null)
             {
-                return false;
+                alphaPanelColor = Color.black;
+                alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+                EditorGUI.DrawRect(position, alphaPanelColor);
+                position = position.AddPadding(DrawTypeMetaBlockPadding * 2f);
+                return DrawTypeMetaBlockResult.None;
             }
-            GUIContent label = UnityEditorUtility.GetLabel(property.displayName);
-
 
             var counter = property.Copy();
             int positionCountr = int.MaxValue;
@@ -555,45 +569,40 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 positionCountr--;
             }
 
-            //var counter = property.Copy();
-            //int positionCountr = int.MaxValue;
-            //while (counter.NextVisible(false))
-            //{
-            //    positionCountr--;
-            //}
-
             string name = meta.Name;
             string description = meta.Description.Text;
 
-            Color panelColor = EcsGUI.SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
-
-            Color alphaPanelColor = panelColor;
+            alphaPanelColor = SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
+            DrawTypeMetaBlockResult result = DrawTypeMetaBlockResult.None;
             using (CheckChanged())
             {
                 EditorGUI.DrawRect(position, alphaPanelColor);
 
-                Rect paddingPosition = RectUtility.AddPadding(position, DrawTypeMetaBlockPadding * 2f);
-
                 Rect optionButton = position;
+                position = position.AddPadding(DrawTypeMetaBlockPadding * 2f);
+
                 optionButton.center -= new Vector2(0, optionButton.height);
                 optionButton.yMin = optionButton.yMax;
                 optionButton.yMax += HeadIconsRect.height;
                 optionButton.xMin = optionButton.xMax - 64;
                 optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
+
                 //Canceling isExpanded
-                if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+                bool oldIsExpanded = property.isExpanded;
+                if (ClickTest(optionButton))
                 {
-                    property.isExpanded = !property.isExpanded;
+                    property.isExpanded = oldIsExpanded;
+                    result |= DrawTypeMetaBlockResult.Drop;
                 }
 
                 //Close button
                 optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
                 if (CloseButton(optionButton))
                 {
-                    property.ResetValues();
-                    return true;
+                    result |= DrawTypeMetaBlockResult.CloseButtonClicked;
+                    return result;
                 }
                 //Edit script button
                 if (UnityEditorUtility.TryGetScriptAsset(meta.Type, out MonoScript script))
@@ -607,21 +616,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                     DescriptionIcon(optionButton, description);
                 }
-
-                //if (string.IsNullOrEmpty(label.text))
-                //{
-                //    EditorGUI.indentLevel++;
-                //    EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
-                //    EditorGUI.indentLevel--;
-                //}
-                //else
-                //{
-                //    GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
-                //}
-
-                position = paddingPosition;
             }
-            return false;
+            return result;
         }
         #endregion
 
@@ -699,22 +695,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
             dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
             return GUI.Button(dropDownRect, "Add Component");
         }
-        public static AddClearComponentButton AddClearComponentButtons(Rect position, out Rect dropDownRect)
+        public static AddClearButton AddClearComponentButtons(Rect position, out Rect dropDownRect)
+        {
+            return AddClearButtons(position, "Add Component", "Clear", out dropDownRect);
+        }
+        public static AddClearButton AddClearSystemButtons(Rect position, out Rect dropDownRect)
+        {
+            return AddClearButtons(position, "Add Record", "Clear", out dropDownRect);
+        }
+        public static AddClearButton AddClearButtons(Rect position, string addText, string clearText, out Rect dropDownRect)
         {
             position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
             var (left, right) = RectUtility.HorizontalSliceLerp(position, 0.75f);
 
             dropDownRect = left;
 
-            if (GUI.Button(left, "Add Component"))
+            if (GUI.Button(left, addText))
             {
-                return AddClearComponentButton.AddComponent;
+                return AddClearButton.Add;
             }
-            if (GUI.Button(right, "Clear"))
+            if (GUI.Button(right, clearText))
             {
-                return AddClearComponentButton.Clear;
+                return AddClearButton.Clear;
             }
-            return AddClearComponentButton.None;
+            return AddClearButton.None;
         }
 
         public static void DrawEmptyComponentProperty(Rect position, SerializedProperty property, string name, bool isDisplayEmpty)
@@ -822,7 +826,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 Dictionary<Key, Item> dict = new Dictionary<Key, Item>();
 
-                foreach (var type in _serializableTypes)
+                foreach (var type in UnityEditorUtility._serializableTypes)
                 {
                     bool isAssignable = false;
                     foreach (Type predicateTypes in PredicateTypes)
@@ -937,20 +941,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static void DrawSelectReferenceButton(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, bool isHideButtonIfNotNull)
         {
             object obj = property.hasMultipleDifferentValues ? null : property.managedReferenceValue;
+            string text = obj == null ? "Select..." : obj.GetMeta().Name;
             if (!isHideButtonIfNotNull || obj == null)
             {
-                if (GUI.Button(position, obj == null ? "Select..." : obj.GetMeta().Name, EditorStyles.layerMaskField))
+                if (GUI.Button(position, text, EditorStyles.layerMaskField))
                 {
-                    _currentProperty = property;
-                    GetReferenceDropDown(sortedPredicateTypes).Show(position);
+                    DrawSelectReferenceMenu(position, property, sortedPredicateTypes);
                 }
             }
             else
             {
-                GUI.Label(position, obj == null ? "Select..." : obj.GetMeta().Name);
+                GUI.Label(position, text);
             }
         }
-
+        public static void DrawSelectReferenceMenu(Rect position, SerializedProperty property, Type[] sortedPredicateTypes)
+        {
+            _currentProperty = property;
+            GetReferenceDropDown(sortedPredicateTypes).Show(position);
+        }
         #endregion
 
 
@@ -1045,9 +1053,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 return EcsGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
             }
-            public static AddClearComponentButton AddClearComponentButtons(out Rect dropDownRect)
+            public static AddClearButton AddClearComponentButtons(out Rect dropDownRect)
             {
                 return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
+            }
+            public static AddClearButton AddClearSystemButtons(out Rect dropDownRect)
+            {
+                return EcsGUI.AddClearSystemButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout = true)
             {
@@ -1071,9 +1083,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     if (AddComponentButtons(out Rect dropDownRect))
                     {
-                        RuntimeComponentDropDown genericMenu = RuntimeComponentsUtility.GetAddComponentGenericMenu(world);
-                        RuntimeComponentsUtility.CurrentEntityID = entityID;
-                        genericMenu.Show(dropDownRect);
+                        RuntimeComponentsUtility.GetAddComponentGenericMenu(world).Open(dropDownRect, entityID);
                     }
 
                     GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
@@ -1109,7 +1119,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     optionButton.xMin = optionButton.xMax - 64;
                     optionButton.center += Vector2.up * padding * 2f;
                     //Canceling isExpanded
-                    if (HitTest(optionButton) && Event.current.type == EventType.MouseUp)
+                    if (ClickTest(optionButton))
                     {
                         ref bool isExpanded = ref expandMatrix.Down();
                         isExpanded = !isExpanded;

@@ -24,37 +24,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override void OnInit()
         {
             _componentDropDown = new ComponentDropDown();
-            _componentDropDown.OnSelected += OnAddComponent;
         }
         #endregion
 
         #region Add/Remove
-        private void OnAddComponent(ComponentDropDown.Item item)
-        {
-            Type componentType = item.Obj.GetType();
-            IComponentTemplate cmptmp = item.Obj;
-            if (this.target is ITemplateInternal target)
-            {
-                SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
-                if (cmptmp.IsUnique)
-                {
-                    for (int i = 0, iMax = componentsProp.arraySize; i < iMax; i++)
-                    {
-                        if (componentsProp.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
-                        {
-                            return;
-                        }
-                    }
-                }
-
-                int index = componentsProp.arraySize;
-                componentsProp.InsertArrayElementAtIndex(index);
-                componentsProp.GetArrayElementAtIndex(index).managedReferenceValue = cmptmp.Clone();
-
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(this.target);
-            }
-        }
         private void OnRemoveComponentAt(int index)
         {
             if (this.target is ITemplateInternal target)
@@ -76,24 +49,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
-            DrawTop(target);
-            GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
-            for (int i = componentsProp.arraySize - 1; i >= 0; i--)
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
-                DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
+                DrawTop(target, componentsProp);
+                GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
+                for (int i = componentsProp.arraySize - 1; i >= 0; i--)
+                {
+                    DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
+                }
             }
-            GUILayout.EndVertical();
         }
-        private void DrawTop(ITemplateInternal target)
+        private void DrawTop(ITemplateInternal target, SerializedProperty componentsProp)
         {
             switch (EcsGUI.Layout.AddClearComponentButtons(out Rect rect))
             {
-                case EcsGUI.AddClearComponentButton.AddComponent:
+                case EcsGUI.AddClearButton.Add:
                     Init();
-                    _componentDropDown.Show(rect);
+                    _componentDropDown.OpenForArray(rect, componentsProp, true);
                     break;
-                case EcsGUI.AddClearComponentButton.Clear:
+                case EcsGUI.AddClearButton.Clear:
                     Init();
                     serializedObject.FindProperty(target.ComponentsPropertyName).ClearArray();
                     serializedObject.ApplyModifiedProperties();
@@ -159,15 +133,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionButton.yMax += HeadIconsRect.height;
             optionButton.xMin = optionButton.xMax - 64;
             optionButton.center += Vector2.up * padding * 2f;
-            bool cancelExpanded = EcsGUI.HitTest(optionButton) && Event.current.type == EventType.MouseUp;
+            bool cancelExpanded = EcsGUI.ClickTest(optionButton);
 
-            using (EcsGUI.CheckChanged())
+            #region Draw Component Block 
+            using (EcsGUI.CheckChanged()) using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor)))
             {
-                //EditorGUI.BeginChangeCheck();
-
-                GUILayout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor));
-
-                #region Draw Component Block 
                 //Close button
                 optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
                 if (EcsGUI.CloseButton(optionButton))
@@ -210,17 +180,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         EditorGUI.PropertyField(r, componentProperty, label, true);
                     }
                 }
-                #endregion
 
-                GUILayout.EndVertical();
-
-                //if (EditorGUI.EndChangeCheck())
                 if (EcsGUI.Changed)
                 {
                     componentProperty.serializedObject.ApplyModifiedProperties();
                     EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
                 }
             }
+            #endregion
         }
         private void DrawDamagedComponent_Replaced(SerializedProperty componentRefProp, int index)
         {
