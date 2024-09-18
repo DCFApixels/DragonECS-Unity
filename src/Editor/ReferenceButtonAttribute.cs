@@ -38,6 +38,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     fieldType = fieldType.GetGenericTypeDefinition();
                 }
+
                 if (fieldType == referenceBaseType)
                 {
                     _isReferenceWrapper = true;
@@ -51,11 +52,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
+            Init();
             if (_isReferenceWrapper)
             {
                 property.Next(true);
             }
-
             if (property.managedReferenceValue != null)
             {
                 return EditorGUI.GetPropertyHeight(property, label, true);
