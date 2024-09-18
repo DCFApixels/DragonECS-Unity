@@ -7,4 +7,14 @@
 
         public const string DEBUG_LAYER = EcsConsts.NAME_SPACE + "Unity." + nameof(DEBUG_LAYER);
     }
+
+    public class EcsUnityDefines
+    {
+        public const bool DISABLE_SERIALIZE_REFERENCE_RECOVERY =
+#if DISABLE_SERIALIZE_REFERENCE_RECOVERY
+            true;
+#else
+            false;
+#endif
+    }
 }
