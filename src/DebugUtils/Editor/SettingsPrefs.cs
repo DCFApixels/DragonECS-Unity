@@ -10,7 +10,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         Auto = 1,
         Rainbow = 2,
     }
-    [FilePath(EcsConsts.AUTHOR + "/" + EcsConsts.FRAMEWORK_NAME + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath(EcsUnityConsts.LOCAL_CACHE_AND_USER_SETTINGS_FOLDER + "/" + nameof(SettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     internal class SettingsPrefs : ScriptableSingleton<SettingsPrefs>
     {
         [SerializeField]
