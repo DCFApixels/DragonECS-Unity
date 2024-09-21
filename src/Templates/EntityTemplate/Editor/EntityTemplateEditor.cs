@@ -15,8 +15,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static ComponentColorMode AutoColorMode
         {
-            get { return SettingsPrefs.instance.ComponentColorMode; }
-            set { SettingsPrefs.instance.ComponentColorMode = value; }
+            get { return UserSettingsPrefs.instance.ComponentColorMode; }
+            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
         }
 
         #region Init

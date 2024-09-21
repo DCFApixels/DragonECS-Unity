@@ -1,13 +1,20 @@
 ﻿using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
     public abstract class ScriptableEntityTemplateBase : ScriptableObject, ITemplate
     {
+        [SerializeField]
+        private int _saveID;
         public abstract void Apply(short worldID, int entityID);
+
+        private static IComponentTemplate _fake = null;
+        protected virtual IList<IComponentTemplate> GetToRecover() { return null; }
+        protected virtual ref IComponentTemplate GetToRecoverSingle() { return ref _fake; }
     }
 
     [MetaColor(MetaColor.Cyan)]

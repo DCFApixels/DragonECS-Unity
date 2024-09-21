@@ -13,9 +13,12 @@ namespace DCFApixels.DragonECS
 {
 #if UNITY_EDITOR && !DISABLE_SERIALIZE_REFERENCE_RECOVERY
     [InitializeOnLoad]
-    internal static class ReferenceUtility
+    internal static class RecoveryReferenceUtility
     {
-        static ReferenceUtility()
+        internal static bool _recompileAfterInitializationScope = false;
+        private static Dictionary<string, Type> _metaIDTypePairs;
+
+        static RecoveryReferenceUtility()
         {
             _recompileAfterInitializationScope = true;
             EditorApplication.update += BeforeCompilation;
@@ -27,7 +30,33 @@ namespace DCFApixels.DragonECS
             EditorApplication.update -= BeforeCompilation;
         }
 
-        internal static bool _recompileAfterInitializationScope = false;
+
+        private static void InitRecoverCache()
+        {
+            if (_metaIDTypePairs != null) { return; }
+            _metaIDTypePairs = new Dictionary<string, Type>();
+
+            List<Type> types = new List<Type>();
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                foreach (var type in assembly.GetTypes())
+                {
+                    if (type.TryGetAttribute(out MetaIDAttribute atr))
+                    {
+                        _metaIDTypePairs.Add(atr.ID, type);
+                    }
+                }
+            }
+        }
+        internal static T TryRecoverReference<T>(string metaID)
+        {
+            InitRecoverCache();
+            if (_metaIDTypePairs.TryGetValue(metaID, out Type type))
+            {
+                return (T)Activator.CreateInstance(type);
+            }
+            return default;
+        }
     }
 #endif
 
@@ -64,42 +93,12 @@ namespace DCFApixels.DragonECS
         public static implicit operator Reference<T>(T a) { return new Reference<T>() { Value = a }; }
 
 #if UNITY_EDITOR && !DISABLE_SERIALIZE_REFERENCE_RECOVERY
-        private static Dictionary<string, Type> _metaIDTypePairs;
-
-        private static void InitRecoverCache()
-        {
-            if (_metaIDTypePairs != null) { return; }
-            _metaIDTypePairs = new Dictionary<string, Type>();
-
-            List<Type> types = new List<Type>();
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                foreach (var type in assembly.GetTypes())
-                {
-                    if (type.TryGetAttribute(out MetaIDAttribute atr))
-                    {
-                        _metaIDTypePairs.Add(atr.ID, type);
-                    }
-                }
-            }
-        }
-        private static T TryRecoverReference(string metaID)
-        {
-            InitRecoverCache();
-            if (_metaIDTypePairs.TryGetValue(metaID, out Type type))
-            {
-                return (T)Activator.CreateInstance(type);
-            }
-            return default;
-        }
-
-
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            if (_value == null && ReferenceUtility._recompileAfterInitializationScope && string.IsNullOrEmpty(_json) == false)
+            if (_value == null && RecoveryReferenceUtility._recompileAfterInitializationScope && string.IsNullOrEmpty(_json) == false)
             {
                 int indexof = _json.IndexOf(',');
-                _value = TryRecoverReference(_json.Substring(0, indexof));
+                _value = RecoveryReferenceUtility.TryRecoverReference<T>(_json.Substring(0, indexof));
                 if (_value == null) { return; }
                 JsonUtility.FromJsonOverwrite(_json.Substring(indexof + 1), _value);
             }

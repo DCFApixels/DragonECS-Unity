@@ -35,13 +35,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected bool IsShowInterfaces
         {
-            get { return SettingsPrefs.instance.IsShowInterfaces; }
-            set { SettingsPrefs.instance.IsShowInterfaces = value; }
+            get { return UserSettingsPrefs.instance.IsShowInterfaces; }
+            set { UserSettingsPrefs.instance.IsShowInterfaces = value; }
         }
         protected bool IsShowHidden
         {
-            get { return SettingsPrefs.instance.IsShowHidden; }
-            set { SettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.IsShowHidden; }
+            set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
         protected bool IsMultipleTargets => targets.Length > 1;
 
@@ -144,13 +144,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected bool IsShowInterfaces
         {
-            get { return SettingsPrefs.instance.IsShowInterfaces; }
-            set { SettingsPrefs.instance.IsShowInterfaces = value; }
+            get { return UserSettingsPrefs.instance.IsShowInterfaces; }
+            set { UserSettingsPrefs.instance.IsShowInterfaces = value; }
         }
         protected bool IsShowHidden
         {
-            get { return SettingsPrefs.instance.IsShowHidden; }
-            set { SettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.IsShowHidden; }
+            set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
         protected virtual bool IsStaticInit { get { return _isStaticInit; } }
         protected virtual bool IsInit { get { return _isInit; } }

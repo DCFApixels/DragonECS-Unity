@@ -267,18 +267,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Properties
         private static ComponentColorMode AutoColorMode
         {
-            get { return SettingsPrefs.instance.ComponentColorMode; }
-            set { SettingsPrefs.instance.ComponentColorMode = value; }
+            get { return UserSettingsPrefs.instance.ComponentColorMode; }
+            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
         }
         private static bool IsShowHidden
         {
-            get { return SettingsPrefs.instance.IsShowHidden; }
-            set { SettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.IsShowHidden; }
+            set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
         private static bool IsShowRuntimeComponents
         {
-            get { return SettingsPrefs.instance.IsShowRuntimeComponents; }
-            set { SettingsPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
         }
         private static float OneLineHeight
         {

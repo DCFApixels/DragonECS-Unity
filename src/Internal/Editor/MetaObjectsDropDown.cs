@@ -50,7 +50,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Type type = item.Obj;
 
-            if (_arrayProperty != null)
+            if (_arrayProperty != null && type != null)
             {
                 int index = _arrayProperty.arraySize;
                 _arrayProperty.arraySize += 1;
@@ -121,7 +121,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Type componentType = item.Obj.GetType();
             IComponentTemplate cmptmp = item.Obj;
 
-            if (_arrayProperty != null)
+            if (_arrayProperty != null && cmptmp != null)
             {
                 int index = _arrayProperty.arraySize;
                 if (_isCheckUnique)

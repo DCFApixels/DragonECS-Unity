@@ -18,12 +18,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             wnd.Show();
         }
 
-        private List<DefineSymbolsInfo> _defineSymbols = null;
+        private DefineSymbolsInfo[] _defineSymbols = null;
         private void InitDefines()
         {
             string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
-            _defineSymbols = new List<DefineSymbolsInfo>(typeof(EcsDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false)));
-            for (int i = 0; i < _defineSymbols.Count; i++)
+            _defineSymbols =
+                typeof(EcsDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false))
+                .Concat(typeof(EcsUnityDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false)))
+                .ToArray();
+            for (int i = 0; i < _defineSymbols.Length; i++)
             {
                 var symbol = _defineSymbols[i];
                 if (symbolsString.Contains(symbol.name))
@@ -34,7 +37,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private void OnGUI()
         {
-            var prefs = SettingsPrefs.instance;
+            var prefs = UserSettingsPrefs.instance;
             float labelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
 
@@ -47,31 +50,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
             Rect rect = GUILayoutUtility.GetLastRect();
             rect.xMin += 9f;
-            GUI.Label(rect, "Settings", EditorStyles.whiteLargeLabel);
+            GUI.Label(rect, "User Settings", EditorStyles.whiteLargeLabel);
 
             //using (prefs.DisableAutoSave())
             {
                 GUILayout.BeginHorizontal();
                 prefs.IsShowHidden = EditorGUILayout.Toggle(prefs.IsShowHidden, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 prefs.IsShowInterfaces = EditorGUILayout.Toggle(prefs.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 prefs.IsShowRuntimeComponents = EditorGUILayout.Toggle(prefs.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
                 prefs.IsUseCustomNames = EditorGUILayout.Toggle(prefs.IsUseCustomNames, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.IsUseCustomNames)), GUILayout.ExpandWidth(false));
+                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)), GUILayout.ExpandWidth(false));
                 GUILayout.EndHorizontal();
 
-                prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(SettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
+                prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
             }
 
             GUILayout.EndVertical();
@@ -89,7 +92,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 InitDefines();
             }
             EditorGUI.BeginChangeCheck();
-            for (int i = 0; i < _defineSymbols.Count; i++)
+            for (int i = 0; i < _defineSymbols.Length; i++)
             {
                 GUILayout.BeginHorizontal();
                 var symbol = _defineSymbols[i];
@@ -108,7 +111,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (GUILayout.Button("Apply"))
             {
                 string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
-                for (int i = 0; i < _defineSymbols.Count; i++)
+                for (int i = 0; i < _defineSymbols.Length; i++)
                 {
                     var symbol = _defineSymbols[i];
                     symbolsString = symbolsString.Replace(symbol.name, "");

@@ -36,13 +36,13 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         private DragonDocsPrefs Prefs { get { return DragonDocsPrefs.instance; } }
         private static bool IsShowHidden
         {
-            get { return SettingsPrefs.instance.IsShowHidden; }
-            set { SettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.IsShowHidden; }
+            set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
         private static bool IsUseCustomNames
         {
-            get { return SettingsPrefs.instance.IsUseCustomNames; }
-            set { SettingsPrefs.instance.IsUseCustomNames = value; }
+            get { return UserSettingsPrefs.instance.IsUseCustomNames; }
+            set { UserSettingsPrefs.instance.IsUseCustomNames = value; }
         }
 
 

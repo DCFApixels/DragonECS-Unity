@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [CustomEditor(typeof(EcsEntityConnect))]
+    [CustomEditor(typeof(EcsEntityConnect), true)]
     [CanEditMultipleObjects]
     internal class EcsEntityConnectEditor : ExtendedEditor<EcsEntityConnect>
     {

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Docs.Editors
 {
-    [FilePath(EcsUnityConsts.LOCAL_CACHE_AND_USER_SETTINGS_FOLDER + "/" + nameof(DragonDocsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
+    [FilePath(EcsUnityConsts.LOCAL_CACHE_FOLDER + "/" + nameof(DragonDocsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     internal class DragonDocsPrefs : ScriptableSingleton<DragonDocsPrefs>
     {
         [SerializeField] private DragonDocs m_docs;
