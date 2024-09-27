@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
@@ -147,106 +146,5 @@ namespace DCFApixels.DragonECS
                 this.parameters = parameters;
             }
         }
-
-
-
-
-
-        [SerializeField]
-        //[HideInInspector]
-        private int _saveID;
-
-        [Serializable]
-        private struct SavedRecordList
-        {
-            public SavedRecord[] records;
-            public SavedRecordList(SavedRecord[] records)
-            {
-                this.records = records;
-            }
-        }
-        [Serializable]
-        private struct SavedRecord
-        {
-            public int index;
-            public string metaID;
-            public string recordJson;
-            public SavedRecord(int index, string metaID, string recordJson)
-            {
-                this.index = index;
-                this.metaID = metaID;
-                this.recordJson = recordJson;
-            }
-        }
-
-        private void Awake()
-        {
-            Load();
-        }
-
-        private void Load()
-        {
-#if UNITY_EDITOR && !DISABLE_SERIALIZE_REFERENCE_RECOVERY
-            if (_saveID != -1)
-            {
-                bool isChanged = false;
-                var savedRecords = UnityEditorCache.instance.Get<SavedRecordList>(ref _saveID).records;
-                if (savedRecords != null)
-                {
-                    for (int i = 0; i < savedRecords.Length; i++)
-                    {
-                        ref var savedRecord = ref savedRecords[i];
-                        if (savedRecord.index < _records.Length)
-                        {
-                            ref var record = ref _records[savedRecord.index];
-                            if (record.target == null && string.IsNullOrEmpty(savedRecord.metaID) == false)
-                            {
-                                record.target = RecoveryReferenceUtility.TryRecoverReference<object>(savedRecord.metaID);
-                                if (record.target == null) { return; }
-                                JsonUtility.FromJsonOverwrite(savedRecord.recordJson, record.target);
-                                isChanged = true;
-                            }
-                        }
-                    }
-                }
-                if (isChanged)
-                {
-                    EditorUtility.SetDirty(this);
-                }
-            }
-#endif
-        }
-        private void Save()
-        {
-#if UNITY_EDITOR && !DISABLE_SERIALIZE_REFERENCE_RECOVERY
-            if (_saveID == -1 || EditorApplication.isPlaying == false)
-            {
-                SavedRecord[] savedRecords = new SavedRecord[_records.Length];
-                SavedRecordList list = new SavedRecordList(savedRecords);
-                for (int i = 0; i < _records.Length; i++)
-                {
-                    ref var record = ref _records[i];
-                    string metaid = record.target.GetMeta().MetaID;
-                    if (string.IsNullOrEmpty(metaid) == false)
-                    {
-                        savedRecords[i] = new SavedRecord(i, metaid, JsonUtility.ToJson(record.target));
-                    }
-                    else
-                    {
-                        savedRecords[i] = default;
-                    }
-                }
-                UnityEditorCache.instance.Set(list, ref _saveID);
-                //RecoveryReferencesCache.instance.Save();
-            }
-#endif
-        }
-
-#if UNITY_EDITOR && !DISABLE_SERIALIZE_REFERENCE_RECOVERY
-        private void OnValidate()
-        {
-            Save();
-        }
-#endif
     }
 }

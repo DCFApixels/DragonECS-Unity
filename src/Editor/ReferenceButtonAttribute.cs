@@ -30,7 +30,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         protected override void OnInit()
         {
-            Type referenceBaseType = typeof(Reference<>);
             Type fieldType = fieldInfo.FieldType;
             if (fieldType.IsGenericType)
             {
@@ -38,25 +37,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     fieldType = fieldType.GetGenericTypeDefinition();
                 }
-
-                if (fieldType == referenceBaseType)
-                {
-                    _isReferenceWrapper = true;
-                    return;
-                }
             }
-            _isReferenceWrapper = false;
         }
-
-        private bool _isReferenceWrapper = false;
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             Init();
-            if (_isReferenceWrapper)
-            {
-                property.Next(true);
-            }
             if (property.managedReferenceValue != null)
             {
                 return EditorGUI.GetPropertyHeight(property, label, true);
@@ -69,12 +55,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (_isReferenceWrapper)
-            {
-                property.Next(true);
-                label.text = property.displayName;
-            }
-
             if (IsArrayElement)
             {
                 label = UnityEditorUtility.GetLabelTemp();
