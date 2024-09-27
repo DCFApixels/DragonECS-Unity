@@ -99,7 +99,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _reorderableRecordsList.onRemoveCallback += OnReorderableListRemove;
             _reorderableRecordsList.drawElementCallback += OnReorderableListDrawEmptyElement;
             _reorderableRecordsList.drawElementBackgroundCallback += OnReorderableRecordsListDrawElement;
-            _reorderableRecordsList.drawNoneElementCallback += OnReorderableRecordsListDrawNoneElement;
+            _reorderableRecordsList.drawNoneElementCallback += OnReorderableListDrawNoneElement;
             _reorderableRecordsList.elementHeightCallback += OnReorderableRecordsListElementHeight;
             _reorderableRecordsList.onReorderCallback += OnReorderableListReorder;
             _reorderableRecordsList.showDefaultBackground = false;
@@ -110,19 +110,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _systemsDropDown = new SystemsDropDown();
         }
 
-        private void OnReorderableRecordsListDrawNoneElement(Rect rect)
-        {
-
-        }
-
+        #region _reorderableList
+        private void OnReorderableListDrawNoneElement(Rect rect) { }
         private void OnReorderableListDrawEmptyElement(Rect rect, int index, bool isActive, bool isFocused) { }
-
         private void OnReorderableListReorder(ReorderableList list)
         {
             EcsGUI.Changed = true;
         }
-
-        #region _reorderableList
         private void OnReorderableListRemove(ReorderableList list)
         {
             if (list.selectedIndices.Count <= 0)
@@ -163,15 +157,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region _reorderableRecordsList
         private void OnReorderableRecordsListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            if (index < 0) { return; }
+            if (index < 0 || Event.current.type == EventType.Used) { return; }
             rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
             using (EcsGUI.CheckChanged())
             {
-                if (Event.current.type == EventType.Used)
-                {
-                    return;
-                }
-                //EcsDebug.PrintPass(index);
                 SerializedProperty prop = _recordsProp.GetArrayElementAtIndex(index);
                 var targetProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.target));
 

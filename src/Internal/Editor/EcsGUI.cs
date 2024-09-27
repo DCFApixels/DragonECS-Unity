@@ -526,7 +526,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static bool DrawTypeMetaElementBlock(ref Rect position, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementProperty, ITypeMeta meta)
         {
-            var result = DrawTypeMetaBlock_Internal(ref position, elementProperty, meta);
+            var result = DrawTypeMetaBlock_Internal(ref position, elementProperty, meta, elementIndex, arrayProperty.arraySize);
             if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
             {
                 arrayProperty.DeleteArrayElementAtIndex(elementIndex);
@@ -549,7 +549,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Drop = 1 << 0,
             CloseButtonClicked = 1 << 1,
         }
-        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty property, ITypeMeta meta)
+        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty property, ITypeMeta meta, int index = -1, int total = -1)
         {
             Color alphaPanelColor;
             if (meta == null)
@@ -561,18 +561,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return DrawTypeMetaBlockResult.None;
             }
 
-            var counter = property.Copy();
-            int positionCountr = int.MaxValue;
-            int depth = -1;
-            while (counter.NextVisibleDepth(false, ref depth))
-            {
-                positionCountr--;
-            }
-
             string name = meta.Name;
             string description = meta.Description.Text;
 
-            alphaPanelColor = SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+            int positionCountr;
+            if (index < 0)
+            {
+                positionCountr = int.MaxValue;
+                var counter = property.Copy();
+                int depth = -1;
+                while (counter.NextVisibleDepth(false, ref depth))
+                {
+                    positionCountr--;
+                }
+            }
+            else
+            {
+                positionCountr = index;
+            }
+
+            alphaPanelColor = SelectPanelColor(meta, positionCountr, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
             alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
             DrawTypeMetaBlockResult result = DrawTypeMetaBlockResult.None;
@@ -605,7 +613,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     return result;
                 }
                 //Edit script button
-                if (UnityEditorUtility.TryGetScriptAsset(meta.Type, out MonoScript script))
+                if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
                 {
                     optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                     ScriptAssetButton(optionButton, script);
@@ -1136,7 +1144,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         return;
                     }
                     //Edit script button
-                    if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+                    if (ScriptsCache.TryGetScriptAsset(meta, out MonoScript script))
                     {
                         optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                         EcsGUI.ScriptAssetButton(optionButton, script);

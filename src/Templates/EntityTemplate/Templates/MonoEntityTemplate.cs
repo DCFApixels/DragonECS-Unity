@@ -67,7 +67,7 @@ namespace DCFApixels.DragonECS
                         savedRecords[i] = default;
                     }
                 }
-                if(recordSingle != null)
+                if (recordSingle != null)
                 {
                     string metaid = recordSingle.GetMeta().MetaID;
                     list.singleRecord = new SavedRecord(-1, metaid, JsonUtility.ToJson(recordSingle));
@@ -126,6 +126,7 @@ namespace DCFApixels.DragonECS
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]
+        [ReferenceButton(typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
 
         #region Properties

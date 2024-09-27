@@ -66,6 +66,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
         public static void DebugRect_Editor(params Rect[] rects)
         {
+#if UNITY_EDITOR
             uint colorState = NextXorShiftState(3136587146);
             foreach (var rect in rects)
             {
@@ -75,6 +76,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 GUI.Box(rect, "", EditorStyles.selectionRect);
                 EditorGUI.DrawRect(rect, color);
             }
+#endif
         }
         #endregion
 

@@ -177,7 +177,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
             //Edit script button
-            if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+            if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
             {
                 optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                 EcsGUI.ScriptAssetButton(optionButton, script);

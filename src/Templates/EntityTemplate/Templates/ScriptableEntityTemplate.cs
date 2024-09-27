@@ -24,6 +24,7 @@ namespace DCFApixels.DragonECS
     public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]
+        [ReferenceButton(typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
 
         #region Properties

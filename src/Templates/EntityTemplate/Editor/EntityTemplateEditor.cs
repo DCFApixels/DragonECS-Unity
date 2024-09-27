@@ -3,6 +3,7 @@ using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Reflection;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -13,18 +14,140 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private ComponentDropDown _componentDropDown;
 
-        private static ComponentColorMode AutoColorMode
-        {
-            get { return UserSettingsPrefs.instance.ComponentColorMode; }
-            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
-        }
+        private SerializedProperty _componentsProp;
+        private ReorderableList _reorderableComponentsList;
 
         #region Init
         protected override bool IsInit => _componentDropDown != null;
         protected override void OnInit()
         {
             _componentDropDown = new ComponentDropDown();
+
+            _componentsProp = serializedObject.FindProperty(Target.ComponentsPropertyName);
+
+            _reorderableComponentsList = new ReorderableList(serializedObject, _componentsProp, true, false, false, false);
+            _reorderableComponentsList.onAddCallback += OnReorderableComponentsListAdd;
+            _reorderableComponentsList.onRemoveCallback += OnReorderableListRemove;
+            _reorderableComponentsList.drawElementCallback += OnReorderableListDrawEmptyElement;
+            _reorderableComponentsList.drawElementBackgroundCallback += OnReorderableComponentsListDrawElement;
+            _reorderableComponentsList.drawNoneElementCallback += OnReorderableComponentsListDrawNoneElement;
+            _reorderableComponentsList.elementHeightCallback += OnReorderableComponentsListElementHeight;
+            _reorderableComponentsList.onReorderCallback += OnReorderableListReorder;
+            _reorderableComponentsList.showDefaultBackground = false;
+            _reorderableComponentsList.footerHeight = 0f;
+            _reorderableComponentsList.headerHeight = 0f;
+            _reorderableComponentsList.elementHeight = 0f;
         }
+
+        #region ReorderableComponentsList
+        private void OnReorderableComponentsListDrawNoneElement(Rect rect) { }
+        private void OnReorderableListDrawEmptyElement(Rect rect, int index, bool isActive, bool isFocused) { }
+
+        private void OnReorderableListReorder(ReorderableList list)
+        {
+            EcsGUI.Changed = true;
+        }
+
+        private SerializedProperty GetTargetProperty(SerializedProperty prop)
+        {
+            IComponentTemplate template = prop.managedReferenceValue as IComponentTemplate;
+            if (template == null || prop.managedReferenceValue == null)
+            {
+                //DrawDamagedComponent_Replaced(componentRefProp, index);
+                return prop;
+            }
+
+            SerializedProperty componentProperty = prop;
+            try
+            {
+                if (componentProperty.managedReferenceValue is ComponentTemplateBase customTemplate)
+                {
+                    componentProperty = prop.FindPropertyRelative("component");
+                }
+
+                if (componentProperty == null)
+                {
+                    throw new NullReferenceException();
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e, serializedObject.targetObject);
+                //DrawDamagedComponent(index, "Damaged component template.");
+                return prop;
+            }
+
+            return componentProperty;
+        }
+        private float OnReorderableComponentsListElementHeight(int index)
+        {
+            var componentProperty = GetTargetProperty(_componentsProp.GetArrayElementAtIndex(index));
+            float result = EditorGUI.GetPropertyHeight(componentProperty);
+            return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
+        }
+        private void OnReorderableComponentsListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
+        {
+            if (index < 0 || Event.current.type == EventType.Used) { return; }
+            rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
+            using (EcsGUI.CheckChanged())
+            {
+                SerializedProperty prop = _componentsProp.GetArrayElementAtIndex(index);
+
+                IComponentTemplate template = prop.managedReferenceValue as IComponentTemplate;
+                if (template == null || prop.managedReferenceValue == null)
+                {
+                    DrawDamagedComponent_Replaced(prop, index);
+                    return;
+                }
+
+                var componentProp = GetTargetProperty(prop);
+
+
+                ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
+
+                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _componentsProp, index, componentProp, meta))
+                {
+                    return;
+                }
+
+
+                GUIContent label = UnityEditorUtility.GetLabel(meta.Name);
+                if (componentProp.propertyType == SerializedPropertyType.Generic)
+                {
+                    EditorGUI.PropertyField(rect, componentProp, label, true);
+                }
+                else
+                {
+                    EditorGUI.PropertyField(rect.AddPadding(0, 20f, 0, 0), componentProp, label, true);
+                }
+
+            }
+        }
+
+        private void OnReorderableComponentsListAdd(ReorderableList list)
+        {
+            list.serializedProperty.arraySize += 1;
+            list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1).ResetValues();
+            EcsGUI.Changed = true;
+        }
+        private void OnReorderableListRemove(ReorderableList list)
+        {
+            if (list.selectedIndices.Count <= 0)
+            {
+                if (list.serializedProperty.arraySize > 0)
+                {
+                    list.serializedProperty.DeleteArrayElementAtIndex(list.serializedProperty.arraySize - 1);
+                }
+                return;
+            }
+            for (int i = list.selectedIndices.Count - 1; i >= 0; i--)
+            {
+                list.serializedProperty.DeleteArrayElementAtIndex(list.selectedIndices[i]);
+            }
+            EcsGUI.Changed = true;
+        }
+        #endregion
+
         #endregion
 
         #region Add/Remove
@@ -40,23 +163,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        protected void Draw(ITemplateInternal target)
+        protected override void DrawCustom()
         {
             Init();
-            SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
-            if (componentsProp == null)
+
+            if (_componentsProp == null)
             {
                 return;
             }
 
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
-                DrawTop(target, componentsProp);
-                GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
-                for (int i = componentsProp.arraySize - 1; i >= 0; i--)
-                {
-                    DrawComponentData(componentsProp.GetArrayElementAtIndex(i), componentsProp.arraySize, i);
-                }
+                DrawTop(Target, _componentsProp);
+                _reorderableComponentsList.DoLayoutList();
+                //GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
+                //for (int i = _componentsProp.arraySize - 1; i >= 0; i--)
+                //{
+                //    DrawComponentData(_componentsProp.GetArrayElementAtIndex(i), _componentsProp.arraySize, i);
+                //}
             }
         }
         private void DrawTop(ITemplateInternal target, SerializedProperty componentsProp)
@@ -69,7 +193,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     break;
                 case EcsGUI.AddClearButton.Clear:
                     Init();
-                    serializedObject.FindProperty(target.ComponentsPropertyName).ClearArray();
+                    componentsProp.ClearArray();
                     serializedObject.ApplyModifiedProperties();
                     break;
             }
@@ -151,7 +275,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     componentProperty.isExpanded = !componentProperty.isExpanded;
                 }
                 //Edit script button
-                if (UnityEditorUtility.TryGetScriptAsset(componentType, out MonoScript script))
+                if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
                 {
                     optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
                     EcsGUI.ScriptAssetButton(optionButton, script);
@@ -222,18 +346,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
     internal class EntityTemplatePresetEditor : EntityTemplateEditorBase<ScriptableEntityTemplate>
     {
-        protected override void DrawCustom()
-        {
-            Draw(Target);
-        }
+        //protected override void DrawCustom()
+        //{
+        //    Draw(Target);
+        //}
     }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
     internal class EntityTemplateEditor : EntityTemplateEditorBase<MonoEntityTemplate>
     {
-        protected override void DrawCustom()
-        {
-            Draw(Target);
-        }
+        //protected override void DrawCustom()
+        //{
+        //    Draw(Target);
+        //}
     }
 }
 #endif    
