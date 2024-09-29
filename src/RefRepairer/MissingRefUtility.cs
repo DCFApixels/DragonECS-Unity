@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEditor;
@@ -7,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityObject = UnityEngine.Object;
 
-namespace DCFApixels.DragonECS.Unity.Editors
+namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
     public static class UnityObjectExtensions
     {
@@ -21,7 +22,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
     }
 
-    internal class RefRepaireUtility
+    internal class MissingRefUtility
     {
         private readonly Dictionary<TypeData, ContainerMissingTypes> _missingTypes = new Dictionary<TypeData, ContainerMissingTypes>();
 
@@ -163,7 +164,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void AddMissingType(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
+        private void AddMissingType(ManagedReferenceMissingType missingType, UnityObjectDataBase unityObject)
         {
             var typeData = new TypeData(missingType);
             var missingTypeData = new MissingTypeData(missingType, unityObject);
@@ -173,85 +174,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _missingTypes.Add(typeData, containerMissingTypes);
             }
 
-            containerMissingTypes.Add(missingTypeData);
+            containerMissingTypes.ManagedReferencesMissingTypeDatas.Add(missingTypeData);
         }
         #endregion
 
-    }
-
-
-
-
-
-    public class ContainerMissingTypes
-    {
-        public readonly TypeData TypeData;
-
-        private readonly List<MissingTypeData> _managedReferencesMissingTypeDatas = new List<MissingTypeData>();
-
-        public IReadOnlyCollection<MissingTypeData> ManagedReferencesMissingTypeDatas => _managedReferencesMissingTypeDatas;
-
-        public ContainerMissingTypes(TypeData typeData)
-        {
-            TypeData = typeData;
-        }
-
-        public void Add(MissingTypeData missingTypeData) => _managedReferencesMissingTypeDatas.Add(missingTypeData);
-
-        public void Remove(MissingTypeData missingTypeData) => _managedReferencesMissingTypeDatas.Remove(missingTypeData);
-
-        public void RemoveAt(int index) => _managedReferencesMissingTypeDatas.RemoveAt(index);
-    }
-    public struct MissingTypeData
-    {
-        public readonly ManagedReferenceMissingType Data;
-        public readonly BaseUnityObjectData UnityObject;
-
-        public MissingTypeData(ManagedReferenceMissingType missingType, BaseUnityObjectData unityObject)
-        {
-            Data = missingType;
-            UnityObject = unityObject;
-        }
-    }
-    public struct TypeData
-    {
-        public readonly string AssemblyName;
-        public readonly string NamespaceName;
-        public readonly string ClassName;
-
-        public TypeData(ManagedReferenceMissingType missingType)
-        {
-            AssemblyName = missingType.assemblyName;
-            NamespaceName = missingType.namespaceName;
-            ClassName = missingType.className;
-        }
-    }
-    public abstract class BaseUnityObjectData
-    {
-        public string LocalAssetPath => AssetDatabase.GUIDToAssetPath(AssetGuid);
-        public abstract GUID AssetGuid { get; }
-    }
-    public class SceneObjectData : BaseUnityObjectData
-    {
-        public readonly string SceneName;
-
-        public override GUID AssetGuid { get; }
-
-        public SceneObjectData(Scene scene)
-        {
-            SceneName = scene.name;
-            AssetGuid = AssetDatabase.GUIDFromAssetPath(scene.path);
-        }
-    }
-    public class UnityObjectData : BaseUnityObjectData
-    {
-        public readonly UnityObject UnityObject;
-        public override GUID AssetGuid { get; }
-
-        public UnityObjectData(UnityObject unityObject, string pathToPrefab)
-        {
-            UnityObject = unityObject;
-            AssetGuid = AssetDatabase.GUIDFromAssetPath(pathToPrefab);
-        }
     }
 }

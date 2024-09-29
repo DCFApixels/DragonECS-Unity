@@ -123,7 +123,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 serializableTypes.AddRange(targetTypes);
             }
             _serializableTypes = serializableTypes.ToArray();
-            _serializableTypeWithMetaIDMetas = serializableTypes.Where(type => TypeMeta.IsHasMetaID(type)).Select(type => type.GetMeta()).ToArray();
+            _serializableTypeWithMetaIDMetas = serializableTypes
+                .Where(type => TypeMeta.IsHasMetaID(type))
+                .Select(type => type.ToMeta())
+                .ToArray();
             //Array.Sort(_serializableTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
 
             //_noHiddenSerializableTypes = _serializableTypes.Where(o => {
@@ -134,6 +137,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         internal static readonly Type[] _serializableTypes;
         internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
+        private static readonly Dictionary<string, Type> _metaIDTypePairs = new Dictionary<string, Type>();
+
+        public static bool TryGetTypeForMetaID(string metaID, out Type type)
+        {
+            return _metaIDTypePairs.TryGetValue(metaID, out type);
+        }
+
         //private static Type[] _noHiddenSerializableTypes;
 
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();

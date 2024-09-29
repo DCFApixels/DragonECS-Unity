@@ -1,19 +1,56 @@
+using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity.Editors
+namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
-    public static class FileRepaireUtility
+    internal static class FileRepaireUtility
     {
         private const string REFLINE_PATTERN = "- rid:";
-        public static void Replace(string filePath)
+        public static void Replace(string[] fileLines, string oldTypeData, string newTypeData)
         {
+            for (int i = 0; i < fileLines.Length; i++)
+            {
+                if (fileLines[i].Contains(REFLINE_PATTERN))
+                {
+                    fileLines[++i].Replace(oldTypeData, newTypeData);
+                }
+            }
+        }
+        public static string GenerateReplacedLine(TypeData typeData)
+        {
+            return $"type: {{class: {typeData.ClassName}, ns: {typeData.NamespaceName}, asm: {typeData.AssemblyName}}}";
+        }
+        public static string GenerateReplacedLine(ManagedReferenceMissingType typeData)
+        {
+            return $"type: {{class: {typeData.className}, ns: {typeData.namespaceName}, asm: {typeData.assemblyName}}}";
+        }
 
+        public struct FileScope : IDisposable
+        {
+            public readonly string FilePath;
+            public readonly string LocalAssetPath;
+            public string[] lines;
+            public FileScope(string localAssetPath)
+            {
+                LocalAssetPath = localAssetPath;
+                FilePath = $"{Application.dataPath.Replace("/Assets", "")}/{localAssetPath}";
+                lines = File.ReadAllLines(localAssetPath);
+            }
+
+            public void Dispose()
+            {
+                File.WriteAllLines(FilePath, lines);
+                AssetDatabase.ImportAsset(LocalAssetPath, ImportAssetOptions.ForceUpdate);
+                AssetDatabase.Refresh();
+            }
         }
     }
-    public class RepairerFile
+
+
+    internal class RepairerFile
     {
         private readonly Type _type;
         private readonly string[] _fileLines;

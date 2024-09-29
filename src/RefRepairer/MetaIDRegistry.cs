@@ -1,104 +1,88 @@
 ﻿#if UNITY_EDITOR
-using DCFApixels.DragonECS.Unity.Internal;
+using DCFApixels.DragonECS.Unity.Editors;
+using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEditor;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity.Editors
+namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
+    [InitializeOnLoad]
     [FilePath(EcsUnityConsts.LOCAL_CACHE_FOLDER + "/" + nameof(MetaIDRegistry) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     internal class MetaIDRegistry : ScriptableSingleton<MetaIDRegistry>, ISerializationCallbackReceiver
     {
-        [SerializeField]
-        private TypeDataList[] _typeDataLists;
-        [SerializeField]
-        private int _typeDataListsCount = 0;
-        [SerializeField]
-        private TypeDataNode[] _typeDataNodes;
-        [SerializeField]
-        private int _typeDataNodesCount = 0;
         #region [SerializeField]
+        [Serializable]
         private struct Pair
         {
-            public string metaID;
-            public int listIndex;
-            public Pair(string metaID, int listIndex)
+            public TypeDataSerializable key;
+            public string value;
+            public Pair(TypeDataSerializable key, string value)
             {
-                this.metaID = metaID;
-                this.listIndex = listIndex;
+                this.key = key;
+                this.value = value;
             }
         }
-        private Pair[] _metaIDListIndexPairsSerializable;
+        [SerializeField]
+        private Pair[] _typeKeyMetaIDPairsSerializable;
         #endregion
-        private Dictionary<string, int> _metaIDListIndexPairs = new Dictionary<string, int>();
+        private Dictionary<TypeData, string> _typeKeyMetaIDPairs = new Dictionary<TypeData, string>();
+        private bool _isChanged = false;
+
+        public bool TryGetMetaID(TypeData key, out string metaID)
+        {
+            return _typeKeyMetaIDPairs.TryGetValue(key, out metaID);
+        }
 
 
+        static MetaIDRegistry()
+        {
+            EditorApplication.update += BeforeCompilation;
+        }
+        private static void BeforeCompilation()
+        {
+            EditorApplication.update -= BeforeCompilation;
+            instance.TryGetMetaID(default, out _);
+            instance.Update();
+        }
 
         #region Update
+        public void Reinit()
+        {
+            _typeKeyMetaIDPairs.Clear();
+            Update();
+        }
         private void Update()
         {
             var typeMetas = UnityEditorUtility._serializableTypeWithMetaIDMetas;
-            bool isChanged = false;
-
-            for (int i = 0; i < _typeDataListsCount; i++)
-            {
-                _typeDataLists[i].containsFlag = false;
-            }
 
             foreach (var meta in typeMetas)
             {
                 var type = meta.Type;
+                var key = new TypeData(type.Name, type.Namespace, type.Assembly.FullName);
+                var metaID = meta.MetaID;
 
-                var name = type.Name;
-                var nameSpace = type.Namespace;
-                var assembly = type.Assembly.FullName;
-
-                if (_metaIDListIndexPairs.TryGetValue(meta.MetaID, out int listIndex) == false)
+                if (_typeKeyMetaIDPairs.TryGetValue(key, out string keyMetaID) == false)
                 {
-                    if (_typeDataLists.Length <= _typeDataListsCount)
+                    if (keyMetaID != metaID)
                     {
-                        Array.Resize(ref _typeDataLists, _typeDataLists.Length << 1);
+                        _typeKeyMetaIDPairs[key] = null; //Таким образом помечаются моменты когда не однозначно какой идентификатор принадлежит этому имени
+                        _isChanged = true;
                     }
-                    listIndex = _typeDataListsCount++;
-                    _metaIDListIndexPairs.Add(meta.MetaID, listIndex);
-                    isChanged = true;
                 }
-
-                ref var listRef = ref _typeDataLists[listIndex];
-                listRef.containsFlag = true;
-                if (listRef.count > 0 && _typeDataNodes[listRef.startNode].EqualsWith(name, nameSpace, assembly))
+                else
                 {
-                    continue;
-                }
-
-                if (_typeDataNodes.Length <= _typeDataNodesCount)
-                {
-                    Array.Resize(ref _typeDataNodes, _typeDataNodes.Length << 1);
-                }
-                int nodeIndex = _typeDataNodesCount++;
-                ref var nodeRef = ref _typeDataNodes[nodeIndex];
-                isChanged = true;
-
-                nodeRef = new TypeDataNode(name, nameSpace, assembly);
-                nodeRef.next = listRef.startNode;
-                listRef.startNode = listIndex;
-                listRef.count++;
-            }
-
-            for (int i = 0; i < _typeDataListsCount; i++)
-            {
-                ref var list = ref _typeDataLists[i];
-                if (list.containsFlag == false)
-                {
-                    _metaIDListIndexPairs.Remove();
+                    _typeKeyMetaIDPairs[key] = metaID;
+                    _isChanged = true;
                 }
             }
 
-            if (isChanged)
+            if (_isChanged)
             {
                 EditorUtility.SetDirty(this);
+                _isChanged = false;
+                Save(true);
             }
         }
         #endregion
@@ -106,65 +90,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region ISerializationCallbackReceiver
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
-            _metaIDListIndexPairs.Clear();
-            if (_typeDataNodes == null)
+            _typeKeyMetaIDPairs.Clear();
+            foreach (var pair in _typeKeyMetaIDPairsSerializable)
             {
-                _typeDataLists = new TypeDataList[256];
-                _typeDataListsCount = 0;
-                _typeDataNodes = new TypeDataNode[256];
-                _typeDataNodesCount = 0;
-            }
-            else
-            {
-                foreach (var pair in _metaIDListIndexPairsSerializable)
+                if (string.IsNullOrEmpty(pair.value) == false)
                 {
-                    _metaIDListIndexPairs[pair.metaID] = pair.listIndex;
+                    _typeKeyMetaIDPairs[pair.key] = pair.value;
                 }
             }
-            Update();
         }
         void ISerializationCallbackReceiver.OnBeforeSerialize()
         {
             int i = 0;
-            _metaIDListIndexPairsSerializable = new Pair[_metaIDListIndexPairs.Count];
-            foreach (var pair in _metaIDListIndexPairs)
+            _typeKeyMetaIDPairsSerializable = new Pair[_typeKeyMetaIDPairs.Count];
+            foreach (var pair in _typeKeyMetaIDPairs)
             {
-                _metaIDListIndexPairsSerializable[i++] = new Pair(pair.Key, pair.Value);
-            }
-        }
-        #endregion
-
-        #region Utils
-        [Serializable]
-        public struct TypeDataList
-        {
-            public string metaID_key;
-            public bool containsFlag;
-            public int startNode;
-            public int count;
-        }
-        [Serializable]
-        public struct TypeDataNode : ILinkedNext
-        {
-            public readonly string Name;
-            public readonly string Namespace;
-            public readonly string Assembly;
-            public int next;
-
-            public bool EqualsWith(string name, string nameSpace, string assembly)
-            {
-                return name == Name && nameSpace == Namespace && assembly == Assembly;
-            }
-            public TypeDataNode(string name, string nameSpace, string assembly) : this()
-            {
-                Name = name;
-                Namespace = nameSpace;
-                Assembly = assembly;
-            }
-            int ILinkedNext.Next
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get { return next; }
+                _typeKeyMetaIDPairsSerializable[i++] = new Pair(pair.Key, pair.Value);
             }
         }
         #endregion
