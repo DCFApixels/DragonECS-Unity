@@ -127,23 +127,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         static ComponentTemplateTypeCache()
         {
-            List<Type> types = new List<Type>();
             Type interfaceType = typeof(IComponentTemplate);
-            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                var targetTypes = assembly.GetTypes().Where(type => !type.IsGenericType && !(type.IsAbstract || type.IsInterface) /*&& type.GetCustomAttribute<SerializableAttribute>() != null*/);
 
-                types.AddRange(targetTypes.Where(type => interfaceType.IsAssignableFrom(type)));
-
-                foreach (var t in targetTypes)
-                {
-                    if (t.IsSubclassOf(typeof(ComponentTemplateBase<>)))
-                    {
-                        types.Add(t);
-                    }
-                }
-            }
-            _types = types.ToArray();
+            _types = UnityEditorUtility._serializableTypes.Where(type => interfaceType.IsAssignableFrom(type)).ToArray();
             foreach (var type in _types)
             {
                 EcsDebugUtility.GetTypeMeta(type);

@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
-using UnityEditor;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
 
@@ -104,6 +103,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    using UnityEditor;
+
     [InitializeOnLoad]
     internal static partial class UnityEditorUtility
     {
@@ -111,8 +112,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             colorBoxeStyles = new SparseArray<GUIStyle>();
 
-            #region InitSerializableTypes
-            List<Type> types = new List<Type>();
+            List<Type> serializableTypes = new List<Type>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 var targetTypes = assembly.GetTypes().Where(type =>
@@ -120,18 +120,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     type.IsSubclassOf(typeof(UnityObject)) == false &&
                     type.GetCustomAttribute<SerializableAttribute>() != null);
 
-                types.AddRange(targetTypes);
+                serializableTypes.AddRange(targetTypes);
             }
-            _serializableTypes = types.ToArray();
+            _serializableTypes = serializableTypes.ToArray();
+            _serializableTypeWithMetaIDMetas = serializableTypes.Where(type => TypeMeta.IsHasMetaID(type)).Select(type => type.GetMeta()).ToArray();
             //Array.Sort(_serializableTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
 
             //_noHiddenSerializableTypes = _serializableTypes.Where(o => {
             //    var atr = o.GetCustomAttribute<MetaTagsAttribute>();
             //    return atr != null && atr.Tags.Contains(MetaTags.HIDDEN);
             //}).ToArray();
-            #endregion
         }
+
         internal static readonly Type[] _serializableTypes;
+        internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
         //private static Type[] _noHiddenSerializableTypes;
 
         private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();

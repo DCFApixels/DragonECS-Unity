@@ -8,11 +8,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 {
     internal class DragonDocsWindow : EditorWindow
     {
-        [MenuItem("Tools/" + EcsConsts.FRAMEWORK_NAME + "/Documentation")]
+        public const string TITLE = "Documentation";
+        [MenuItem("Tools/" + EcsConsts.FRAMEWORK_NAME + "/" + TITLE)]
         static void Open()
         {
             var wnd = GetWindow<DragonDocsWindow>();
-            wnd.titleContent = new GUIContent($"{EcsConsts.FRAMEWORK_NAME} Documentation");
+            wnd.titleContent = new GUIContent(TITLE);
             wnd.minSize = new Vector2(100f, 120f);
             wnd.Show();
         }

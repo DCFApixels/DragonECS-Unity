@@ -18,7 +18,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private ReorderableList _reorderableComponentsList;
 
         #region Init
-        protected override bool IsInit => _componentDropDown != null;
+        protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
         {
             _componentDropDown = new ComponentDropDown();
