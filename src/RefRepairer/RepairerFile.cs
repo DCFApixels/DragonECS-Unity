@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
-    internal static class FileRepaireUtility
+    internal static class RepaireFileUtility
     {
         private const string REFLINE_PATTERN = "- rid:";
         public static void Replace(string[] fileLines, string oldTypeData, string newTypeData)
@@ -18,6 +18,17 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                     fileLines[++i].Replace(oldTypeData, newTypeData);
                 }
             }
+        }
+        public static int NextRefLine(string[] fileLines, int startIndex)
+        {
+            for (int i = startIndex; i < fileLines.Length; i++)
+            {
+                if (fileLines[i].Contains(REFLINE_PATTERN))
+                {
+                    return ++i;
+                }
+            }
+            return -1;
         }
         public static string GenerateReplacedLine(TypeData typeData)
         {
