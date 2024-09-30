@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             wnd.Show();
         }
 
-        private List<ContainerMissingRefs> _missingTypes;
+        //private List<ContainerMissingRefs> _missingTypes;
         //private readonly CollectorMissingTypes _collectorMissingTypes = new CollectorMissingTypes();
 
         private bool TryInit()

@@ -5,6 +5,16 @@ using System.Runtime.CompilerServices;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
+    public readonly struct ArrayBuffer<T>
+    {
+        public readonly T[] Array;
+        public readonly int Length;
+        public ArrayBuffer(T[] array, int length)
+        {
+            Array = array;
+            Length = length;
+        }
+    }
     internal interface ILinkedNext
     {
         int Next { get; }

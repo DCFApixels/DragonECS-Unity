@@ -1,6 +1,8 @@
+#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.IO;
+using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -34,11 +36,60 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         {
             return $"type: {{class: {typeData.ClassName}, ns: {typeData.NamespaceName}, asm: {typeData.AssemblyName}}}";
         }
-        public static string GenerateReplacedLine(ManagedReferenceMissingType typeData)
+        public static void RepaieAsset(MissingRefContainer container)
         {
-            return $"type: {{class: {typeData.className}, ns: {typeData.namespaceName}, asm: {typeData.assemblyName}}}";
-        }
+            if (container.collectedMissingTypesBufferCount <= 0) { return; }
 
+            MissingsResolvingData[] missingsResolvingDatas = container.MissingsResolvingDatas.Values.Where(o => o.IsResolved).ToArray();
+            for (int i = 0; i < container.collectedMissingTypesBufferCount; i++)
+            {
+                ref var missing = ref container.collectedMissingTypesBuffer[i];
+                if (missing.IsNull) { continue; }
+
+                var unityObjectData = missing.UnityObject;
+                using (var file = new FileScope(AssetDatabase.GUIDToAssetPath(unityObjectData.AssetGuid)))
+                {
+                    int startRepaierLineIndex = 0;//Ёто нужно чтобы скипать уже "отремонтированную" часть файл.
+
+                    // тут итерируюсь по блоку missingsResolvingDatas с одинаковым юнити объектом, так как такие идеут подр€т
+                    do
+                    {
+                        bool isAnySkiped = false;
+                        int lineIndex = NextRefLine(file.lines, startRepaierLineIndex);
+                        while (lineIndex > 0)
+                        {
+                            var line = file.lines[lineIndex];
+
+                            //  ак сказанно в документации к методу Replace
+                            // A string that is equivalent to this instance except that all instances of oldChar are replaced with newChar.
+                            // If oldChar is not found in the current instance, the method returns the current instance unchanged.
+                            // ј конкретно строчки "returns the current instance unchanged", можно сделать упрощенную проверку через ReferenceEquals 
+                            string oldLine = line;
+                            line = line.Replace(missing.ResolvingData.OldSerializedInfoLine, missing.ResolvingData.NewSerializedInfoLine);
+                            bool isChanged = !ReferenceEquals(oldLine, line);
+
+
+                            if (isChanged == false)
+                            {
+                                isAnySkiped = true;
+                            }
+                            else
+                            {
+                                if (isAnySkiped == false)
+                                {
+                                    startRepaierLineIndex = lineIndex;
+                                }
+                            }
+                            lineIndex = NextRefLine(file.lines, lineIndex);
+                        }
+
+                        missing = ref container.collectedMissingTypesBuffer[i++];
+                    } while (unityObjectData == missing.UnityObject);
+                    i--;//чтобы итераци€ не поломалась
+                }
+            }
+            container.RemoveResolved();
+        }
         public struct FileScope : IDisposable
         {
             public readonly string FilePath;
@@ -61,63 +112,64 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
     }
 
 
-    internal class RepairerFile
-    {
-        private readonly Type _type;
-        private readonly string[] _fileLines;
-
-        private string _currentLine;
-        private string _nextLine;
-
-        private int _currentIndex;
-
-        private readonly string _path;
-        private readonly string _localAssetPath;
-
-        public RepairerFile(Type type, string localAssetPath)
-        {
-            _type = type;
-            _localAssetPath = localAssetPath;
-
-            _path = $"{Application.dataPath.Replace("/Assets", "")}/{localAssetPath}";
-            _fileLines = File.ReadAllLines(_path);
-        }
-
-        public delegate bool GetterMissingTypeData(out MissingTypeData missingType);
-
-        public void Repair(Func<bool> callbackForNextLine)
-        {
-            for (int i = 0; i < _fileLines.Length - 1; ++i)
-            {
-                _currentIndex = i;
-
-                _currentLine = _fileLines[i];
-                _nextLine = _fileLines[i + 1];
-
-                if (callbackForNextLine.Invoke())
-                    break;
-            }
-
-            File.WriteAllLines(_path, _fileLines);
-
-            AssetDatabase.ImportAsset(_localAssetPath, ImportAssetOptions.ForceUpdate);
-            AssetDatabase.Refresh();
-        }
-
-        public bool CheckNeedLineAndReplacedIt(ManagedReferenceMissingType missingType)
-        {
-            string rid = $"rid: {missingType.referenceId}";
-            string oldTypeData = $"type: {{class: {missingType.className}, ns: {missingType.namespaceName}, asm: {missingType.assemblyName}}}";
-
-            if (_currentLine.Contains(rid) && _nextLine.Contains(oldTypeData))
-            {
-                string newTypeData = $"type: {{class: {_type.Name}, ns: {_type.Namespace}, asm: {_type.Assembly.GetName().Name}}}";
-                _fileLines[_currentIndex + 1] = _nextLine.Replace(oldTypeData, newTypeData);
-
-                return true;
-            }
-
-            return false;
-        }
-    }
+    //internal class RepairerFile
+    //{
+    //    private readonly Type _type;
+    //    private readonly string[] _fileLines;
+    //
+    //    private string _currentLine;
+    //    private string _nextLine;
+    //
+    //    private int _currentIndex;
+    //
+    //    private readonly string _path;
+    //    private readonly string _localAssetPath;
+    //
+    //    public RepairerFile(Type type, string localAssetPath)
+    //    {
+    //        _type = type;
+    //        _localAssetPath = localAssetPath;
+    //
+    //        _path = $"{Application.dataPath.Replace("/Assets", "")}/{localAssetPath}";
+    //        _fileLines = File.ReadAllLines(_path);
+    //    }
+    //
+    //    public delegate bool GetterMissingTypeData(out MissingTypeData missingType);
+    //
+    //    public void Repair(Func<bool> callbackForNextLine)
+    //    {
+    //        for (int i = 0; i < _fileLines.Length - 1; ++i)
+    //        {
+    //            _currentIndex = i;
+    //
+    //            _currentLine = _fileLines[i];
+    //            _nextLine = _fileLines[i + 1];
+    //
+    //            if (callbackForNextLine.Invoke())
+    //                break;
+    //        }
+    //
+    //        File.WriteAllLines(_path, _fileLines);
+    //
+    //        AssetDatabase.ImportAsset(_localAssetPath, ImportAssetOptions.ForceUpdate);
+    //        AssetDatabase.Refresh();
+    //    }
+    //
+    //    public bool CheckNeedLineAndReplacedIt(ManagedReferenceMissingType missingType)
+    //    {
+    //        string rid = $"rid: {missingType.referenceId}";
+    //        string oldTypeData = $"type: {{class: {missingType.className}, ns: {missingType.namespaceName}, asm: {missingType.assemblyName}}}";
+    //
+    //        if (_currentLine.Contains(rid) && _nextLine.Contains(oldTypeData))
+    //        {
+    //            string newTypeData = $"type: {{class: {_type.Name}, ns: {_type.Namespace}, asm: {_type.Assembly.GetName().Name}}}";
+    //            _fileLines[_currentIndex + 1] = _nextLine.Replace(oldTypeData, newTypeData);
+    //
+    //            return true;
+    //        }
+    //
+    //        return false;
+    //    }
+    //}
 }
+#endif
