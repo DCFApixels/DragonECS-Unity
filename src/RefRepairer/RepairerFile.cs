@@ -40,21 +40,21 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         {
             if (container.collectedMissingTypesBufferCount <= 0) { return; }
 
-            MissingsResolvingData[] missingsResolvingDatas = container.MissingsResolvingDatas.Values.Where(o => o.IsResolved).ToArray();
+            //MissingsResolvingData[] missingsResolvingDatas = container.MissingsResolvingDatas.Values.Where(o => o.IsResolved).ToArray();
             for (int i = 0; i < container.collectedMissingTypesBufferCount; i++)
             {
                 ref var missing = ref container.collectedMissingTypesBuffer[i];
                 if (missing.IsNull) { continue; }
 
                 var unityObjectData = missing.UnityObject;
-                using (var file = new FileScope(AssetDatabase.GUIDToAssetPath(unityObjectData.AssetGuid)))
+                using (var file = new FileScope(unityObjectData.GetLocalAssetPath()))
                 {
                     int startRepaierLineIndex = 0;//Это нужно чтобы скипать уже "отремонтированную" часть файл.
 
                     // тут итерируюсь по блоку missingsResolvingDatas с одинаковым юнити объектом, так как такие идеут подрят
                     do
                     {
-                        bool isAnySkiped = false;
+                        //bool isAnySkiped = false;
                         int lineIndex = NextRefLine(file.lines, startRepaierLineIndex);
                         while (lineIndex > 0)
                         {
@@ -71,14 +71,15 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 
                             if (isChanged == false)
                             {
-                                isAnySkiped = true;
+                                //isAnySkiped = true;
                             }
                             else
                             {
-                                if (isAnySkiped == false)
-                                {
-                                    startRepaierLineIndex = lineIndex;
-                                }
+                                break;
+                                //if (isAnySkiped == false)
+                                //{
+                                //    startRepaierLineIndex = lineIndex;
+                                //}
                             }
                             lineIndex = NextRefLine(file.lines, lineIndex);
                         }

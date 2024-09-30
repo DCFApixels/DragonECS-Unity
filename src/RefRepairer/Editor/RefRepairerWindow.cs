@@ -1,6 +1,5 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
@@ -20,8 +19,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
             wnd.Show();
         }
 
-        //private List<ContainerMissingRefs> _missingTypes;
-        //private readonly CollectorMissingTypes _collectorMissingTypes = new CollectorMissingTypes();
+        private MissingRefContainer _missingRefContainer = new MissingRefContainer();
+
+
+        private void OnGUI()
+        {
+            if (_missingRefContainer.IsEmplty)
+            {
+                if(GUILayout.Button("Collect missing references"))
+                {
+                    if (TryInit())
+                    {
+                        _missingRefContainer.Collect();
+                    }
+                }
+                return;
+            }
+
+
+            _missingRefContainer.MissingsResolvingDatas
+        }
+
+
 
         private bool TryInit()
         {
@@ -47,7 +66,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorSceneManager.SaveScene(dirtyScene);
             }
 
-            //_missingTypes = _collectorMissingTypes.Collect();
+            _missingRefContainer.Collect();
             return true;
         }
     }

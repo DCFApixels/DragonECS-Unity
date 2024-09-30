@@ -17,6 +17,11 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         public CollectedAssetMissingRecord[] collectedMissingTypesBuffer = null;
         public int collectedMissingTypesBufferCount = 0;
         public readonly Dictionary<TypeData, MissingsResolvingData> MissingsResolvingDatas = new Dictionary<TypeData, MissingsResolvingData>();
+        public MissingsResolvingData[] MissingsResolvingDataValues;
+        public bool IsEmplty
+        {
+            get { return collectedMissingTypesBufferCount == 0; }
+        }
 
         #region Clear/RemoveResolved
         public void Clear()
@@ -93,6 +98,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             CollectByScriptableObjects();
             CollectByScenes();
 
+            MissingsResolvingDataValues = MissingsResolvingDatas.Values.ToArray();
             for (int i = collectedMissingTypesBufferCount; i < oldCollectedMissingTypesBufferCount; i++)
             {
                 collectedMissingTypesBuffer[i] = default;
