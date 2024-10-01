@@ -127,6 +127,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 .Where(type => TypeMeta.IsHasMetaID(type))
                 .Select(type => type.ToMeta())
                 .ToArray();
+
+            foreach (var item in _serializableTypeWithMetaIDMetas)
+            {
+                _metaIDTypePairs[item.MetaID] = item.Type;
+            }
             //Array.Sort(_serializableTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
 
             //_noHiddenSerializableTypes = _serializableTypes.Where(o => {

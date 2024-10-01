@@ -3,6 +3,7 @@ using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -20,24 +21,52 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
         private MissingRefContainer _missingRefContainer = new MissingRefContainer();
+        private MissingsResolvingData[] _cachedMissingsResolvingDatas = null;
 
+        private ReorderableList _reorderableList;
+
+        private void InitList()
+        {
+            if(_reorderableList == null)
+            {
+                _reorderableList = new ReorderableList(_cachedMissingsResolvingDatas, typeof(MissingsResolvingData), false, false, false, false);
+                _reorderableList.headerHeight = 0;
+                _reorderableList.footerHeight = 0;
+            }
+            _reorderableList.list = _cachedMissingsResolvingDatas;
+        }
 
         private void OnGUI()
         {
             if (_missingRefContainer.IsEmplty)
             {
-                if(GUILayout.Button("Collect missing references"))
+                if (GUILayout.Button("Collect missing references"))
                 {
                     if (TryInit())
                     {
                         _missingRefContainer.Collect();
+                        _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
+                        InitList();
                     }
                 }
                 return;
             }
 
+            if (GUILayout.Button("Repaire missing references"))
+            {
+                Debug.Log(_missingRefContainer.IsEmplty);
+                var x = _missingRefContainer.collectedMissingTypesBuffer[0];
+                Debug.Log(x.ResolvingData.NewTypeData.AutoToString());
+                RepaireFileUtility.RepaieAsset(_missingRefContainer);
+            }
 
-            _missingRefContainer.MissingsResolvingDatas
+            if (_missingRefContainer.MissingsResolvingDatas.Count != _cachedMissingsResolvingDatas.Length)
+            {
+                _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
+                InitList();
+            }
+
+            _reorderableList.DoLayoutList();
         }
 
 

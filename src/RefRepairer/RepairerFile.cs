@@ -2,7 +2,6 @@
 using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.IO;
-using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
@@ -37,10 +36,9 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             return $"type: {{class: {typeData.ClassName}, ns: {typeData.NamespaceName}, asm: {typeData.AssemblyName}}}";
         }
         public static void RepaieAsset(MissingRefContainer container)
-        {
-            if (container.collectedMissingTypesBufferCount <= 0) { return; }
+        { 
+            if (container.IsEmplty) { return; }
 
-            //MissingsResolvingData[] missingsResolvingDatas = container.MissingsResolvingDatas.Values.Where(o => o.IsResolved).ToArray();
             for (int i = 0; i < container.collectedMissingTypesBufferCount; i++)
             {
                 ref var missing = ref container.collectedMissingTypesBuffer[i];
@@ -49,13 +47,10 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                 var unityObjectData = missing.UnityObject;
                 using (var file = new FileScope(unityObjectData.GetLocalAssetPath()))
                 {
-                    int startRepaierLineIndex = 0;//Это нужно чтобы скипать уже "отремонтированную" часть файл.
-
                     // тут итерируюсь по блоку missingsResolvingDatas с одинаковым юнити объектом, так как такие идеут подрят
                     do
                     {
-                        //bool isAnySkiped = false;
-                        int lineIndex = NextRefLine(file.lines, startRepaierLineIndex);
+                        int lineIndex = NextRefLine(file.lines, 0);
                         while (lineIndex > 0)
                         {
                             var line = file.lines[lineIndex];
@@ -64,22 +59,14 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                             // A string that is equivalent to this instance except that all instances of oldChar are replaced with newChar.
                             // If oldChar is not found in the current instance, the method returns the current instance unchanged.
                             // А конкретно строчки "returns the current instance unchanged", можно сделать упрощенную проверку через ReferenceEquals 
-                            string oldLine = line;
                             line = line.Replace(missing.ResolvingData.OldSerializedInfoLine, missing.ResolvingData.NewSerializedInfoLine);
-                            bool isChanged = !ReferenceEquals(oldLine, line);
+                            bool isChanged = !ReferenceEquals(file.lines[lineIndex], line);
 
 
-                            if (isChanged == false)
+                            if (isChanged)
                             {
-                                //isAnySkiped = true;
-                            }
-                            else
-                            {
+                                file.lines[lineIndex] = line;
                                 break;
-                                //if (isAnySkiped == false)
-                                //{
-                                //    startRepaierLineIndex = lineIndex;
-                                //}
                             }
                             lineIndex = NextRefLine(file.lines, lineIndex);
                         }

@@ -3,7 +3,6 @@ using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -57,33 +56,9 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         private void Update()
         {
             var typeMetas = UnityEditorUtility._serializableTypeWithMetaIDMetas;
-            StringBuilder sb = null;
             foreach (var meta in typeMetas)
             {
-                var type = meta.Type;
-                string name = null;
-                if (type.DeclaringType == null)
-                {
-                    name = type.Name;
-                }
-                else
-                {
-                    Type iteratorType = type;
-                    if (sb == null)
-                    {
-                        sb = new StringBuilder();
-                    }
-                    sb.Clear();
-                    sb.Append(iteratorType.Name);
-                    while ((iteratorType = iteratorType.DeclaringType) != null)
-                    {
-                        sb.Insert(0, '/');
-                        sb.Insert(0, iteratorType.Name);
-                    }
-                    name = sb.ToString();
-                }
-
-                var key = new TypeData(name, type.Namespace, type.Assembly.GetName().Name);
+                var key = new TypeData(meta.Type);
                 var metaID = meta.MetaID;
 
                 //Debug.LogWarning(type + " " + metaID);

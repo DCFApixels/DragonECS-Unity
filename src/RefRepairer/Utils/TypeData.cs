@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using System;
+using System.Text;
 using UnityEditor;
 
 namespace DCFApixels.DragonECS.Unity.RefRepairer.Internal
@@ -35,6 +36,37 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Internal
             ClassName = typeName;
             NamespaceName = namespaceName;
             AssemblyName = assemblyName;
+        }
+
+        [ThreadStatic]
+        private static StringBuilder sb;
+        public TypeData(Type type)
+        {
+            string name = null;
+            if (type.DeclaringType == null)
+            {
+                name = type.Name;
+            }
+            else
+            {
+                Type iteratorType = type;
+                if (sb == null)
+                {
+                    sb = new StringBuilder();
+                }
+                sb.Clear();
+                sb.Append(iteratorType.Name);
+                while ((iteratorType = iteratorType.DeclaringType) != null)
+                {
+                    sb.Insert(0, '/');
+                    sb.Insert(0, iteratorType.Name);
+                }
+                name = sb.ToString();
+            }
+
+            ClassName = name;
+            NamespaceName = type.Namespace;
+            AssemblyName = type.Assembly.GetName().Name;
         }
         public bool Equals(TypeData other)
         {

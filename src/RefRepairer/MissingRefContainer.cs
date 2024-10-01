@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
 using System.Collections.Generic;
@@ -17,7 +18,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         public CollectedAssetMissingRecord[] collectedMissingTypesBuffer = null;
         public int collectedMissingTypesBufferCount = 0;
         public readonly Dictionary<TypeData, MissingsResolvingData> MissingsResolvingDatas = new Dictionary<TypeData, MissingsResolvingData>();
-        public MissingsResolvingData[] MissingsResolvingDataValues;
         public bool IsEmplty
         {
             get { return collectedMissingTypesBufferCount == 0; }
@@ -38,6 +38,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             int offset = 0;
             int i = 0;
             int newLength = collectedMissingTypesBufferCount;
+            bool isReturn = true;
             for (; i < newLength; i++)
             {
                 ref var collectedMissingType = ref collectedMissingTypesBuffer[i];
@@ -49,10 +50,11 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                     }
                     offset = 1;
                     newLength--;
+                    isReturn = false;
                     break;
                 }
             }
-            if (i >= newLength) { return; }
+            if (isReturn) { return; }
 
             int nextI = i + offset;
             for (; nextI < newLength; nextI++)
@@ -98,7 +100,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             CollectByScriptableObjects();
             CollectByScenes();
 
-            MissingsResolvingDataValues = MissingsResolvingDatas.Values.ToArray();
             for (int i = collectedMissingTypesBufferCount; i < oldCollectedMissingTypesBufferCount; i++)
             {
                 collectedMissingTypesBuffer[i] = default;
@@ -107,11 +108,19 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         private void Add(UnityObjectDataBase unityObjectData, ref ManagedReferenceMissingType missing)
         {
-            var typeData = new TypeData(missing);
-            if (MissingsResolvingDatas.TryGetValue(typeData, out var resolvingData) == false)
+            var oldTypeData = new TypeData(missing);
+            if (MissingsResolvingDatas.TryGetValue(oldTypeData, out var resolvingData) == false)
             {
-                resolvingData = new MissingsResolvingData(typeData);
-                MissingsResolvingDatas.Add(typeData, resolvingData);
+                resolvingData = new MissingsResolvingData(oldTypeData);
+                MissingsResolvingDatas.Add(oldTypeData, resolvingData);
+
+                if (MetaIDRegistry.instance.TryGetMetaID(oldTypeData, out string metaID))
+                {
+                    if (UnityEditorUtility.TryGetTypeForMetaID(metaID, out Type type))
+                    {
+                        resolvingData.NewTypeData = new TypeData(type);
+                    }
+                }
             }
 
             if (collectedMissingTypesBufferCount >= collectedMissingTypesBuffer.Length)
@@ -255,7 +264,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             return localIdProp.intValue;
         }
     }
-    
+
 
     //internal class ContainerMissingTypes
     //{
