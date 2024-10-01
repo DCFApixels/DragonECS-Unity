@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using UnityEditor;
-using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -17,35 +16,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             foreach (string str in importedAssets)
             {
-                Debug.Log("Reimported Asset: " + str);
+                //Debug.Log("Reimported Asset: " + str);
                 ProcessAssetPath(str);
             }
             foreach (string str in deletedAssets)
             {
-                Debug.Log("Deleted Asset: " + str);
+                //Debug.Log("Deleted Asset: " + str);
                 RemoveAssetPath(str);
             }
 
             for (int i = 0; i < movedAssets.Length; i++)
             {
-                Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
+                //Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
                 RemoveAssetPath(movedFromAssetPaths[i]);
                 ProcessAssetPath(movedAssets[i]);
             }
 
-            if (didDomainReload)
-            {
-                Debug.Log("Domain has been reloaded");
-            }
+            //if (didDomainReload)
+            //{
+            //    Debug.Log("Domain has been reloaded");
+            //}
 
-            foreach (var item in _removedScriptGuids)
-            {
-                Debug.Log(item);
-            }
-            foreach (var item in _newScriptIDs)
-            {
-                Debug.Log(item);
-            }
+
             _version = DateTime.Now.Ticks;
         }
 
@@ -64,14 +56,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static void RemoveAssetPath(string filePath)
         {
             if (IsScript(filePath) == false) { return; }
-            Debug.Log("RemoveAssetPath: " + filePath);
+            //Debug.Log("RemoveAssetPath: " + filePath);
             _removedScriptGuids.Add(filePath);
         }
 
         private static void ProcessAssetPath(string filePath)
         {
             if (IsScript(filePath) == false) { return; }
-            Debug.Log("ProcessAssetPath: " + filePath);
+            //Debug.Log("ProcessAssetPath: " + filePath);
 
             var script = AssetDatabase.LoadAssetAtPath<MonoScript>(filePath).text;
             _newScriptIDs.Add(filePath);

@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
@@ -118,7 +117,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var targetTypes = assembly.GetTypes().Where(type =>
                     (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
                     type.IsSubclassOf(typeof(UnityObject)) == false &&
-                    type.GetCustomAttribute<SerializableAttribute>() != null);
+                    /*type.GetCustomAttribute<SerializableAttribute>() != null*/ true);
 
                 serializableTypes.AddRange(targetTypes);
             }
