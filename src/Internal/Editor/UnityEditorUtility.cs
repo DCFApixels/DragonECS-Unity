@@ -102,6 +102,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    using System.Reflection;
     using UnityEditor;
 
     [InitializeOnLoad]
@@ -114,10 +115,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             List<Type> serializableTypes = new List<Type>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                //var targetTypes = assembly.GetTypes().Where(type =>
+                //    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
+                //    type.IsSubclassOf(typeof(UnityObject)) == false &&
+                //    type.GetCustomAttribute<SerializableAttribute>() != null);
+
                 var targetTypes = assembly.GetTypes().Where(type =>
                     (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
                     type.IsSubclassOf(typeof(UnityObject)) == false &&
-                    /*type.GetCustomAttribute<SerializableAttribute>() != null*/ true);
+                    type.GetConstructor(Type.EmptyTypes) != null);
 
                 serializableTypes.AddRange(targetTypes);
             }
