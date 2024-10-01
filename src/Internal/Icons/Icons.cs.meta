@@ -16,6 +16,9 @@ MonoImporter:
   - _labelIconType: {fileID: 2800000, guid: 5476d6e1435981e4cbc915a080f93ee6, type: 3}
   - _labelIconMeta: {fileID: 2800000, guid: ebb82b09315bde749a10dfa45e64067c, type: 3}
   - _fileIcon: {fileID: 2800000, guid: 4f1ca6aa9d407844485856184c785946, type: 3}
+  - _errorIcon: {fileID: 2800000, guid: c67e8a1d6cb0e904590c7847368fe794, type: 3}
+  - _warningIcon: {fileID: 2800000, guid: 223d96e24d4b49f468b628cf9839584c, type: 3}
+  - _passIcon: {fileID: 2800000, guid: 0df5856dbbe53494aae23b959ca05ecc, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

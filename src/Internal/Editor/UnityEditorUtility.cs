@@ -124,7 +124,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             _serializableTypes = serializableTypes.ToArray();
             _serializableTypeWithMetaIDMetas = serializableTypes
-                .Where(type => TypeMeta.IsHasMetaID(type))
+                .Where(TypeMeta.IsHasMetaID)
                 .Select(type => type.ToMeta())
                 .ToArray();
 
@@ -318,6 +318,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 _singletonContent = new GUIContent();
             }
+            _singletonContent.text = string.Empty;
+            _singletonContent.tooltip = string.Empty;
+            _singletonContent.image = null;
             return _singletonContent;
         }
         public static GUIContent GetLabel(string name, string tooltip = null)

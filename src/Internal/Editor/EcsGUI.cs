@@ -242,10 +242,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
         public static IndentLevelScope UpIndentLevel() => new IndentLevelScope(EditorGUI.indentLevel + 1);
         public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
+        public static ContentColorScope SetContentColor(Color value, float a) => new ContentColorScope(value.r, value.g, value.b, a);
         public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
         public static BackgroundColorScope SetBackgroundColor(Color value) => new BackgroundColorScope(value);
+        public static BackgroundColorScope SetBackgroundColor(Color value, float a) => new BackgroundColorScope(value.r, value.g, value.b, a);
         public static BackgroundColorScope SetBackgroundColor(float r, float g, float b, float a = 1f) => new BackgroundColorScope(r, g, b, a);
         public static ColorScope SetColor(Color value) => new ColorScope(value);
+        public static ColorScope SetColor(Color value, float a) => new ColorScope(value.a, value.g, value.b, a);
         public static ColorScope SetColor(float r, float g, float b, float a = 1f) => new ColorScope(r, g, b, a);
         public static ColorScope SetAlpha(float a) => new ColorScope(GUI.color * new Color(1, 1, 1, a));
         public static EditorGUI.DisabledScope Enable => new EditorGUI.DisabledScope(false);

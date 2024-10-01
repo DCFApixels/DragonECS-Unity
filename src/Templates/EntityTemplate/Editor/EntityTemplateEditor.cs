@@ -172,15 +172,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
+            if (IsMultipleTargets == false && SerializationUtility.HasManagedReferencesWithMissingTypes(target))
+            {
+                using (EcsGUI.Layout.BeginHorizontal(EditorStyles.helpBox))
+                {
+                    GUILayout.Label(UnityEditorUtility.GetLabel(Icons.Instance.WarningIcon), GUILayout.ExpandWidth(false));
+                    using (EcsGUI.Layout.BeginVertical())
+                    {
+                        GUILayout.Label("This object contains SerializeReference types which are missing.", EditorStyles.miniLabel);
+                        if (GUILayout.Button("Repaire References Tool", EditorStyles.miniButton, GUILayout.MaxWidth(200f)))
+                        {
+                            RefRepairerWindow.Open();
+                        }
+                    }
+                }
+            }
+
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
                 DrawTop(Target, _componentsProp);
                 _reorderableComponentsList.DoLayoutList();
-                //GUILayout.Label("", GUILayout.Height(0), GUILayout.ExpandWidth(true));
-                //for (int i = _componentsProp.arraySize - 1; i >= 0; i--)
-                //{
-                //    DrawComponentData(_componentsProp.GetArrayElementAtIndex(i), _componentsProp.arraySize, i);
-                //}
+
             }
         }
         private void DrawTop(ITemplateInternal target, SerializedProperty componentsProp)
