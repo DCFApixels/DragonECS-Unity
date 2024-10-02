@@ -161,7 +161,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             IEnumerable<(IEcsPool, ITypeMeta)> itemMetaPairs = pools.Select(pool =>
             {
-                return (pool, (ITypeMeta)pool.ComponentType.GetMeta());
+                return (pool, (ITypeMeta)pool.ComponentType.ToMeta());
             });
             Setup(itemMetaPairs);
         }

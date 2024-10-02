@@ -597,7 +597,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 optionButton.yMin = optionButton.yMax;
                 optionButton.yMax += HeadIconsRect.height;
                 optionButton.xMin = optionButton.xMax - 64;
-                optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
+                optionButton.center += Vector2.up * DrawTypeMetaBlockPadding;
 
                 //Canceling isExpanded
                 bool oldIsExpanded = rootProperty.isExpanded;
@@ -1083,33 +1083,33 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 var componentTypeIDs = world.GetComponentTypeIDsFor(entityID);
 
-                GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
-
-                if (isWithFoldout)
+                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
                 {
-                    IsShowRuntimeComponents = EditorGUILayout.BeginFoldoutHeaderGroup(IsShowRuntimeComponents, "RUNTIME COMPONENTS", EditorStyles.foldout);
-                    EditorGUILayout.EndFoldoutHeaderGroup();
-                }
-                if (isWithFoldout == false || IsShowRuntimeComponents)
-                {
-                    if (AddComponentButtons(out Rect dropDownRect))
+                    if (isWithFoldout)
                     {
-                        RuntimeComponentsUtility.GetAddComponentGenericMenu(world).Open(dropDownRect, entityID);
+                        IsShowRuntimeComponents = EditorGUILayout.BeginFoldoutHeaderGroup(IsShowRuntimeComponents, "RUNTIME COMPONENTS", EditorStyles.foldout);
+                        EditorGUILayout.EndFoldoutHeaderGroup();
                     }
-
-                    GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
-                    IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
-
-                    int i = 0;
-                    foreach (var componentTypeID in componentTypeIDs)
+                    if (isWithFoldout == false || IsShowRuntimeComponents)
                     {
-                        var pool = world.FindPoolInstance(componentTypeID);
+                        if (AddComponentButtons(out Rect dropDownRect))
                         {
-                            DrawRuntimeComponent(componentTypeIDs.Length, i++, entityID, pool);
+                            RuntimeComponentsUtility.GetAddComponentGenericMenu(world).Open(dropDownRect, entityID);
+                        }
+
+                        GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
+                        IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
+
+                        int i = 0;
+                        foreach (var componentTypeID in componentTypeIDs)
+                        {
+                            var pool = world.FindPoolInstance(componentTypeID);
+                            {
+                                DrawRuntimeComponent(componentTypeIDs.Length, i++, entityID, pool);
+                            }
                         }
                     }
                 }
-                GUILayout.EndVertical();
             }
             private static void DrawRuntimeComponent(int total, int index, int entityID, IEcsPool pool)
             {
