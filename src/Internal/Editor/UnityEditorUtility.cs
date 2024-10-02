@@ -102,7 +102,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    using System.Reflection;
     using UnityEditor;
 
     [InitializeOnLoad]

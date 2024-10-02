@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DCFApixels.DragonECS.Unity.Editors;
+using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -61,5 +62,16 @@ namespace DCFApixels.DragonECS
         public readonly struct Null { }
     }
 
-    public sealed class ComponentTemplateReferenceAttribute : PropertyAttribute { }
+    public sealed class ComponentTemplateReferenceAttribute : PropertyAttribute, IReferenceButtonAttribute
+    {
+        public readonly Type[] PredicateTypes;
+        public readonly bool IsHideButtonIfNotNull;
+        Type[] IReferenceButtonAttribute.PredicateTypes { get { return PredicateTypes; } }
+        bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
+        public ComponentTemplateReferenceAttribute()
+        {
+            PredicateTypes = new Type[] { typeof(IComponentTemplate) };
+            IsHideButtonIfNotNull = true;
+        }
+    }
 }

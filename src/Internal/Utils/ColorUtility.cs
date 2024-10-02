@@ -16,5 +16,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
             b = b + (gray - b) * (1 - t);
             return new Color(r, g, b, self.a);
         }
+        public static Color SetAlpha(this Color self, float a)
+        {
+            self.a = a;
+            return self;
+        }
     }
 }

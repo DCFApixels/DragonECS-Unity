@@ -118,6 +118,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             base.ItemSelected(item);
 
+            if (item.Obj == null)
+            {
+                _fieldProperty.managedReferenceValue = null;
+                _fieldProperty.serializedObject.ApplyModifiedProperties();
+                return;
+            }
+
             Type componentType = item.Obj.GetType();
             IComponentTemplate cmptmp = item.Obj;
 

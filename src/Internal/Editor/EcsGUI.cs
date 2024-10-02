@@ -527,21 +527,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return DrawTypeMetaBlockPadding * 2 + contentHeight;
         }
-        public static bool DrawTypeMetaElementBlock(ref Rect position, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementProperty, ITypeMeta meta)
+        public static bool DrawTypeMetaElementBlock(ref Rect position, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementRootProperty, ITypeMeta meta)
         {
-            var result = DrawTypeMetaBlock_Internal(ref position, elementProperty, meta, elementIndex, arrayProperty.arraySize);
+            var result = DrawTypeMetaBlock_Internal(ref position, elementRootProperty, meta, elementIndex, arrayProperty.arraySize);
             if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
             {
                 arrayProperty.DeleteArrayElementAtIndex(elementIndex);
             }
             return result != DrawTypeMetaBlockResult.None;
         }
-        public static bool DrawTypeMetaBlock(ref Rect position, SerializedProperty property, ITypeMeta meta)
+        public static bool DrawTypeMetaBlock(ref Rect position, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
-            var result = DrawTypeMetaBlock_Internal(ref position, property, meta);
+            var result = DrawTypeMetaBlock_Internal(ref position, rootProperty, meta, index, total);
             if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
             {
-                property.ResetValues();
+                rootProperty.ResetValues();
             }
             return result.HasFlag(DrawTypeMetaBlockResult.Drop);
         }
@@ -552,7 +552,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Drop = 1 << 0,
             CloseButtonClicked = 1 << 1,
         }
-        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty property, ITypeMeta meta, int index = -1, int total = -1)
+        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
             Color alphaPanelColor;
             if (meta == null)
@@ -567,24 +567,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
             string name = meta.Name;
             string description = meta.Description.Text;
 
-            int positionCountr;
+            int positionIndex;
             if (index < 0)
             {
-                positionCountr = int.MaxValue;
-                var counter = property.Copy();
+                positionIndex = int.MaxValue;
+                var counter = rootProperty.Copy();
                 int depth = -1;
                 while (counter.NextVisibleDepth(false, ref depth))
                 {
-                    positionCountr--;
+                    positionIndex--;
                 }
             }
             else
             {
-                positionCountr = index;
+                positionIndex = index;
             }
 
-            alphaPanelColor = SelectPanelColor(meta, positionCountr, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
-            alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+            alphaPanelColor = SelectPanelColor(meta, positionIndex, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE).SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
 
             DrawTypeMetaBlockResult result = DrawTypeMetaBlockResult.None;
             using (CheckChanged())
@@ -601,10 +600,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 optionButton.center += Vector2.up * DrawTypeMetaBlockPadding * 1f;
 
                 //Canceling isExpanded
-                bool oldIsExpanded = property.isExpanded;
+                bool oldIsExpanded = rootProperty.isExpanded;
                 if (ClickTest(optionButton))
                 {
-                    property.isExpanded = oldIsExpanded;
+                    rootProperty.isExpanded = oldIsExpanded;
                     result |= DrawTypeMetaBlockResult.Drop;
                 }
 
@@ -639,7 +638,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 depth = property.depth;
             }
-            return property.NextVisible(child) && property.depth >= depth;
+            var next = property.NextVisible(child);
+            return next && property.depth >= depth;
         }
         internal static bool NextDepth(this SerializedProperty property, bool child, ref int depth)
         {

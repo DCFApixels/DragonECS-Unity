@@ -1,25 +1,29 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomPropertyDrawer(typeof(ComponentTemplateProperty), true)]
-    internal class ComponentTemplatePropertyDrawer : PropertyDrawer
+    internal class ComponentTemplatePropertyDrawer : ExtendedPropertyDrawer
     {
         private ComponentTemplateReferenceDrawer _drawer = new ComponentTemplateReferenceDrawer();
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             property.Next(true);
+            _drawer.StaticInit();
+            _drawer.Init();
             return _drawer.GetPropertyHeight(property, label);
         }
-        public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
+        protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
+            var root = property.Copy();
             property.Next(true);
-            _drawer.OnGUI(position, property, label);
+            _drawer.StaticInit();
+            _drawer.Init();
+            _drawer.Draw(position, root, property, label);
         }
     }
     [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
@@ -29,9 +33,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
         private static ComponentDropDown _componentDropDown;
 
+        #region Properties
         private float SingleLineWithPadding => OneLineHeight + Padding * 4f;
         private float Padding => Spacing;
-        protected override bool IsInit => _componentDropDown != null;
+        protected override bool IsStaticInit => _componentDropDown != null;
+        #endregion
 
         #region Init
         protected override void OnStaticInit()
@@ -53,25 +59,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            if (property.propertyType == SerializedPropertyType.ManagedReference == false)
+            #region No SerializeReference
+            if (property.propertyType != SerializedPropertyType.ManagedReference)
             {
                 return EditorGUI.GetPropertyHeight(property, label);
             }
-            IComponentTemplate template = property.managedReferenceValue as IComponentTemplate;
-            if (template == null || property.managedReferenceValue == null)
+            #endregion
+
+            var instance = property.managedReferenceValue;
+            IComponentTemplate template = instance as IComponentTemplate;
+
+            if (template == null || instance == null)
             {
                 return EditorGUIUtility.singleLineHeight + Padding * 2f;
             }
 
             try
             {
-                ComponentTemplateBase customTemplate = property.managedReferenceValue as ComponentTemplateBase;
-                if (customTemplate != null)
+                if (instance is ComponentTemplateBase customTemplate)
                 {
                     property = property.FindPropertyRelative("component");
                 }
             }
-            catch (Exception)
+            catch
             {
                 property = null;
             }
@@ -85,155 +95,66 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return (propCount <= 0 ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(property, label)) + Padding * 4f;
         }
 
-
-        protected override void DrawCustom(Rect position, SerializedProperty componentRefProp, GUIContent label)
+        protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
-            if (componentRefProp.propertyType == SerializedPropertyType.ManagedReference == false)
+            Draw(position, property, property, label);
+        }
+        public void Draw(Rect position, SerializedProperty rootProperty, SerializedProperty property, GUIContent label)
+        {
+            #region No SerializeReference
+            if (property.propertyType != SerializedPropertyType.ManagedReference)
             {
-                EditorGUI.PropertyField(position, componentRefProp, label, true);
+                EditorGUI.PropertyField(position, property, label, true);
+                return;
+            }
+            #endregion
+
+            var instance = property.managedReferenceValue;
+            IComponentTemplate template = instance as IComponentTemplate;
+
+            if (template == null || instance == null)
+            {
+                DrawSelectionPopup(position, property, label);
                 return;
             }
 
-            Init();
-            var counter = componentRefProp.Copy();
-
-            int positionCountr = int.MaxValue;
-            while (counter.NextVisible(false))
+            SerializedProperty componentProp = property;
+            if (componentProp.managedReferenceValue is ComponentTemplateBase customTemplate)
             {
-                positionCountr--;
+                componentProp = property.FindPropertyRelative("component");
             }
-
-            IComponentTemplate template = componentRefProp.managedReferenceValue as IComponentTemplate;
-            if (template == null || componentRefProp.managedReferenceValue == null)
+            if (componentProp == null)
             {
-                DrawSelectionPopup(position, componentRefProp, label);
-                return;
-            }
-
-            Type componentType;
-            SerializedProperty componentProperty = componentRefProp;
-            try
-            {
-                ComponentTemplateBase customTemplate = componentProperty.managedReferenceValue as ComponentTemplateBase;
-                if (customTemplate != null)
-                {
-                    componentProperty = componentRefProp.FindPropertyRelative("component");
-                    componentType = customTemplate.GetType().GetField("component", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).FieldType;
-                }
-                else
-                {
-                    componentType = componentProperty.managedReferenceValue.GetType();
-                }
-
-                if (componentType == null || componentProperty == null)
-                {
-                    throw new NullReferenceException();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e, componentRefProp.serializedObject.targetObject);
                 DrawDamagedComponent(position, "Damaged component template.");
                 return;
             }
 
-            //сюда попадают уже валидные компоненты
-
             ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
-            string name = meta.Name;
-            string description = meta.Description.Text;
 
-            int propCount = EcsGUI.GetChildPropertiesCount(componentProperty);
-
-            Color panelColor = EcsGUI.SelectPanelColor(meta, positionCountr, -1).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
-
-            Color alphaPanelColor = panelColor;
-            alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
-
-
-            EditorGUI.BeginChangeCheck();
-            EditorGUI.DrawRect(position, alphaPanelColor);
-
-            Rect paddingPosition = RectUtility.AddPadding(position, Padding * 2f);
-
-            Rect optionButton = position;
-            optionButton.center -= new Vector2(0, optionButton.height);
-            optionButton.yMin = optionButton.yMax;
-            optionButton.yMax += HeadIconsRect.height;
-            optionButton.xMin = optionButton.xMax - 64;
-            optionButton.center += Vector2.up * Padding * 1f;
-            //Canceling isExpanded
-            if (EcsGUI.ClickTest(optionButton))
+            Rect rect = position;
+            if (EcsGUI.DrawTypeMetaBlock(ref rect, rootProperty, meta))
             {
-                componentProperty.isExpanded = !componentProperty.isExpanded;
-            }
-
-            #region Draw Component Block 
-            //Close button
-            optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-            if (EcsGUI.CloseButton(optionButton))
-            {
-                componentRefProp.managedReferenceValue = null;
                 return;
             }
-            //Edit script button
-            if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.ScriptAssetButton(optionButton, script);
-            }
-            //Description icon
-            if (string.IsNullOrEmpty(description) == false)
-            {
-                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                EcsGUI.DescriptionIcon(optionButton, description);
-            }
 
-
-            if (propCount <= 0)
+            label.text = meta.Name;
+            if (componentProp.propertyType == SerializedPropertyType.Generic)
             {
-                EcsGUI.DrawEmptyComponentProperty(paddingPosition, componentRefProp, label, false);
+                EditorGUI.PropertyField(rect, componentProp, label, true);
             }
             else
             {
-                if (componentProperty.propertyType == SerializedPropertyType.Generic)
-                {
-                    EditorGUI.PropertyField(paddingPosition, componentProperty, label, true);
-                }
-                else
-                {
-                    Rect r = RectUtility.AddPadding(paddingPosition, 0, 20f, 0, 0);
-                    EditorGUI.PropertyField(r, componentProperty, label, true);
-                }
-            }
-            if (string.IsNullOrEmpty(label.text))
-            {
-                EditorGUI.indentLevel++;
-                EditorGUI.PrefixLabel(position.AddPadding(0, 0, 0, position.height - SingleLineWithPadding), UnityEditorUtility.GetLabel(name));
-                EditorGUI.indentLevel--;
-            }
-            else
-            {
-                GUI.Label(position.AddPadding(EditorGUIUtility.labelWidth, 0, 0, position.height - SingleLineWithPadding), name);
-            }
-
-
-            #endregion
-
-            if (EditorGUI.EndChangeCheck())
-            {
-                componentProperty.serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(componentProperty.serializedObject.targetObject);
+                EditorGUI.PropertyField(rect.AddPadding(0, 20f, 0, 0), componentProp, label, true);
             }
         }
 
-        private void DrawSelectionPopup(Rect position, SerializedProperty componentRefProp, GUIContent label)
+        private void DrawSelectionPopup(Rect position, SerializedProperty property, GUIContent label)
         {
             EditorGUI.LabelField(position, label);
             Rect buttonRect = RectUtility.AddPadding(position, EditorGUIUtility.labelWidth, 0f, 0f, 0f);
             if (GUI.Button(buttonRect, "Select"))
             {
-                currentProperty = componentRefProp;
+                currentProperty = property;
                 _componentDropDown.Show(buttonRect);
             }
         }
