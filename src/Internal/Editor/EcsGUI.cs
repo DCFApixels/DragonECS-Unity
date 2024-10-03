@@ -1079,9 +1079,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     DrawRuntimeComponents(entityID, world, isWithFoldout);
                 }
             }
+
+            [ThreadStatic]
+            private static List<IEcsPool> _componentPoolsBuffer;
             public static void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout = true)
             {
-                var componentTypeIDs = world.GetComponentTypeIDsFor(entityID);
 
                 using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
                 {
@@ -1100,25 +1102,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
                         IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
 
-                        int i = 0;
-                        foreach (var componentTypeID in componentTypeIDs)
+                        if (_componentPoolsBuffer == null)
                         {
-                            var pool = world.FindPoolInstance(componentTypeID);
-                            {
-                                DrawRuntimeComponent(componentTypeIDs.Length, i++, entityID, pool);
-                            }
+                            _componentPoolsBuffer = new List<IEcsPool>(64);
+                        }
+                        world.GetComponentPoolsFor(entityID, _componentPoolsBuffer);
+                        int i = 0;
+                        int iMax = _componentPoolsBuffer.Count;
+                        foreach (var componentPool in _componentPoolsBuffer)
+                        {
+                            DrawRuntimeComponent(entityID, componentPool, iMax, i++);
                         }
                     }
                 }
             }
-            private static void DrawRuntimeComponent(int total, int index, int entityID, IEcsPool pool)
+            private static void DrawRuntimeComponent(int entityID, IEcsPool pool, int total, int index)
             {
                 var meta = pool.ComponentType.ToMeta();
                 if (meta.IsHidden == false || IsShowHidden)
                 {
                     object data = pool.GetRaw(entityID);
-
-                    Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
 
                     Type componentType = pool.ComponentType;
                     ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
@@ -1136,7 +1139,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         isExpanded = !isExpanded;
                     }
 
-                    GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
+                    Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE).SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
+                    GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor));
                     EditorGUI.BeginChangeCheck();
 
                     //Close button
@@ -1192,18 +1196,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     if (isExpanded)
                     {
-                        EditorGUI.indentLevel++;
-                        foreach (var field in type.GetFields(fieldFlags))
+                        using (UpIndentLevel())
                         {
-                            GUIContent subLabel = UnityEditorUtility.GetLabel(UnityEditorUtility.TransformFieldName(field.Name));
-                            if (DrawRuntimeData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
+                            foreach (var field in type.GetFields(fieldFlags))
                             {
-                                field.SetValue(data, fieldData);
-                                outData = data;
-                                changed = true;
+                                GUIContent subLabel = UnityEditorUtility.GetLabel(UnityEditorUtility.TransformFieldName(field.Name));
+                                if (DrawRuntimeData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
+                                {
+                                    field.SetValue(data, fieldData);
+                                    outData = data;
+                                    changed = true;
+                                }
                             }
                         }
-                        EditorGUI.indentLevel--;
                     }
                 }
                 else
@@ -1226,6 +1231,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         {
                             uobj = go.GetComponent(fieldType);
                         }
+
                         if (EditorGUI.EndChangeCheck())
                         {
                             outData = uobj;
