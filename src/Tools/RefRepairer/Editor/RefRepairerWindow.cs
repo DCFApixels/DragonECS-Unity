@@ -1,13 +1,13 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.Internal;
-using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
 using System.Linq;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEditorInternal;
 using UnityEngine;
 
-namespace DCFApixels.DragonECS.Unity.Editors
+namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
     internal class RefRepairerWindow : EditorWindow
     {
