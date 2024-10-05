@@ -1,14 +1,22 @@
 ﻿using System;
 using Unity.Profiling;
-using UnityEditor;
 using UnityEngine;
+
+#region [InitializeOnLoad]
+#if UNITY_EDITOR
+namespace DCFApixels.DragonECS
+{
+    using UnityEditor;
+    [InitializeOnLoad]
+    public partial class UnityDebugService { }
+}
+#endif
+#endregion
 
 namespace DCFApixels.DragonECS
 {
-#if UNITY_EDITOR
-    [InitializeOnLoad]
-#endif
-    public class UnityDebugService : DebugService
+    // Методы юнитевского Debug и ProfilerMarker потоко безопасны
+    public partial class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
 
@@ -20,15 +28,18 @@ namespace DCFApixels.DragonECS
         {
             Set<UnityDebugService>();
         }
+
+        protected override DebugService CreateThreadInstance()
+        {
+            return new UnityDebugService();
+        }
         public override void Print(string tag, object v)
         {
-            string log;
             if (v is Exception e)
             {
                 Debug.LogException(e);
                 return;
             }
-
             string msg = AutoConvertObjectToString(v);
             bool hasTag = string.IsNullOrEmpty(tag) == false;
             if (hasTag)
@@ -37,20 +48,20 @@ namespace DCFApixels.DragonECS
                 switch (taglower)
                 {
                     case "pass":
-                        log = $"[<color=#00ff00>{tag}</color>] {msg}";
-                        Debug.Log(log);
+                        Debug.Log(
+                            $"[<color=#00ff00>{tag}</color>] {msg}");
                         break;
                     case "warning":
-                        log = $"[<color=#ffff00>{tag}</color>] {msg}";
-                        Debug.LogWarning(log);
+                        Debug.LogWarning(
+                            $"[<color=#ffff00>{tag}</color>] {msg}");
                         break;
                     case "error":
-                        log = $"[<color=#ff4028>{tag}</color>] {msg}";
-                        Debug.LogError(log);
+                        Debug.LogError(
+                            $"[<color=#ff4028>{tag}</color>] {msg}");
                         break;
                     default:
-                        log = $"[{tag}] {msg}";
-                        Debug.Log(log);
+                        Debug.Log(
+                            $"[{tag}] {msg}");
                         break;
                 }
                 return;
