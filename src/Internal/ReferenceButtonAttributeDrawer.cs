@@ -1,28 +1,8 @@
-﻿using DCFApixels.DragonECS.Unity.Editors;
-using System;
-using UnityEngine;
+﻿using System;
 
-namespace DCFApixels.DragonECS
-{
-    public sealed class ReferenceButtonAttribute : PropertyAttribute, IReferenceButtonAttribute
-    {
-        public readonly Type[] PredicateTypes;
-        public readonly bool IsHideButtonIfNotNull;
-        Type[] IReferenceButtonAttribute.PredicateTypes { get { return PredicateTypes; } }
-        bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
-        public ReferenceButtonAttribute(bool isHideButtonIfNotNull = false) : this(isHideButtonIfNotNull, Array.Empty<Type>()) { }
-        public ReferenceButtonAttribute(params Type[] predicateTypes) : this(false, predicateTypes) { }
-        public ReferenceButtonAttribute(bool isHideButtonIfNotNull, params Type[] predicateTypes)
-        {
-            IsHideButtonIfNotNull = isHideButtonIfNotNull;
-            PredicateTypes = predicateTypes;
-            Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
-        }
-    }
-}
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    public interface IReferenceButtonAttribute
+    internal interface IReferenceButtonAttribute
     {
         Type[] PredicateTypes { get; }
         bool IsHideButtonIfNotNull { get; }
@@ -35,6 +15,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     using DCFApixels.DragonECS.Unity.Internal;
     using System;
     using UnityEditor;
+    using UnityEngine;
 
     [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
     [CustomPropertyDrawer(typeof(ReferenceButtonAttribute), true)]

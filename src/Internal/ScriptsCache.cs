@@ -2,8 +2,10 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text.RegularExpressions;
 using UnityEditor;
+using UnityEditorInternal;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -24,7 +26,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public string metaID;
             public string scriptPath;
-
             public Pair(string metaID, string scriptPath)
             {
                 this.metaID = metaID;
@@ -77,9 +78,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Save(true);
         }
+
         private void Init()
         {
-            if (_isInit) { return; }
+            if (_isInit && _metaIDScriptPathPairs.Count > 0) { return; }
+
             _metaIDScriptPathPairs.Clear();
             var scriptGuids = AssetDatabase.FindAssets($"* t:MonoScript");
 
@@ -102,16 +105,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 metaIDsBuffer.Clear();
             }
 
-            foreach (var pair in _metaIDScriptPathPairs)
-            {
-                EcsDebug.PrintPass($"k:{pair.Key} v:{pair.Value}");
-            }
+            //foreach (var pair in _metaIDScriptPathPairs)
+            //{
+            //    EcsDebug.PrintPass($"k:{pair.Key} v:{pair.Value}");
+            //}
 
             _isInit = true;
 
             Save(true);
         }
-
         public void Reinit()
         {
             _isInit = false;
@@ -290,11 +292,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (_serializableMetaIDScriptPathPairs == null) { return; }
             foreach (var item in _serializableMetaIDScriptPathPairs)
             {
-                if (string.IsNullOrEmpty(item.scriptPath))
+                if (string.IsNullOrEmpty(item.scriptPath) == false)
                 {
                     _metaIDScriptPathPairs.Add(item.metaID, item.scriptPath);
                 }
             }
+        }
+        #endregion
+
+        #region Utils
+        private bool CheckFileExists()
+        {
+            string filePath = GetFilePath();
+            return File.Exists(filePath);
         }
         #endregion
     }
