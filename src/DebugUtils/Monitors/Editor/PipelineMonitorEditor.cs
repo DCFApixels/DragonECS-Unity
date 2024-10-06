@@ -17,6 +17,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private GUIStyle systemsListStyle;
 
+        private void CopyToClipboard()
+        {
+            var names = Target.Pipeline.AllSystems.Select(o => { 
+                if(o is SystemsLayerMarkerSystem l)
+                {
+                    return $"[ {l.name} ]";
+                }
+                return o.GetMeta().Name;
+            });
+            GUIUtility.systemCopyBuffer = string.Join("\r\n", names);
+        }
+
         protected override void DrawCustom()
         {
             systemsListStyle = new GUIStyle(EditorStyles.miniLabel);
@@ -38,7 +50,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _headerStyle.fontSize = 28;
             }
 
-            GUILayout.Label("[Systems]", _headerStyle);
+            using (EcsGUI.Layout.BeginHorizontal())
+            {
+                GUILayout.Label("[Systems]", _headerStyle, GUILayout.ExpandWidth(true));
+                if(GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
+                {
+                    CopyToClipboard();
+                }
+            }
 
             IsShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", IsShowInterfaces);
             IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
