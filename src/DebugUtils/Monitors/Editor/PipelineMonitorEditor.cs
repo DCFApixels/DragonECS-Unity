@@ -19,13 +19,32 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void CopyToClipboard()
         {
-            var names = Target.Pipeline.AllSystems.Select(o => { 
-                if(o is SystemsLayerMarkerSystem l)
+            var all = Target.Pipeline.AllSystems;
+            string[] names = new string[all.Length];
+            for (int i = 0; i < all.Length; i++)
+            {
+                var system = all[i];
+                string name;
+                if (system is SystemsLayerMarkerSystem l)
                 {
-                    return $"[ {l.name} ]";
+                    name = $"[ {l.name} ]";
                 }
-                return o.GetMeta().Name;
-            });
+                else
+                {
+                    var meta = system.GetMeta();
+                    MetaColor color;
+                    if (meta.IsCustomColor)
+                    {
+                        color = meta.Color;
+                    }
+                    else
+                    {
+                        color = EcsGUI.SelectPanelColor(meta, i, -1).ToMetaColor();
+                    }
+                    name = $"{meta.Name} : {meta.TypeName} : {meta.MetaID} : {color.colorCode:X8}";
+                }
+                names[i] = name;
+            }
             GUIUtility.systemCopyBuffer = string.Join("\r\n", names);
         }
 
@@ -53,7 +72,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (EcsGUI.Layout.BeginHorizontal())
             {
                 GUILayout.Label("[Systems]", _headerStyle, GUILayout.ExpandWidth(true));
-                if(GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
+                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
                 {
                     CopyToClipboard();
                 }
