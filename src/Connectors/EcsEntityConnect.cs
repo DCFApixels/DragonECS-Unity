@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-#region UNITY_EDITOR
+#if UNITY_EDITOR
 using UnityEditor;
 using DCFApixels.DragonECS.Unity.Internal;
 using DCFApixels.DragonECS.Unity;
-#endregion
+#endif
 
 namespace DCFApixels.DragonECS
 {

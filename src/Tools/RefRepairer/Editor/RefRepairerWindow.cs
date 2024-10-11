@@ -15,6 +15,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         [MenuItem("Tools/" + EcsConsts.FRAMEWORK_NAME + "/" + TITLE)]
         public static void Open()
         {
+            _isNoFound = false;
             var wnd = GetWindow<RefRepairerWindow>();
             wnd.titleContent = new GUIContent(TITLE);
             wnd.minSize = new Vector2(140f, 140f);
@@ -147,81 +148,137 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 
 
         private Vector2 _scrollViewPosition;
+        private static bool _isNoFound = false;
+        private GUIStyle _panel;
+
         private void OnGUI()
         {
-            if (_missingRefContainer.IsEmplty)
+            //if (_panel == null)
             {
-                if (GUILayout.Button("Collect missing references"))
+                _panel = new GUIStyle();
+                _panel.padding = new RectOffset(5, 5, 5, 5);
+            }
+            using (EcsGUI.Layout.BeginVertical(_panel))
+            {
+                const string LIST_EMPTY_MESSAGE = "List of Missings is Empty";
+                const string COLLECT_BUTTON = "Collect Missings";
+                if (_missingRefContainer.IsEmplty)
                 {
-                    if (TryInit())
+                    GUILayout.Label("", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+                    using (EcsGUI.SetFontSize(14))
+                    using (EcsGUI.SetFontSize(GUI.skin.button, 14))
+                    using (EcsGUI.SetAlignment(value: TextAnchor.MiddleCenter))
                     {
-                        _missingRefContainer.Collect();
-                        _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
-                        InitList();
+                        Vector2 center = GUILayoutUtility.GetLastRect().center;
+                        Vector2 labelSize = GUI.skin.label.CalcSize(UnityEditorUtility.GetLabel(LIST_EMPTY_MESSAGE));
+                        Vector2 buttonSize = GUI.skin.button.CalcSize(UnityEditorUtility.GetLabel(COLLECT_BUTTON));
+                        labelSize *= 1.2f;
+                        buttonSize *= 1.2f;
+                        Rect r;
+                        r = new Rect(Vector2.zero, labelSize);
+                        r.center = center;
+                        r.y -= labelSize.y / 2f;
+                        GUI.Label(r, LIST_EMPTY_MESSAGE);
+                        r = new Rect(Vector2.zero, buttonSize);
+                        r.center = center;
+                        r.y += buttonSize.y / 2f;
+                        if (Event.current.type == EventType.MouseDown && EcsGUI.HitTest(r))
+                        {
+                            _isNoFound = false;
+                        }
+                        if (GUI.Button(r, COLLECT_BUTTON, GUI.skin.button))
+                        {
+                            if (TryInit())
+                            {
+                                _missingRefContainer.Collect();
+                                _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
+                                InitList();
+                                if (_missingRefContainer.IsEmplty)
+                                {
+                                    _isNoFound = true;
+                                }
+                            }
+                        }
+
+                        GUIContent label = UnityEditorUtility.GetLabel("Missing references not found in the project.");
+                        labelSize = GUI.skin.label.CalcSize(label);
+                        r.y += labelSize.y * 1.1f;
+                        r.xMin -= labelSize.x / 2f;
+                        r.xMax += labelSize.x / 2f;
+                        if (_isNoFound)
+                        {
+                            GUI.Label(r, label);
+                        }
+                    }
+                    return;
+                }
+
+                if (_missingRefContainer.MissingsResolvingDatas.Count != _cachedMissingsResolvingDatas.Length)
+                {
+                    _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
+                    InitList();
+                }
+
+                var bc = EcsGUI.SetBackgroundColor(Color.black, 0.5f);
+                using (EcsGUI.Layout.BeginVertical(EditorStyles.helpBox))
+                {
+                    bc.Dispose();
+                    _scrollViewPosition = GUILayout.BeginScrollView(_scrollViewPosition, GUILayout.ExpandHeight(true));
+                    _reorderableResolvingDataList.DoLayoutList();
+                    GUILayout.EndScrollView();
+                }
+                GUILayout.Space(4f);
+
+                using (EcsGUI.Layout.BeginVertical(GUILayout.ExpandHeight(false)))
+                {
+                    //GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandHeight(false));
+
+                    var data = _selectedMissingsResolvingData;
+                    Rect rect = GUILayoutUtility.GetRect(
+                        EditorGUIUtility.currentViewWidth,
+                        (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 3f + EditorGUIUtility.standardVerticalSpacing * 2f)
+                        .AddPadding(EditorGUIUtility.standardVerticalSpacing);
+
+
+                    if (data == null)
+                    {
+                        using (EcsGUI.SetAlignment(TextAnchor.MiddleCenter))
+                        {
+                            GUI.Label(rect, "Select any record");
+                        }
+                    }
+                    else
+                    {
+                        using (EcsGUI.CheckChanged())
+                        {
+                            rect.height = EditorGUIUtility.singleLineHeight;
+                            rect = rect.Move(0, EditorGUIUtility.standardVerticalSpacing);
+                            string ClassName = DrawEditableLine(rect, "Name:", data.OldTypeData.ClassName, data.NewTypeData.ClassName);
+                            rect = rect.Move(0, EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+                            string NamespaceName = DrawEditableLine(rect, "Namespace:", data.OldTypeData.NamespaceName, data.NewTypeData.NamespaceName);
+                            rect = rect.Move(0, EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
+                            string AssemblyName = DrawEditableLine(rect, "Assembly:", data.OldTypeData.AssemblyName, data.NewTypeData.AssemblyName);
+                            if (EcsGUI.Changed)
+                            {
+                                data.NewTypeData = new Internal.TypeData(ClassName, NamespaceName, AssemblyName);
+                            }
+                        }
                     }
                 }
-                return;
-            }
 
-            if (GUILayout.Button("Repaire missing references"))
-            {
-                _selectedMissingsResolvingData = null;
-                RepaireFileUtility.RepaieAsset(_missingRefContainer);
-            }
-
-            if (_missingRefContainer.MissingsResolvingDatas.Count != _cachedMissingsResolvingDatas.Length)
-            {
-                _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
-                InitList();
-            }
-
-            var bc = EcsGUI.SetBackgroundColor(Color.black, 0.5f);
-            using (EcsGUI.Layout.BeginVertical(EditorStyles.helpBox))
-            {
-                bc.Dispose();
-                _scrollViewPosition = GUILayout.BeginScrollView(_scrollViewPosition, GUILayout.ExpandHeight(true));
-                _reorderableResolvingDataList.DoLayoutList();
-                GUILayout.EndScrollView();
-            }
-
-
-
-            GUILayout.BeginVertical(GUILayout.ExpandHeight(false));
-            //GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandHeight(false));
-
-            var data = _selectedMissingsResolvingData;
-            Rect rect = GUILayoutUtility.GetRect(
-                EditorGUIUtility.currentViewWidth,
-                (EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing) * 3f + EditorGUIUtility.standardVerticalSpacing * 2f)
-                .AddPadding(EditorGUIUtility.standardVerticalSpacing);
-
-
-            if (data == null)
-            {
-                using (EcsGUI.SetAlignment(TextAnchor.MiddleCenter))
+                using (EcsGUI.Layout.BeginHorizontal(GUILayout.Height(26f)))
                 {
-                    GUI.Label(rect, "Select any record");
-                }
-            }
-            else
-            {
-                using (EcsGUI.CheckChanged())
-                {
-                    rect.height = EditorGUIUtility.singleLineHeight;
-                    rect = rect.Move(0, EditorGUIUtility.standardVerticalSpacing);
-                    string ClassName = DrawEditableLine(rect, "Name:", data.OldTypeData.ClassName, data.NewTypeData.ClassName);
-                    rect = rect.Move(0, EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
-                    string NamespaceName = DrawEditableLine(rect, "Namespace:", data.OldTypeData.NamespaceName, data.NewTypeData.NamespaceName);
-                    rect = rect.Move(0, EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
-                    string AssemblyName = DrawEditableLine(rect, "Assembly:", data.OldTypeData.AssemblyName, data.NewTypeData.AssemblyName);
-                    if (EcsGUI.Changed)
+                    if (GUILayout.Button("Re-Collect", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(false)))
                     {
-                        data.NewTypeData = new RefRepairer.Internal.TypeData(ClassName, NamespaceName, AssemblyName);
+
+                    }
+                    if (GUILayout.Button("Repaire missing references", GUILayout.ExpandHeight(true)))
+                    {
+                        _selectedMissingsResolvingData = null;
+                        RepaireFileUtility.RepaieAsset(_missingRefContainer);
                     }
                 }
             }
-
-            GUILayout.EndVertical();
         }
 
 

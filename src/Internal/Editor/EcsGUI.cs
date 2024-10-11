@@ -235,6 +235,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static FontStyleScope SetFontStyle(FontStyle value) => new FontStyleScope(GUI.skin.label, value);
         public static FontStyleScope SetFontStyle(GUIStyle target) => new FontStyleScope(target);
         public static FontSizeScope SetFontSize(GUIStyle target, int value) => new FontSizeScope(target, value);
+        public static FontSizeScope SetFontSize(int value) => new FontSizeScope(GUI.skin.label, value);
         public static FontSizeScope SetFontSize(GUIStyle target) => new FontSizeScope(target);
         public static AlignmentScope SetAlignment(GUIStyle target, TextAnchor value) => new AlignmentScope(target, value);
         public static AlignmentScope SetAlignment(TextAnchor value) => new AlignmentScope(GUI.skin.label, value);
