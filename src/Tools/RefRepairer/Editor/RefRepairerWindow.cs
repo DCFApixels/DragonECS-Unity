@@ -153,7 +153,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 
         private void OnGUI()
         {
-            //if (_panel == null)
+            if (_panel == null)
             {
                 _panel = new GUIStyle();
                 _panel.padding = new RectOffset(5, 5, 5, 5);
