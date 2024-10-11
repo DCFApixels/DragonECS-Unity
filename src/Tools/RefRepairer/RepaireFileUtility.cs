@@ -37,7 +37,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         public static void RepaieAsset(MissingRefContainer container)
         {
-            if (container.IsEmplty) { return; }
+            if (container.IsEmpty) { return; }
 
             for (int i = 0; i < container.collectedMissingTypesBufferCount; i++)
             {

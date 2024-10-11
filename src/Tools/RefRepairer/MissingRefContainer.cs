@@ -18,7 +18,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         public CollectedAssetMissingRecord[] collectedMissingTypesBuffer = null;
         public int collectedMissingTypesBufferCount = 0;
         public readonly Dictionary<TypeData, MissingsResolvingData> MissingsResolvingDatas = new Dictionary<TypeData, MissingsResolvingData>();
-        public bool IsEmplty
+        public bool IsEmpty
         {
             get { return collectedMissingTypesBufferCount == 0; }
         }

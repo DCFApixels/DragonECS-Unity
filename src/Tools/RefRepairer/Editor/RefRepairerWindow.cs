@@ -162,7 +162,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             {
                 const string LIST_EMPTY_MESSAGE = "List of Missings is Empty";
                 const string COLLECT_BUTTON = "Collect Missings";
-                if (_missingRefContainer.IsEmplty)
+                if (_missingRefContainer.IsEmpty)
                 {
                     GUILayout.Label("", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
                     using (EcsGUI.SetFontSize(14))
@@ -193,7 +193,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                                 _missingRefContainer.Collect();
                                 _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
                                 InitList();
-                                if (_missingRefContainer.IsEmplty)
+                                if (_missingRefContainer.IsEmpty)
                                 {
                                     _isNoFound = true;
                                 }
