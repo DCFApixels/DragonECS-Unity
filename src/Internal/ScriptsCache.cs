@@ -121,7 +121,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region Get
-        public static bool TryGetScriptAsset(Type meta, out MonoScript script) { return TryGetScriptAsset(meta.GetMeta(), out script); }
+        public static bool TryGetScriptAsset(Type type, out MonoScript script) { return TryGetScriptAsset(type.ToMeta(), out script); }
         public static bool TryGetScriptAsset(TypeMeta meta, out MonoScript script)
         {
             int uniqueID = meta.GetHashCode();

@@ -10,6 +10,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private Texture _helpIcon = null;
         [SerializeField]
         private Texture _fileIcon = null;
+        [SerializeField]
+        private Texture _metaIDIcon = null;
 
         [SerializeField]
         private Texture _errorIcon = null;
@@ -42,6 +44,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         internal Texture HelpIcon { get { return _helpIcon; } }
         internal Texture FileIcon { get { return _fileIcon; } }
+        internal Texture MetaIDIcon { get { return _metaIDIcon; } }
 
         internal Texture ErrorIcon { get { return _errorIcon; } }
         internal Texture WarningIcon { get { return _warningIcon; } }

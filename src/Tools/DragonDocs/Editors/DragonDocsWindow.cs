@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.Internal;
+using System;
 using UnityEditor;
 using UnityEngine;
 
@@ -109,7 +110,10 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
             GUI.enabled = true;
 
-            GUILayout.Label(infos[_selectedIndex].Path);
+            if (_selectedIndex >= 0 && _selectedIndex < infos.Length)
+            {
+                GUILayout.Label(infos[_selectedIndex].Path);
+            }
         }
 
         private void DrawToolbar()
@@ -255,10 +259,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                     using (EcsGUI.Layout.BeginHorizontal())
                     {
                         GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
+
                         if (meta.TryGetSourceType(out System.Type targetType) && ScriptsCache.TryGetScriptAsset(targetType, out MonoScript script))
                         {
-                            EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(19f));
+                            EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(18f));
                         }
+
                         if (meta.IsCustomName)
                         {
                             using (EcsGUI.SetAlpha(0.64f)) using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
@@ -266,48 +272,47 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                                 GUILayout.TextArea(IsUseCustomNames ? meta.TypeName : meta.Name, GUI.skin.label);
                             }
                         }
+                        else
+                        {
+                            GUILayout.Label("");
+                        }
+
+
+                        if (string.IsNullOrEmpty(meta.MetaID) == false)
+                        {
+                            GUILayout.Space(-EditorGUIUtility.standardVerticalSpacing);
+                            EcsGUI.Layout.CopyMetaIDButton(meta.MetaID, GUILayout.Width(18f));
+                        }
                     }
 
-                    //draw description block
-                    Rect lastRect = GUILayoutUtility.GetLastRect();
-                    if (string.IsNullOrEmpty(meta.Description) == false)
+                    void DrawLine()
                     {
-                        Rect lineRect = lastRect;
+                        Rect lineRect = GUILayoutUtility.GetLastRect(); ;
                         lineRect.yMin = lineRect.yMax;
                         lineRect.yMax += 1f;
                         lineRect.y += 5f;
                         EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
+                    }
+
+                    bool isWithMetaID = string.IsNullOrEmpty(meta.MetaID) == false;
+
+                    //draw description block
+                    if (string.IsNullOrEmpty(meta.Description) == false)
+                    {
+                        DrawLine();
 
                         GUILayout.Space(7f);
 
                         GUILayout.TextArea(meta.Description, EditorStyles.wordWrappedLabel);
                     }
 
-                    //footer line
-                    if (string.IsNullOrEmpty(meta.MetaID) == false || meta._tags.Length > 0)
-                    {
-                        Rect lineRect = GUILayoutUtility.GetLastRect();
-                        lineRect.yMin = lineRect.yMax;
-                        lineRect.yMax += 1f;
-                        lineRect.y += 5f;
-                        EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
-
-                        GUILayout.Space(3f);
-                    }
-
-                    //draw metaid block
-                    if (string.IsNullOrEmpty(meta.MetaID) == false)
-                    {
-                        using (EcsGUI.SetAlpha(0.5f))
-                        {
-                            GUILayout.TextArea(meta.MetaID, EditorStyles.wordWrappedMiniLabel);
-                        }
-                        //EditorGUI.DrawRect(lineRect, new Color(1, 1, 1, 0.12f));
-                    }
-
                     //draw tags block
                     if (meta._tags.Length > 0)
                     {
+                        DrawLine();
+
+                        GUILayout.Space(3f);
+
                         var tagsstring = string.Join(',', meta._tags);
                         using (EcsGUI.SetAlpha(0.5f))
                         {
@@ -333,6 +338,10 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                 for (int i = 0; i < infos.Length; i++)
                 {
+                    if (infos.Length > _searchingHideGroupMap.Length)
+                    {
+                        Array.Resize(ref _searchingHideGroupMap, infos.Length);
+                    }
                     if (_searchingHideGroupMap[i]) { continue; }
 
                     var groupInfo = infos[i];

@@ -126,7 +126,8 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             m_docs = docs;
             if (m_isExpands == null || m_isExpands.Length != docs.Metas.Length)
             {
-                Array.Resize(ref m_isExpands, docs.Metas.Length);
+                int size = docs.Metas.Length;
+                Array.Resize(ref m_isExpands, size <= 0 ? 1 : size);
                 m_isExpands[0] = true;
             }
             _isInitInfos = false;

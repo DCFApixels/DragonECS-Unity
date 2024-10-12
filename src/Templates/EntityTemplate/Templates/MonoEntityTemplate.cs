@@ -12,7 +12,7 @@ namespace DCFApixels.DragonECS
 
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(MonoEntityTemplate), 30)]
-    [MetaColor(MetaColor.Cyan)]
+    [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal

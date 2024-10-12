@@ -984,6 +984,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 EcsGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);
             }
+
+
+            public static void CopyMetaIDButton(string metaID, params GUILayoutOption[] options)
+            {
+                Rect r = GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options);
+                var current = Event.current;
+                var hover = IconHoverScan(r, current);
+                using (new ColorScope(new Color(1f, 1f, 1f, hover ? 1f : 0.8f)))
+                {
+                    DrawIcon(r, Icons.Instance.MetaIDIcon, hover ? 1f : 2f, metaID);
+                    if (hover && current.type == EventType.MouseUp)
+                    {
+                        GUIUtility.systemCopyBuffer = metaID;
+                    }
+                }
+            }
             public static bool IconButton(Texture icon, params GUILayoutOption[] options)
             {
                 bool result = GUILayout.Button(UnityEditorUtility.GetLabel(string.Empty), options);
