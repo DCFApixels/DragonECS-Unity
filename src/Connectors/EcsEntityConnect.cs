@@ -68,7 +68,7 @@ namespace DCFApixels.DragonECS
         private static SparseArray<EcsEntityConnect> _connectedEntities = new SparseArray<EcsEntityConnect>();
 
         [SerializeField]
-        private bool _deleteEntiityWithDestroy = false;
+        private bool _deleteEntityWithDestroy = false;
         [SerializeField]
         private ScriptableEntityTemplateBase[] _scriptableTemplates;
         [SerializeField]
@@ -173,7 +173,7 @@ namespace DCFApixels.DragonECS
             Disconnect();
 
 
-            if (_deleteEntiityWithDestroy == false)
+            if (_deleteEntityWithDestroy == false)
             {
                 return;
             }
