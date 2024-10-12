@@ -160,15 +160,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             }
             using (EcsGUI.Layout.BeginVertical(_panel))
             {
-                if (_missingRefContainer != null)
-                {
-                    Debug.Log(_missingRefContainer.IsEmptyX);
-                }
-                else
-                {
-                    Debug.Log("NULL");
-                }
-
                 const string LIST_EMPTY_MESSAGE = "List of Missings is Empty";
                 const string COLLECT_BUTTON = "Collect Missings";
                 if (_missingRefContainer.IsEmpty)

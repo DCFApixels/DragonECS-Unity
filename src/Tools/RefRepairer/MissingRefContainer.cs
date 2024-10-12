@@ -23,10 +23,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         {
             get { return collectedMissingTypesBufferCount == 0; }
         }
-        public int IsEmptyX
-        {
-            get { return collectedMissingTypesBufferCount; }
-        }
 
         #region Clear/RemoveResolved
         public void Clear()
