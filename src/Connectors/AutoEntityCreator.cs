@@ -8,6 +8,7 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Automatically creates an entity in the selected world and connects it to EcsEntityConnect.")]
+    [MetaID("D699B3809201285A46DDF91BCF0540A7")]
     public class AutoEntityCreator : MonoBehaviour
     {
         [SerializeField]

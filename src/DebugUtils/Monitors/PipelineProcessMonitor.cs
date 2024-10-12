@@ -6,6 +6,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
+    [MetaID("75CCB6809201450CA3E1F280CB1EB0E7")]
     internal class PipelineProcessMonitor : MonoBehaviour
     {
         private EcsPipeline _pipeline;

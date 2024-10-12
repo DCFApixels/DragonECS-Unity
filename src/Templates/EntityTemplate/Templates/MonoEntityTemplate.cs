@@ -15,6 +15,7 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
+    [MetaID("C734BA8092014833C14F21E05D7B1551")]
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]

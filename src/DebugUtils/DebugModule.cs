@@ -3,6 +3,10 @@ using DCFApixels.DragonECS.Unity.Internal;
 
 namespace DCFApixels.DragonECS
 {
+    [MetaColor(MetaColor.DragonRose)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
+    [MetaDescription(EcsConsts.AUTHOR, "...")]
+    [MetaID("1D16B980920108B62A0971E4058A3E01")]
     public sealed class DebugModule : IEcsModule
     {
         public const string DEBUG_LAYER = EcsUnityConsts.DEBUG_LAYER;

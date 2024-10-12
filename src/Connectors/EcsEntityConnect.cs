@@ -60,6 +60,7 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Responsible for connecting the entity and GameObject using the EcsEntityConnect.ConnectWith method.")]
+    [MetaID("FF7EB3809201DEC2F1977C00D3B3443B")]
     public class EcsEntityConnect : MonoBehaviour
     {
         private entlong _entity;

@@ -6,6 +6,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
+    [MetaID("A551B6809201D56AA0F1B51248174B4D")]
     internal class EntityMonitor : MonoBehaviour
     {
         private entlong _entity;
