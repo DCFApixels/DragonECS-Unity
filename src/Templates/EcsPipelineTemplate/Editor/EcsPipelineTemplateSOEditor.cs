@@ -228,6 +228,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
+                GUILayout.Space(4f);
+
                 switch (EcsGUI.Layout.AddClearSystemButtons(out Rect dropDownRect))
                 {
                     case EcsGUI.AddClearButton.Add:

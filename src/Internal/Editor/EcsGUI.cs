@@ -705,7 +705,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Other Elements
         public static bool AddComponentButton(Rect position, out Rect dropDownRect)
         {
-            dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
+            dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 1f, 1f); ;
             return GUI.Button(dropDownRect, "Add Component");
         }
         public static AddClearButton AddClearComponentButtons(Rect position, out Rect dropDownRect)
@@ -718,7 +718,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static AddClearButton AddClearButtons(Rect position, string addText, string clearText, out Rect dropDownRect)
         {
-            position = RectUtility.AddPadding(position, 20f, 20f, 12f, 2f);
+            position = RectUtility.AddPadding(position, 20f, 20f, 1f, 1f);
             var (left, right) = RectUtility.HorizontalSliceLerp(position, 0.75f);
 
             dropDownRect = left;
@@ -1080,15 +1080,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             public static bool AddComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
+                return EcsGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static AddClearButton AddClearComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
+                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static AddClearButton AddClearSystemButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddClearSystemButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 36f), out dropDownRect);
+                return EcsGUI.AddClearSystemButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout = true)
             {

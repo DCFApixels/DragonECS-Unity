@@ -61,6 +61,7 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         protected T component;
         [SerializeField]
+        [HideInInspector]
         private byte _offset; // Fucking Unity drove me crazy with the error "Cannot get managed reference index with out bounds offset". This workaround helps avoid that error.
 
         #region Properties

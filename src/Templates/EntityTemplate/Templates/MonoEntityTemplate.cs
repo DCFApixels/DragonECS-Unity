@@ -19,7 +19,7 @@ namespace DCFApixels.DragonECS
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
     {
         [SerializeReference]
-        [ReferenceButton(typeof(IComponentTemplate))]
+        [ReferenceButton(true, typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
 
         #region Properties

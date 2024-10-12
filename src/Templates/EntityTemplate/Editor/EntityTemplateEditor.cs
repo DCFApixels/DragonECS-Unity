@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
-using System;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -58,28 +57,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             SerializedProperty componentProperty = prop;
-            try
+            if (componentProperty.managedReferenceValue is ComponentTemplateBase customTemplate)
             {
-                if (componentProperty.managedReferenceValue is ComponentTemplateBase customTemplate)
-                {
-                    componentProperty = prop.FindPropertyRelative("component");
-                }
-
-                if (componentProperty == null)
-                {
-                    //Debug.Log(prop.displayName);
-                    throw new NullReferenceException();
-                }
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e, serializedObject.targetObject);
-                //DrawDamagedComponent(index, "Damaged component template.");
-                return prop;
+                componentProperty = prop.FindPropertyRelative("component");
             }
 
-            return componentProperty;
+            return componentProperty == null ? prop : componentProperty;
         }
+
         private float OnReorderableComponentsListElementHeight(int index)
         {
             var componentProperty = GetTargetProperty(_componentsProp.GetArrayElementAtIndex(index));
@@ -194,11 +179,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 DrawTop(Target, _componentsProp);
                 _reorderableComponentsList.DoLayoutList();
-
             }
         }
         private void DrawTop(ITemplateInternal target, SerializedProperty componentsProp)
         {
+            GUILayout.Space(2f);
+
             switch (EcsGUI.Layout.AddClearComponentButtons(out Rect rect))
             {
                 case EcsGUI.AddClearButton.Add:

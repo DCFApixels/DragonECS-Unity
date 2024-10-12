@@ -198,7 +198,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private IEnumerable<(T, ITypeMeta)> _itemMetaPairs;
         public MetaObjectsDropDown() : base(new AdvancedDropdownState())
         {
-            minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * 30);
+            minimumSize = new Vector2(220f, EditorGUIUtility.singleLineHeight * 20);
 
         }
         protected void Setup(IEnumerable<(T, ITypeMeta)> itemMetaPairs, string name = "Select Type...", bool isContainsNull = true)
