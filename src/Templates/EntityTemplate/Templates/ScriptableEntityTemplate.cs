@@ -47,7 +47,7 @@ namespace DCFApixels.DragonECS
             if (_components == null) { return; }
             foreach (var item in _components)
             {
-                item.OnValidate(this);
+                item?.OnValidate(this);
             }
         }
         #endregion

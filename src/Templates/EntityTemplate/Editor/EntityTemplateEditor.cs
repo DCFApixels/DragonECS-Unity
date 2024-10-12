@@ -67,6 +67,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (componentProperty == null)
                 {
+                    //Debug.Log(prop.displayName);
                     throw new NullReferenceException();
                 }
             }

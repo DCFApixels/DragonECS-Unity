@@ -39,43 +39,40 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         {
             if (container.IsEmpty) { return; }
 
+            UnityObjectDataBase unityObjectData = null;
+            FileScope fileScope = default;
             for (int i = 0; i < container.collectedMissingTypesBufferCount; i++)
             {
                 ref var missing = ref container.collectedMissingTypesBuffer[i];
-                if (missing.IsNull) { continue; }
-
-                var unityObjectData = missing.UnityObject;
-                using (var file = new FileScope(unityObjectData.GetLocalAssetPath()))
+                if (unityObjectData != missing.UnityObject)
                 {
-                    // тут итерируюсь по блоку missingsResolvingDatas с одинаковым юнити объектом, так как такие идеут подр€т
-                    do
+                    unityObjectData = missing.UnityObject;
+                    fileScope.Dispose();
+                    fileScope = new FileScope(unityObjectData.GetLocalAssetPath());
+                }
+
+                int lineIndex = NextRefLine(fileScope.lines, 0);
+                while (lineIndex > 0)
+                {
+                    var line = fileScope.lines[lineIndex];
+
+                    //  ак сказанно в документации к методу Replace
+                    // A string that is equivalent to this instance except that all instances of oldChar are replaced with newChar.
+                    // If oldChar is not found in the current instance, the method returns the current instance unchanged.
+                    // ј конкретно строчки "returns the current instance unchanged", можно сделать упрощенную проверку через ReferenceEquals 
+                    line = line.Replace(missing.ResolvingData.OldSerializedInfoLine, missing.ResolvingData.NewSerializedInfoLine);
+                    bool isChanged = !ReferenceEquals(fileScope.lines[lineIndex], line);
+
+                    if (isChanged)
                     {
-                        int lineIndex = NextRefLine(file.lines, 0);
-                        while (lineIndex > 0)
-                        {
-                            var line = file.lines[lineIndex];
-
-                            //  ак сказанно в документации к методу Replace
-                            // A string that is equivalent to this instance except that all instances of oldChar are replaced with newChar.
-                            // If oldChar is not found in the current instance, the method returns the current instance unchanged.
-                            // ј конкретно строчки "returns the current instance unchanged", можно сделать упрощенную проверку через ReferenceEquals 
-                            line = line.Replace(missing.ResolvingData.OldSerializedInfoLine, missing.ResolvingData.NewSerializedInfoLine);
-                            bool isChanged = !ReferenceEquals(file.lines[lineIndex], line);
-
-
-                            if (isChanged)
-                            {
-                                file.lines[lineIndex] = line;
-                                break;
-                            }
-                            lineIndex = NextRefLine(file.lines, lineIndex);
-                        }
-
-                        missing = ref container.collectedMissingTypesBuffer[i++];
-                    } while (unityObjectData == missing.UnityObject);
-                    i--;//чтобы итераци€ не поломалась
+                        fileScope.lines[lineIndex] = line;
+                        break;
+                    }
+                    lineIndex = NextRefLine(fileScope.lines, lineIndex);
                 }
             }
+            fileScope.Dispose();
+
             container.RemoveResolved();
         }
         public struct FileScope : IDisposable
@@ -92,6 +89,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 
             public void Dispose()
             {
+                if (string.IsNullOrEmpty(FilePath)) { return; }
                 File.WriteAllLines(FilePath, lines);
                 AssetDatabase.ImportAsset(LocalAssetPath, ImportAssetOptions.ForceUpdate);
                 AssetDatabase.Refresh();

@@ -15,12 +15,17 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
     internal class MissingRefContainer
     {
+        // обязательно распологать так чтобы записи сссылающиеся на один и тот же ассет шли подряд друг за другом
         public CollectedAssetMissingRecord[] collectedMissingTypesBuffer = null;
         public int collectedMissingTypesBufferCount = 0;
         public readonly Dictionary<TypeData, MissingsResolvingData> MissingsResolvingDatas = new Dictionary<TypeData, MissingsResolvingData>();
         public bool IsEmpty
         {
             get { return collectedMissingTypesBufferCount == 0; }
+        }
+        public int IsEmptyX
+        {
+            get { return collectedMissingTypesBufferCount; }
         }
 
         #region Clear/RemoveResolved
@@ -35,53 +40,57 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         public void RemoveResolved()
         {
-            int offset = 0;
-            int i = 0;
-            int newLength = collectedMissingTypesBufferCount;
-            bool isReturn = true;
-            for (; i < newLength; i++)
+            int startI = 0;
+            int newCollectedMissingTypesBufferCount = collectedMissingTypesBufferCount;
+            bool isNoResolved = true;
+            // тут проверяется что есть разрешенные миссинги
+            // или просто скипается часть с не разрешенными миссингами
+            for (; startI < collectedMissingTypesBufferCount; startI++)
             {
-                ref var collectedMissingType = ref collectedMissingTypesBuffer[i];
+                ref var collectedMissingType = ref collectedMissingTypesBuffer[startI];
                 if (collectedMissingType.IsResolvedOrNull)
                 {
                     if (collectedMissingType.ResolvingData != null)
                     {
                         MissingsResolvingDatas.Remove(collectedMissingType.ResolvingData.OldTypeData);
                     }
-                    offset = 1;
-                    newLength--;
-                    isReturn = false;
+                    newCollectedMissingTypesBufferCount--;
+                    isNoResolved = false;
                     break;
                 }
             }
-            if (isReturn) { return; }
+            if (isNoResolved) { return; }
+            // тут один разрешенный миссинг уже найден
 
-            int nextI = i + offset;
-            for (; nextI < newLength; nextI++)
+            int nextI = startI + 1;
+            for (; nextI < collectedMissingTypesBufferCount;)
             {
-                ref var collectedMissingType = ref collectedMissingTypesBuffer[i];
+                ref var collectedMissingType = ref collectedMissingTypesBuffer[nextI];
                 if (collectedMissingType.IsResolvedOrNull)
                 {
                     if (collectedMissingType.ResolvingData != null)
                     {
                         MissingsResolvingDatas.Remove(collectedMissingType.ResolvingData.OldTypeData);
                     }
-                    offset++;
-                    newLength--;
+                    newCollectedMissingTypesBufferCount--;
+                    nextI++;
                 }
                 else
                 {
-                    collectedMissingTypesBuffer[i] = collectedMissingTypesBuffer[nextI];
-                    i++;
+                    collectedMissingTypesBuffer[startI] = collectedMissingTypesBuffer[nextI];
+                    startI++;
+                    nextI++;
                 }
             }
 
-            for (i = newLength; i < collectedMissingTypesBufferCount; i++)
+
+            //очистка хвостовой части откуда все уехало
+            for (startI = newCollectedMissingTypesBufferCount; startI < collectedMissingTypesBufferCount; startI++)
             {
-                collectedMissingTypesBuffer[i] = default;
+                collectedMissingTypesBuffer[startI] = default;
             }
 
-            collectedMissingTypesBufferCount = newLength;
+            collectedMissingTypesBufferCount = newCollectedMissingTypesBufferCount;
         }
         #endregion
 
