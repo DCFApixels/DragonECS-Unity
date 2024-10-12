@@ -196,6 +196,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                                 if (_missingRefContainer.IsEmpty)
                                 {
                                     _isNoFound = true;
+                                    MetaIDRegistry.instance.Reinit();
                                 }
                             }
                         }
@@ -270,7 +271,17 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                 {
                     if (GUILayout.Button("Re-Collect", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(false)))
                     {
-
+                        if (TryInit())
+                        {
+                            _missingRefContainer.Collect();
+                            _cachedMissingsResolvingDatas = _missingRefContainer.MissingsResolvingDatas.Values.ToArray();
+                            InitList();
+                            if (_missingRefContainer.IsEmpty)
+                            {
+                                _isNoFound = true;
+                                MetaIDRegistry.instance.Reinit();
+                            }
+                        }
                     }
                     if (GUILayout.Button("Repaire missing references", GUILayout.ExpandHeight(true)))
                     {

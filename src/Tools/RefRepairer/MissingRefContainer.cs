@@ -104,7 +104,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             {
                 collectedMissingTypesBuffer[i] = default;
             }
-
         }
         private void Add(UnityObjectDataBase unityObjectData, ref ManagedReferenceMissingType missing)
         {
