@@ -83,9 +83,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             using (EcsGUI.Layout.BeginVertical())
             {
+                int i = 0;
                 foreach (var item in Target.Pipeline.AllSystems)
                 {
-                    DrawSystem(item);
+                    DrawSystem(item, i++);
                 }
             }
 
@@ -94,16 +95,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
+                int i = 0;
                 foreach (var item in Target.Pipeline.AllRunners)
                 {
                     if (item.Key.IsInterface == false)
                     {
-                        DrawRunner(item.Value);
+                        DrawRunner(item.Value, i++);
                     }
                 }
             }
         }
-        private void DrawSystem(IEcsProcess system)
+        private void DrawSystem(IEcsProcess system, int index)
         {
             if (system is SystemsLayerMarkerSystem markerSystem)
             {
@@ -143,7 +145,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             string name = meta.Name;
-            Color color = meta.Color.ToUnityColor();
+            Color color = EcsGUI.SelectPanelColor(meta, index, -1);
 
 
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f)))
@@ -155,7 +157,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.Label(name, EditorStyles.boldLabel);
             }
         }
-        private void DrawRunner(IEcsRunner runner)
+        private void DrawRunner(IEcsRunner runner, int index)
         {
             Type type = runner.GetType();
             TypeMeta meta = type.ToMeta();
@@ -164,7 +166,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 return;
             }
-            Color color = meta.Color.ToUnityColor();
+            Color color = EcsGUI.SelectPanelColor(meta, index, -1);
 
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f)))
             {
