@@ -68,6 +68,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomEditor(typeof(ScriptablePipelineTemplate))]
     internal class PipelineTemplateEditorBase : ExtendedEditor<IPipelineTemplate>
     {
+        private SerializedProperty _parametersProp;
         private SerializedProperty _layersProp;
         private SerializedProperty _recordsProp;
         private ReorderableList _reorderableLayersList;
@@ -82,6 +83,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override void OnStaticInit() { }
         protected override void OnInit()
         {
+            _parametersProp = FindProperty("_parameters");
             _layersProp = FindProperty("_layers");
             _recordsProp = FindProperty("_records");
 
@@ -200,6 +202,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             EcsGUI.Changed = GUILayout.Button("Validate");
 
+            EditorGUILayout.PropertyField(_parametersProp, UnityEditorUtility.GetLabel(_parametersProp.displayName));
             DrawLayoutNameList(_layersProp);
             DrawRecordList(_recordsProp);
 

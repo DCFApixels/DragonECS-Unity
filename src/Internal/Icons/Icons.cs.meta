@@ -7,6 +7,7 @@ MonoImporter:
   - _helpIcon: {fileID: 2800000, guid: e135cf23a5d53ce48a75e163b41e39d5, type: 3}
   - _fileIcon: {fileID: 2800000, guid: 4f1ca6aa9d407844485856184c785946, type: 3}
   - _metaIDIcon: {fileID: 2800000, guid: d3c6215cfdc36cb448661398160560a7, type: 3}
+  - _repaireIcon: {fileID: 2800000, guid: 561fcfb28d73d7c4f8c9fac36e8ece86, type: 3}
   - _errorIcon: {fileID: 2800000, guid: c67e8a1d6cb0e904590c7847368fe794, type: 3}
   - _warningIcon: {fileID: 2800000, guid: 223d96e24d4b49f468b628cf9839584c, type: 3}
   - _passIcon: {fileID: 2800000, guid: 0df5856dbbe53494aae23b959ca05ecc, type: 3}

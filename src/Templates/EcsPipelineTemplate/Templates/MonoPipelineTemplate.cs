@@ -15,11 +15,14 @@ namespace DCFApixels.DragonECS
 
     [DisallowMultipleComponent]
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(MonoPipelineTemplate), 30)]
-    public class MonoPipelineTemplate : MonoPipelineTemplateBase, IPipelineTemplate
+    public class MonoPipelineTemplate : MonoPipelineTemplateBase, IPipelineTemplate, IEcsDefaultAddParams
     {
         [SerializeField]
         [ArrayElement]
         private string[] _layers = DefaultLayers.ToArray();
+
+        [SerializeField]
+        private AddParams _parameters;
 
         [SerializeField]
         [ArrayElement]
@@ -28,6 +31,10 @@ namespace DCFApixels.DragonECS
         public ReadOnlySpan<string> Layers
         {
             get { return _layers; }
+        }
+        public AddParams AddParams
+        {
+            get { return _parameters; }
         }
         public ReadOnlySpan<Record> Records
         {
@@ -56,6 +63,7 @@ namespace DCFApixels.DragonECS
             }
         }
 
+        [ContextMenu("Validate")]
         public bool Validate()
         {
             bool resutl = ValidateLayers(ref _layers);

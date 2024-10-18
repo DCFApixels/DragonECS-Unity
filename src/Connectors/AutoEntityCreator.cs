@@ -3,11 +3,13 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
+    using static EcsConsts;
+
     [DisallowMultipleComponent]
-    [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(AutoEntityCreator), 30)]
+    [AddComponentMenu(FRAMEWORK_NAME + "/" + nameof(AutoEntityCreator), 30)]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Automatically creates an entity in the selected world and connects it to EcsEntityConnect.")]
+    [MetaDescription(AUTHOR, nameof(MonoBehaviour) + ". Automatically creates an entity in the selected world and connects it to EcsEntityConnect.")]
     [MetaID("D699B3809201285A46DDF91BCF0540A7")]
     public class AutoEntityCreator : MonoBehaviour
     {

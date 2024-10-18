@@ -14,11 +14,14 @@ namespace DCFApixels.DragonECS
     }
 
     [CreateAssetMenu(fileName = nameof(ScriptablePipelineTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptablePipelineTemplate), order = 1)]
-    public sealed class ScriptablePipelineTemplate : ScriptablePipelineTemplateBase, IPipelineTemplate
+    public sealed class ScriptablePipelineTemplate : ScriptablePipelineTemplateBase, IPipelineTemplate, IEcsDefaultAddParams
     {
         [SerializeField]
         [ArrayElement]
         private string[] _layers = DefaultLayers.ToArray();
+
+        [SerializeField]
+        private AddParams _parameters;
 
         [SerializeField]
         [ArrayElement]
@@ -27,6 +30,10 @@ namespace DCFApixels.DragonECS
         public ReadOnlySpan<string> Layers
         {
             get { return _layers; }
+        }
+        public AddParams AddParams
+        {
+            get { return _parameters; }
         }
         public ReadOnlySpan<Record> Records
         {
@@ -55,6 +62,7 @@ namespace DCFApixels.DragonECS
             }
         }
 
+        [ContextMenu("Validate")]
         public bool Validate()
         {
             bool resutl = ValidateLayers(ref _layers);

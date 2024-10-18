@@ -11,20 +11,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         protected override void DrawCustom()
         {
-            EcsEntityConnect[] targets = new EcsEntityConnect[this.targets.Length];
-            for (int i = 0; i < targets.Length; i++)
-            {
-                targets[i] = (EcsEntityConnect)this.targets[i];
-            }
-            DrawEntityInfo(targets);
+            DrawEntityInfo();
 
             DrawTemplates();
 
-            DrawControlButtons(targets);
-            DrawComponents(targets);
+            DrawControlButtons();
+            DrawComponents();
         }
 
-        private void DrawEntityInfo(EcsEntityConnect[] targets)
+        private void DrawEntityInfo()
         {
             bool isConnected = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
             EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
@@ -49,7 +44,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawControlButtons(EcsEntityConnect[] targets)
+        private void DrawControlButtons()
         {
             float height = EcsGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
@@ -58,7 +53,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var (_, buttonRect) = rect.HorizontalSliceRight(height);
             if (EcsGUI.AutosetCascadeButton(buttonRect))
             {
-                foreach (var target in targets)
+                foreach (var target in Targets)
                 {
                     target.AutosetCascade_Editor();
                 }
@@ -66,7 +61,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             buttonRect = RectUtility.Move(buttonRect, -height, 0);
             if (EcsGUI.AutosetButton(buttonRect))
             {
-                foreach (var target in targets)
+                foreach (var target in Targets)
                 {
                     target.Autoset_Editor();
                 }
@@ -76,7 +71,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 buttonRect = buttonRect.Move(-height, 0);
                 if (EcsGUI.DelEntityButton(buttonRect))
                 {
-                    foreach (var target in targets)
+                    foreach (var target in Targets)
                     {
                         target.DeleteEntity_Editor();
                     }
@@ -84,7 +79,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 buttonRect = buttonRect.Move(-height, 0);
                 if (EcsGUI.UnlinkButton(buttonRect))
                 {
-                    foreach (var target in targets)
+                    foreach (var target in Targets)
                     {
                         target.UnlinkEntity_Editor();
                     }
@@ -92,13 +87,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawComponents(EcsEntityConnect[] targets)
+        private void DrawComponents()
         {
             if (IsMultipleTargets)
             {
-                for (int i = 0; i < targets.Length; i++)
+                for (int i = 0; i < Targets.Length; i++)
                 {
-                    if (targets[i].IsConnected == true)
+                    if (Targets[i].IsConnected == true)
                     {
                         EditorGUILayout.HelpBox("Multiple component editing is not available.", MessageType.Warning);
                         return;

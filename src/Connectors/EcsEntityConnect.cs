@@ -10,6 +10,8 @@ using UnityEditor;
 
 namespace DCFApixels.DragonECS
 {
+    using static EcsConsts;
+
     public static class EcsConnect
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -56,10 +58,10 @@ namespace DCFApixels.DragonECS
 
     [SelectionBase]
     [DisallowMultipleComponent]
-    [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
+    [AddComponentMenu(FRAMEWORK_NAME + "/" + nameof(EcsEntityConnect), 30)]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + ". Responsible for connecting the entity and GameObject using the EcsEntityConnect.ConnectWith method.")]
+    [MetaDescription(AUTHOR, nameof(MonoBehaviour) + ". Responsible for connecting the entity and GameObject using the EcsEntityConnect.ConnectWith method.")]
     [MetaID("FF7EB3809201DEC2F1977C00D3B3443B")]
     public class EcsEntityConnect : MonoBehaviour
     {
@@ -210,7 +212,6 @@ namespace DCFApixels.DragonECS
         internal void Autoset_Editor()
         {
             Autoset(this);
-
         }
         [ContextMenu("Autoset Cascade")]
         internal void AutosetCascade_Editor()

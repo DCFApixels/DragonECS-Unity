@@ -424,6 +424,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return click;
             }
         }
+
+        public static bool ValidateButton(Rect position)
+        {
+            return IconButton(position, Icons.Instance.RepaireIcon, 2f, "Validate");
+        }
         public static bool AutosetCascadeButton(Rect position)
         {
             return IconButton(position, Icons.Instance.AutosetCascadeIcon, 0f, "Autoset Cascade");
