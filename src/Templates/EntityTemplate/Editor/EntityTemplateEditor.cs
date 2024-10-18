@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal abstract class EntityTemplateEditorBase<T> : ExtendedEditor<ITemplateInternal>
+    internal abstract class EntityTemplateEditorBase : ExtendedEditor<IEntityTemplateInternal>
     {
         private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
@@ -140,7 +140,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Add/Remove
         private void OnRemoveComponentAt(int index)
         {
-            if (this.target is ITemplateInternal target)
+            if (this.target is IEntityTemplateInternal target)
             {
                 SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
                 componentsProp.DeleteArrayElementAtIndex(index);
@@ -181,7 +181,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _reorderableComponentsList.DoLayoutList();
             }
         }
-        private void DrawTop(ITemplateInternal target, SerializedProperty componentsProp)
+        private void DrawTop(IEntityTemplateInternal target, SerializedProperty componentsProp)
         {
             GUILayout.Space(2f);
 
@@ -201,8 +201,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
-    internal class EntityTemplatePresetEditor : EntityTemplateEditorBase<ScriptableEntityTemplate> { }
+    internal class ScriptableEntityTemplateEditor : EntityTemplateEditorBase { }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
-    internal class EntityTemplateEditor : EntityTemplateEditorBase<MonoEntityTemplate> { }
+    internal class MonoEntityTemplateEditor : EntityTemplateEditorBase { }
 }
 #endif    

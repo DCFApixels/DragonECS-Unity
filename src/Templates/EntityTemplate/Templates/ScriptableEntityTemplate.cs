@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
-    public abstract class ScriptableEntityTemplateBase : ScriptableObject, ITemplate
+    public abstract class ScriptableEntityTemplateBase : ScriptableObject, IEntityTemplate
     {
         public abstract void Apply(short worldID, int entityID);
     }
@@ -15,14 +15,14 @@ namespace DCFApixels.DragonECS
     [MetaDescription(EcsConsts.AUTHOR, nameof(ScriptableObject) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     [CreateAssetMenu(fileName = nameof(ScriptableEntityTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptableEntityTemplate), order = 1)]
     [MetaID("7C4DBA809201D959401A5BDFB6363EC0")]
-    public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateInternal
+    public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, IEntityTemplateInternal
     {
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
 
         #region Properties
-        string ITemplateInternal.ComponentsPropertyName
+        string IEntityTemplateInternal.ComponentsPropertyName
         {
             get { return nameof(_components); }
         }

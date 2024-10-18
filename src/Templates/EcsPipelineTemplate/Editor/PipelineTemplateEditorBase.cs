@@ -1,14 +1,15 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [CustomPropertyDrawer(typeof(EcsPipelineTemplateSO.Record))]
-    internal class EcsPipelineTemplateSORecordDrawer : ExtendedPropertyDrawer
+    [CustomPropertyDrawer(typeof(PipelineTemplateUtility.Record))]
+    internal class PipelineTemplateUtilityRecordDrawer : ExtendedPropertyDrawer
     {
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
@@ -64,8 +65,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return result;
         }
     }
-    [CustomEditor(typeof(EcsPipelineTemplateSO))]
-    internal class EcsPipelineTemplateSOEditor : ExtendedEditor<EcsPipelineTemplateSO>
+    [CustomEditor(typeof(ScriptablePipelineTemplate))]
+    internal class PipelineTemplateEditorBase : ExtendedEditor<IPipelineTemplate>
     {
         private SerializedProperty _layersProp;
         private SerializedProperty _recordsProp;
@@ -136,12 +137,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region _reorderableLayersList
+        private static readonly HashSet<string> _defaultLayersSet = new HashSet<string>(PipelineTemplateUtility.DefaultLayers);
         private void OnReorderableLayersListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
             using (EcsGUI.CheckChanged())
             {
                 var elementProp = _layersProp.GetArrayElementAtIndex(index);
-                elementProp.stringValue = EditorGUI.TextField(rect, elementProp.stringValue);
+                string str = elementProp.stringValue;
+                using (EcsGUI.SetEnable(_defaultLayersSet.Contains(str) == false))
+                {
+                    elementProp.stringValue = EditorGUI.TextField(rect, str);
+                }
             }
         }
         private void OnReorderableLayersListAdd(ReorderableList list)
@@ -162,7 +168,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (EcsGUI.CheckChanged())
             {
                 SerializedProperty prop = _recordsProp.GetArrayElementAtIndex(index);
-                var targetProp = prop.FindPropertyRelative(nameof(EcsPipelineTemplateSO.Record.target));
+                var targetProp = prop.FindPropertyRelative(nameof(PipelineTemplateUtility.Record.target));
 
                 bool isNull = targetProp.managedReferenceValue == null;
                 ITypeMeta meta = isNull ? null : targetProp.managedReferenceValue.GetMeta();
@@ -210,7 +216,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             foreach (var target in Targets)
             {
                 target.Validate();
-                EditorUtility.SetDirty(target);
+                EditorUtility.SetDirty((UnityEngine.Object)target);
             }
             serializedObject.Update();
         }
@@ -245,5 +251,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
     }
+
+    [CustomEditor(typeof(ScriptablePipelineTemplate), true)]
+    internal class ScriptablePipelineTemplateEditor : PipelineTemplateEditorBase { }
+    [CustomEditor(typeof(MonoPipelineTemplate), true)]
+    internal class MonoPipelineTemplateEditor : PipelineTemplateEditorBase { }
 }
 #endif

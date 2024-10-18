@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
-    public abstract class MonoEntityTemplateBase : MonoBehaviour, ITemplate
+    public abstract class MonoEntityTemplateBase : MonoBehaviour, IEntityTemplate
     {
         public abstract void Apply(short worldID, int entityID);
     }
@@ -16,14 +16,14 @@ namespace DCFApixels.DragonECS
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     [MetaID("C734BA8092014833C14F21E05D7B1551")]
-    public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateInternal
+    public class MonoEntityTemplate : MonoEntityTemplateBase, IEntityTemplateInternal
     {
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
 
         #region Properties
-        string ITemplateInternal.ComponentsPropertyName
+        string IEntityTemplateInternal.ComponentsPropertyName
         {
             get { return nameof(_components); }
         }

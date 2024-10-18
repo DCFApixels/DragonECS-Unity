@@ -1,6 +1,6 @@
 ﻿namespace DCFApixels.DragonECS
 {
-    public interface ITemplate : ITemplateNode { }
+    public interface IEntityTemplate : ITemplateNode { }
 
     public static class ITemplateNodeExtensions
     {
@@ -15,7 +15,7 @@
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
-    internal interface ITemplateInternal : ITemplate
+    internal interface IEntityTemplateInternal : IEntityTemplate
     {
         string ComponentsPropertyName { get; }
     }

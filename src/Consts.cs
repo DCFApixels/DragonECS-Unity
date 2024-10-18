@@ -2,7 +2,7 @@
 {
     public class EcsUnityConsts
     {
-        public const string PACK_GROUP = "_" + EcsConsts.FRAMEWORK_NAME + "/Unity";
+        public const string PACK_GROUP = "_" + EcsConsts.FRAMEWORK_NAME + "/_Unity";
         public const string ENTITY_BUILDING_GROUP = "Entity Building";
         public const string PIPELINE_BUILDING_GROUP = "Pipeline Building";
 
@@ -12,8 +12,6 @@
 
         public const string LOCAL_CACHE_FOLDER = "/Library/" + EcsConsts.AUTHOR + "/" + UNITY_PACKAGE_NAME;
         public const string USER_SETTINGS_FOLDER = "/UserSettings/" + EcsConsts.AUTHOR + "/" + UNITY_PACKAGE_NAME;
-
-        //EcsConsts.AUTHOR + "/" + EcsConsts.FRAMEWORK_NAME + "/" + nameof(DragonDocsPrefs) + ".prefs"
     }
 
     public class EcsUnityDefines
