@@ -202,8 +202,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             EcsGUI.Changed = GUILayout.Button("Validate");
 
-            EditorGUILayout.PropertyField(_parametersProp, UnityEditorUtility.GetLabel(_parametersProp.displayName));
             DrawLayoutNameList(_layersProp);
+            EditorGUILayout.PropertyField(_parametersProp, UnityEditorUtility.GetLabel(_parametersProp.displayName));
             DrawRecordList(_recordsProp);
 
             if (EcsGUI.Changed)
