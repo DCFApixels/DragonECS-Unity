@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Internal;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -9,6 +11,8 @@ namespace DCFApixels.DragonECS
     [AddComponentMenu(EcsConsts.FRAMEWORK_NAME + "/" + nameof(EcsRootUnity), 30)]
     public class EcsRootUnity : MonoBehaviour
     {
+        [SerializeField]
+        private bool _enablePipelineDebug = true;
         [SerializeField]
         private ScriptablePipelineTemplateBase[] _scriptableTemplates;
         [SerializeField]
@@ -46,6 +50,13 @@ namespace DCFApixels.DragonECS
                 if (template == null) { continue; }
                 pipelineBuilder.Add(template);
             }
+#if UNITY_EDITOR
+            if (_enablePipelineDebug)
+            {
+                pipelineBuilder.Layers.Insert(EcsConsts.POST_END_LAYER, EcsUnityConsts.DEBUG_LAYER);
+                pipelineBuilder.AddUnique(new PipelineMonitorSystem(), EcsUnityConsts.DEBUG_LAYER);
+            }
+#endif
             _pipeline = pipelineBuilder.BuildAndInit();
         }
 

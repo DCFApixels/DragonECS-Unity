@@ -7,22 +7,21 @@ namespace DCFApixels.DragonECS
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaID("1D16B980920108B62A0971E4058A3E01")]
-    public sealed class DebugModule : IEcsModule
+    public sealed class UnityDebugModule : IEcsModule
     {
-        public const string DEBUG_LAYER = EcsUnityConsts.DEBUG_LAYER;
         public EcsWorld[] _worlds;
-        public DebugModule(params EcsWorld[] worlds)
+        public UnityDebugModule(params EcsWorld[] worlds)
         {
             _worlds = worlds;
         }
         void IEcsModule.Import(EcsPipeline.Builder b)
         {
             UnityDebugService.Activate();
-            b.Layers.Insert(EcsConsts.POST_END_LAYER, DEBUG_LAYER);
-            b.AddUnique(new PipelineMonitorSystem(), DEBUG_LAYER);
+            b.Layers.Insert(EcsConsts.POST_END_LAYER, EcsUnityConsts.DEBUG_LAYER);
+            b.AddUnique(new PipelineMonitorSystem(), EcsUnityConsts.DEBUG_LAYER);
             foreach (var world in _worlds)
             {
-                b.Add(new WorldMonitorSystem(world), DEBUG_LAYER);
+                b.Add(new WorldMonitorSystem(world), EcsUnityConsts.DEBUG_LAYER);
             }
         }
     }
@@ -31,7 +30,7 @@ namespace DCFApixels.DragonECS
     {
         public static EcsPipeline.Builder AddUnityDebug(this EcsPipeline.Builder self, params EcsWorld[] worlds)
         {
-            self.AddModule(new DebugModule(worlds));
+            self.AddModule(new UnityDebugModule(worlds));
             return self;
         }
     }
