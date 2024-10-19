@@ -420,14 +420,14 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 Хранится как отдельный ассет. Наследуется от `ScriptableObject`. Действия чтобы создать `ScriptableEntityTemplate` ассет: `Asset > Create > DragonECS > ScriptablePipelineTemplate`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1">   
+<img src="https://github.com/user-attachments/assets/c61c483d-3f2f-4356-bf9d-62633fc06fce">   
 </p>
 
 ## MonoPipelineTemplate
 Крепится к `GameObject`. Наследуется от `MonoBehaviour`. Повесить компонент: `Add Component > DragonECS > MonoPipelineTemplate`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd">   
+<img src="https://github.com/user-attachments/assets/4ba4d594-e031-4588-bd36-3273611db820">   
 </p>
 
 </br>
@@ -436,8 +436,9 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 Упрощенная реализация Ecs Root для юнити, собирает пайплайн из шаблонов пайплайна. Наследуется от `MonoBehaviour`. Чтобы повесить GameObject: `Add Component > DragonECS > EcsRootUnity`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd">   
+<img src="https://github.com/user-attachments/assets/3ff42747-0366-4db8-8015-9ea254d72feb">   
 </p>
+
 
 </br>
 
@@ -493,7 +494,7 @@ public class EcsRoot : MonoBehaviour
 Расширение активно задействует `[SerializeReference]`, у которого есть известная проблема с потерей типов при переименовании. Чтобы упростить восстановление потерянных типов имеется специальный инструмент `Reference Repairer`. Он может собирать все ассеты с потерянными типами, после предоставляет окно для указания новых имен потерянны типов. Далее проведет восстановление потерянных типов в собранных ассетах. Открыть окно инструмента: `Tools > DragonECS > Reference Repairer`.
 > Если потерянные типы были с атрибутом `[MetaID(id)]` то инструмент автоматически определит новое имя типа.
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
+<img src="https://github.com/user-attachments/assets/ffb2b78a-db43-445d-a371-6358250b8cee">   
 </p>
 
 </br>
