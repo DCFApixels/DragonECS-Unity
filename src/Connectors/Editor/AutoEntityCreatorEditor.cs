@@ -31,18 +31,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
             rect = rect.AddPadding(2f, 0f);
-            var (left, autosetCascadeRect) = rect.HorizontalSliceRight(height);
-            var (_, autosetRect) = rect.HorizontalSliceRight(height);
+            var (_, buttonRect) = rect.HorizontalSliceRight(height);
 
-            if (EcsGUI.AutosetCascadeButton(autosetCascadeRect))
+            //var (left, autosetCascadeRect) = rect.HorizontalSliceRight(height);
+            //var (_, autosetRect) = rect.HorizontalSliceRight(height);
+
+            if (EcsGUI.AutosetCascadeButton(buttonRect))
             {
                 foreach (AutoEntityCreator target in targets)
                 {
                     target.AutosetCascade_Editor();
                 }
             }
-
-            if (EcsGUI.AutosetButton(autosetRect))
+            buttonRect = buttonRect.Move(-height, 0);
+            if (EcsGUI.AutosetButton(buttonRect))
             {
                 foreach (AutoEntityCreator target in targets)
                 {
