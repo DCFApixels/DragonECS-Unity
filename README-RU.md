@@ -47,9 +47,10 @@
   - [Debug Модуль](#debug-модуль)
   - [Debug Сервис](#debug-сервис)
   - [Визуальная отладка](#визуальная-отладка)
-- [Шаблоны](#шаблоны)
+- [Шаблон Сущности](#шаблон-сущности)
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
+- [Шаблон Пайплайна](#шаблон-пайплайна)
 - [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
 - [Документация проекта](#документация-проекта)
 - [Окно настроек](#окно-настроек)
@@ -147,7 +148,7 @@ EcsDebug.Break();
 -----
 
 * ### `EntityMonitor`
-Показывает состояние сущности мира. На каждую сущность в мире создается отдельный монитор. Все мониторы сущностей помещаются в монитор мира.
+Показывает состояние сущности мира, позволяет добавлять/изменять/удалять компоненты по время Play Mode. На каждую сущность в мире создается отдельный монитор. Все мониторы сущностей помещаются в монитор мира.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1">   
@@ -157,8 +158,8 @@ EcsDebug.Break();
 
 </br>
 
-# Шаблоны
-Шаблоны - это настраиваемые наборы компонентов которые можно применить к сущностям. Шаблоны должны реализовывать интерфейс  `ITemplateNode`. 
+# Шаблон Сущности
+Настраиваемый набор компонентов которые можно применить к сущностям. Шаблоны должны реализовывать интерфейс `ITemplateNode`. 
 ```c#
 ITemplateNode someTemplate = /*...*/;
 //...
@@ -260,8 +261,7 @@ class SomeComponentTemplate : IComponentTemplate
 </details>
 </br>
 
-
-### Кастомизирование отображения
+### Кастомизация отображения типов
 В раскрывающемся при нажатии `Add Component` меню выбора компонента поддерживается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
 Компоненты в инспекторе по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в [окне настроек](#окно-настроек) фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
@@ -411,6 +411,38 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 
 </br>
 
+# Шаблон Пайплайна
+Пайплайн как и сущности можно собирать из шаблонов. Шаблоны пайплайна это модули, реализующие интерфейс `IEcsModule`。
+
+По умолчанию расширение содержит 2 вида шаблонов: `ScriptablePipelineTemplate`, `MonoPipelineTemplate`.
+
+## ScriptablePipelineTemplate
+Хранится как отдельный ассет. Наследуется от `ScriptableObject`. Действия чтобы создать `ScriptableEntityTemplate` ассет: `Asset > Create > DragonECS > ScriptablePipelineTemplate`.
+
+<p align="center">
+<img width="450" src="https://github.com/user-attachments/assets/c61c483d-3f2f-4356-bf9d-62633fc06fce">   
+</p>
+
+## MonoPipelineTemplate
+Крепится к `GameObject`. Наследуется от `MonoBehaviour`. Повесить компонент: `Add Component > DragonECS > MonoPipelineTemplate`.
+
+<p align="center">
+<img width="450" src="https://github.com/user-attachments/assets/4ba4d594-e031-4588-bd36-3273611db820">   
+</p>
+
+</br>
+
+# EcsRootUnity
+Упрощенная реализация Ecs Root для юнити, собирает пайплайн из шаблонов пайплайна. Наследуется от `MonoBehaviour`. Чтобы повесить GameObject: `Add Component > DragonECS > EcsRootUnity`.
+
+<p align="center">
+<img width="450" src="https://github.com/user-attachments/assets/3ff42747-0366-4db8-8015-9ea254d72feb">   
+</p>
+
+
+</br>
+
+
 # FixedUpdate LateUpdate 
 ```c#
 using DCFApixels.DragonECS;
@@ -454,6 +486,15 @@ public class EcsRoot : MonoBehaviour
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
+</p>
+
+</br>
+
+# Инструмент для восстановления Missing Reference
+Расширение активно задействует `[SerializeReference]`, у которого есть известная проблема с потерей типов при переименовании. Чтобы упростить восстановление потерянных типов имеется специальный инструмент `Reference Repairer`. Он может собирать все ассеты с потерянными типами, после предоставляет окно для указания новых имен потерянны типов. Далее проведет восстановление потерянных типов в собранных ассетах. Открыть окно инструмента: `Tools > DragonECS > Reference Repairer`.
+> Если потерянные типы были с атрибутом `[MetaID(id)]` то инструмент автоматически определит новое имя типа.
+<p align="center">
+<img width="700" src="https://github.com/user-attachments/assets/ffb2b78a-db43-445d-a371-6358250b8cee">   
 </p>
 
 </br>
