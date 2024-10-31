@@ -16,6 +16,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private SerializedProperty _componentsProp;
         private ReorderableList _reorderableComponentsList;
 
+        //public virtual bool IsStaticData { get { return false; } }
+
         #region Init
         protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
@@ -201,8 +203,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
-    internal class ScriptableEntityTemplateEditor : EntityTemplateEditorBase { }
+    internal class ScriptableEntityTemplateEditor : EntityTemplateEditorBase
+    {
+        //public override bool IsStaticData { get { return true; } }
+    }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
-    internal class MonoEntityTemplateEditor : EntityTemplateEditorBase { }
+    internal class MonoEntityTemplateEditor : EntityTemplateEditorBase
+    {
+        //public override bool IsStaticData { get { return false; } }
+    }
 }
 #endif    
