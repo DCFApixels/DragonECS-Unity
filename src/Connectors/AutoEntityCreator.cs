@@ -60,23 +60,20 @@ namespace DCFApixels.DragonECS
         }
         private void CreateEntity()
         {
-            if (_created)
-            {
-                return;
-            }
+            if (_created) { return; }
+
             if (_world == null)
             {
                 AutoResolveWorldProviderDependensy();
             }
-            else
-            {
-                InitConnect(_connect, _world.GetRaw());
-            }
+
+            InitConnect(_connect, _world.GetRaw());
             _created = true;
         }
 
         private void InitConnect(EcsEntityConnect connect, EcsWorld world)
         {
+            if (connect.IsConnected) { return; }
             connect.ConnectWith(CreateEntity(world), true);
         }
         protected virtual entlong CreateEntity(EcsWorld world)
