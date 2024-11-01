@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.RunnersCore;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
@@ -14,16 +15,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public SystemsDropDown()
         {
             Type[] predicateTypes = new Type[] { typeof(IEcsModule), typeof(IEcsProcess) };
+            Type[] withoutTypes = new Type[] { typeof(IEcsRunner) };
             IEnumerable<(Type, ITypeMeta)> itemMetaPairs = UnityEditorUtility._serializableTypes.Where(o =>
             {
-                foreach (Type predicateTypes in predicateTypes)
+                bool result = false;
+                foreach (Type type in predicateTypes)
                 {
-                    if (predicateTypes.IsAssignableFrom(o))
+                    if (type.IsAssignableFrom(o))
                     {
-                        return true;
+                        result = true;
+                        break;
                     }
                 }
-                return false;
+                foreach (Type type in withoutTypes)
+                {
+                    if (type.IsAssignableFrom(o))
+                    {
+                        return false;
+                    }
+                }
+                return result;
             }).Select(o => (o, (ITypeMeta)o.ToMeta()));
             Setup(itemMetaPairs);
         }

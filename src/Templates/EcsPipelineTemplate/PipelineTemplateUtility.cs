@@ -1,4 +1,5 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
+﻿using DCFApixels.DragonECS.RunnersCore;
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -100,6 +101,7 @@ namespace DCFApixels.DragonECS.Unity
         {
             [SerializeReference]
             [ReferenceButton(true, typeof(IEcsModule), typeof(IEcsProcess))]
+            [ReferenceButtonWithOut(typeof(IEcsRunner))]
             [ArrayElement]
             public object target;// нельзя менять поярдок полей, иначе это поломает отрисовку в инспекторе изза применения property.Next(bool);
             public AddParams parameters;

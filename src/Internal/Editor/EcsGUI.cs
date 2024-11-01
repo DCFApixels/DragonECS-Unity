@@ -765,13 +765,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static SerializedProperty _currentProperty;
 
         #region Init
-        private static ReferenceDropDown GetReferenceDropDown(Type[] predicatTypes)
+        private static ReferenceDropDown GetReferenceDropDown(Type[] predicatTypes, Type[] sortedWithOutTypes)
         {
-            if (_predicatTypesMenus.TryGetValue(predicatTypes, out ReferenceDropDown menu) == false)
+            if (_predicatTypesMenus.TryGetValue((predicatTypes, sortedWithOutTypes), out ReferenceDropDown menu) == false)
             {
-                menu = new ReferenceDropDown(predicatTypes);
+                menu = new ReferenceDropDown(predicatTypes, sortedWithOutTypes);
                 menu.OnSelected += SelectComponent;
-                _predicatTypesMenus.Add(predicatTypes, menu);
+                _predicatTypesMenus.Add((predicatTypes, sortedWithOutTypes), menu);
             }
 
             return menu;
@@ -798,16 +798,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private readonly struct PredicateTypesKey : IEquatable<PredicateTypesKey>
         {
             public readonly Type[] types;
-            public PredicateTypesKey(Type[] types)
+            public readonly Type[] withoutTypes;
+            public PredicateTypesKey(Type[] types, Type[] withoutTypes)
             {
                 this.types = types;
+                this.withoutTypes = withoutTypes;
             }
             public bool Equals(PredicateTypesKey other)
             {
                 if (types.Length != other.types.Length) { return false; }
+                if (withoutTypes.Length != other.withoutTypes.Length) { return false; }
                 for (int i = 0; i < types.Length; i++)
                 {
                     if (types[i] != other.types[i])
+                    {
+                        return false;
+                    }
+                }
+                for (int i = 0; i < withoutTypes.Length; i++)
+                {
+                    if (withoutTypes[i] != other.withoutTypes[i])
                     {
                         return false;
                     }
@@ -822,8 +832,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 return HashCode.Combine(types);
             }
-            public static implicit operator PredicateTypesKey(Type[] types) { return new PredicateTypesKey(types); }
-            public static implicit operator Type[](PredicateTypesKey key) { return key.types; }
+            public static implicit operator PredicateTypesKey((Type[], Type[]) types) { return new PredicateTypesKey(types.Item1, types.Item2); }
         }
         #endregion
 
@@ -831,9 +840,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private class ReferenceDropDown : AdvancedDropdown
         {
             public readonly Type[] PredicateTypes;
-            public ReferenceDropDown(Type[] predicateTypes) : base(new AdvancedDropdownState())
+            public readonly Type[] WithOutTypes;
+            public ReferenceDropDown(Type[] predicateTypes, Type[] withOutTypes) : base(new AdvancedDropdownState())
             {
                 PredicateTypes = predicateTypes;
+                WithOutTypes = withOutTypes;
                 minimumSize = new Vector2(minimumSize.x, EditorGUIUtility.singleLineHeight * 30);
             }
             protected override AdvancedDropdownItem BuildRoot()
@@ -852,6 +863,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         if (predicateTypes.IsAssignableFrom(type))
                         {
                             isAssignable = true;
+                            break;
+                        }
+                    }
+                    foreach (Type withoutType in WithOutTypes)
+                    {
+                        if (withoutType.IsAssignableFrom(type))
+                        {
+                            isAssignable = false;
                             break;
                         }
                     }
@@ -956,7 +975,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        public static void DrawSelectReferenceButton(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, bool isHideButtonIfNotNull)
+        public static void DrawSelectReferenceButton(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, Type[] sortedWithOutTypes, bool isHideButtonIfNotNull)
         {
             object obj = property.hasMultipleDifferentValues ? null : property.managedReferenceValue;
             string text = obj == null ? "Select..." : obj.GetMeta().Name;
@@ -964,7 +983,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (GUI.Button(position, text, EditorStyles.layerMaskField))
                 {
-                    DrawSelectReferenceMenu(position, property, sortedPredicateTypes);
+                    DrawSelectReferenceMenu(position, property, sortedPredicateTypes, sortedWithOutTypes);
                 }
             }
             else
@@ -972,10 +991,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUI.Label(position, text);
             }
         }
-        public static void DrawSelectReferenceMenu(Rect position, SerializedProperty property, Type[] sortedPredicateTypes)
+        public static void DrawSelectReferenceMenu(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, Type[] sortedWithOutTypes)
         {
             _currentProperty = property;
-            GetReferenceDropDown(sortedPredicateTypes).Show(position);
+            GetReferenceDropDown(sortedPredicateTypes, sortedWithOutTypes).Show(position);
         }
         #endregion
 

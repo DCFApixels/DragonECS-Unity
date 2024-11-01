@@ -19,4 +19,15 @@ namespace DCFApixels.DragonECS
             Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
         }
     }
+    public sealed class ReferenceButtonWithOutAttribute : Attribute
+    {
+        public readonly Type[] PredicateTypes;
+        [Obsolete("With empty parameters, this attribute makes no sense.", true)]
+        public ReferenceButtonWithOutAttribute() : this(Array.Empty<Type>()) { }
+        public ReferenceButtonWithOutAttribute(params Type[] predicateTypes)
+        {
+            PredicateTypes = predicateTypes;
+            Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
+        }
+    }
 }

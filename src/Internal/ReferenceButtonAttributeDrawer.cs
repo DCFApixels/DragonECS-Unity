@@ -21,9 +21,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomPropertyDrawer(typeof(ReferenceButtonAttribute), true)]
     internal sealed class ReferenceButtonAttributeDrawer : ExtendedPropertyDrawer<IReferenceButtonAttribute>
     {
+        private Type[] _withOutTypes;
         protected override void OnInit()
         {
             Type fieldType = fieldInfo.FieldType;
+            _withOutTypes = fieldType.TryGetAttribute(out ReferenceButtonWithOutAttribute a) ? a.PredicateTypes : Array.Empty<Type>();
             if (fieldType.IsGenericType)
             {
                 if (fieldType.IsGenericTypeDefinition == false)
@@ -71,7 +73,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawSelectionPopupButton(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect buttonRect = IsArrayElement ? position : position.AddPadding(EditorGUIUtility.labelWidth, 0f, 0f, 0f); ;
-            EcsGUI.DrawSelectReferenceButton(buttonRect, property, Attribute.PredicateTypes.Length == 0 ? new Type[1] { fieldInfo.FieldType } : Attribute.PredicateTypes, Attribute.IsHideButtonIfNotNull);
+            EcsGUI.DrawSelectReferenceButton(buttonRect, property, Attribute.PredicateTypes.Length == 0 ? new Type[1] { fieldInfo.FieldType } : Attribute.PredicateTypes, _withOutTypes, Attribute.IsHideButtonIfNotNull);
         }
     }
 }
