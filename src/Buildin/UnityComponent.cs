@@ -34,11 +34,11 @@ namespace DCFApixels.DragonECS
         }
         IEnumerator<T> IEnumerable<T>.GetEnumerator() //IntelliSense hack
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
         IEnumerator IEnumerable.GetEnumerator() //IntelliSense hack
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator T(UnityComponent<T> a) { return a.obj; }

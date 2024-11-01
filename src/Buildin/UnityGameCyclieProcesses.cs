@@ -57,34 +57,15 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaID("2DD8BC809201633E2761D5AEF65B7090")]
     public class EcsLateGizmosRunner : EcsRunner<IEcsGizmosProcess>, IEcsGizmosProcess
     {
-#if DEBUG && !DISABLE_DEBUG
-        private EcsProfilerMarker[] _markers;
-#endif
-        public void DrawGizmos()
-        {
-#if DEBUG && !DISABLE_DEBUG
-            for (int i = 0; i < Process.Length; i++)
-            {
-                using (_markers[i].Auto())
-                {
-                    Process[i].DrawGizmos();
-                }
-            }
-#else
-            foreach (var item in Process) item.DrawGizmos();
-#endif
-        }
-
-#if DEBUG && !DISABLE_DEBUG
+        private RunHelper _helper;
         protected override void OnSetup()
         {
-            _markers = new EcsProfilerMarker[Process.Length];
-            for (int i = 0; i < Process.Length; i++)
-            {
-                _markers[i] = new EcsProfilerMarker($"{Process[i].GetType().Name}.{nameof(DrawGizmos)}");
-            }
+            _helper = new RunHelper(this);
         }
-#endif
+        public void DrawGizmos()
+        {
+            _helper.Run(p => p.DrawGizmos());
+        }
     }
 
     [MetaColor(MetaColor.DragonRose)]
@@ -94,34 +75,15 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaID("EDE8BC809201603B47C3A9D1EFD4EE95")]
     public class EcsLateRunRunner : EcsRunner<IEcsLateRunProcess>, IEcsLateRunProcess
     {
-#if DEBUG && !DISABLE_DEBUG
-        private EcsProfilerMarker[] _markers;
-#endif
-        public void LateRun()
-        {
-#if DEBUG && !DISABLE_DEBUG
-            for (int i = 0; i < Process.Length; i++)
-            {
-                using (_markers[i].Auto())
-                {
-                    Process[i].LateRun();
-                }
-            }
-#else
-            foreach (var item in Process) item.LateRun();
-#endif
-        }
-
-#if DEBUG && !DISABLE_DEBUG
+        private RunHelper _helper;
         protected override void OnSetup()
         {
-            _markers = new EcsProfilerMarker[Process.Length];
-            for (int i = 0; i < Process.Length; i++)
-            {
-                _markers[i] = new EcsProfilerMarker($"EcsRunner.{Process[i].GetType().Name}.{nameof(LateRun)}");
-            }
+            _helper = new RunHelper(this);
         }
-#endif
+        public void LateRun()
+        {
+            _helper.Run(p => p.LateRun());
+        }
     }
 
     [MetaColor(MetaColor.DragonRose)]
@@ -131,33 +93,14 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaID("45F7BC809201866AA05F6DC096A47F01")]
     public class EcsFixedRunRunner : EcsRunner<IEcsFixedRunProcess>, IEcsFixedRunProcess
     {
-#if DEBUG && !DISABLE_DEBUG
-        private EcsProfilerMarker[] _markers;
-#endif
-        public void FixedRun()
-        {
-#if DEBUG && !DISABLE_DEBUG
-            for (int i = 0; i < Process.Length; i++)
-            {
-                using (_markers[i].Auto())
-                {
-                    Process[i].FixedRun();
-                }
-            }
-#else
-            foreach (var item in Process) item.FixedRun();
-#endif
-        }
-
-#if DEBUG && !DISABLE_DEBUG
+        private RunHelper _helper;
         protected override void OnSetup()
         {
-            _markers = new EcsProfilerMarker[Process.Length];
-            for (int i = 0; i < Process.Length; i++)
-            {
-                _markers[i] = new EcsProfilerMarker($"EcsRunner.{Process[i].GetType().Name}.{nameof(FixedRun)}");
-            }
+            _helper = new RunHelper(this);
         }
-#endif
+        public void FixedRun()
+        {
+            _helper.Run(p => p.FixedRun());
+        }
     }
 }
