@@ -1043,7 +1043,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public static void DrawWorldBaseInfo(EcsWorld world)
             {
-                bool isNull = world == null || world.IsDestroyed || world.id == 0;
+                bool isNull = world == null || world.IsDestroyed || world.ID == 0;
                 int entitesCount = isNull ? 0 : world.Count;
                 int capacity = isNull ? 0 : world.Capacity;
                 int leakedEntitesCount = isNull ? 0 : world.CountLeakedEntitesDebug();

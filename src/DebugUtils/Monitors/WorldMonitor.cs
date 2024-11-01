@@ -52,7 +52,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 return;
             }
             TypeMeta meta = _world.GetMeta();
-            _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)} ( {_world.id} )").AddComponent<WorldMonitor>();
+            _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)} ( {_world.ID} )").AddComponent<WorldMonitor>();
             UnityEngine.Object.DontDestroyOnLoad(_monitor);
             _monitor.Set(_world);
             _monitor.gameObject.SetActive(false);

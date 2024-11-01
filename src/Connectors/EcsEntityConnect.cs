@@ -133,7 +133,7 @@ namespace DCFApixels.DragonECS
                 goConnects.TryAddOrGet(newEntityID) = new GameObjectConnect(this);
                 if (applyTemplates)
                 {
-                    ApplyTemplatesFor(world.id, newEntityID);
+                    ApplyTemplatesFor(world.ID, newEntityID);
                 }
             }
         }

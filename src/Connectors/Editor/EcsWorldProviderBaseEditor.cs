@@ -23,12 +23,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (world.IsDestroyed)
                 {
                     var style = UnityEditorUtility.GetStyle(new Color32(255, 75, 0, 100));
-                    GUILayout.Box($"{world.GetMeta().Name} ( {world.id} ) Destroyed", style, GUILayout.ExpandWidth(true));
+                    GUILayout.Box($"{world.GetMeta().Name} ( {world.ID} ) Destroyed", style, GUILayout.ExpandWidth(true));
                 }
                 else
                 {
                     var style = UnityEditorUtility.GetStyle(new Color32(75, 255, 0, 100));
-                    GUILayout.Box($"{world.GetMeta().Name} ( {world.id} )", style, GUILayout.ExpandWidth(true));
+                    GUILayout.Box($"{world.GetMeta().Name} ( {world.ID} )", style, GUILayout.ExpandWidth(true));
                 }
             }
             EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());

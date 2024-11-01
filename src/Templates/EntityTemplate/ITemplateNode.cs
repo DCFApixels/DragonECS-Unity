@@ -7,7 +7,7 @@
         public static entlong NewEntityWithGameObject(this EcsWorld world, ITemplateNode template, string name = "Entity", GameObjectIcon icon = GameObjectIcon.NONE)
         {
             entlong e = world.NewEntityWithGameObject(name, icon);
-            template.Apply(world.id, e.ID);
+            template.Apply(world.ID, e.ID);
             return e;
         }
     }
