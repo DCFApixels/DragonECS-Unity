@@ -54,23 +54,27 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //using (prefs.DisableAutoSave())
             {
                 GUILayout.BeginHorizontal();
-                prefs.IsShowHidden = EditorGUILayout.Toggle(prefs.IsShowHidden, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)), GUILayout.ExpandWidth(false));
+                prefs.IsShowHidden = EditorGUILayout.ToggleLeft(
+                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)),
+                    prefs.IsShowHidden);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                prefs.IsShowInterfaces = EditorGUILayout.Toggle(prefs.IsShowInterfaces, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)), GUILayout.ExpandWidth(false));
+                prefs.IsShowInterfaces = EditorGUILayout.ToggleLeft(
+                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)),
+                    prefs.IsShowInterfaces);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                prefs.IsShowRuntimeComponents = EditorGUILayout.Toggle(prefs.IsShowRuntimeComponents, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)), GUILayout.ExpandWidth(false));
+                prefs.IsShowRuntimeComponents = EditorGUILayout.ToggleLeft(
+                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)),
+                    prefs.IsShowRuntimeComponents);
                 GUILayout.EndHorizontal();
 
                 GUILayout.BeginHorizontal();
-                prefs.IsUseCustomNames = EditorGUILayout.Toggle(prefs.IsUseCustomNames, GUILayout.Width(checkBoxWidth));
-                GUILayout.Label(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)), GUILayout.ExpandWidth(false));
+                prefs.IsUseCustomNames = EditorGUILayout.ToggleLeft(
+                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
+                    prefs.IsUseCustomNames);
                 GUILayout.EndHorizontal();
 
                 prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
@@ -80,7 +84,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.Space(20f);
             using (EcsGUI.SetColor(Color.white * 0.5f))
+            {
                 GUILayout.BeginVertical(EditorStyles.helpBox);
+            }
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
             GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
             rect = GUILayoutUtility.GetLastRect();
@@ -95,15 +101,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 GUILayout.BeginHorizontal();
                 var symbol = _defineSymbols[i];
-                symbol.isOn = EditorGUILayout.Toggle(symbol.isOn, GUILayout.Width(checkBoxWidth));
-                if (symbol.name == "DEBUG")
-                {
-                    GUILayout.Label(symbol.name + " (Build Olny)", GUILayout.ExpandWidth(false));
-                }
-                else
-                {
-                    GUILayout.Label(symbol.name, GUILayout.ExpandWidth(false));
-                }
+
+                string text = symbol.name == "DEBUG" ? symbol.name + " (Build Olny)" : symbol.name;
+                symbol.isOn = EditorGUILayout.ToggleLeft(text, symbol.isOn);
+
                 GUILayout.EndHorizontal();
             }
             if (EditorGUI.EndChangeCheck()) { }

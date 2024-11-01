@@ -268,6 +268,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
 
+        private static float indent => (float)EditorGUI.indentLevel * 15f;
+
         #region Properties
         private static ComponentColorMode AutoColorMode
         {
@@ -446,6 +448,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return IconButton(position, Icons.Instance.CloseIcon, 0f, "Delete Entity");
         }
         #endregion
+
+        //#region One line elems
+        //public static bool LeftToggle(Rect position, GUIContent label, bool value)
+        //{
+        //    position = position.AddPadding(indent, 0, 0, 0);
+        //    Rect togglePos;
+        //    (togglePos, position) = position.HorizontalSliceLeft(18f);
+        //
+        //    EditorGUI.togg(position, label);
+        //    GUI.Label(position, label);
+        //}
+        //#endregion
 
         #region entity bar
         public static void EntityBarForAlive(Rect position, EntityStatus status, int id, short gen, short world)
@@ -978,6 +992,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static void DrawSelectReferenceButton(Rect position, SerializedProperty property, Type[] sortedPredicateTypes, Type[] sortedWithOutTypes, bool isHideButtonIfNotNull)
         {
             object obj = property.hasMultipleDifferentValues ? null : property.managedReferenceValue;
+
             string text = obj == null ? "Select..." : obj.GetMeta().Name;
             if (!isHideButtonIfNotNull || obj == null)
             {

@@ -56,7 +56,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             Rect selButtnoRect = position;
             selButtnoRect.height = OneLineHeight;
-            DrawSelectionPopupButton(selButtnoRect, property, label);
+            DrawSelectionPopupButton(selButtnoRect, property);
 
             if (property.managedReferenceValue != null)
             {
@@ -70,7 +70,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        private void DrawSelectionPopupButton(Rect position, SerializedProperty property, GUIContent label)
+        private void DrawSelectionPopupButton(Rect position, SerializedProperty property)
         {
             Rect buttonRect = IsArrayElement ? position : position.AddPadding(EditorGUIUtility.labelWidth, 0f, 0f, 0f); ;
             EcsGUI.DrawSelectReferenceButton(buttonRect, property, Attribute.PredicateTypes.Length == 0 ? new Type[1] { fieldInfo.FieldType } : Attribute.PredicateTypes, _withOutTypes, Attribute.IsHideButtonIfNotNull);

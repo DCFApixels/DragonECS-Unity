@@ -43,10 +43,10 @@ namespace DCFApixels.DragonECS
         public sealed override void Import(EcsPipeline.Builder b)
         {
             b.Layers.MergeWith(_layers);
-            foreach (var s in _records)
+            foreach (var r in _records)
             {
-                if (s.target == null) { continue; }
-                b.Add(s.target, s.parameters);
+                if (r.target == null || r.disabled) { continue; }
+                b.Add(r.target, r.parameters);
             }
         }
 
@@ -58,7 +58,7 @@ namespace DCFApixels.DragonECS
             for (int i = 0; i < _records.Length; i++)
             {
                 ref var s = ref template.records[i];
-                _records[i] = new Record(s.target, s.parameters);
+                _records[i] = new Record(s.target, s.parameters, true);
             }
         }
 

@@ -105,10 +105,13 @@ namespace DCFApixels.DragonECS.Unity
             [ArrayElement]
             public object target;// нельзя менять поярдок полей, иначе это поломает отрисовку в инспекторе изза применения property.Next(bool);
             public AddParams parameters;
-            public Record(object target, AddParams parameters)
+            [CustomToggle(Name = "Enable", IsLeft = true, IsInverted = true)]
+            public bool disabled;
+            public Record(object target, AddParams parameters, bool disabled)
             {
                 this.target = target;
                 this.parameters = parameters;
+                this.disabled = disabled;
             }
         }
     }
