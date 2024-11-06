@@ -40,7 +40,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             float labelWidth = EditorGUIUtility.labelWidth;
             EditorGUIUtility.labelWidth = 0f;
 
-            float checkBoxWidth = 20f;
+            //float checkBoxWidth = 20f;
 
             GUILayout.Space(20f);
             using (new EcsGUI.ColorScope(Color.white * 0.5f))
