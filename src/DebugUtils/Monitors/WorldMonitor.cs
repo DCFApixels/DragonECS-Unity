@@ -31,6 +31,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     {
         private EcsWorld _world;
         private WorldMonitor _monitor;
+        private WorldQueriesMonitor _queriesMonitor;
         private Transform _entityMonitorsPoolRoot;
         private EntityMonitor[] _entityMonitors;
         public EcsWorld World
@@ -54,7 +55,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
             TypeMeta meta = _world.GetMeta();
             _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)} ( {_world.ID} )").AddComponent<WorldMonitor>();
             UnityEngine.Object.DontDestroyOnLoad(_monitor);
+            _queriesMonitor = _monitor.gameObject.AddComponent<WorldQueriesMonitor>();
             _monitor.Set(_world);
+            _queriesMonitor.Set(_world);
             _monitor.gameObject.SetActive(false);
 
             _entityMonitorsPoolRoot = new GameObject("__pool__").transform;

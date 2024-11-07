@@ -715,9 +715,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
                         return hsv.Desaturate(0.48f) / 1.18f;
                     default:
-                        return index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
+                        return GetGenericPanelColor(index);
                 }
             }
+        }
+        public static Color GetGenericPanelColor(int index)
+        {
+            return index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
         }
         #endregion
 
@@ -1083,6 +1087,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 int leakedEntitesCount = isNull ? 0 : world.CountLeakedEntitesDebug();
                 EditorGUILayout.IntField("Entities", entitesCount, EditorStyles.boldLabel);
                 EditorGUILayout.IntField("Capacity", capacity, EditorStyles.boldLabel);
+                EditorGUILayout.LongField("Version", world.Version, EditorStyles.boldLabel);
                 Color color = leakedEntitesCount > 0 ? Color.yellow : GUI.contentColor;
                 using (new ContentColorScope(color))
                 {
