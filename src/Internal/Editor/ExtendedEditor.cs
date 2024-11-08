@@ -25,6 +25,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isStaticInit = false;
         private bool _isInit = false;
 
+        public bool AutoChechChanges = true;
         protected float OneLineHeight
         {
             get => EditorGUIUtility.singleLineHeight;
@@ -70,12 +71,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public sealed override void OnInspectorGUI()
         {
-            using (EcsGUI.CheckChanged(serializedObject))
+            if (AutoChechChanges)
             {
-                StaticInit();
-                Init();
-                DrawCustom();
+                using (EcsGUI.CheckChanged(serializedObject))
+                {
+                    StaticInit();
+                    Init();
+                    DrawCustom();
+                }
+                return;
             }
+
+            StaticInit();
+            Init();
+            DrawCustom();
         }
 
         protected abstract void DrawCustom();

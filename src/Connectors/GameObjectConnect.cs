@@ -12,6 +12,7 @@ namespace DCFApixels.DragonECS
     [MetaDescription(EcsConsts.AUTHOR, "This component is automatically added if an entity is connected to one of the EcsEntityConnect. It also contains a reference to the connected EcsEntityConnect.")]
     [MetaID("14AC6B239201C6A60337AF3384D237E7")]
     [MetaTags(MetaTags.ENGINE_MEMBER)]
+    [System.Serializable]
     public readonly struct GameObjectConnect : IEcsComponent, IEcsComponentLifecycle<GameObjectConnect>
     {
         public readonly EcsEntityConnect Connect;

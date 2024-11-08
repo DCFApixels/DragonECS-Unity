@@ -20,6 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal abstract class WrapperBase<TSelf> : WrapperBase
         where TSelf : WrapperBase<TSelf>
     {
+
         private SerializedObject _so;
         private SerializedProperty _property;
 
@@ -28,19 +29,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static Stack<TSelf> _wrappers = new Stack<TSelf>();
 
-        public override bool IsExpanded
+        public sealed override bool IsExpanded
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return Property.isExpanded; }
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             set { Property.isExpanded = value; }
         }
-        public override SerializedObject SO
+        public sealed override SerializedObject SO
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _so; }
         }
-        public override SerializedProperty Property
+        public sealed override SerializedProperty Property
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _property; }

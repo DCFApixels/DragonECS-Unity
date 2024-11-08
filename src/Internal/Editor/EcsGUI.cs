@@ -2,10 +2,14 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
+
+//using System.Drawing;
 using System.Reflection;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using Color = UnityEngine.Color;
 using UnityComponent = UnityEngine.Component;
 using UnityObject = UnityEngine.Object;
 
@@ -1146,8 +1150,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             private static List<IEcsPool> _componentPoolsBuffer;
             public static void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout = true)
             {
-
-                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+                using (BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
                 {
                     if (isWithFoldout)
                     {
@@ -1170,10 +1173,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                         world.GetComponentPoolsFor(entityID, _componentPoolsBuffer);
                         int i = 0;
-                        int iMax = _componentPoolsBuffer.Count;
+                        //int iMax = _componentPoolsBuffer.Count;
                         foreach (var componentPool in _componentPoolsBuffer)
                         {
-                            DrawRuntimeComponent(entityID, componentPool, iMax, i++);
+                            DrawRuntimeComponent(entityID, componentPool, 9, i++);
                         }
                     }
                 }
@@ -1183,9 +1186,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var meta = pool.ComponentType.ToMeta();
                 if (meta.IsHidden == false || IsShowHidden)
                 {
+                    Type componentType = pool.ComponentType;
+
                     object data = pool.GetRaw(entityID);
 
-                    Type componentType = pool.ComponentType;
                     ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
 
                     float padding = EditorGUIUtility.standardVerticalSpacing;
@@ -1201,8 +1205,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         isExpanded = !isExpanded;
                     }
 
-                    Color panelColor = SelectPanelColor(meta, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE).SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
-                    GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor));
+                    Color panelColor = SelectPanelColor(meta, index, total);
+                    GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
                     EditorGUI.BeginChangeCheck();
 
                     //Close button
@@ -1225,8 +1229,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         DescriptionIcon(optionButton, meta.Description.Text);
                     }
 
-
-                    if (DrawRuntimeData(componentType, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
+                    RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
+                    if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
                     {
                         pool.SetRaw(entityID, resultData);
                     }
@@ -1234,24 +1238,98 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     GUILayout.EndVertical();
                 }
             }
+            [InitializeOnLoadMethod]
+            private static void ResetRuntimeComponentReflectionCache()
+            {
+                _runtimeComponentReflectionCaches.Clear();
+            }
+            private class RuntimeComponentReflectionCache
+            {
+                public readonly Type Type;
 
-            private static bool DrawRuntimeData(Type fieldType, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
+                public readonly bool IsUnityObjectType;
+                public readonly bool IsUnitySerializable;
+                public readonly bool IsUnmanaged;
+
+                public readonly FieldInfoData[] Fields;
+
+                public readonly RefEditorWrapper Wrapper;
+
+                public RuntimeComponentReflectionCache(Type type)
+                {
+                    Type = type;
+
+                    IsUnmanaged = UnsafeUtility.IsUnmanaged(type);
+                    IsUnityObjectType = typeof(UnityObject).IsAssignableFrom(type);
+                    IsUnitySerializable = IsUnityObjectType || (!type.IsGenericType && type.IsSerializable);
+
+                    Wrapper = RefEditorWrapper.Take();
+
+                    if (type == typeof(void)) { return; }
+
+                    if (IsUnitySerializable == false)
+                    {
+                        var fs = type.GetFields(fieldFlags);
+                        Fields = new FieldInfoData[fs.Length];
+                        for (int i = 0; i < fs.Length; i++)
+                        {
+                            var f = fs[i];
+                            Fields[i] = new FieldInfoData(f);
+                        }
+                    }
+                }
+                public readonly struct FieldInfoData
+                {
+                    public readonly FieldInfo FieldInfo;
+                    public readonly Type FieldType;
+                    public readonly string UnityFormatName;
+                    public readonly bool IsUnityObjectField;
+                    public FieldInfoData(FieldInfo fieldInfo)
+                    {
+                        FieldInfo = fieldInfo;
+                        FieldType = fieldInfo.FieldType;
+                        IsUnityObjectField = typeof(UnityObject).IsAssignableFrom(fieldInfo.FieldType);
+                        UnityFormatName = UnityEditorUtility.TransformFieldName(fieldInfo.Name);
+                    }
+                    public FieldInfoData(FieldInfo fieldInfo, Type fieldType, string unityFormatName)
+                    {
+                        FieldInfo = fieldInfo;
+                        FieldType = fieldType;
+                        UnityFormatName = unityFormatName;
+                        IsUnityObjectField = typeof(UnityObject).IsAssignableFrom(fieldType);
+                    }
+                }
+            }
+            private static Dictionary<Type, RuntimeComponentReflectionCache> _runtimeComponentReflectionCaches = new Dictionary<Type, RuntimeComponentReflectionCache>();
+            private static RuntimeComponentReflectionCache GetRuntimeComponentReflectionCache(Type type)
+            {
+                if (_runtimeComponentReflectionCaches.TryGetValue(type, out RuntimeComponentReflectionCache result) == false)
+                {
+                    result = new RuntimeComponentReflectionCache(type);
+                    _runtimeComponentReflectionCaches.Add(type, result);
+                }
+                return result;
+            }
+            private static bool DrawRuntimeData(ref RuntimeComponentReflectionCache.FieldInfoData fieldInfoData, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
             {
                 outData = data;
                 Type type = data == null ? typeof(void) : data.GetType();
 
-                bool isUnityObject = typeof(UnityObject).IsAssignableFrom(fieldType);
+                RuntimeComponentReflectionCache cache = GetRuntimeComponentReflectionCache(type);
 
-                if (isUnityObject == false && data == null)
+                bool isUnityObjectField = fieldInfoData.IsUnityObjectField;
+                if (isUnityObjectField == false && data == null)
                 {
                     EditorGUILayout.TextField(label, "Null");
                     return false;
                 }
+                bool isUnityObjectType = cache.IsUnityObjectType;
+
                 ref bool isExpanded = ref expandMatrix.Down();
                 bool changed = false;
-                outData = data;
 
-                if (isUnityObject == false && (type.IsGenericType || !type.IsSerializable))
+
+                if (cache.IsUnitySerializable == false)
                 {
                     isExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(isExpanded, label, EditorStyles.foldout);
                     EditorGUILayout.EndFoldoutHeaderGroup();
@@ -1260,12 +1338,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         using (UpIndentLevel())
                         {
-                            foreach (var field in type.GetFields(fieldFlags))
+                            for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
                             {
-                                GUIContent subLabel = UnityEditorUtility.GetLabel(UnityEditorUtility.TransformFieldName(field.Name));
-                                if (DrawRuntimeData(field.FieldType, subLabel, expandMatrix, field.GetValue(data), out object fieldData))
+                                var field = cache.Fields[j];
+                                if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData))
                                 {
-                                    field.SetValue(data, fieldData);
+                                    field.FieldInfo.SetValue(data, fieldData);
                                     outData = data;
                                     changed = true;
                                 }
@@ -1275,10 +1353,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    if (isUnityObject)
+                    Type fieldType = fieldInfoData.FieldType;
+                    if (isUnityObjectType || isUnityObjectField)
                     {
                         EditorGUI.BeginChangeCheck();
-                        var uobj = (UnityObject)data;
+                        var uobj = UnsafeUtility.As<object, UnityObject>(ref data);
 
                         bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldType);
                         if (isComponent)
@@ -1289,13 +1368,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         {
                             uobj = EditorGUILayout.ObjectField(label, uobj, fieldType, true);
                         }
-                        if (isComponent && uobj is GameObject go)
-                        {
-                            uobj = go.GetComponent(fieldType);
-                        }
 
                         if (EditorGUI.EndChangeCheck())
                         {
+                            if (isComponent && uobj is GameObject go)
+                            {
+                                uobj = go.GetComponent(fieldType);
+                            }
+
                             outData = uobj;
                             changed = true;
                         }
@@ -1303,19 +1383,34 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     else
                     {
                         EditorGUI.BeginChangeCheck();
-                        WrapperBase w = RefEditorWrapper.Take(data);
+                        //WrapperBase wrapper = RefEditorWrapper.Take(data);
 
-                        w.IsExpanded = isExpanded;
-                        EditorGUILayout.PropertyField(w.Property, label, true);
-                        isExpanded = w.IsExpanded;
+                        RefEditorWrapper wrapper = cache.Wrapper;
+
+                        wrapper.data = data;
+                        wrapper.SO.Update();
+
+                        wrapper.IsExpanded = isExpanded;
+                        try
+                        {
+                            EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                        }
+                        catch (ArgumentException)
+                        {
+                            if (Event.current.type != EventType.Repaint)
+                            {
+                                throw;
+                            }
+                        }
 
                         if (EditorGUI.EndChangeCheck())
                         {
-                            w.SO.ApplyModifiedProperties();
-                            outData = w.Data;
+                            isExpanded = wrapper.IsExpanded;
+                            wrapper.SO.ApplyModifiedProperties();
+                            outData = wrapper.Data;
                             changed = true;
                         }
-                        w.Release();
+                        //wrapper.Release();
                     }
                 }
 
