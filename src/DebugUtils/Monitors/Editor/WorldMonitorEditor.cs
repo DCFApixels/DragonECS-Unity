@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             const char SEPARATOR = '\t';
 
             var world = Target.World;
-            EntitesMatrix mtrx = new EntitesMatrix(world);
+            EntitiesMatrix mtrx = new EntitiesMatrix(world);
 
             var allpools = world.AllPools.Slice(0, world.PoolsCount);
             StringBuilder sb = new StringBuilder();
