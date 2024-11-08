@@ -19,6 +19,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void CopyToClipboard()
         {
+            const char SEPARATOR = '\t';
+
             var all = Target.Pipeline.AllSystems;
             string[] names = new string[all.Length];
             for (int i = 0; i < all.Length; i++)
@@ -41,7 +43,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         color = EcsGUI.SelectPanelColor(meta, i, -1).ToMetaColor();
                     }
-                    name = $"{meta.Name} : {meta.TypeName} : {meta.MetaID} : {color.colorCode:X8}";
+                    name = $"{meta.Name}{SEPARATOR}{meta.TypeName}{SEPARATOR}{meta.MetaID}{SEPARATOR}{color.colorCode:X8}";
                 }
                 names[i] = name;
             }

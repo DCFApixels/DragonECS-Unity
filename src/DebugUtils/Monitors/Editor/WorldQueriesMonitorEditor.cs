@@ -2,6 +2,7 @@
 using DCFApixels.DragonECS.Core;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Text;
 using UnityEditor;
 using UnityEngine;
 
@@ -10,9 +11,119 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomEditor(typeof(WorldQueriesMonitor))]
     internal class WorldQueriesMonitorEditor : ExtendedEditor<WorldQueriesMonitor>
     {
+        private GUIStyle _headerStyle;
+
+        private void CopyToClipboard()
+        {
+            const char SEPARATOR = '\t';
+            var allqueries = Target.MaskQueryExecutors;
+            var allpools = Target.World.AllPools.Slice(0, Target.World.PoolsCount);
+
+            StringBuilder sb = new StringBuilder();
+            int i = -1;
+
+            //numbers
+            sb.Append($"{SEPARATOR}{SEPARATOR}№");
+            i = -1;
+            foreach (var pool in allpools)
+            {
+                i++;
+                sb.Append($"{SEPARATOR}{i}");
+            }
+            sb.Append("\r\n");
+            //numbers end
+
+            //chunks
+            sb.Append($"{SEPARATOR}{SEPARATOR}Chunks");
+            i = -1;
+            foreach (var pool in allpools)
+            {
+                i++;
+                sb.Append($"{SEPARATOR}{i >> 5}");
+            }
+            sb.Append("\r\n");
+            //chunks end
+
+
+            //header
+            sb.Append($"№{SEPARATOR}Version{SEPARATOR}Count");
+
+            //pools
+            foreach (var pool in allpools)
+            {
+                sb.Append($"{SEPARATOR}");
+                if (pool.IsNullOrDummy() == false)
+                {
+                    sb.Append(pool.ComponentType.ToMeta().TypeName);
+                }
+                else
+                {
+                    sb.Append("NULL");
+                }
+            }
+            sb.Append("\r\n");
+            //header end
+
+
+            //content
+            i = -1;
+            foreach (var query in allqueries)
+            {
+                i++;
+
+                sb.Append($"{i}{SEPARATOR}{query.Version}{SEPARATOR}{query.LastCachedCount}");
+
+                var incs = query.Mask.Incs;
+                var excs = query.Mask.Excs;
+                var incsI = 0;
+                var excsI = 0;
+                for (int j = 0; j < allpools.Length; j++)
+                {
+                    var pool = allpools[j];
+
+                    sb.Append($"{SEPARATOR}");
+                    if (pool.IsNullOrDummy() == false)
+                    {
+                        if (incsI < incs.Length && incs[incsI] == j)
+                        {
+                            sb.Append($"+");
+                            incsI++;
+                            continue;
+                        }
+
+                        if (excsI < excs.Length && excs[excsI] == j)
+                        {
+                            sb.Append($"-");
+                            excsI++;
+                            continue;
+                        }
+                    }
+                }
+                sb.Append("\r\n");
+            }
+
+            //end
+
+            GUIUtility.systemCopyBuffer = sb.ToString();
+        }
+
         protected override void DrawCustom()
         {
+            if (_headerStyle == null)
+            {
+                _headerStyle = new GUIStyle(EditorStyles.boldLabel);
+                _headerStyle.fontSize = 28;
+            }
             var executors = Target.MaskQueryExecutors;
+
+            using (EcsGUI.Layout.BeginHorizontal())
+            {
+                GUILayout.Label("[Queries]", _headerStyle, GUILayout.ExpandWidth(true));
+                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
+                {
+                    CopyToClipboard();
+                }
+            }
 
             EditorGUILayout.IntField("Count: ", executors.Count);
             GUILayout.Space(20);
