@@ -123,7 +123,7 @@ namespace DCFApixels.DragonECS
         {
             EcsWorldConfig config = new EcsWorldConfig(_entitiesCapacity, _groupCapacity, _poolsCapacity, _poolComponentsCapacity, _poolRecycledComponentsCapacity);
             ConfigContainer configs = new ConfigContainer().Set(config);
-            return (TWorld)Activator.CreateInstance(typeof(TWorld), new object[] { configs, _worldID });
+            return (TWorld)Activator.CreateInstance(typeof(TWorld), new object[] { configs, null, _worldID });
         }
         protected virtual void OnWorldCreated(TWorld world) { }
         #endregion

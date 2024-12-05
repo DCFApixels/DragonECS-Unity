@@ -453,18 +453,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        //#region One line elems
-        //public static bool LeftToggle(Rect position, GUIContent label, bool value)
-        //{
-        //    position = position.AddPadding(indent, 0, 0, 0);
-        //    Rect togglePos;
-        //    (togglePos, position) = position.HorizontalSliceLeft(18f);
-        //
-        //    EditorGUI.togg(position, label);
-        //    GUI.Label(position, label);
-        //}
-        //#endregion
-
         #region entity bar
         public static void EntityBarForAlive(Rect position, EntityStatus status, int id, short gen, short world)
         {
@@ -1088,14 +1076,90 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 bool isNull = world == null || world.IsDestroyed || world.ID == 0;
                 int entitesCount = isNull ? 0 : world.Count;
                 int capacity = isNull ? 0 : world.Capacity;
+                long Version = isNull ? 0 : world.Version;
                 int leakedEntitesCount = isNull ? 0 : world.CountLeakedEntitesDebug();
                 EditorGUILayout.IntField("Entities", entitesCount, EditorStyles.boldLabel);
                 EditorGUILayout.IntField("Capacity", capacity, EditorStyles.boldLabel);
-                EditorGUILayout.LongField("Version", world.Version, EditorStyles.boldLabel);
+                EditorGUILayout.LongField("Version", Version, EditorStyles.boldLabel);
                 Color color = leakedEntitesCount > 0 ? Color.yellow : GUI.contentColor;
                 using (new ContentColorScope(color))
                 {
                     EditorGUILayout.IntField("Leaked Entites", leakedEntitesCount, EditorStyles.boldLabel);
+                }
+            }
+            public static void DrawWorldComponents(EcsWorld world)
+            {
+                bool isNull = world == null || world.IsDestroyed || world.ID == 0;
+                if (isNull) { return; }
+                using (BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+                {
+                    IsShowRuntimeComponents = EditorGUILayout.BeginFoldoutHeaderGroup(IsShowRuntimeComponents, "RUNTIME COMPONENTS", EditorStyles.foldout);
+                    EditorGUILayout.EndFoldoutHeaderGroup();
+                    if (IsShowRuntimeComponents == false) { return; }
+
+                    var worldID = world.ID;
+                    var cmps = world.GetWorldComponents();
+                    int index = -1;
+                    int total = 9;
+                    foreach (var cmp in cmps)
+                    {
+                        index++;
+                        var meta = cmp.ComponentType.ToMeta();
+                        if (meta.IsHidden == false || IsShowHidden)
+                        {
+                            Type componentType = cmp.ComponentType;
+
+                            object data = cmp.GetRaw(worldID);
+
+                            ExpandMatrix expandMatrix = ExpandMatrix.Take(componentType);
+
+                            float padding = EditorGUIUtility.standardVerticalSpacing;
+                            Rect optionButton = GUILayoutUtility.GetLastRect();
+                            optionButton.yMin = optionButton.yMax;
+                            optionButton.yMax += HeadIconsRect.height;
+                            optionButton.xMin = optionButton.xMax - 64;
+                            optionButton.center += Vector2.up * padding * 2f;
+                            //Canceling isExpanded
+                            if (ClickTest(optionButton))
+                            {
+                                ref bool isExpanded = ref expandMatrix.Down();
+                                isExpanded = !isExpanded;
+                            }
+
+                            Color panelColor = SelectPanelColor(meta, index, total);
+                            GUILayout.BeginVertical(UnityEditorUtility.GetStyle(panelColor, EscEditorConsts.COMPONENT_DRAWER_ALPHA));
+                            EditorGUI.BeginChangeCheck();
+
+                            ////Close button
+                            //optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
+                            //if (CloseButton(optionButton))
+                            //{
+                            //    cmp.Del(worldID);
+                            //    return;
+                            //}
+
+                            //Edit script button
+                            if (ScriptsCache.TryGetScriptAsset(meta, out MonoScript script))
+                            {
+                                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                                EcsGUI.ScriptAssetButton(optionButton, script);
+                            }
+                            //Description icon
+                            if (string.IsNullOrEmpty(meta.Description.Text) == false)
+                            {
+                                optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                                DescriptionIcon(optionButton, meta.Description.Text);
+                            }
+
+                            RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
+                            if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
+                            {
+                                cmp.SetRaw(worldID, resultData);
+                            }
+
+                            GUILayout.EndVertical();
+                        }
+                    }
                 }
             }
 

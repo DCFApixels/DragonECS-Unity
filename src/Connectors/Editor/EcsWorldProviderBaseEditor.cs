@@ -33,7 +33,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
 
-
             base.OnInspectorGUI();
 
             GUILayout.Space(10);
@@ -53,6 +52,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             c.a = 0.3f;
             EditorGUI.DrawRect(r, c);
             GUILayout.Space(10);
+
+            EcsGUI.Layout.DrawWorldComponents(Target.GetCurrentWorldRaw());
         }
     }
 }
