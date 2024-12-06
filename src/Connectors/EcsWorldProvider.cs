@@ -46,6 +46,10 @@ namespace DCFApixels.DragonECS
         {
             get { return _world == null; }
         }
+        public short WorldID
+        {
+            get { return _worldID; }
+        }
         public int EntitiesCapacity
         {
             get { return _entitiesCapacity; }
@@ -89,7 +93,9 @@ namespace DCFApixels.DragonECS
         {
             if (_world == null || _world.IsDestroyed)
             {
-                Set(BuildWorld());
+                EcsWorldConfig config = new EcsWorldConfig(_entitiesCapacity, _groupCapacity, _poolsCapacity, _poolComponentsCapacity, _poolRecycledComponentsCapacity);
+                ConfigContainer configs = new ConfigContainer().Set(config);
+                Set(BuildWorld(configs));
                 OnWorldCreated(_world);
             }
             return _world;
@@ -119,12 +125,7 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Events
-        protected virtual TWorld BuildWorld()
-        {
-            EcsWorldConfig config = new EcsWorldConfig(_entitiesCapacity, _groupCapacity, _poolsCapacity, _poolComponentsCapacity, _poolRecycledComponentsCapacity);
-            ConfigContainer configs = new ConfigContainer().Set(config);
-            return (TWorld)Activator.CreateInstance(typeof(TWorld), new object[] { configs, null, _worldID });
-        }
+        protected abstract TWorld BuildWorld(ConfigContainer configs);
         protected virtual void OnWorldCreated(TWorld world) { }
         #endregion
     }
