@@ -14,6 +14,6 @@
                 return _instance;
             }
         }
-        protected override EcsDefaultWorld BuildWorld(ConfigContainer configs) { return new EcsDefaultWorld(configs, WorldID); }
+        protected override EcsDefaultWorld BuildWorld(ConfigContainer configs) { return new EcsDefaultWorld(configs, null, WorldID); }
     }
 }

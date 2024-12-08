@@ -2,6 +2,7 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using UnityEngine;
+using static UnityEngine.GraphicsBuffer;
 
 namespace DCFApixels.DragonECS
 {

@@ -103,12 +103,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     using UnityEditor;
+    using Assembly = System.Reflection.Assembly;
 
     [InitializeOnLoad]
     internal static partial class UnityEditorUtility
     {
         static UnityEditorUtility()
         {
+            _integrationAssembly = typeof(UnityEditorUtility).Assembly;
+
             colorBoxeStyles = new SparseArray<GUIStyle>();
 
             List<Type> serializableTypes = new List<Type>();
@@ -144,6 +147,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //}).ToArray();
         }
 
+        internal static readonly Assembly _integrationAssembly;
         internal static readonly Type[] _serializableTypes;
         internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
         private static readonly Dictionary<string, Type> _metaIDTypePairs = new Dictionary<string, Type>();

@@ -1,7 +1,9 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
+using System;
 using UnityEditor;
+using UnityEditor.Graphs;
 using UnityEditorInternal;
 using UnityEngine;
 

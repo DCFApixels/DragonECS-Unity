@@ -3,8 +3,10 @@ using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 
+
 //using System.Drawing;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
@@ -15,7 +17,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal static class EcsGUI
+    internal static partial class EcsGUI
     {
         #region Scores
         private static int _changedCounter = 0;
@@ -1013,7 +1015,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-
         public static partial class Layout
         {
             public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
@@ -1302,12 +1303,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     GUILayout.EndVertical();
                 }
             }
+
+            #region Default DrawRuntimeData
             [InitializeOnLoadMethod]
             private static void ResetRuntimeComponentReflectionCache()
             {
                 _runtimeComponentReflectionCaches.Clear();
             }
-            private class RuntimeComponentReflectionCache
+            internal class RuntimeComponentReflectionCache
             {
                 public readonly Type Type;
 
@@ -1481,6 +1484,290 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 expandMatrix.Up();
                 return changed;
             }
+            #endregion
+
+            #region FactMode DrawRuntimeData
+            private class InspectorTypeInfo
+            {
+                #region cahce
+                private static Dictionary<Type, InspectorTypeInfo> _typeInfosCache = new Dictionary<Type, InspectorTypeInfo>();
+                public static InspectorTypeInfo Get(Type type)
+                {
+                    if (_typeInfosCache.TryGetValue(type, out InspectorTypeInfo info) == false)
+                    {
+                        info = new InspectorTypeInfo(type);
+                        _typeInfosCache.Add(type, info);
+                    }
+
+                    return info;
+                }
+                #endregion
+
+                public readonly Type Type;
+                public readonly InspectorFieldInfo[] Fields;
+
+                #region Constructors
+                private static StructList<InspectorFieldInfo> CnstrBuffer = new StructList<InspectorFieldInfo>(32);
+                private static readonly char[] VectorFields = new char[] { 'x', 'y', 'z', 'w' };
+                private static readonly char[] ColorFields = new char[] { 'r', 'g', 'b', 'a' };
+                public InspectorTypeInfo(Type type)
+                {
+                    CnstrBuffer.FastClear();
+                    Type = type;
+                    var fieldInfos = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    foreach (var fieldInfo in fieldInfos)
+                    {
+                        InspectorFieldInfo.Union infoUniton = default;
+                        ref InspectorFieldInfo.Constructor infocstr = ref infoUniton.Constructor;
+
+                        var fieldType = fieldInfo.FieldType;
+
+                        infocstr.FieldInfo = fieldInfo;
+                        infocstr.Offset = UnsafeUtility.GetFieldOffset(fieldInfo); ;
+                        infocstr.Size = UnsafeUtility.SizeOf(fieldType); ;
+                        infocstr.Name = UnityEditorUtility.TransformFieldName(fieldType.Name);
+                        infocstr.TypeID = FieldTypeIDUtitlity.GetFieldTypeIDFor(fieldType);
+
+                        #region Def custom types
+                        if (infocstr.TypeID == FieldTypeID.Struct)
+                        {
+                            InspectorTypeInfo preDefinedTypeInfo = Get(fieldType);
+                            infocstr.PreDefinedType = preDefinedTypeInfo;
+                            int length = preDefinedTypeInfo.Fields.Length;
+                            if (length >= 2 && length <= 3)
+                            {
+                                bool isCheck = true;
+                                for (int i = 0; i < length; i++)
+                                {
+                                    ref var field = ref preDefinedTypeInfo.Fields[i];
+                                    if (char.ToLower(field.Name[0]) != VectorFields[i])
+                                    {
+                                        isCheck = false;
+                                        break;
+                                    }
+                                }
+                                if (isCheck)
+                                {
+                                    infocstr.TypeID = FieldTypeID.StructVector;
+                                }
+                                else
+                                {
+                                    isCheck = true;
+                                    for (int i = 0; i < length; i++)
+                                    {
+                                        ref var field = ref preDefinedTypeInfo.Fields[i];
+                                        if (char.ToLower(field.Name[0]) != ColorFields[i])
+                                        {
+                                            isCheck = false;
+                                            break;
+                                        }
+                                    }
+                                    if (isCheck)
+                                    {
+                                        infocstr.TypeID = FieldTypeID.StructColor;
+                                    }
+                                }
+                            }
+                        }
+                        #endregion
+
+                        CnstrBuffer.Add(infoUniton.Result);
+                    }
+
+                    Fields = CnstrBuffer.ToArray();
+                    Array.Sort(Fields);
+                }
+                #endregion
+            }
+
+            private static class FieldTypeIDUtitlity
+            {
+                #region GetFieldTypeIDFor
+                public static FieldTypeID GetFieldTypeIDFor(Type type)
+                {
+                    var size = UnsafeUtility.SizeOf(type);
+                    if (type.IsClass)
+                    {
+                        if (typeof(UnityObject).IsAssignableFrom(type))
+                        {
+                            return FieldTypeID.UnityObject;
+                        }
+                        if (type == typeof(string))
+                        {
+                            return FieldTypeID.String;
+                        }
+                        if (type == typeof(AnimationCurve))
+                        {
+                            return FieldTypeID.AnimationCurve;
+                        }
+                        if (type == typeof(Gradient))
+                        {
+                            return FieldTypeID.Gradient;
+                        }
+                        if (type == typeof(Array))
+                        {
+                            return FieldTypeID.RefArray;
+                        }
+                        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                        {
+                            return FieldTypeID.RefArray;
+                        }
+
+                        return FieldTypeID.Ref;
+                    }
+                    else
+                    {
+                        if (type.IsPrimitive)
+                        {
+                            if (UnsafeUtility.IsBlittable(type))
+                            {
+                                switch (size)
+                                {
+                                    case 1:
+                                        if (type == typeof(byte))
+                                        {
+                                            return FieldTypeID.UInt;
+                                        }
+                                        if (type == typeof(sbyte))
+                                        {
+                                            return FieldTypeID.Int;
+                                        }
+                                        break;
+                                    case 2:
+                                        if (type == typeof(ushort))
+                                        {
+                                            return FieldTypeID.UInt;
+                                        }
+                                        if (type == typeof(short))
+                                        {
+                                            return FieldTypeID.Int;
+                                        }
+                                        break;
+                                    case 4:
+                                        if (type == typeof(uint))
+                                        {
+                                            return FieldTypeID.UInt;
+                                        }
+                                        if (type == typeof(int))
+                                        {
+                                            return FieldTypeID.Int;
+                                        }
+                                        if (type == typeof(float))
+                                        {
+                                            return FieldTypeID.Real;
+                                        }
+                                        break;
+                                    case 8:
+                                        if (type == typeof(ulong))
+                                        {
+                                            return FieldTypeID.UInt;
+                                        }
+                                        if (type == typeof(long))
+                                        {
+                                            return FieldTypeID.Int;
+                                        }
+                                        if (type == typeof(double))
+                                        {
+                                            return FieldTypeID.Real;
+                                        }
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                if (type == typeof(bool))
+                                {
+                                    return FieldTypeID.Bool;
+                                }
+                            }
+                        }
+                        else if (type.IsEnum)
+                        {
+                            return FieldTypeID.Enum;
+                        }
+
+                        if (type == typeof(LayerMask))
+                        {
+                            return FieldTypeID.LayerMask;
+                        }
+
+                        return FieldTypeID.Struct;
+                    }
+                }
+                #endregion
+            }
+            private enum FieldTypeID : byte
+            {
+                None = 0,
+                CantDisplayed,
+
+                // leaf types
+                Bool,
+                Int,
+                UInt,
+                Real,
+                String,
+                Enum,
+
+                UnityObject,
+                LayerMask,
+                Gradient,
+                AnimationCurve,
+
+                // struct types
+                Struct,
+                Ref,
+
+                // custom struct types
+                StructVector,
+                StructColor,
+                RefArray,
+                RefList,
+            }
+
+            [StructLayout(LayoutKind.Sequential)]
+            private unsafe readonly struct InspectorFieldInfo : IEquatable<InspectorFieldInfo>, IComparable<InspectorFieldInfo>
+            {
+                public readonly FieldInfo FieldInfo;
+                public readonly InspectorTypeInfo PreDefinedType;
+                public readonly string Name;
+                public readonly int Offset;
+                public readonly int Size;
+                public readonly FieldTypeID ID;
+
+                public int CompareTo(InspectorFieldInfo other)
+                {
+                    return other.Offset - Offset;
+                }
+                public bool Equals(InspectorFieldInfo other)
+                {
+                    return EqualityComparer<InspectorFieldInfo>.Default.Equals(this, other);
+                }
+                [StructLayout(LayoutKind.Sequential)]
+                public unsafe struct Constructor
+                {
+                    public FieldInfo FieldInfo;
+                    public InspectorTypeInfo PreDefinedType;
+                    public string Name;
+                    public int Offset;
+                    public int Size;
+                    public byte AxisCount;
+                    public FieldTypeID TypeID;
+                }
+                [StructLayout(LayoutKind.Explicit)]
+                public struct Union
+                {
+                    [FieldOffset(0)]
+                    public Constructor Constructor;
+                    [FieldOffset(0)]
+                    public InspectorFieldInfo Result;
+                }
+            }
+            private unsafe static bool FastDrawRuntimeData(void* data, InspectorTypeInfo cache)
+            {
+                throw new NotImplementedException();
+            }
+            #endregion
         }
     }
 }

@@ -77,6 +77,7 @@ namespace DCFApixels.DragonECS
 
         private void OnDrawGizmos()
         {
+            Gizmos.DrawIcon(transform.position, "", false);
             _pipeline?.DrawGizmos();
         }
 
