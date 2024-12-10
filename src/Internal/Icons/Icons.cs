@@ -44,25 +44,75 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private Texture _labelIconMeta = null;
 
 
-        internal Texture HelpIcon { get { return _helpIcon; } }
-        internal Texture FileIcon { get { return _fileIcon; } }
-        internal Texture MetaIDIcon { get { return _metaIDIcon; } }
-        internal Texture RepaireIcon { get { return _repaireIcon; } }
+        private Texture2D _dummy;
+        private Texture2D _dummyRed;
+        private Texture2D _dummyGreen;
+        private Texture2D _dummyYellow;
 
-        internal Texture ErrorIcon { get { return _errorIcon; } }
-        internal Texture WarningIcon { get { return _warningIcon; } }
-        internal Texture PassIcon { get { return _passIcon; } }
+        private Texture2D Dummy
+        {
+            get { InitDummies(); return _dummy; }
+        }
+        private Texture2D DummyRed
+        {
+            get { InitDummies(); return _dummyRed; }
+        }
+        private Texture2D DummyGreen
+        {
+            get { InitDummies(); return _dummyGreen; }
+        }
+        private Texture2D DummyYellow
+        {
+            get { InitDummies(); return _dummyYellow; }
+        }
 
-        internal Texture UnlinkIcon { get { return _unlinkIcon; } }
-        internal Texture SearchIcon { get { return _searchIcon; } }
-        internal Texture CloseIcon { get { return _closeIcon; } }
-        internal Texture CloseIconOn { get { return _closeIconOn; } }
-        internal Texture AuotsetIcon { get { return _auotsetIcon; } }
-        internal Texture AutosetCascadeIcon { get { return _auotsetCascadeIcon; } }
-        internal Texture VisibilityIconOn { get { return _visibilityIconOn; } }
-        internal Texture VisibilityIconOff { get { return _visibilityIconOff; } }
-        internal Texture LabelIconType { get { return _labelIconType; } }
-        internal Texture LabelIconMeta { get { return _labelIconMeta; } }
+        private void InitDummies()
+        {
+            if (_dummy != null) { return; }
+            EcsDebug.PrintWarning("Some icons are missing. The issue might be resolved by using \"Assets -> Reimport All\" or by deleting the \"*project_name*/Library\" folder and restarting Unity.");
+            Texture2D Create(Color color_)
+            {
+                Texture2D result_ = new Texture2D(2, 2);
+                for (int i = 0; i < 2; i++)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        result_.SetPixel(i, j, color_);
+                    }
+                }
+                result_.Apply();
+                return result_;
+            }
+            _dummy = Create(Color.white);
+            _dummyRed = Create(Color.red);
+            _dummyGreen = Create(Color.green);
+            _dummyYellow = Create(Color.yellow);
+        }
+
+        private static Texture Return(Texture icon, Texture dummy)
+        {
+            return icon == null ? dummy : icon;
+        }
+
+        internal Texture HelpIcon { get { return Return(_helpIcon, Dummy); } }
+        internal Texture FileIcon { get { return Return(_fileIcon, Dummy); } }
+        internal Texture MetaIDIcon { get { return Return(_metaIDIcon, Dummy); } }
+        internal Texture RepaireIcon { get { return Return(_repaireIcon, Dummy); } }
+
+        internal Texture ErrorIcon { get { return Return(_errorIcon, DummyRed); } }
+        internal Texture WarningIcon { get { return Return(_warningIcon, DummyYellow); } }
+        internal Texture PassIcon { get { return Return(_passIcon, DummyGreen); } }
+
+        internal Texture UnlinkIcon { get { return Return(_unlinkIcon, Dummy); } }
+        internal Texture SearchIcon { get { return Return(_searchIcon, Dummy); } }
+        internal Texture CloseIcon { get { return Return(_closeIcon, DummyRed); } }
+        internal Texture CloseIconOn { get { return Return(_closeIconOn, DummyRed); } }
+        internal Texture AuotsetIcon { get { return Return(_auotsetIcon, Dummy); } }
+        internal Texture AutosetCascadeIcon { get { return Return(_auotsetCascadeIcon, Dummy); } }
+        internal Texture VisibilityIconOn { get { return Return(_visibilityIconOn, Dummy); } }
+        internal Texture VisibilityIconOff { get { return Return(_visibilityIconOff, Dummy); } }
+        internal Texture LabelIconType { get { return Return(_labelIconType, Dummy); } }
+        internal Texture LabelIconMeta { get { return Return(_labelIconMeta, Dummy); } }
 #endif
     }
 }
