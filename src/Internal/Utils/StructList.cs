@@ -11,6 +11,22 @@ namespace DCFApixels.DragonECS.Unity.Internal
     {
         internal T[] _items;
         internal int _count;
+
+        public IEnumerable<T> Enumerable
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _items.Take(_count); }
+        }
+        public bool IsNull
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _items == null; }
+        }
+        public bool IsNullOrEmpty
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get { return _items == null || _items.Length <= 0; }
+        }
         public int Count
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]

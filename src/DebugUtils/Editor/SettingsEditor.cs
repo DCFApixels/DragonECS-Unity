@@ -53,29 +53,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             //using (prefs.DisableAutoSave())
             {
-                GUILayout.BeginHorizontal();
                 prefs.IsShowHidden = EditorGUILayout.ToggleLeft(
                     UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)),
                     prefs.IsShowHidden);
-                GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
                 prefs.IsShowInterfaces = EditorGUILayout.ToggleLeft(
                     UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)),
                     prefs.IsShowInterfaces);
-                GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
                 prefs.IsShowRuntimeComponents = EditorGUILayout.ToggleLeft(
                     UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)),
                     prefs.IsShowRuntimeComponents);
-                GUILayout.EndHorizontal();
 
-                GUILayout.BeginHorizontal();
                 prefs.IsUseCustomNames = EditorGUILayout.ToggleLeft(
                     UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
                     prefs.IsUseCustomNames);
-                GUILayout.EndHorizontal();
+
+                prefs.IsFastModeRuntimeComponents = EditorGUILayout.ToggleLeft(
+                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsFastModeRuntimeComponents)),
+                    prefs.IsFastModeRuntimeComponents);
 
                 prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
             }
