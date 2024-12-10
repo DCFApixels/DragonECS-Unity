@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
@@ -70,6 +71,14 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             if (_dummy != null) { return; }
             EcsDebug.PrintWarning("Some icons are missing. The issue might be resolved by using \"Assets -> Reimport All\" or by deleting the \"*project_name*/Library\" folder and restarting Unity.");
+            try
+            {
+                string json = JsonUtility.ToJson(CreateInstance(typeof(Icons)));
+                JsonUtility.FromJsonOverwrite(json, this);
+                EditorUtility.SetDirty(this);
+            }
+            catch { }
+
             Texture2D Create(Color color_)
             {
                 Texture2D result_ = new Texture2D(2, 2);
@@ -89,30 +98,25 @@ namespace DCFApixels.DragonECS.Unity.Internal
             _dummyYellow = Create(Color.yellow);
         }
 
-        private static Texture Return(Texture icon, Texture dummy)
-        {
-            return icon == null ? dummy : icon;
-        }
+        internal Texture HelpIcon { get { return _helpIcon != null ? _helpIcon : Dummy; } }
+        internal Texture FileIcon { get { return _fileIcon != null ? _fileIcon : Dummy; } }
+        internal Texture MetaIDIcon { get { return _metaIDIcon != null ? _metaIDIcon : Dummy; } }
+        internal Texture RepaireIcon { get { return _repaireIcon != null ? _repaireIcon : Dummy; } }
 
-        internal Texture HelpIcon { get { return Return(_helpIcon, Dummy); } }
-        internal Texture FileIcon { get { return Return(_fileIcon, Dummy); } }
-        internal Texture MetaIDIcon { get { return Return(_metaIDIcon, Dummy); } }
-        internal Texture RepaireIcon { get { return Return(_repaireIcon, Dummy); } }
+        internal Texture ErrorIcon { get { return _errorIcon != null ? _errorIcon : DummyRed; } }
+        internal Texture WarningIcon { get { return _warningIcon != null ? _warningIcon : DummyYellow; } }
+        internal Texture PassIcon { get { return _passIcon != null ? _passIcon : DummyGreen; } }
 
-        internal Texture ErrorIcon { get { return Return(_errorIcon, DummyRed); } }
-        internal Texture WarningIcon { get { return Return(_warningIcon, DummyYellow); } }
-        internal Texture PassIcon { get { return Return(_passIcon, DummyGreen); } }
-
-        internal Texture UnlinkIcon { get { return Return(_unlinkIcon, Dummy); } }
-        internal Texture SearchIcon { get { return Return(_searchIcon, Dummy); } }
-        internal Texture CloseIcon { get { return Return(_closeIcon, DummyRed); } }
-        internal Texture CloseIconOn { get { return Return(_closeIconOn, DummyRed); } }
-        internal Texture AuotsetIcon { get { return Return(_auotsetIcon, Dummy); } }
-        internal Texture AutosetCascadeIcon { get { return Return(_auotsetCascadeIcon, Dummy); } }
-        internal Texture VisibilityIconOn { get { return Return(_visibilityIconOn, Dummy); } }
-        internal Texture VisibilityIconOff { get { return Return(_visibilityIconOff, Dummy); } }
-        internal Texture LabelIconType { get { return Return(_labelIconType, Dummy); } }
-        internal Texture LabelIconMeta { get { return Return(_labelIconMeta, Dummy); } }
+        internal Texture UnlinkIcon { get { return _unlinkIcon != null ? _unlinkIcon : Dummy; } }
+        internal Texture SearchIcon { get { return _searchIcon != null ? _searchIcon : Dummy; } }
+        internal Texture CloseIcon { get { return _closeIcon != null ? _closeIcon : DummyRed; } }
+        internal Texture CloseIconOn { get { return _closeIconOn != null ? _closeIconOn : DummyRed; } }
+        internal Texture AuotsetIcon { get { return _auotsetIcon != null ? _auotsetIcon : Dummy; } }
+        internal Texture AutosetCascadeIcon { get { return _auotsetCascadeIcon != null ? _auotsetCascadeIcon : Dummy; } }
+        internal Texture VisibilityIconOn { get { return _visibilityIconOn != null ? _visibilityIconOn : Dummy; } }
+        internal Texture VisibilityIconOff { get { return _visibilityIconOff != null ? _visibilityIconOff : Dummy; } }
+        internal Texture LabelIconType { get { return _labelIconType != null ? _labelIconType : Dummy; } }
+        internal Texture LabelIconMeta { get { return _labelIconMeta != null ? _labelIconMeta : Dummy; } }
 #endif
     }
 }

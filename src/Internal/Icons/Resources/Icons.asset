@@ -15,17 +15,17 @@ MonoBehaviour:
   _helpIcon: {fileID: 0}
   _fileIcon: {fileID: 0}
   _metaIDIcon: {fileID: 0}
-  _repaireIcon: {fileID: 0}
-  _errorIcon: {fileID: 0}
-  _warningIcon:{fileID: 0}
-  _passIcon: {fileID: 0}
-  _unlinkIcon:{fileID: 0}
-  _searchIcon: {fileID: 0}
-  _closeIcon: {fileID: 0}
-  _closeIconOn: {fileID: 0}
-  _auotsetIcon: {fileID: 0}
-  _auotsetCascadeIcon: {fileID: 0}
-  _visibilityIconOn: {fileID: 0}
-  _visibilityIconOff: {fileID: 0}
-  _labelIconType: {fileID: 0}
-  _labelIconMeta: {fileID: 0}
+  _repaireIcon:   {fileID: 0}
+  _errorIcon:     {fileID: 0}
+  _warningIcon:   {fileID: 0}
+  _passIcon:      {fileID: 0}
+  _unlinkIcon:    {fileID: 0}
+  _searchIcon:    {fileID: 0}
+  _closeIcon:     {fileID: 0}
+  _closeIconOn:   {fileID: 0}
+  _auotsetIcon:   {fileID: 0}
+  _auotsetCascadeIcon:  {fileID: 0}
+  _visibilityIconOn:    {fileID: 0}
+  _visibilityIconOff:   {fileID: 0}
+  _labelIconType:       {fileID: 0}
+  _labelIconMeta:       {fileID: 0}
