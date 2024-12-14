@@ -304,7 +304,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                     else
                     {
-                        if (DrawProperty(data))
+                        if (DrawProperty(data, meta.Name))
                         {
                             pool.SetRaw(entityID, data);
                         }

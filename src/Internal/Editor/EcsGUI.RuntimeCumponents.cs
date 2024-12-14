@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Xml.Schema;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEditorInternal;
@@ -20,10 +21,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private struct PtrRefUnion
         {
             [FieldOffset(0)]
-            public void* Ptr;
+            public byte* Ptr;
             [FieldOffset(0)]
             public object Ref;
-            public PtrRefUnion(void* ptr) : this()
+            public PtrRefUnion(byte* ptr) : this()
             {
                 Ptr = ptr;
             }
@@ -58,7 +59,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (isRef)
                 {
                     IntPtr* refPtr = (IntPtr*)fieldPtr;
-                    valuePtr = (byte*)&refPtr;
+                    valuePtr = (byte*)(refPtr[0]);
                 }
                 else
                 {
@@ -187,12 +188,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public override float GetHeight(in InspectorFieldInfo field, in Value value)
             {
                 float result = GetPropertyHeight(field, ValueInfo, value);
-                Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 return result;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value value)
             {
-                Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 DrawProperty(rect, field, ValueInfo, value);
             }
         }
@@ -202,12 +203,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public sealed override float GetHeight(in InspectorFieldInfo field, in Value value)
             {
                 float result = GetHeight(field, value, ref value.AsValue<T>());
-                Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 return result;
             }
             public sealed override void Draw(Rect rect, in InspectorFieldInfo field, in Value value)
             {
-                Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 Draw(rect, field, value, ref value.AsValue<T>());
             }
             public virtual float GetHeight(in InspectorFieldInfo field, in Value raw, ref T value)
@@ -225,12 +226,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public sealed override float GetHeight(in InspectorFieldInfo field, in Value value)
             {
                 float result = GetHeight(field, value, value.AsRef<T>());
-                Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("GetHeight: " + result + " : " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 return result;
             }
             public sealed override void Draw(Rect rect, in InspectorFieldInfo field, in Value value)
             {
-                Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
+                //Debug.Log("Draw: " + ValueInfo.Type + " : " + ValueInfo.Fields + " : " + ValueInfo.IsNull);
                 Draw(rect, field, value, value.AsRef<T>());
             }
             public virtual float GetHeight(in InspectorFieldInfo field, in Value raw, T value)
@@ -284,7 +285,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 //
                 //}
 
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, Array value)
             {
@@ -300,7 +301,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref sbyte value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref sbyte value)
             {
@@ -311,7 +312,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref byte value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref byte value)
             {
@@ -322,7 +323,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref short value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref short value)
             {
@@ -333,7 +334,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref ushort value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref ushort value)
             {
@@ -344,7 +345,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref int value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref int value)
             {
@@ -355,7 +356,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref uint value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref uint value)
             {
@@ -366,7 +367,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref long value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref long value)
             {
@@ -377,7 +378,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref ulong value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref ulong value)
             {
@@ -388,7 +389,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref float value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref float value)
             {
@@ -399,7 +400,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref double value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref double value)
             {
@@ -410,7 +411,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref char value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref char value)
             {
@@ -426,7 +427,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, ref Color value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref Color value)
             {
@@ -437,7 +438,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, string value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, string value)
             {
@@ -448,7 +449,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, Gradient value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, Gradient value)
             {
@@ -459,7 +460,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, AnimationCurve value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, AnimationCurve value)
             {
@@ -470,7 +471,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             public override float GetHeight(in InspectorFieldInfo field, in Value raw, UnityObject value)
             {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             }
             public override void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, UnityObject value)
             {
@@ -544,13 +545,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     infocstr.FieldInfo = fieldInfo;
                     infocstr.Offset = UnsafeUtility.GetFieldOffset(fieldInfo);
-                    infocstr.Name = UnityEditorUtility.TransformFieldName(fieldType.Name);
+                    infocstr.Name = UnityEditorUtility.TransformFieldName(fieldInfo.Name);
                     infocstr.Flag = FieldFlagUtitlity.GetFieldFlag(fieldType);
 
-                    Debug.LogWarning("Offset: " + type.Name + "." + infocstr.Name + "." + infocstr.Offset);
-
-
-                    if (infocstr.Flag == FieldFlag.Struct)
+                    if (infocstr.Flag == FieldFlag.StructValue)
                     {
                         infocstr.PreDefinedType = Get(fieldType);
                     }
@@ -560,8 +558,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                     else
                     {
-                        infocstr.PreDefinedType = NullTypeInfo;
+                        if (type == infocstr.FieldInfo.FieldType)
+                        {
+                            infocstr.PreDefinedType = NullTypeInfo;
+                        }
+                        else
+                        {
+                            infocstr.PreDefinedType = Get(fieldType);
+                        }
                     }
+                    
 
                     CnstrBuffer.Add(infoUniton.Result);
                 }
@@ -577,7 +583,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         ref var field = ref Fields[i];
                         
-                        if (field.Flag == FieldFlag.Leaf &&
+                        if (field.Flag == FieldFlag.LeafValue &&
                             field.PreDefinedType.Type.IsPrimitive &&
                             char.ToLower(field.Name[0]) != VectorFields[i])
                         {
@@ -595,7 +601,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         for (int i = 0; i < length; i++)
                         {
                             ref var field = ref Fields[i];
-                            if (field.Flag == FieldFlag.Leaf &&
+                            if (field.Flag == FieldFlag.LeafValue &&
                                 field.PreDefinedType.Type.IsPrimitive && 
                                 char.ToLower(field.Name[0]) != ColorFields[i])
                             {
@@ -631,7 +637,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             public int CompareTo(InspectorFieldInfo other)
             {
-                return other.Offset - Offset;
+                return Offset - other.Offset;
             }
             public bool Equals(InspectorFieldInfo other)
             {
@@ -684,13 +690,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 if (fieldType.IsPrimitive || fieldType.IsEnum || _leafTypes.Contains(fieldType))
                 {
-                    return FieldFlag.Leaf;
+                    return FieldFlag.LeafValue;
                 }
-                return FieldFlag.Struct;
+                return FieldFlag.StructValue;
             }
             public static bool IsValueField(FieldFlag flag)
             {
-                return flag == FieldFlag.Leaf || flag == FieldFlag.Struct;
+                return flag == FieldFlag.LeafValue || flag == FieldFlag.StructValue;
             }
             public static bool IsCanDisplayed(FieldFlag flag)
             {
@@ -701,23 +707,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             None = 0,
             CantDisplayed,
-            Leaf,
-            Struct,
+            LeafValue,
+            StructValue,
             Ref,
-        }
-        private unsafe static bool FastDrawRuntimeData(void* data, InspectorTypeInfo cache)
-        {
-            throw new NotImplementedException();
         }
         #endregion
 
         private static void DrawProperty(Rect rect, in InspectorFieldInfo field, InspectorTypeInfo valueInfo, in Value value)
         {
-            if (field.Flag == FieldFlag.Leaf)
-            {
-                EditorGUI.LabelField(rect, UnityEditorUtility.GetLabel(field.Name));
-                return;
-            }
+            //if (field.Flag == FieldFlag.LeafValue)
+            //{
+            //    EditorGUI.LabelField(rect, UnityEditorUtility.GetLabel(field.Name));
+            //    return;
+            //}
             float y = rect.y;
             float height = EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
             Rect subRect = rect;
@@ -738,8 +740,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     switch (subField.Flag)
                     {
-                        case FieldFlag.Leaf:
-                        case FieldFlag.Struct:
+                        case FieldFlag.LeafValue:
+                        case FieldFlag.StructValue:
                             subValueType = subField.PreDefinedType.Type;
                             break;
                         case FieldFlag.Ref:
@@ -762,7 +764,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     subRect.height = height - EditorGUIUtility.standardVerticalSpacing;
                     y += height;
 
-                    if (subField.Flag == FieldFlag.Struct && processor.IsDefault)
+                    if (subField.Flag == FieldFlag.StructValue && processor.IsDefault)
                     {
                         if (subField.PreDefinedType.IsVector)
                         {
@@ -791,29 +793,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static float GetPropertyHeight(in InspectorFieldInfo field, InspectorTypeInfo valueInfo, in Value value)
         {
             float result = 0;
-            if (field.Flag == FieldFlag.Leaf)
-            {
-                return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
-            }
+            //if (field.Flag == FieldFlag.LeafValue)
+            //{
+            //    return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
+            //}
 
-            Debug.Log(string.Join("\r\n", valueInfo.Fields));
+            //Debug.Log(string.Join("\r\n", valueInfo.Fields));
 
             foreach (var subField in valueInfo.Fields)
             {
                 if (FieldFlagUtitlity.IsCanDisplayed(subField.Flag) == false) { continue; }
 
                 var subValue = value.Read(subField);
-                Type subValueType;
+                Type subValueType = null;
 
                 switch (subField.Flag)
                 {
-                    case FieldFlag.None:
-                    case FieldFlag.CantDisplayed:
-                    default:
-                        subValueType = null;
-                        break;
-                    case FieldFlag.Leaf:
-                    case FieldFlag.Struct:
+                    case FieldFlag.LeafValue:
+                    case FieldFlag.StructValue:
                         subValueType = subField.PreDefinedType.Type;
                         break;
                     case FieldFlag.Ref:
@@ -825,15 +822,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 if (subValueType == null) { continue; }
 
                 var processor = FieldValueProcessor.GetProcessor(subValueType);
-                if (subField.Flag == FieldFlag.Struct && processor.IsDefault)
+                if (subField.Flag == FieldFlag.StructValue && processor.IsDefault)
                 {
                     if (subField.PreDefinedType.IsVector)
                     //if (subField.PreDefinedType.IsVector || subField.PreDefinedType.IsColor)
                     {
-                        return EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                        return EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                     }
                 }
-                result += EditorGUIUtility.currentViewWidth + EditorGUIUtility.standardVerticalSpacing;
+                result += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
                 result += processor.GetHeight(subField, subValue);
             }
             return result;
@@ -841,42 +838,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public static unsafe partial class Layout
         {
-            private static bool DrawProperty(object data)
+            private static bool DrawProperty(object data, string name)
             {
-                Debug.LogWarning("--------------------------------------------");
+                //Debug.LogWarning("--------------------------------------------");
                 EditorGUI.BeginChangeCheck();
                 Type type = data.GetType();
                 byte* ptr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(data, out ulong gcHandle);
-
+                ptr += sizeof(IntPtr) * 2; //TODO тут надо просчитать что констатно ли значение смещения для упакованных данных
                 try
                 {
                     InspectorTypeInfo inspectorTypeInfo = InspectorTypeInfo.Get(type);
-                    Value value = new Value(null, ptr);
+                    Value value = new Value(ptr, ptr);
 
-#if DEV_MODE
-                    if (data is GameObjectConnect goc)
-                    {
-                        byte* ptrX = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(goc.Connect, out ulong gcHandleX);
-                        UnsafeUtility.ReleaseGCObject(gcHandleX);
-
-                        var fieldX = inspectorTypeInfo.Fields[0];
-
-                        Value valueX = value.Read(fieldX);
-                        byte* ptrX2 = valueX.ValuePtr;
-
-                        PtrRefUnion u = default;
-                        u.Ref = goc.Connect;
-
-
-                        Debug.Log((IntPtr)ptrX + " " + (IntPtr)ptrX2);
-                    }
-#endif
-
-
-                    InspectorFieldInfo f = default;
-                    float h = GetPropertyHeight(in f, inspectorTypeInfo, in value);
+                    InspectorFieldInfo.Union f = default;
+                    f.Constructor.Name = name;
+                    float h = GetPropertyHeight(in f.Result, inspectorTypeInfo, in value);
                     var r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, h);
-                    EcsGUI.DrawProperty(r, in f, inspectorTypeInfo, in value);
+                    EcsGUI.DrawProperty(r, in f.Result, inspectorTypeInfo, in value);
 
 
                     UnsafeUtility.ReleaseGCObject(gcHandle);
