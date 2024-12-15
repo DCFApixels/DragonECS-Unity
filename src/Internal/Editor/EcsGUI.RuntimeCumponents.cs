@@ -4,13 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Xml.Schema;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 using Color = UnityEngine.Color;
-using Debug = UnityEngine.Debug;
 using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -217,7 +215,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public virtual void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, ref T value)
             {
-                base.Draw(rect, field, raw);
+                base.Draw(rect, in field, in raw);
             }
         }
         private class RefFieldValueProcessor<T> : StructFieldValueProcessor where T : class
@@ -240,7 +238,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             public virtual void Draw(Rect rect, in InspectorFieldInfo field, in Value raw, T value)
             {
-                base.Draw(rect, field, raw);
+                base.Draw(rect, in field, in raw);
             }
         }
         private unsafe class ArrayFieldValueProcessor : RefFieldValueProcessor<Array>
@@ -736,7 +734,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (FieldFlagUtitlity.IsCanDisplayed(subField.Flag) == false) { continue; }
 
                     var subValue = value.Read(subField);
-                    Type subValueType; 
+                    Type subValueType = null; 
 
                     switch (subField.Flag)
                     {
@@ -748,17 +746,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             var obj = subValue.AsRef();
                             subValueType = obj.GetType();
                             break;
-                        case FieldFlag.None:
-                        case FieldFlag.CantDisplayed:
-                        default:
-                            subValueType = null;
-                            break;
                     }
 
                     if (subValueType == null) { continue; }
 
                     var processor = FieldValueProcessor.GetProcessor(subValueType);
-                    height = processor.GetHeight(subField, subValue);
+                    height = processor.GetHeight(subField, in subValue);
                     subRect = rect;
                     subRect.y = y;
                     subRect.height = height - EditorGUIUtility.standardVerticalSpacing;
@@ -776,7 +769,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             foreach (var vectorField in vectorFields)
                             {
                                 var vectorFieldProcessor = FieldValueProcessor.GetProcessor(vectorField.PreDefinedType.Type);
-                                vectorFieldProcessor.Draw(subRect, vectorField, subValue.Read(vectorField));
+                                vectorFieldProcessor.Draw(subRect, in vectorField, subValue.Read(vectorField));
                             }
                             EditorGUIUtility.labelWidth = defLabelWidth;
                         }
@@ -786,7 +779,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         //}
                     }
 
-                    processor.Draw(subRect, subField, subValue);
+                    processor.Draw(subRect, in subField, in subValue);
                 }
             }
         }
@@ -831,11 +824,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 result += EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing;
-                result += processor.GetHeight(subField, subValue);
+                result += processor.GetHeight(subField, in subValue);
             }
             return result;
         }
-
+        [StructLayout(LayoutKind.Explicit)]
+        private ref struct RefPtrUnion
+        {
+            [FieldOffset(0)]
+            public object Ref;
+            [FieldOffset(0)]
+            public IntPtr Ptr;
+            public RefPtrUnion(object @ref) : this()
+            {
+                Ref = @ref;
+            }
+            public RefPtrUnion(IntPtr ptr) : this()
+            {
+                Ptr = ptr;
+            }
+        }
         public static unsafe partial class Layout
         {
             private static bool DrawProperty(object data, string name)
@@ -843,32 +851,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 //Debug.LogWarning("--------------------------------------------");
                 EditorGUI.BeginChangeCheck();
                 Type type = data.GetType();
-                byte* ptr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(data, out ulong gcHandle);
+                //byte* ptr = (byte*)UnsafeUtility.PinGCObjectAndGetAddress(data, out ulong gcHandle);
+                RefPtrUnion union = new RefPtrUnion(data);
+                byte* ptr = (byte*)union.Ptr;
                 ptr += sizeof(IntPtr) * 2; //TODO тут надо просчитать что констатно ли значение смещения для упакованных данных
-                try
-                {
-                    InspectorTypeInfo inspectorTypeInfo = InspectorTypeInfo.Get(type);
-                    Value value = new Value(ptr, ptr);
+                InspectorTypeInfo inspectorTypeInfo = InspectorTypeInfo.Get(type);
+                Value value = new Value(ptr, ptr);
 
-                    InspectorFieldInfo.Union f = default;
-                    f.Constructor.Name = name;
-                    float h = GetPropertyHeight(in f.Result, inspectorTypeInfo, in value);
-                    var r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, h);
-                    EcsGUI.DrawProperty(r, in f.Result, inspectorTypeInfo, in value);
+                InspectorFieldInfo.Union f = default;
+                f.Constructor.Name = name;
+                float h = GetPropertyHeight(in f.Result, inspectorTypeInfo, in value);
+                var r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, h);
+
+                EcsGUI.DrawProperty(r, in f.Result, inspectorTypeInfo, in value);
 
 
-                    UnsafeUtility.ReleaseGCObject(gcHandle);
-                }
-                catch (Exception)
-                {
-                    UnsafeUtility.ReleaseGCObject(gcHandle);
-                    throw;
-                }
-
-                
                 return EditorGUI.EndChangeCheck();
             }
-
         }
     }
 }
