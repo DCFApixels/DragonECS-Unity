@@ -69,9 +69,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
                     prefs.IsUseCustomNames);
 
-                prefs.IsFastModeRuntimeComponents = EditorGUILayout.ToggleLeft(
-                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsFastModeRuntimeComponents)),
-                    prefs.IsFastModeRuntimeComponents);
+                //prefs.IsFastModeRuntimeComponents = EditorGUILayout.ToggleLeft(
+                //    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsFastModeRuntimeComponents)),
+                //    prefs.IsFastModeRuntimeComponents);
 
                 prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
             }

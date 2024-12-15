@@ -295,21 +295,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
 
-                    if (IsFastModeRuntimeComponents)
+                    if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
                     {
-                        if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
-                        {
-                            pool.SetRaw(entityID, resultData);
-                        }
+                        pool.SetRaw(entityID, resultData);
                     }
-                    else
-                    {
-                        if (DrawProperty(data, meta.Name))
-                        {
-                            pool.SetRaw(entityID, data);
-                        }
-                    }
-                    
+
 
                     GUILayout.EndVertical();
                 }

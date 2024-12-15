@@ -289,11 +289,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
             set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
         }
-        private static bool IsFastModeRuntimeComponents
-        {
-            get { return UserSettingsPrefs.instance.IsFastModeRuntimeComponents; }
-            set { UserSettingsPrefs.instance.IsFastModeRuntimeComponents = value; }
-        }
+        //private static bool IsFastModeRuntimeComponents
+        //{
+        //    get { return UserSettingsPrefs.instance.IsFastModeRuntimeComponents; }
+        //    set { UserSettingsPrefs.instance.IsFastModeRuntimeComponents = value; }
+        //}
         private static float OneLineHeight
         {
             get => EditorGUIUtility.singleLineHeight;
