@@ -69,17 +69,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
-
         //[SerializeField]
-        //private bool _poolsToggle = false;
-        //public bool PoolsToggle
+        //private bool _isFastModeRuntimeComponents = false;
+        //public bool IsFastModeRuntimeComponents
         //{
-        //    get => _poolsToggle;
+        //    get => _isFastModeRuntimeComponents;
         //    set
         //    {
-        //        _isChanged = _poolsToggle != value;
-        //        _poolsToggle = value;
-        //        AutoSave();
+        //        if (_isFastModeRuntimeComponents != value)
+        //        {
+        //            _isFastModeRuntimeComponents = value;
+        //            AutoSave();
+        //        }
         //    }
         //}
 

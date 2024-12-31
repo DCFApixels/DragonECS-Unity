@@ -92,12 +92,35 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             base.OnInspectorGUI();
         }
-
-
         protected SerializedProperty FindProperty(string name)
         {
             return serializedObject.FindProperty(name);
         }
+
+
+        //Color proColor = (Color)new Color32(56, 56, 56, 255);
+        //Color plebColor = (Color)new Color32(194, 194, 194, 255);
+        //protected override void OnHeaderGUI()
+        //{
+        //    //base.OnHeaderGUI();
+        //    var rect = EditorGUILayout.GetControlRect(false, 0f);
+        //    rect.height = EditorGUIUtility.singleLineHeight;
+        //    rect.y -= rect.height;
+        //    rect.x = 48;
+        //    rect.xMax -= rect.x * 2f;
+        //
+        //    //GUI.skin.settings
+        //    EditorGUI.DrawRect(rect, EditorGUIUtility.isProSkin ? proColor : plebColor);
+        //
+        //    //string header = (target as ComponentFolder).folderName; // <--- your variable
+        //    string header = "";
+        //    if (string.IsNullOrEmpty(header))
+        //    {
+        //        header = target.ToString() + 1;
+        //    }
+        //
+        //    EditorGUI.LabelField(rect, header, EditorStyles.boldLabel);
+        //}
     }
     internal abstract class ExtendedEditor<T> : ExtendedEditor
     {

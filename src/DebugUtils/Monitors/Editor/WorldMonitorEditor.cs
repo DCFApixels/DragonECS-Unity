@@ -118,6 +118,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
             EcsGUI.Layout.DrawWorldBaseInfo(Target.World);
+
+            EcsGUI.Layout.DrawWorldComponents(Target.World);
         }
     }
 }

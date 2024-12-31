@@ -71,4 +71,75 @@ namespace DCFApixels.DragonECS.Unity.Internal
             void IEnumerator.Reset() { throw new NotSupportedException(); }
         }
     }
+
+    internal static class ArrayUtility
+    {
+        private static int GetHighBitNumber(uint bits)
+        {
+            if (bits == 0)
+            {
+                return -1;
+            }
+            int bit = 0;
+            if ((bits & 0xFFFF0000) != 0)
+            {
+                bits >>= 16;
+                bit |= 16;
+            }
+            if ((bits & 0xFF00) != 0)
+            {
+                bits >>= 8;
+                bit |= 8;
+            }
+            if ((bits & 0xF0) != 0)
+            {
+                bits >>= 4;
+                bit |= 4;
+            }
+            if ((bits & 0xC) != 0)
+            {
+                bits >>= 2;
+                bit |= 2;
+            }
+            if ((bits & 0x2) != 0)
+            {
+                bit |= 1;
+            }
+            return bit;
+        }
+        public static int NormalizeSizeToPowerOfTwo(int minSize)
+        {
+            unchecked
+            {
+                return 1 << (GetHighBitNumber((uint)minSize - 1u) + 1);
+            }
+        }
+        public static int NormalizeSizeToPowerOfTwo_ClampOverflow(int minSize)
+        {
+            unchecked
+            {
+                int hibit = (GetHighBitNumber((uint)minSize - 1u) + 1);
+                if (hibit >= 32)
+                {
+                    return int.MaxValue;
+                }
+                return 1 << hibit;
+            }
+        }
+        public static void Fill<T>(T[] array, T value, int startIndex = 0, int length = -1)
+        {
+            if (length < 0)
+            {
+                length = array.Length;
+            }
+            else
+            {
+                length = startIndex + length;
+            }
+            for (int i = startIndex; i < length; i++)
+            {
+                array[i] = value;
+            }
+        }
+    }
 }
