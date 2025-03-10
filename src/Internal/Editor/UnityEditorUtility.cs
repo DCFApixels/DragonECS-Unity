@@ -111,8 +111,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             _integrationAssembly = typeof(UnityEditorUtility).Assembly;
 
-            colorBoxeStyles = new SparseArray<GUIStyle>();
-
             List<Type> serializableTypes = new List<Type>();
             List<EntityEditorBlockDrawer> entityEditorBlockDrawers = new List<EntityEditorBlockDrawer>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
