@@ -109,6 +109,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         static UnityEditorUtility()
         {
+            EcsWorld.ResetStaticState();
+
             _integrationAssembly = typeof(UnityEditorUtility).Assembly;
 
             List<Type> serializableTypes = new List<Type>();
