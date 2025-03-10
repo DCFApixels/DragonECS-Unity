@@ -172,8 +172,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
-
-        private static Dictionary<Type, MonoScript> scriptsAssets = new Dictionary<Type, MonoScript>(256);
+        private static Dictionary<Type, MonoScript> _scriptsAssets = new Dictionary<Type, MonoScript>(256);
 
 
         internal static void ResetValues(this SerializedProperty property, bool isExpand = false)
@@ -293,7 +292,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         internal static bool TryGetScriptAsset(Type type, out MonoScript script)
         {
-            if (scriptsAssets.TryGetValue(type, out script) == false)
+            if (_scriptsAssets.TryGetValue(type, out script) == false)
             {
                 script = null;
                 string name = type.Name;
@@ -312,7 +311,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         break;
                     }
                 }
-                scriptsAssets.Add(type, script);
+                _scriptsAssets.Add(type, script);
             }
             return script != null;
         }
