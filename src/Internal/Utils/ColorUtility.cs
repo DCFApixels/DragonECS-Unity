@@ -21,5 +21,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
             self.a = a;
             return self;
         }
+
+        public unsafe static int GetCode32(this Color32 self)
+        {
+            return *(int*)&self;
+        }
     }
 }

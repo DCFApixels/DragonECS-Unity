@@ -1,9 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
-using System;
 using UnityEditor;
-using UnityEditor.Graphs;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -179,7 +177,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 DrawTop(Target, _componentsProp);
                 _reorderableComponentsList.DoLayoutList();

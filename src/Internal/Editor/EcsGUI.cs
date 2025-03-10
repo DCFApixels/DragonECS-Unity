@@ -205,12 +205,26 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 public VerticalScope(GUILayoutOption[] options) { GUILayout.BeginVertical(options); }
                 public VerticalScope(GUIStyle style, GUILayoutOption[] options) { GUILayout.BeginVertical(style, options); }
+                public VerticalScope(Color backgroundColor, GUILayoutOption[] options)
+                {
+                    using (SetColor(backgroundColor))
+                    {
+                        GUILayout.BeginVertical(UnityEditorUtility.GetWhiteStyle(), options);
+                    }
+                }
                 public void Dispose() { GUILayout.EndVertical(); }
             }
             public struct HorizontalScope : IDisposable
             {
                 public HorizontalScope(GUILayoutOption[] options) { GUILayout.BeginHorizontal(options); }
                 public HorizontalScope(GUIStyle style, GUILayoutOption[] options) { GUILayout.BeginHorizontal(style, options); }
+                public HorizontalScope(Color backgroundColor, GUILayoutOption[] options)
+                {
+                    using (SetColor(backgroundColor))
+                    {
+                        GUILayout.BeginHorizontal(UnityEditorUtility.GetWhiteStyle(), options);
+                    }
+                }
                 public void Dispose() { GUILayout.EndHorizontal(); }
             }
             public struct ScrollViewScope : IDisposable
@@ -221,14 +235,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             public static ScrollViewScope BeginScrollView(ref Vector2 pos) => new ScrollViewScope(ref pos, Array.Empty<GUILayoutOption>());
-            public static HorizontalScope BeginHorizontal() => new HorizontalScope(Array.Empty<GUILayoutOption>());
-            public static VerticalScope BeginVertical() => new VerticalScope(Array.Empty<GUILayoutOption>());
             public static ScrollViewScope BeginScrollView(ref Vector2 pos, params GUILayoutOption[] options) => new ScrollViewScope(ref pos, options);
-            public static HorizontalScope BeginHorizontal(params GUILayoutOption[] options) => new HorizontalScope(options);
-            public static VerticalScope BeginVertical(params GUILayoutOption[] options) => new VerticalScope(options);
             public static ScrollViewScope BeginScrollView(ref Vector2 pos, GUIStyle style, params GUILayoutOption[] options) => new ScrollViewScope(ref pos, style, options);
+            public static HorizontalScope BeginHorizontal() => new HorizontalScope(Array.Empty<GUILayoutOption>());
+            public static HorizontalScope BeginHorizontal(params GUILayoutOption[] options) => new HorizontalScope(options);
             public static HorizontalScope BeginHorizontal(GUIStyle style, params GUILayoutOption[] options) => new HorizontalScope(style, options);
+            public static HorizontalScope BeginHorizontal(Color backgroundColor, params GUILayoutOption[] options) => new HorizontalScope(backgroundColor, options);
+            public static VerticalScope BeginVertical() => new VerticalScope(Array.Empty<GUILayoutOption>());
+            public static VerticalScope BeginVertical(params GUILayoutOption[] options) => new VerticalScope(options);
             public static VerticalScope BeginVertical(GUIStyle style, params GUILayoutOption[] options) => new VerticalScope(style, options);
+            public static VerticalScope BeginVertical(Color backgroundColor, params GUILayoutOption[] options) => new VerticalScope(backgroundColor, options);
         }
         public static CheckChangedScope CheckChanged() => CheckChangedScope.New();
         public static CheckChangedScopeWithAutoApply CheckChanged(SerializedObject serializedObject) => new CheckChangedScopeWithAutoApply(serializedObject);
@@ -1022,7 +1038,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GetReferenceDropDown(sortedPredicateTypes, sortedWithOutTypes).Show(position);
         }
 
-#endregion
+        #endregion
     }
 }
 #endif

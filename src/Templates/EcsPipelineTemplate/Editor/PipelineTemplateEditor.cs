@@ -178,7 +178,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawRecordList(SerializedProperty recordsProp)
         {
             GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 GUILayout.Space(4f);
 

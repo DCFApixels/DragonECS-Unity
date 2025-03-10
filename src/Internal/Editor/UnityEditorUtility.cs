@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Text;
 using UnityEngine;
 using UnityObject = UnityEngine.Object;
@@ -125,7 +124,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 foreach (var type in assembly.GetTypes())
                 {
-                    if ((type.IsGenericType || type.IsAbstract || type.IsInterface) == false && 
+                    if ((type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
                         typeof(EntityEditorBlockDrawer).IsAssignableFrom(type))
                     {
                         var drawer = (EntityEditorBlockDrawer)Activator.CreateInstance(type);
@@ -368,6 +367,36 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
+        #region WhiteTexture
+        private static Texture2D _whiteTexture;
+        private static GUIStyle _whiteStyle;
+        private static GUIStyle _transperentBlackBackgrounStyle;
+        public static Texture2D GetWhiteTexture()
+        {
+            if (_whiteTexture == null)
+            {
+                _whiteTexture = CreateTexture(2, 2, Color.white);
+            }
+            return _whiteTexture;
+        }
+        public static GUIStyle GetWhiteStyle()
+        {
+            if (_whiteStyle == null || _whiteStyle.normal.background == null)
+            {
+                _whiteStyle = CreateStyle(GetWhiteTexture(), GUI.skin.label);
+            }
+            return _whiteStyle;
+        }
+        public static GUIStyle GetTransperentBlackBackgrounStyle()
+        {
+            if (_transperentBlackBackgrounStyle == null || _transperentBlackBackgrounStyle.normal.background == null)
+            {
+                _transperentBlackBackgrounStyle = CreateStyle(CreateTexture(2, 2, new Color(0, 0, 0, 0.2f)), GUI.skin.label);
+            }
+            return _transperentBlackBackgrounStyle;
+        }
+        #endregion
+
         #region GetStyle
         public static GUIStyle GetStyle(Color color, float alphaMultiplier)
         {
@@ -376,26 +405,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static GUIStyle GetStyle(Color32 color32)
         {
-            int colorCode = new Color32Union(color32).colorCode;
+            int colorCode = color32.GetCode32();
             if (colorBoxeStyles.TryGetValue(colorCode, out GUIStyle style))
             {
                 if (style == null || style.normal.background == null)
                 {
-                    style = CreateStyle(color32, colorCode);
+                    style = CreateStyle(CreateTexture(2, 2, color32));
                     colorBoxeStyles[colorCode] = style;
                 }
                 return style;
             }
 
-            style = CreateStyle(color32, colorCode);
+            style = CreateStyle(CreateTexture(2, 2, color32));
             colorBoxeStyles.Add(colorCode, style);
             return style;
         }
-        private static GUIStyle CreateStyle(Color32 color32, int colorCode)
+        private static GUIStyle CreateStyle(Texture2D texture, GUIStyle referenceStyle = null)
         {
+            if (referenceStyle == null)
+            {
+                referenceStyle = GUI.skin.box;
+            }
             GUIStyle result = new GUIStyle(GUI.skin.box);
-            Color componentColor = color32;
-            Texture2D texture2D = CreateTexture(2, 2, componentColor);
+            Texture2D texture2D = texture;
             result.hover.background = texture2D;
             result.hover.scaledBackgrounds = Array.Empty<Texture2D>();
             result.focused.background = texture2D;
@@ -410,43 +442,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var pixels = new Color[width * height];
             for (var i = 0; i < pixels.Length; ++i)
+            {
                 pixels[i] = color;
-
+            }
             var result = new Texture2D(width, height);
             result.SetPixels(pixels);
             result.Apply();
             return result;
-        }
-        #endregion
-
-        #region Utils
-        [StructLayout(LayoutKind.Explicit, Pack = 1, Size = 4)]
-        private readonly ref struct Color32Union
-        {
-            [FieldOffset(0)]
-            public readonly int colorCode;
-            [FieldOffset(0)]
-            public readonly byte r;
-            [FieldOffset(1)]
-            public readonly byte g;
-            [FieldOffset(2)]
-            public readonly byte b;
-            [FieldOffset(3)]
-            public readonly byte a;
-            public Color32Union(byte r, byte g, byte b, byte a) : this()
-            {
-                this.r = r;
-                this.g = g;
-                this.b = b;
-                this.a = a;
-            }
-            public Color32Union(Color32 color) : this()
-            {
-                r = color.r;
-                g = color.g;
-                b = color.b;
-                a = color.a;
-            }
         }
         #endregion
     }

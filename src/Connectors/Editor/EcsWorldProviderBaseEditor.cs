@@ -10,27 +10,41 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         private EcsWorldProviderBase Target => (EcsWorldProviderBase)target;
 
+        private static Color _emptyColor = new Color32(255, 0, 75, 100);
+        private static Color _destroyedColor = new Color32(255, 75, 0, 100);
+        private static Color _aliveColor = new Color32(75, 255, 0, 100);
+
         public override void OnInspectorGUI()
         {
             EcsWorld world = Target.GetCurrentWorldRaw();
+
+            Color labelBackColor;
+            string labelText;
+
             if (world == null)
             {
-                var style = UnityEditorUtility.GetStyle(new Color32(255, 0, 75, 100));
-                GUILayout.Box("Is Empty", style, GUILayout.ExpandWidth(true));
+                labelBackColor = _emptyColor;
+                labelText = "Is Empty";
             }
             else
             {
                 if (world.IsDestroyed)
                 {
-                    var style = UnityEditorUtility.GetStyle(new Color32(255, 75, 0, 100));
-                    GUILayout.Box($"{world.GetMeta().Name} ( {world.ID} ) Destroyed", style, GUILayout.ExpandWidth(true));
+                    labelBackColor = _destroyedColor;
+                    labelText = $"{world.GetMeta().Name} ( {world.ID} ) Destroyed";
                 }
                 else
                 {
-                    var style = UnityEditorUtility.GetStyle(new Color32(75, 255, 0, 100));
-                    GUILayout.Box($"{world.GetMeta().Name} ( {world.ID} )", style, GUILayout.ExpandWidth(true));
+                    labelBackColor = _aliveColor;
+                    labelText = $"{world.GetMeta().Name} ( {world.ID} )";
                 }
             }
+
+            using (EcsGUI.SetBackgroundColor(labelBackColor))
+            {
+                GUILayout.Box("Is Empty", UnityEditorUtility.GetWhiteStyle(), GUILayout.ExpandWidth(true));
+            }
+
             EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
 
             base.OnInspectorGUI();

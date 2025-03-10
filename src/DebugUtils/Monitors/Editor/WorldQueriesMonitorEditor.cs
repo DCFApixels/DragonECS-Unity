@@ -146,7 +146,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //GUILayout.Space(10f);
 
             //using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(GetGenericPanelColor(index))))
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 var mask = executor.Mask;
                 DrawConstraint("+", mask.Incs);
@@ -189,7 +189,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                         Color color = EcsGUI.SelectPanelColor(meta, i, 9);
 
-                        using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f)))
+                        using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
                         {
                             GUILayout.Label(meta.TypeName);
                         }

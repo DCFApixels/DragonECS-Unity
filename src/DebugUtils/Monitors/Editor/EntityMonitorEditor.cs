@@ -24,7 +24,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var drawers = UnityEditorUtility._entityEditorBlockDrawers;
             if (drawers.Length > 0)
             {
-                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
                 {
                     bool isExpand = false;
                     using (EcsGUI.CheckChanged())
@@ -44,9 +44,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
                 }
-                    
+
             }
-            
+
             EcsGUI.Layout.DrawRuntimeComponents(entity, false);
         }
     }

@@ -10,7 +10,7 @@ namespace DCFApixels.DragonECS
     {
         private EcsPipeline _pipeline;
         private static EcsPipelineProvider _singletonInstance;
-        
+
         #region Properties
         public bool IsEmpty
         {
@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS
         {
             get
             {
-                if(_singletonInstance == null)
+                if (_singletonInstance == null)
                 {
                     _singletonInstance = FindOrCreateSingleton();
                 }

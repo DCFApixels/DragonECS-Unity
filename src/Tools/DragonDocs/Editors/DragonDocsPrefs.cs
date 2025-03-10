@@ -73,7 +73,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         private void AddInfo(List<MetaGroupInfo> infos, string path, int startIndex, int length)
         {
             MetaGroupInfo lastInfo;
-            if (infos.Count == 0) 
+            if (infos.Count == 0)
             {
                 lastInfo = new MetaGroupInfo(string.Empty, string.Empty, 0, 0, 0);
             }

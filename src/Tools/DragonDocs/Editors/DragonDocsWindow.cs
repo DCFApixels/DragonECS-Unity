@@ -94,7 +94,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
 
 
-            DataScrolPosition = GUILayout.BeginScrollView(DataScrolPosition, UnityEditorUtility.GetStyle(Color.black, 0.2f), GUILayout.ExpandWidth(true));
+            DataScrolPosition = GUILayout.BeginScrollView(DataScrolPosition, UnityEditorUtility.GetTransperentBlackBackgrounStyle(), GUILayout.ExpandWidth(true));
             DrawSelectedGroupMeta(selectedGroupInfo);
             GUILayout.EndScrollView();
 
@@ -251,7 +251,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 Color alphaPanelColor = panelColor;
                 alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(alphaPanelColor)))
+                using (EcsGUI.Layout.BeginVertical(alphaPanelColor))
                 {
                     GUILayout.Space(1f);
 

@@ -95,7 +95,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.Label("[Runners]", _headerStyle);
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 int i = 0;
                 foreach (var item in Target.Pipeline.AllRunners)
@@ -112,7 +112,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (system is SystemsLayerMarkerSystem markerSystem)
             {
                 GUILayout.EndVertical();
-                GUILayout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f));
+                GUILayout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle());
 
                 using (EcsGUI.Layout.BeginHorizontal()) using (var scope = EcsGUI.SetAlignment(GUI.skin.label))
                 {
@@ -150,7 +150,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Color color = EcsGUI.SelectPanelColor(meta, index, -1);
 
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
             {
                 if (IsShowInterfaces)
                 {
@@ -170,7 +170,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             Color color = EcsGUI.SelectPanelColor(meta, index, -1);
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(color, 0.2f)))
+            using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
             {
                 GUILayout.Label(meta.Name, EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.ProcessRaw.Cast<object>().Select(o => o.GetType().Name)), systemsListStyle);
