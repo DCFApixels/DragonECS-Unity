@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private DefineSymbolsInfo[] _defineSymbols = null;
         private void InitDefines()
         {
-            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);
+            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);//TODO
             _defineSymbols =
                 typeof(EcsDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false))
                 .Concat(typeof(EcsUnityDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false)))
@@ -98,7 +98,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginHorizontal();
                 var symbol = _defineSymbols[i];
 
-                string text = symbol.name == "DEBUG" ? symbol.name + " (Build Olny)" : symbol.name;
+                string text = symbol.name == "DEBUG" ? symbol.name + " (Build Only)" : symbol.name;
                 symbol.isOn = EditorGUILayout.ToggleLeft(text, symbol.isOn);
 
                 GUILayout.EndHorizontal();
@@ -106,14 +106,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (EditorGUI.EndChangeCheck()) { }
             if (GUILayout.Button("Apply"))
             {
+                BuildTargetGroup group = EditorUserBuildSettings.selectedBuildTargetGroup;
+#if UNITY_6000_0_OR_NEWER
+                string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group));
+                for (int i = 0; i < _defineSymbols.Length; i++)
+                {
+                    symbolsString = symbolsString.Replace(_defineSymbols[i].name, "");
+                }
+                symbolsString += ";" + string.Join(';', _defineSymbols.Where(o => o.isOn).Select(o => o.name));
+                PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group), symbolsString);
+#else
                 string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
                 for (int i = 0; i < _defineSymbols.Length; i++)
                 {
-                    var symbol = _defineSymbols[i];
-                    symbolsString = symbolsString.Replace(symbol.name, "");
+                    symbolsString = symbolsString.Replace(_defineSymbols[i].name, "");
                 }
                 symbolsString += ";" + string.Join(';', _defineSymbols.Where(o => o.isOn).Select(o => o.name));
                 PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, symbolsString);
+#endif
                 InitDefines();
             }
             GUILayout.EndVertical();

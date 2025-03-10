@@ -88,9 +88,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
     internal class ComponentDropDown : MetaObjectsDropDown<IComponentTemplate>
     {
+        //private class StringComparer : IComparer<string>
+        //{
+        //    public int Compare(string x, string y)
+        //    {
+        //        return x.CompareTo(y);
+        //    }
+        //}
         public ComponentDropDown()
         {
-            IEnumerable<(IComponentTemplate, ITypeMeta)> itemMetaPairs = ComponentTemplateTypeCache.Dummies.ToArray().Select(dummy =>
+            IEnumerable<(IComponentTemplate template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.Dummies.ToArray().Select(dummy =>
             {
                 ITypeMeta meta;
                 if (dummy is IComponentTemplateWithMetaOverride withMetaOverride)
@@ -103,6 +110,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 return (dummy, meta);
             });
+            //TODO оптимизировать или вырезать
+            itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
             Setup(itemMetaPairs);
         }
 
@@ -170,7 +179,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public RuntimeComponentDropDown(IEnumerable<IEcsPool> pools)
         {
-            IEnumerable<(IEcsPool, ITypeMeta)> itemMetaPairs = pools.Select(pool =>
+            IEnumerable<(IEcsPool pool, ITypeMeta meta)> itemMetaPairs = pools.Select(pool =>
             {
                 return (pool, (ITypeMeta)pool.ComponentType.ToMeta());
             });
@@ -229,6 +238,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             Dictionary<Key, Item> dict = new Dictionary<Key, Item>();
+
 
             foreach (var pair in _itemMetaPairs)
             {

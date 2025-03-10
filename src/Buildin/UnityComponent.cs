@@ -32,18 +32,16 @@ namespace DCFApixels.DragonECS
         {
             this.obj = obj;
         }
-        IEnumerator<T> IEnumerable<T>.GetEnumerator() //IntelliSense hack
-        {
-            throw new NotSupportedException();
-        }
-        IEnumerator IEnumerable.GetEnumerator() //IntelliSense hack
-        {
-            throw new NotSupportedException();
-        }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() { throw new NotSupportedException(); }//IntelliSense hack 
+        IEnumerator IEnumerable.GetEnumerator() { throw new NotSupportedException(); }//IntelliSense hack 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator T(UnityComponent<T> a) { return a.obj; }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static implicit operator UnityComponent<T>(T a) { return new UnityComponent<T>(a); }
+        public override string ToString()
+        {
+            return $"UnityComponent<{typeof(T).ToMeta().TypeName}>";
+        }
     }
 
     #region Unity Component Templates

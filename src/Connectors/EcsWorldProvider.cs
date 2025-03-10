@@ -1,7 +1,5 @@
 ﻿using System;
 using UnityEngine;
-
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -17,14 +15,17 @@ namespace DCFApixels.DragonECS
         public abstract EcsWorld GetCurrentWorldRaw();
     }
     [Serializable]
-    public abstract class EcsWorldProvider<TWorld> : EcsWorldProviderBase where TWorld : EcsWorld
+    public abstract class EcsWorldProvider<TWorld> : EcsWorldProviderBase, IEcsModule
+        where TWorld : EcsWorld
     {
         private TWorld _world;
 
-        [SerializeField]
-        public short _worldID = -1;
-
         [Header("Default Configs")]
+        [Header("Base")]
+        [SerializeField]
+        private short _worldID = -1;
+        private string _worldName = "";
+
         [Header("Entites")]
         [SerializeField]
         private int _entitiesCapacity = EcsWorldConfig.Default.EntitiesCapacity;
@@ -49,6 +50,10 @@ namespace DCFApixels.DragonECS
         public short WorldID
         {
             get { return _worldID; }
+        }
+        public string WorldName
+        {
+            get { return _worldName; }
         }
         public int EntitiesCapacity
         {
@@ -122,9 +127,19 @@ namespace DCFApixels.DragonECS
             }
             return instance;
         }
+        void IEcsModule.Import(EcsPipeline.Builder b)
+        {
+            var wolrd = Get();
+            b.Inject(wolrd);
+            if (b.IsEnableWorldDebug())
+            {
+                b.AddUnityDebug(wolrd);
+            }
+        }
         #endregion
 
         #region Events
+        //TODO переименовать в CreateWorld
         protected abstract TWorld BuildWorld(ConfigContainer configs);
         protected virtual void OnWorldCreated(TWorld world) { }
         #endregion

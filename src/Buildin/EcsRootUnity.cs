@@ -2,8 +2,10 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace DCFApixels.DragonECS
 {
@@ -12,13 +14,18 @@ namespace DCFApixels.DragonECS
     public class EcsRootUnity : MonoBehaviour
     {
         [SerializeField]
+        private EcsPipelineProvider _pipelineProvider;
+        [SerializeField]
         private bool _enablePipelineDebug = true;
+        [SerializeField]
+        private bool _enableWorldDebug = true;
         [SerializeField]
         private ScriptablePipelineTemplateBase[] _scriptableTemplates;
         [SerializeField]
         private MonoPipelineTemplateBase[] _monoTemplates;
 
         private EcsPipeline _pipeline;
+        private bool _isInit = false;
 
         public IEnumerable<ScriptablePipelineTemplateBase> ScriptableTemplates
         {
@@ -34,12 +41,23 @@ namespace DCFApixels.DragonECS
         }
         public bool IsInit
         {
-            get { return _pipeline != null && _pipeline.IsInit; }
+            get { return _isInit; }
+        }
+        public bool EnablePipelineDebug
+        {
+            get { return _enablePipelineDebug; }
+        }
+        public bool EnableWorldDebug
+        {
+            get { return _enableWorldDebug; }
         }
 
-        private void Start()
+        public void ManualStart()
         {
-            var pipelineBuilder = EcsPipeline.New();
+            if (_isInit) { return; }
+
+            var pipelineBuilder = EcsPipeline.New(new ConfigContainer(this));
+
             foreach (var template in _scriptableTemplates)
             {
                 if (template == null) { continue; }
@@ -50,6 +68,7 @@ namespace DCFApixels.DragonECS
                 if (template == null) { continue; }
                 pipelineBuilder.Add(template);
             }
+
 #if UNITY_EDITOR
             if (_enablePipelineDebug)
             {
@@ -57,7 +76,26 @@ namespace DCFApixels.DragonECS
                 pipelineBuilder.AddUnique(new PipelineMonitorSystem(), EcsUnityConsts.DEBUG_LAYER);
             }
 #endif
-            _pipeline = pipelineBuilder.BuildAndInit();
+            _pipeline = pipelineBuilder.Build();
+            if (_pipelineProvider != null)
+            {
+                _pipelineProvider.Set(_pipeline);
+            }
+            _pipeline.Init();
+
+            _isInit = true;
+        }
+        private void Start()
+        {
+            ManualStart();
+        }
+
+        private void OnValidate()
+        {
+            if (_pipelineProvider == null)
+            {
+                _pipelineProvider = EcsPipelineProvider.SingletonInstance;
+            }
         }
 
         private void Update()
@@ -77,7 +115,6 @@ namespace DCFApixels.DragonECS
 
         private void OnDrawGizmos()
         {
-            Gizmos.DrawIcon(transform.position, "", false);
             _pipeline?.DrawGizmos();
         }
 
@@ -132,5 +169,12 @@ namespace DCFApixels.DragonECS
         }
 #endif
         #endregion
+    }
+    public static class EcsRootUnityExt
+    {
+        public static bool IsEnableWorldDebug(this EcsPipeline.Builder self)
+        {
+            return self.Configs.Instance.Get<EcsRootUnity>().EnableWorldDebug;
+        }
     }
 }

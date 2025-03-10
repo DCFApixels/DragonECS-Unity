@@ -66,7 +66,7 @@ namespace DCFApixels.DragonECS
                 }
                 return;
             }
-            Debug.Log(v);
+            Debug.Log(msg);
         }
         public override void Break()
         {

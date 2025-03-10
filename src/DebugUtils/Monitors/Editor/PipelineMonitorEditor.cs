@@ -55,7 +55,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             systemsListStyle = new GUIStyle(EditorStyles.miniLabel);
             systemsListStyle.wordWrap = true;
 
-            if (Target.Pipeline == null || Target.Pipeline.IsDestoryed)
+            if (Target.Pipeline == null || Target.Pipeline.IsDestroyed)
             {
                 return;
             }

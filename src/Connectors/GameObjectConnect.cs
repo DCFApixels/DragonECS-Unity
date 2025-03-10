@@ -39,6 +39,10 @@ namespace DCFApixels.DragonECS
             }
             component = default;
         }
+        public override string ToString()
+        {
+            return $"GO({(Connect == null ? "NULL" : Connect.name)})";
+        }
     }
 
     public enum GameObjectIcon : byte

@@ -51,6 +51,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     target.Autoset_Editor();
                 }
             }
+            using (EcsGUI.SetEnable(Application.isPlaying))
+            {
+                buttonRect = buttonRect.Move(-height, 0);
+                if (EcsGUI.NewEntityButton(buttonRect))
+                {
+                    foreach (AutoEntityCreator target in targets)
+                    {
+                        target.ManualCreate();
+                    }
+                }
+            }
         }
     }
 }

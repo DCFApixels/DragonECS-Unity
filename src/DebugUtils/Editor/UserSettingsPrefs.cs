@@ -69,6 +69,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
+        [SerializeField]
+        private bool _isShowEntityOther = false;
+        public bool IsShowEntityOtherData
+        {
+            get => _isShowEntityOther;
+            set
+            {
+                if (_isShowEntityOther != value)
+                {
+                    _isShowEntityOther = value;
+                    AutoSave();
+                }
+            }
+        }
         //[SerializeField]
         //private bool _isFastModeRuntimeComponents = false;
         //public bool IsFastModeRuntimeComponents

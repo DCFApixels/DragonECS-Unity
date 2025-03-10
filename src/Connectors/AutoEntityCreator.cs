@@ -18,7 +18,7 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private EcsWorldProviderBase _world;
 
-        private bool _created;
+        private bool _started;
 
         #region Properties
         public EcsEntityConnect Connect
@@ -39,10 +39,7 @@ namespace DCFApixels.DragonECS
                 AutoResolveWorldProviderDependensy();
             }
         }
-        private void Start()
-        {
-            CreateEntity();
-        }
+        private void Start() { ManualStart(); }
         #endregion
 
         #region Methods
@@ -56,19 +53,17 @@ namespace DCFApixels.DragonECS
         }
         public void ManualStart()
         {
-            CreateEntity();
+            if (_started) { return; }
+            ManualCreate();
+            _started = true;
         }
-        private void CreateEntity()
+        public void ManualCreate()
         {
-            if (_created) { return; }
-
             if (_world == null)
             {
                 AutoResolveWorldProviderDependensy();
             }
-
             InitConnect(_connect, _world.GetRaw());
-            _created = true;
         }
 
         private void InitConnect(EcsEntityConnect connect, EcsWorld world)

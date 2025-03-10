@@ -115,12 +115,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
             colorBoxeStyles = new SparseArray<GUIStyle>();
 
             List<Type> serializableTypes = new List<Type>();
+            List<EntityEditorBlockDrawer> entityEditorBlockDrawers = new List<EntityEditorBlockDrawer>();
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 //var targetTypes = assembly.GetTypes().Where(type =>
                 //    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
                 //    type.IsSubclassOf(typeof(UnityObject)) == false &&
                 //    type.GetCustomAttribute<SerializableAttribute>() != null);
+
+                foreach (var type in assembly.GetTypes())
+                {
+                    if ((type.IsGenericType || type.IsAbstract || type.IsInterface) == false && 
+                        typeof(EntityEditorBlockDrawer).IsAssignableFrom(type))
+                    {
+                        var drawer = (EntityEditorBlockDrawer)Activator.CreateInstance(type);
+                        entityEditorBlockDrawers.Add(drawer);
+                    }
+                }
 
                 var targetTypes = assembly.GetTypes().Where(type =>
                     (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
@@ -130,6 +141,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 serializableTypes.AddRange(targetTypes);
             }
             _serializableTypes = serializableTypes.ToArray();
+            _entityEditorBlockDrawers = entityEditorBlockDrawers.ToArray();
             _serializableTypeWithMetaIDMetas = serializableTypes
                 .Where(TypeMeta.IsHasMetaID)
                 .Select(type => type.ToMeta())
@@ -149,6 +161,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         internal static readonly Assembly _integrationAssembly;
         internal static readonly Type[] _serializableTypes;
+        internal static readonly EntityEditorBlockDrawer[] _entityEditorBlockDrawers;
         internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
         private static readonly Dictionary<string, Type> _metaIDTypePairs = new Dictionary<string, Type>();
 

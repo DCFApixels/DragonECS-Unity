@@ -435,6 +435,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
+        public static bool NewEntityButton(Rect position)
+        {
+            return IconButton(position, Icons.Instance.PassIcon, 2f, "Create entity");
+        }
         public static bool ValidateButton(Rect position)
         {
             return IconButton(position, Icons.Instance.RepaireIcon, 2f, "Validate");
@@ -523,15 +527,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     using (new EditorGUI.DisabledScope(true))
                     {
                         GUI.Label(idRect, "Entity ID", style);
-                        GUI.Label(genRect, "Generation", style);
-                        GUI.Label(worldRect, "World ID", style);
+                        using (SetAlpha(0.85f))
+                        {
+                            GUI.Label(genRect, "Generation", style);
+                            GUI.Label(worldRect, "World ID", style);
+                        }
                     }
                 }
                 else
                 {
                     EditorGUI.IntField(idRect, id, style);
-                    EditorGUI.IntField(genRect, gen, style);
-                    EditorGUI.IntField(worldRect, world, style);
+                    using (SetAlpha(0.85f))
+                    {
+                        EditorGUI.IntField(genRect, gen, style);
+                        EditorGUI.IntField(worldRect, world, style);
+                    }
                 }
             }
         }
