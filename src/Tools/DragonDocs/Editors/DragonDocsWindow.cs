@@ -84,19 +84,20 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
             GUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
 
-
-            ButtonsScrolPosition = GUILayout.BeginScrollView(ButtonsScrolPosition, UnityEditorUtility.GetStyle(Color.black, 0f), GUILayout.Width(_buttonsWidth));
-            var selectedGroupInfo = DrawGroups();
-            GUILayout.EndScrollView();
+            MetaGroupInfo selectedGroupInfo;
+            using (EcsGUI.Layout.BeginScrollView(ref ButtonsScrolPosition, UnityEditorUtility.GetClearBackgrounStyle(), GUILayout.Width(_buttonsWidth)))
+            {
+                selectedGroupInfo = DrawGroups();
+            }
 
             DrawDragger();
 
             GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
 
-
-            DataScrolPosition = GUILayout.BeginScrollView(DataScrolPosition, UnityEditorUtility.GetTransperentBlackBackgrounStyle(), GUILayout.ExpandWidth(true));
-            DrawSelectedGroupMeta(selectedGroupInfo);
-            GUILayout.EndScrollView();
+            using (EcsGUI.Layout.BeginScrollView(ref DataScrolPosition, UnityEditorUtility.GetTransperentBlackBackgrounStyle(), GUILayout.ExpandWidth(true)))
+            {
+                DrawSelectedGroupMeta(selectedGroupInfo);
+            }
 
             //GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
             GUILayout.EndHorizontal();

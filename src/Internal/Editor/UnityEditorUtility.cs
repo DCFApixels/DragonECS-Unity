@@ -367,10 +367,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        #region WhiteTexture
+        #region GetDefaultStyle
         private static Texture2D _whiteTexture;
         private static GUIStyle _whiteStyle;
         private static GUIStyle _transperentBlackBackgrounStyle;
+        private static GUIStyle _clearBackgrounStyle;
         public static Texture2D GetWhiteTexture()
         {
             if (_whiteTexture == null)
@@ -379,9 +380,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             return _whiteTexture;
         }
+        private static bool IsNotInitializedStyle(GUIStyle style)
+        {
+            return style == null || style.normal.background == null;
+        }
         public static GUIStyle GetWhiteStyle()
         {
-            if (_whiteStyle == null || _whiteStyle.normal.background == null)
+            if (IsNotInitializedStyle(_whiteStyle))
             {
                 _whiteStyle = CreateStyle(GetWhiteTexture(), GUI.skin.label);
             }
@@ -389,11 +394,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static GUIStyle GetTransperentBlackBackgrounStyle()
         {
-            if (_transperentBlackBackgrounStyle == null || _transperentBlackBackgrounStyle.normal.background == null)
+            if (IsNotInitializedStyle(_transperentBlackBackgrounStyle))
             {
                 _transperentBlackBackgrounStyle = CreateStyle(CreateTexture(2, 2, new Color(0, 0, 0, 0.2f)), GUI.skin.label);
             }
             return _transperentBlackBackgrounStyle;
+        }
+        public static GUIStyle GetClearBackgrounStyle()
+        {
+            if (IsNotInitializedStyle(_clearBackgrounStyle))
+            {
+                _clearBackgrounStyle = CreateStyle(CreateTexture(2, 2, new Color(0, 0, 0, 0)), GUI.skin.label);
+            }
+            return _clearBackgrounStyle;
         }
         #endregion
 

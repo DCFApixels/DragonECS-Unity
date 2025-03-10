@@ -229,7 +229,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             RuntimeComponentsUtility.GetAddComponentGenericMenu(world).Open(dropDownRect, entityID);
                         }
 
-                        GUILayout.Box("", UnityEditorUtility.GetStyle(GUI.color, 0.16f), GUILayout.ExpandWidth(true));
+                        using (SetBackgroundColor(GUI.color.SetAlpha(0.16f)))
+                        {
+                            GUILayout.Box("", UnityEditorUtility.GetWhiteStyle(), GUILayout.ExpandWidth(true));
+                        }
                         IsShowHidden = EditorGUI.Toggle(GUILayoutUtility.GetLastRect(), "Show Hidden", IsShowHidden);
 
                         if (_componentPoolsBuffer == null)
