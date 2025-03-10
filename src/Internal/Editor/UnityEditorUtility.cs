@@ -171,7 +171,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         //private static Type[] _noHiddenSerializableTypes;
 
-        private static SparseArray<GUIStyle> colorBoxeStyles = new SparseArray<GUIStyle>();
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
@@ -411,28 +410,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region GetStyle
-        public static GUIStyle GetStyle(Color color, float alphaMultiplier)
-        {
-            color.a *= alphaMultiplier;
-            return GetStyle(color);
-        }
-        public static GUIStyle GetStyle(Color32 color32)
-        {
-            int colorCode = color32.GetCode32();
-            if (colorBoxeStyles.TryGetValue(colorCode, out GUIStyle style))
-            {
-                if (style == null || style.normal.background == null)
-                {
-                    style = CreateStyle(CreateTexture(2, 2, color32));
-                    colorBoxeStyles[colorCode] = style;
-                }
-                return style;
-            }
-
-            style = CreateStyle(CreateTexture(2, 2, color32));
-            colorBoxeStyles.Add(colorCode, style);
-            return style;
-        }
         private static GUIStyle CreateStyle(Texture2D texture, GUIStyle referenceStyle = null)
         {
             if (referenceStyle == null)
