@@ -36,7 +36,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             TypeMeta meta = typeof(EcsPipeline).ToMeta();
             _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)}").AddComponent<PipelineMonitor>();
-            UnityEngine.Object.DontDestroyOnLoad(_monitor);
+            Object.DontDestroyOnLoad(_monitor);
             _monitor.Set(Pipeline);
             _monitor.gameObject.SetActive(false);
 
@@ -48,7 +48,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         public void Destroy()
         {
-            UnityEngine.Object.Destroy(_monitor);
+            if (_monitor != null)
+            {
+                Object.Destroy(_monitor.gameObject);
+            }
         }
     }
 }
