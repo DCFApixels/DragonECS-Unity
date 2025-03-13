@@ -7,8 +7,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal class MonoScriptsAssetProcessor : AssetPostprocessor
     {
-        private static long _version;
-        public static long Version { get { return _version; } }
+        private static long _timeTicks;
+        public static long Version
+        {
+            get { return _timeTicks; }
+        }
         private static void OnPostprocessAllAssets(string[] importedAssets, string[] deletedAssets, string[] movedAssets, string[] movedFromAssetPaths, bool didDomainReload)
         {
             _removedScriptGuids.Clear();
@@ -25,10 +28,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 RemoveAssetPath(str);
             }
 
+            for (int i = 0; i < movedFromAssetPaths.Length; i++)
+            {
+                RemoveAssetPath(movedFromAssetPaths[i]);
+            }
             for (int i = 0; i < movedAssets.Length; i++)
             {
                 //Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-                RemoveAssetPath(movedFromAssetPaths[i]);
                 ProcessAssetPath(movedAssets[i]);
             }
 
@@ -38,7 +44,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //}
 
 
-            _version = DateTime.Now.Ticks;
+            _timeTicks = DateTime.Now.Ticks;
         }
 
 
