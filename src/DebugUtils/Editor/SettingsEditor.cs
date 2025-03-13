@@ -1,8 +1,8 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEditor;
-using UnityEditor.Build;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -17,22 +17,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             wnd.Show();
         }
 
-        private DefineSymbolsInfo[] _defineSymbols = null;
+        private IEnumerable<DefinesUtility.Symbols> _defineSymbols = null;
         private void InitDefines()
         {
-            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.Standalone);//TODO
-            _defineSymbols =
-                typeof(EcsDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false))
-                .Concat(typeof(EcsUnityDefines).GetFields(BindingFlags.Static | BindingFlags.Public).Select(o => new DefineSymbolsInfo(o.Name, false)))
-                .ToArray();
-            for (int i = 0; i < _defineSymbols.Length; i++)
-            {
-                var symbol = _defineSymbols[i];
-                if (symbolsString.Contains(symbol.name))
-                {
-                    symbol.isOn = true;
-                }
-            }
+            if (_defineSymbols != null) { return; }
+            _defineSymbols = DefinesUtility.LoadDefines(typeof(EcsDefines));
+            _defineSymbols = _defineSymbols.Concat(DefinesUtility.LoadDefines(typeof(EcsUnityDefines)));
         }
         private void OnGUI()
         {
@@ -88,58 +78,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
             rect = GUILayoutUtility.GetLastRect();
             rect.xMin += 9f;
             GUI.Label(rect, "Scripting Define Symbols", EditorStyles.whiteLargeLabel);
-            if (_defineSymbols == null)
-            {
-                InitDefines();
-            }
+            
+            InitDefines();
+            
             EditorGUI.BeginChangeCheck();
-            for (int i = 0; i < _defineSymbols.Length; i++)
+            foreach (var symbol in _defineSymbols)
             {
-                GUILayout.BeginHorizontal();
-                var symbol = _defineSymbols[i];
-
-                string text = symbol.name == "DEBUG" ? symbol.name + " (Build Only)" : symbol.name;
-                symbol.isOn = EditorGUILayout.ToggleLeft(text, symbol.isOn);
-
-                GUILayout.EndHorizontal();
+                symbol.flag = EditorGUILayout.ToggleLeft(symbol.Name, symbol.flag);
             }
+
             if (EditorGUI.EndChangeCheck()) { }
             if (GUILayout.Button("Apply"))
             {
-                BuildTargetGroup group = EditorUserBuildSettings.selectedBuildTargetGroup;
-#if UNITY_6000_0_OR_NEWER
-                string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group));
-                for (int i = 0; i < _defineSymbols.Length; i++)
-                {
-                    symbolsString = symbolsString.Replace(_defineSymbols[i].name, "");
-                }
-                symbolsString += ";" + string.Join(';', _defineSymbols.Where(o => o.isOn).Select(o => o.name));
-                PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group), symbolsString);
-#else
-                string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
-                for (int i = 0; i < _defineSymbols.Length; i++)
-                {
-                    symbolsString = symbolsString.Replace(_defineSymbols[i].name, "");
-                }
-                symbolsString += ";" + string.Join(';', _defineSymbols.Where(o => o.isOn).Select(o => o.name));
-                PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, symbolsString);
-#endif
+                DefinesUtility.ApplyDefines(_defineSymbols);
                 InitDefines();
             }
             GUILayout.EndVertical();
 
             EditorGUIUtility.labelWidth = labelWidth;
-        }
-        private class DefineSymbolsInfo
-        {
-            public string name;
-            public bool isOn;
-            public DefineSymbolsInfo(string name, bool isOn)
-            {
-                this.name = name;
-                this.isOn = isOn;
-            }
-            public static implicit operator DefineSymbolsInfo(string a) => new DefineSymbolsInfo(a, false);
         }
     }
 }
