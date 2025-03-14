@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿#if DISABLE_DEBUG
+#undef DEBUG
+#endif
+using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

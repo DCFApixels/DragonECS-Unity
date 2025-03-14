@@ -1,3 +1,6 @@
+#if DISABLE_DEBUG
+#undef DEBUG
+#endif
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using DCFApixels.DragonECS.Unity;

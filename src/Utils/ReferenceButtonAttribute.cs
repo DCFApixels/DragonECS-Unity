@@ -1,4 +1,7 @@
-﻿using DCFApixels.DragonECS.Unity.Editors;
+﻿#if DISABLE_DEBUG
+#undef DEBUG
+#endif
+using DCFApixels.DragonECS.Unity.Editors;
 using System;
 using UnityEngine;
 

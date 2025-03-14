@@ -1,4 +1,7 @@
-﻿using DCFApixels.DragonECS.RunnersCore;
+﻿#if DISABLE_DEBUG
+#undef DEBUG
+#endif
+using DCFApixels.DragonECS.RunnersCore;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;

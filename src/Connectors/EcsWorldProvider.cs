@@ -1,4 +1,7 @@
-﻿using System;
+﻿#if DISABLE_DEBUG
+#undef DEBUG
+#endif
+using System;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;

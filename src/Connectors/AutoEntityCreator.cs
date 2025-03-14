@@ -1,3 +1,6 @@
+#if DISABLE_DEBUG
+#undef DEBUG
+#endif
 using DCFApixels.DragonECS.Unity;
 using UnityEngine;
 
