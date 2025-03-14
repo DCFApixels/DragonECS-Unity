@@ -19,7 +19,11 @@ namespace DCFApixels.DragonECS
             {
                 if (_singletonInstance == null)
                 {
-                    _singletonInstance = FindObjectOfType<EcsRootUnitySingleton>();//FindFirstObjectByType<EcsRootUnitySingleton>();
+#if UNITY_6000_0_OR_NEWER
+                    _singletonInstance = FindFirstObjectByType<EcsRootUnitySingleton>();
+#else
+                    _singletonInstance = FindObjectOfType<EcsRootUnitySingleton>();
+#endif
                 }
                 return _singletonInstance?._root;
             }
