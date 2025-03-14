@@ -261,7 +261,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                     {
                         GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
 
-                        if (meta.TryGetSourceType(out System.Type targetType) && ScriptsCache.TryGetScriptAsset(targetType, out MonoScript script))
+                        if (meta.TryGetSourceType(out System.Type targetType) && ScriptsCache.TryGetScriptAsset(targetType.ToMeta(), out MonoScript script))
                         {
                             EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(18f));
                         }

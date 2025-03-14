@@ -121,7 +121,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region Get
-        public static bool TryGetScriptAsset(Type type, out MonoScript script) { return TryGetScriptAsset(type.ToMeta(), out script); }
         public static bool TryGetScriptAsset(TypeMeta meta, out MonoScript script)
         {
             int uniqueID = meta.GetHashCode();
@@ -154,25 +153,52 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (script == null)
                 {
-                    //Ищем совпадения имет в ассетах
+                    //Ищем совпадения имен в ассетах
                     string name = meta.TypeName;
                     int genericTypeCharIndex = name.IndexOf('<');
                     if (genericTypeCharIndex >= 0)
                     {
                         name = name.Substring(0, genericTypeCharIndex);
                     }
-                    var guids = AssetDatabase.FindAssets($"{name} t:MonoScript");
+                    string[] guids = AssetDatabase.FindAssets($"{name} t:MonoScript");
+                    string[] skipped = Array.Empty<string>();
+                    int skippedCount = 0;
+
                     for (var i = 0; i < guids.Length; i++)
                     {
-                        MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(AssetDatabase.GUIDToAssetPath(guids[i]));
+                        string assetPath = AssetDatabase.GUIDToAssetPath(guids[i]);
+
+                        if (assetPath.IndexOf("Packages/com.unity.") == 0)
+                        {
+                            if(skippedCount == 0)
+                            {
+                                skipped = new string[guids.Length];
+                            }
+                            skipped[skippedCount++] = assetPath;
+                            continue;
+                        }
+                        MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
                         if (textAsset != null && textAsset.name == name)
                         {
                             script = textAsset;
                             break;
                         }
                     }
-                }
 
+                    if(script == null)
+                    {
+                        foreach (var assetPath in new ReadOnlySpan<string>(skipped, 0, skippedCount))
+                        {
+                            MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+                            if (textAsset != null && textAsset.name == name)
+                            {
+                                script = textAsset;
+                                break;
+                            }
+                        }
+                    }
+
+                }
                 _scriptsAssets.Add(uniqueID, script);
             }
             return script != null;
