@@ -19,7 +19,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             BuildTargetGroup group = EditorUserBuildSettings.selectedBuildTargetGroup;
 #if UNITY_6000_0_OR_NEWER
-            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group));
+            string symbolsString = PlayerSettings.GetScriptingDefineSymbols(UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(group));
 #else
             string symbolsString = PlayerSettings.GetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone);
 #endif
@@ -31,7 +31,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
             symbolsString += ";" + string.Join(';', defines.Where(o => o.flag).Select(o => o.Name));
 #if UNITY_6000_0_OR_NEWER
-            PlayerSettings.SetScriptingDefineSymbols(NamedBuildTarget.FromBuildTargetGroup(group), symbolsString);
+            PlayerSettings.SetScriptingDefineSymbols(UnityEditor.Build.NamedBuildTarget.FromBuildTargetGroup(group), symbolsString);
 #else
             PlayerSettings.SetScriptingDefineSymbolsForGroup(BuildTargetGroup.Standalone, symbolsString);
 #endif
