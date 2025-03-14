@@ -77,6 +77,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static bool IsScript(string filePath)
         {
+            if (filePath.Length <= 3) { return false; }
             int i = filePath.Length - 3;
             return filePath[i++] == '.'
                 && filePath[i++] == 'c'
