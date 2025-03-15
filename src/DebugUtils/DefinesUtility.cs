@@ -11,8 +11,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         public static Symbols[] LoadDefines(Type defineConstsType)
         {
             const BindingFlags REFL_FLAGS = BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
-            var fields = defineConstsType.GetFields(REFL_FLAGS);
-            return fields.Where(o => o.FieldType == typeof(bool)).Select(o => new Symbols(o.Name, (bool)o.GetValue(null))).ToArray();
+            var fields = defineConstsType.GetFields(REFL_FLAGS).Where(o => o.FieldType == typeof(bool)).Where(o => o.GetCustomAttribute<ObsoleteAttribute>() == null);
+            return fields.Select(o => new Symbols(o.Name, (bool)o.GetValue(null))).ToArray();
         }
 
         public static void ApplyDefines(IEnumerable<Symbols> defines)
