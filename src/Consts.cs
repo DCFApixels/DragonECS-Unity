@@ -16,6 +16,12 @@
 
     public class EcsUnityDefines
     {
+        public const bool ENABLE_IL2CPP =
+#if ENABLE_IL2CPP
+            true;
+#else
+            false;
+#endif
         //        public const bool DISABLE_SERIALIZE_REFERENCE_RECOVERY =
         //#if DISABLE_SERIALIZE_REFERENCE_RECOVERY
         //            true;
