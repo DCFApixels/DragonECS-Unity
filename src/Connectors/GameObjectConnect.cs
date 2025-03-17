@@ -4,6 +4,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Core;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
