@@ -1,6 +1,7 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
+using DCFApixels.DragonECS.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,12 +61,29 @@ namespace DCFApixels.DragonECS
     [StructLayout(LayoutKind.Sequential)]
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase
     {
-        protected static TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
+        protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
+        protected static readonly bool _isHasIEcsComponentLifecycle;
+        protected static readonly IEcsComponentLifecycle<T> _iEcsComponentLifecycle;
+        static ComponentTemplateBase()
+        {
+            _isHasIEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.isHasHandler;
+            _iEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.instance;
+        }
+        private static T InitComponent()
+        {
+            T result = default;
+            if (_isHasIEcsComponentLifecycle)
+            {
+                _iEcsComponentLifecycle.Enable(ref result);
+            }
+            return result;
+        }
+
         [SerializeField]
-        protected T component;
+        protected T component = InitComponent();
         [SerializeField]
         [HideInInspector]
-        private byte _offset; // Fucking Unity drove me crazy with the error "Cannot get managed reference index with out bounds offset". This workaround helps avoid that error.
+        private byte _offset; // Avoids the error "Cannot get managed reference index with out bounds offset"
 
         #region Properties
         public sealed override ITypeMeta BaseMeta { get { return Meta; } }
