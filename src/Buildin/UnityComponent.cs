@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
+using UnityEngine.Scripting.APIUpdating;
 
 namespace DCFApixels.DragonECS
 {
@@ -43,8 +44,13 @@ namespace DCFApixels.DragonECS
             return $"UnityComponent<{typeof(T).ToMeta().TypeName}>";
         }
     }
+}
 
-    #region Unity Component Templates
+namespace DCFApixels.DragonECS.Unity.Generated
+{
+    using static EcsConsts;
+
+    #region Unity Component Templates Base
     [MetaID("13DAACF9910155DD27F822442987E0AE")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
@@ -74,35 +80,41 @@ namespace DCFApixels.DragonECS
             }
         }
     }
+    #endregion
 
+    #region Unity Component Templates
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("843B8EF991013F1BFD9133437E1AFE9C")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentTransformTemplate : UnityComponentTemplate<Transform> { }
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentTransformTemplate")]
+    public sealed class Template_068A1DA395014799316EAD2F9495C57E : UnityComponentTemplate<Transform> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("9A4B8EF99101396C44BF789C3215E9A9")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentRigitBodyInitializer : UnityComponentTemplate<Rigidbody> { }
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentRigitBodyInitializer")]
+    public sealed class Template_2FBD1DA395013588823232240D607899 : UnityComponentTemplate<Rigidbody> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("52598EF991016655335F234F20F44526")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentAnimatorInitializer : UnityComponentTemplate<Animator> { }
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentAnimatorInitializer")]
+    public sealed class Template_ADCE1DA395013CDF357AE983D26934D8 : UnityComponentTemplate<Animator> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("AD658EF99101E8E38BB575D5353E7B1E")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentCharacterControllerInitializer : UnityComponentTemplate<CharacterController> { }
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentCharacterControllerInitializer")]
+    public sealed class Template_C6DD1DA39501AC0B83DFBC5BB8960322 : UnityComponentTemplate<CharacterController> { }
     #endregion
 
     #region Render Templates
@@ -112,7 +124,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentMeshRendererTemplate : UnityComponentTemplate<MeshRenderer>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentMeshRendererTemplate")]
+    public sealed class Template_6E7615A39501C9BD5010B1EE54536E51 : UnityComponentTemplate<MeshRenderer>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.RenderGroup; } }
     }
@@ -122,7 +135,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentMeshFilterTemplate : UnityComponentTemplate<MeshFilter>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentMeshFilterTemplate")]
+    public sealed class Template_DE9B15A395018C8C5DB56E886F0DAA36 : UnityComponentTemplate<MeshFilter>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.RenderGroup; } }
     }
@@ -132,7 +146,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentSkinnedMeshRendererTemplate : UnityComponentTemplate<SkinnedMeshRenderer>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentSkinnedMeshRendererTemplate")]
+    public sealed class Template_A5B215A3950119C9A0688E80D567089F : UnityComponentTemplate<SkinnedMeshRenderer>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.RenderGroup; } }
     }
@@ -142,7 +157,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentSpriteRendererTemplate : UnityComponentTemplate<SpriteRenderer>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentSpriteRendererTemplate")]
+    public sealed class Template_272C16A39501340FEC32FFCE3DA82BFB : UnityComponentTemplate<SpriteRenderer>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.RenderGroup; } }
     }
@@ -155,7 +171,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentColliderTemplate : UnityComponentTemplate<Collider>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentColliderTemplate")]
+    public sealed class Template_EE4916A39501FDAF46D5890449A4E655 : UnityComponentTemplate<Collider>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
@@ -165,7 +182,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentBoxColliderTemplate : UnityComponentTemplate<BoxCollider>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentBoxColliderTemplate")]
+    public sealed class Template_BD6616A39501D86EF97887158FFC7B7B : UnityComponentTemplate<BoxCollider>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
@@ -175,7 +193,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentSphereColliderTemplate : UnityComponentTemplate<SphereCollider>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentSphereColliderTemplate")]
+    public sealed class Template_D78D16A39501B9DC0EE0442F8079E56A : UnityComponentTemplate<SphereCollider>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
@@ -185,7 +204,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentCapsuleColliderTemplate : UnityComponentTemplate<CapsuleCollider>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentCapsuleColliderTemplate")]
+    public sealed class Template_55A216A39501DAAB05E1C2CA616D1B9C : UnityComponentTemplate<CapsuleCollider>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
@@ -195,7 +215,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentMeshColliderTemplate : UnityComponentTemplate<MeshCollider>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentMeshColliderTemplate")]
+    public sealed class Template_6EB916A395011FDDFA239772EF7E297E : UnityComponentTemplate<MeshCollider>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.ColliderGroup; } }
     }
@@ -208,7 +229,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentJointTemplate : UnityComponentTemplate<Joint>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentJointTemplate")]
+    public sealed class Template_7DCF16A39501C6CA9A862911585CFAB5 : UnityComponentTemplate<Joint>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
@@ -218,7 +240,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentFixedJointTemplate : UnityComponentTemplate<FixedJoint>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentFixedJointTemplate")]
+    public sealed class Template_65ED16A395018249ADEC44BED95512B5 : UnityComponentTemplate<FixedJoint>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
@@ -228,7 +251,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentCharacterJointTemplate : UnityComponentTemplate<CharacterJoint>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentCharacterJointTemplate")]
+    public sealed class Template_960117A395014C46F58BF054964DBC76 : UnityComponentTemplate<CharacterJoint>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
@@ -238,7 +262,8 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
-    public sealed class UnityComponentConfigurableJointTemplate : UnityComponentTemplate<ConfigurableJoint>
+    [MovedFrom(true, "DCFApixels.DragonECS", "DCFApixels.DragonECS.Unity", "UnityComponentConfigurableJointTemplate")]
+    public sealed class Template_E61A17A39501E6C2B6B9EDABC328BEFB : UnityComponentTemplate<ConfigurableJoint>
     {
         public override MetaGroup Group { get { return UnityComponentConsts.JointGroup; } }
     }
