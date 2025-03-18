@@ -32,10 +32,9 @@ namespace DCFApixels.DragonECS
             Selected
         }
     }
-    public interface IComponentTemplateWithMetaOverride : IComponentTemplate, ITypeMeta { }
 
     [Serializable]
-    public abstract class ComponentTemplateBase : IComponentTemplateWithMetaOverride
+    public abstract class ComponentTemplateBase : IComponentTemplate, ITypeMeta
     {
         #region Properties
         public abstract Type Type { get; }

@@ -88,19 +88,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
     internal class ComponentDropDown : MetaObjectsDropDown<IComponentTemplate>
     {
-        //private class StringComparer : IComparer<string>
-        //{
-        //    public int Compare(string x, string y)
-        //    {
-        //        return x.CompareTo(y);
-        //    }
-        //}
         public ComponentDropDown()
         {
             IEnumerable<(IComponentTemplate template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.Dummies.ToArray().Select(dummy =>
             {
                 ITypeMeta meta;
-                if (dummy is IComponentTemplateWithMetaOverride withMetaOverride)
+                if (dummy is ITypeMeta withMetaOverride)
                 {
                     meta = withMetaOverride;
                 }
