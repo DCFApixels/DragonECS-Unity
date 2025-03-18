@@ -1,8 +1,6 @@
 #if UNITY_EDITOR
 using DCFApixels.DragonECS;
 using DCFApixels.DragonECS.PoolsCore;
-using DCFApixels.DragonECS.Unity;
-using DCFApixels.DragonECS.Unity.Editors;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -143,17 +141,34 @@ public static class GeneratorUtility
     public delegate void ApplyHandler<TComponent>(ref TComponent data);
     public delegate void ApplyHandler<TComponent, TPool>(ref TComponent data, TPool pool);
 
-    public static bool SkanTypeStructure(Type type)
+    public static TypeScan SkanTypeStructure(Type type)
     {
-
+        return TypeScan.Scan(type);
     }
     private static bool IsSerializableField(FieldInfo fieldInfo)
     {
         return fieldInfo.IsPublic || fieldInfo.GetCustomAttribute<SerializeField>() != null || fieldInfo.GetCustomAttribute<SerializeReference>() != null;
     }
-    private static bool IsCanUnsafeOverride(FieldInfo fieldInfo)
+    private static bool IsCanUnsafeOverwrite(FieldInfo fieldInfo, bool isLeaf)
     {
+        if (isLeaf)
+        {
+            return true;
+        }
         if (fieldInfo.FieldType.IsValueType)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    private static bool IsLeafField(FieldInfo fieldInfo)
+    {
+        if (fieldInfo.FieldType.IsEnum)
+        {
+            return true;
+        }
+        if (fieldInfo.FieldType.IsPrimitive)
         {
             return true;
         }
@@ -169,35 +184,126 @@ public static class GeneratorUtility
         {
             return true;
         }
-
         return false;
     }
 
-    //public interface IUnityCompilatorInfo // defines hack
-    //{
-    //    /// <summary> VMT size </summary>
-    //    public int ObjectVirtualDataSize { get; }
-    //    /// <summary> can rewrite VMT </summary>
-    //    public bool IsSupportRewriteObjectVirtualData { get; }
-    //}
-    //private class UnityCompilatorInfo : IUnityCompilatorInfo 
-    //{
-    //    public int ObjectVirtualDataSize
-    //    {
-    //        get
-    //        {
-    //            return 8;
-    //        }
-    //    }
-    //    public bool IsSupportRewriteObjectVirtualData
-    //    {
-    //        get
-    //        {
-    //            return true;
-    //        }
-    //    }
-    //}
+    public class TypeScan
+    {
+        public static readonly TypeScan NoSerializableScan = new TypeScan();
+
+        public readonly bool IsSerializable;
+        public readonly bool IsCanUnsafeOverwrite;
+
+        public readonly bool IsClass;
+        public readonly bool IsStruct;
+
+        public readonly FieldScan[] Fields = Array.Empty<FieldScan>();
+        public readonly Type SerializableType;
+
+        //public readonly string[] EnumFlagNames; 
+
+        private TypeScan() { }
+        private TypeScan(Type type)
+        {
+            IsSerializable = true;
+            SerializableType = type;
+
+
+
+            IsCanUnsafeOverwrite = true;
+            ReadOnlySpan<FieldScan> fields = FieldScan.GetFieldScans(type);
+            for (int i = 0; i < fields.Length; i++)
+            {
+                var field = fields[i];
+                if (field.IsCanUnsafeOverwrite == false)
+                {
+                    IsCanUnsafeOverwrite = false;
+                    break;
+                }
+            }
+
+            Fields = fields.ToArray();
+        }
+        public static TypeScan Scan(Type type)
+        {
+            if (type.GetCustomAttribute<System.SerializableAttribute>() == null)
+            {
+                return NoSerializableScan;
+            }
+            return new TypeScan(type);
+        }
+    }
+
+    public class FieldScan
+    {
+        public static readonly FieldScan NoSerializableScan = new FieldScan();
+
+        public readonly bool IsSerializable;
+
+        public readonly bool IsSerializeField;
+        public readonly bool IsSerializeReference;
+        public readonly bool IsUnityObject;
+
+        public readonly bool IsLeaf;
+        public readonly bool IsCanUnsafeOverwrite;
+        public readonly TypeScan ValueTypeScan;
+        public readonly FieldInfo SerializableFieldInfo;
+
+        //public readonly 
+
+        private FieldScan() { }
+        private FieldScan(FieldInfo field)
+        {
+            IsSerializable = true;
+            SerializableFieldInfo = field;
+            IsLeaf = IsLeafField(field);
+            IsCanUnsafeOverwrite = IsCanUnsafeOverwrite(field, IsLeaf);
+
+            if (field.FieldType.IsValueType)
+            {
+                ValueTypeScan = TypeScan.Scan(field.FieldType);
+            }
+        }
+
+
+        private static FieldScan[] FieldsBuffer = new FieldScan[64];
+        private static int FieldsBufferCount = 0;
+        public static ReadOnlySpan<FieldScan> GetFieldScans(Type type)
+        {
+            var fields = type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            if (FieldsBuffer == null || FieldsBuffer.Length < fields.Length)
+            {
+                var newsize = DCFApixels.DragonECS.Unity.Internal.ArrayUtility.NormalizeSizeToPowerOfTwo(fields.Length);
+                FieldsBuffer = new FieldScan[newsize];
+            }
+            for (int i = 0; i < fields.Length; i++)
+            {
+                FieldsBuffer[i] = Scan(fields[i]);
+                FieldsBufferCount++;
+            }
+            return new ReadOnlySpan<FieldScan>(FieldsBuffer, 0, FieldsBufferCount);
+        }
+        public static void CleanGetFieldScansBuffer()
+        {
+            for (int i = 0; i < FieldsBufferCount; i++)
+            {
+                FieldsBuffer[i] = null;
+            }
+        }
+        public static FieldScan Scan(FieldInfo field)
+        {
+            if (IsSerializableField(field) == false)
+            {
+                return NoSerializableScan;
+            }
+
+            return new FieldScan(field);
+        }
+    }
+
+    //public class AttributeScan { } // TODO
 }
+
 public abstract class ConverterWrapperBase<TStencil>
 {
     public abstract void Apply(ref TStencil component, short worldID, int entityID);
