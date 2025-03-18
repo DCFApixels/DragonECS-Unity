@@ -1,0 +1,7 @@
+namespace DCFApixels.DragonECS.Unity.Generated
+{
+    [MetaTags(MetaTags.HIDDEN)]
+    [MetaGroup("<GENERATED>")]
+    [MetaName(#NAME#)]
+    internal class Template_#GUID# : TagComponentTemplate<#TYPE_NAMESPACE#.#TYPE#> { }
+}

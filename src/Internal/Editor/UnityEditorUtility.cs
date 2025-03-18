@@ -141,12 +141,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             _serializableTypes = serializableTypes.ToArray();
             _entityEditorBlockDrawers = entityEditorBlockDrawers.ToArray();
-            _serializableTypeWithMetaIDMetas = serializableTypes
+            _serializableTypeWithMetaIDs = serializableTypes
                 .Where(TypeMeta.IsHasMetaID)
                 .Select(type => type.ToMeta())
                 .ToArray();
 
-            foreach (var item in _serializableTypeWithMetaIDMetas)
+            foreach (var item in _serializableTypeWithMetaIDs)
             {
                 _metaIDTypePairs[item.MetaID] = item.Type;
             }
@@ -161,7 +161,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal static readonly Assembly _integrationAssembly;
         internal static readonly Type[] _serializableTypes;
         internal static readonly EntityEditorBlockDrawer[] _entityEditorBlockDrawers;
-        internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
+        internal static readonly TypeMeta[] _serializableTypeWithMetaIDs;
         private static readonly Dictionary<string, Type> _metaIDTypePairs = new Dictionary<string, Type>();
 
         public static bool TryGetTypeForMetaID(string metaID, out Type type)

@@ -55,7 +55,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         private void Update()
         {
-            var typeMetas = UnityEditorUtility._serializableTypeWithMetaIDMetas;
+            var typeMetas = UnityEditorUtility._serializableTypeWithMetaIDs;
             foreach (var meta in typeMetas)
             {
                 var key = new TypeData(meta.Type);
