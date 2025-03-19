@@ -105,7 +105,7 @@ namespace DCFApixels.DragonECS
     {
         public override void Apply(short worldID, int entityID)
         {
-            EcsWorld.GetPoolInstance<EcsPool<T>>(worldID).TryAddOrGet(entityID) = component;
+            EcsPool<T>.Apply(ref component, entityID, worldID);
         }
     }
     public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>
@@ -113,7 +113,7 @@ namespace DCFApixels.DragonECS
     {
         public override void Apply(short worldID, int entityID)
         {
-            EcsWorld.GetPoolInstance<EcsTagPool<T>>(worldID).Set(entityID, true);
+            EcsTagPool<T>.Apply(ref component, entityID, worldID);
         }
     }
 }
