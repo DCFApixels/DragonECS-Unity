@@ -8,7 +8,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("DDE9B6809201381D86DEF36AD06601A9")]
+    [MetaID("DragonECS_DDE9B6809201381D86DEF36AD06601A9")]
     internal class WorldMonitor : MonoBehaviour
     {
         private EcsWorld _world;
@@ -26,7 +26,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("B5FBB680920179310BEBB305817462B5")]
+    [MetaID("DragonECS_B5FBB680920179310BEBB305817462B5")]
     internal class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener
     {
         private EcsWorld _world;

@@ -7,7 +7,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("EC9DB6809201CDD801B5B342C8A2AC8D")]
+    [MetaID("DragonECS_EC9DB6809201CDD801B5B342C8A2AC8D")]
     internal class PipelineMonitor : MonoBehaviour
     {
         private EcsPipeline _pipeline;
@@ -25,7 +25,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("1DB9B6809201E092088A446A19EB9C7D")]
+    [MetaID("DragonECS_1DB9B6809201E092088A446A19EB9C7D")]
     internal class PipelineMonitorSystem : IEcsInit, IEcsPipelineMember, IEcsDestroy
     {
         private PipelineMonitor _monitor;

@@ -22,7 +22,7 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, COMPONENTS_GROUP)]
     [MetaDescription(AUTHOR, "Component-reference to Unity object for EcsPool.")]
-    [MetaID("734F667C9201B80F1913388C2A8BB689")]
+    [MetaID("DragonECS_734F667C9201B80F1913388C2A8BB689")]
     [MetaTags(MetaTags.ENGINE_MEMBER)]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
@@ -51,10 +51,10 @@ namespace DCFApixels.DragonECS.Unity.Generated
     using static EcsConsts;
 
     #region Unity Component Templates Base
-    [MetaID("13DAACF9910155DD27F822442987E0AE")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     [MetaDescription(AUTHOR, "Template for UnityComponent<T>")]
+    [MetaID("DragonECS_13DAACF9910155DD27F822442987E0AE")]
     public abstract class UnityComponentTemplate<T> : ComponentTemplateBase<UnityComponent<T>> where T : Component
     {
         public override string Name
@@ -85,7 +85,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     #region Unity Component Templates
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("843B8EF991013F1BFD9133437E1AFE9C")]
+    [MetaID("DragonECS_843B8EF991013F1BFD9133437E1AFE9C")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -93,7 +93,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     public sealed class Template_068A1DA395014799316EAD2F9495C57E : UnityComponentTemplate<Transform> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("9A4B8EF99101396C44BF789C3215E9A9")]
+    [MetaID("DragonECS_9A4B8EF99101396C44BF789C3215E9A9")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -101,7 +101,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     public sealed class Template_2FBD1DA395013588823232240D607899 : UnityComponentTemplate<Rigidbody> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("52598EF991016655335F234F20F44526")]
+    [MetaID("DragonECS_52598EF991016655335F234F20F44526")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -109,7 +109,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     public sealed class Template_ADCE1DA395013CDF357AE983D26934D8 : UnityComponentTemplate<Animator> { }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("AD658EF99101E8E38BB575D5353E7B1E")]
+    [MetaID("DragonECS_AD658EF99101E8E38BB575D5353E7B1E")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -120,7 +120,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     #region Render Templates
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("6C6CA0F99101E80E013BCCCB5DA78FA5")]
+    [MetaID("DragonECS_6C6CA0F99101E80E013BCCCB5DA78FA5")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -131,7 +131,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("5475A1F9910109A138F609268B697A62")]
+    [MetaID("DragonECS_5475A1F9910109A138F609268B697A62")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -142,7 +142,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("2C13A2F99101FAA3EA21BD351BF3B169")]
+    [MetaID("DragonECS_2C13A2F99101FAA3EA21BD351BF3B169")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -153,7 +153,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("8B57A1F991016B2E1FC57D16F2D20A64")]
+    [MetaID("DragonECS_8B57A1F991016B2E1FC57D16F2D20A64")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -167,7 +167,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     #region Collider Templates
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("557F8EF9910132FE990CF50CBF368412")]
+    [MetaID("DragonECS_557F8EF9910132FE990CF50CBF368412")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -178,7 +178,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("43669CF99101E94AB9EC19DC8EA3878B")]
+    [MetaID("DragonECS_43669CF99101E94AB9EC19DC8EA3878B")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -189,7 +189,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("749F9CF991017792E288D4E3B5BFE340")]
+    [MetaID("DragonECS_749F9CF991017792E288D4E3B5BFE340")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -200,7 +200,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("72B09CF99101A33EBC4410B0FD8375E0")]
+    [MetaID("DragonECS_72B09CF99101A33EBC4410B0FD8375E0")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -211,7 +211,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("3BBC9CF99101F7C00989D2E55A40EF1B")]
+    [MetaID("DragonECS_3BBC9CF99101F7C00989D2E55A40EF1B")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -225,7 +225,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     #region Joint Templates
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("1AC79CF99101C4279852BB6AE12DC61B")]
+    [MetaID("DragonECS_1AC79CF99101C4279852BB6AE12DC61B")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -236,7 +236,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("E3D99CF991016428C6688672052C6F4E")]
+    [MetaID("DragonECS_E3D99CF991016428C6688672052C6F4E")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -247,7 +247,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("7BE59CF99101322AE307229E1466B225")]
+    [MetaID("DragonECS_7BE59CF99101322AE307229E1466B225")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]
@@ -258,7 +258,7 @@ namespace DCFApixels.DragonECS.Unity.Generated
     }
     [Serializable]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("FBF29CF99101EE07543CFF460854B1F6")]
+    [MetaID("DragonECS_FBF29CF99101EE07543CFF460854B1F6")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, TEMPLATES_GROUP)]
     [MetaDescription(AUTHOR, "...")]

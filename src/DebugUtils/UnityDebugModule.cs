@@ -6,7 +6,7 @@ namespace DCFApixels.DragonECS
     [MetaColor(MetaColor.DragonRose)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
-    [MetaID("1D16B980920108B62A0971E4058A3E01")]
+    [MetaID("DragonECS_1D16B980920108B62A0971E4058A3E01")]
     public sealed class UnityDebugModule : IEcsModule
     {
         public EcsWorld[] _worlds;

@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS
     [MetaName("MonoBehaviourSystem")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaDescription(AUTHOR, "Wrapper for MonoBehaviour systems")]
-    [MetaID("2877029E9201347B4F58E1EC0A4BCD1B")]
+    [MetaID("DragonECS_2877029E9201347B4F58E1EC0A4BCD1B")]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     public class MonoBehaviourSystemWrapper : IEcsModule
     {

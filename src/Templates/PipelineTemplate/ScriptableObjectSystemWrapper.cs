@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS
     [MetaName("ScriptableObjectSystem")]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaDescription(AUTHOR, "Wrapper for ScriptableObject systems")]
-    [MetaID("F5A94C5F92015B4D9286E76809311AF4")]
+    [MetaID("DragonECS_F5A94C5F92015B4D9286E76809311AF4")]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     public class ScriptableObjectSystemWrapper : IEcsModule
     {

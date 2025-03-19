@@ -8,7 +8,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.DEBUG_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
-    [MetaID("AC178504930164FD2EABFA071EF0476F")]
+    [MetaID("DragonECS_AC178504930164FD2EABFA071EF0476F")]
     internal class WorldQueriesMonitor : MonoBehaviour
     {
         private EcsWorld _world;
