@@ -418,19 +418,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var current = Event.current;
             var hover = IconHoverScan(position, current);
-            using (new ColorScope(new Color(1f, 1f, 1f, hover ? 1f : 0.8f)))
+            if (GUI.enabled)
             {
-                DrawIcon(position, Icons.Instance.FileIcon, hover ? 1f : 2f, "One click - Ping File. Double click - Edit Script");
-            }
-            if (hover)
-            {
-                if (current.type == EventType.MouseUp)
+                using (SetColor(1f, 1f, 1f, hover ? 1f : 0.8f))
                 {
-                    EditorGUIUtility.PingObject(script);
+                    DrawIcon(position, Icons.Instance.FileIcon, hover ? 1f : 2f, "One click - Ping File. Double click - Edit Script");
                 }
-                else if (current.type == EventType.MouseDown && current.clickCount >= 2)
+                if (hover)
                 {
-                    AssetDatabase.OpenAsset(script);
+                    if (current.type == EventType.MouseUp)
+                    {
+                        EditorGUIUtility.PingObject(script);
+                    }
+                    else if (current.type == EventType.MouseDown && current.clickCount >= 2)
+                    {
+                        AssetDatabase.OpenAsset(script);
+                    }
+                }
+            }
+            else
+            {
+                using (SetColor(0.85f, 0.85f, 0.85f, 0.7f))
+                {
+                    DrawIcon(position, Icons.Instance.FileIcon, 2f, "One click - Ping File. Double click - Edit Script");
                 }
             }
         }

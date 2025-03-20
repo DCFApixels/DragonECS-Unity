@@ -2,6 +2,7 @@
 using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
@@ -17,6 +18,20 @@ namespace DCFApixels.DragonECS.Unity.Internal
         public static bool HasAttribute<T>(this MemberInfo self) where T : Attribute
         {
             return self.GetCustomAttribute<T>() != null;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsConcreteType(this Type self)
+        {
+            if (self.IsGenericType || self.IsAbstract || self.IsInterface)
+            {
+                return false;
+            }
+            return self.IsValueType || self.IsClass;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsUnityObject(this Type self)
+        {
+            return self.IsSubclassOf(typeof(UnityObject));
         }
     }
 }

@@ -26,6 +26,7 @@ namespace DCFApixels.DragonECS
         }
         public static void Activate()
         {
+            if (Instance.GetType() == typeof(UnityDebugService)) { return; }
             Set<UnityDebugService>();
         }
 

@@ -78,9 +78,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             rect = GUILayoutUtility.GetLastRect();
             rect.xMin += 9f;
             GUI.Label(rect, "Scripting Define Symbols", EditorStyles.whiteLargeLabel);
-            
+
             InitDefines();
-            
+
             EditorGUI.BeginChangeCheck();
             foreach (var symbol in _defineSymbols)
             {

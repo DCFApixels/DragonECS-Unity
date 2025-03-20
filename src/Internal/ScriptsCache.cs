@@ -33,54 +33,88 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
         private static Dictionary<string, string> _metaIDScriptPathPairs = new Dictionary<string, string>();
+        public static IReadOnlyDictionary<string, string> MetaIDScriptPathPairs
+        {
+            get
+            {
+                instance.InitUpdate();
+                return _metaIDScriptPathPairs;
+            }
+        }
 
         private static SparseArray<MonoScript> _scriptsAssets = new SparseArray<MonoScript>(256);
 
+        public static void Reinit()
+        {
+            instance._isInit = false;
+            _metaIDScriptPathPairs.Clear();
+            instance.InitUpdate();
+        }
+
         #region Init/Update
+        private static object _lock = new object();
         private void InitUpdate()
         {
             Init();
-
             if (MonoScriptsAssetProcessor.Version <= _version) { return; }
-
-            if (MonoScriptsAssetProcessor.RemovedScriptPaths.Count > 0)
+            lock (_lock)
             {
-                uint pathsLength = (uint)MonoScriptsAssetProcessor.RemovedScriptPaths.Count;
-                string[] paths = new string[pathsLength];
-                int i = 0;
-                foreach (var path in MonoScriptsAssetProcessor.RemovedScriptPaths)
+                if (MonoScriptsAssetProcessor.Version <= _version) { return; }
+
+                if (MonoScriptsAssetProcessor.RemovedScriptPaths.Count > 0)
                 {
-                    paths[i++] = path;
-                }
-                foreach (var metaIDScriptPathPair in _metaIDScriptPathPairs)
-                {
-                    for (uint j = 0; j < pathsLength; j++)
+                    List<string> removedKeys = new List<string>();
+                    uint pathsLength = (uint)MonoScriptsAssetProcessor.RemovedScriptPaths.Count;
+                    string[] paths = new string[pathsLength];
+                    int i = 0;
+                    foreach (var path in MonoScriptsAssetProcessor.RemovedScriptPaths)
                     {
-                        if (paths[j] == metaIDScriptPathPair.Value)
+                        paths[i++] = path;
+                    }
+                    foreach (var metaIDScriptPathPair in _metaIDScriptPathPairs)
+                    {
+                        for (uint j = 0; j < pathsLength; j++)
                         {
-                            _metaIDScriptPathPairs[metaIDScriptPathPair.Key] = null;
+                            if (paths[j] == metaIDScriptPathPair.Value)
+                            {
+                                removedKeys.Add(metaIDScriptPathPair.Key);
+                            }
+                        }
+                    }
+
+                    foreach (var key in removedKeys)
+                    {
+                        _metaIDScriptPathPairs.Remove(key);
+                    }
+                }
+
+                if (MonoScriptsAssetProcessor.NewScriptPaths.Count > 0)
+                {
+                    List<string> metaIDs = new List<string>();
+                    foreach (var assetPath in MonoScriptsAssetProcessor.NewScriptPaths)
+                    {
+                        ExtractMetaIDs(AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath).text, metaIDs);
+                        foreach (var metaID in metaIDs)
+                        {
+                            _metaIDScriptPathPairs[metaID] = assetPath;
                         }
                     }
                 }
-            }
 
-            List<string> metaIDs = new List<string>();
-            foreach (var assetPath in MonoScriptsAssetProcessor.NewScriptPaths)
-            {
-                ExtractMetaIDs(AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath).text, metaIDs);
-                foreach (var metaID in metaIDs)
-                {
-                    _metaIDScriptPathPairs[metaID] = assetPath;
-                }
-            }
-            _version = MonoScriptsAssetProcessor.Version;
+                _version = MonoScriptsAssetProcessor.Version;
 
-            Save(true);
+                Save(true);
+            }
         }
 
         private void Init()
         {
             if (_isInit && _metaIDScriptPathPairs.Count > 0) { return; }
+
+            if (_metaIDScriptPathPairs == null)
+            {
+                _metaIDScriptPathPairs = new Dictionary<string, string>();
+            }
 
             _metaIDScriptPathPairs.Clear();
             var scriptGuids = AssetDatabase.FindAssets($"* t:MonoScript");
@@ -113,43 +147,43 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             Save(true);
         }
-        public void Reinit()
-        {
-            _isInit = false;
-            InitUpdate();
-        }
         #endregion
 
         #region Get
         public static bool TryGetScriptAsset(TypeMeta meta, out MonoScript script)
         {
-            int uniqueID = meta.GetHashCode();
+            int metaUniqueID = meta.GetHashCode();
 
-            if (_scriptsAssets.TryGetValue(uniqueID, out script) == false)
+            if (_scriptsAssets.TryGetValue(metaUniqueID, out script) == false)
             {
                 script = null;
 
                 //Ищем по мета айди совпадения
-                string metaID = meta.MetaID;
-                if (string.IsNullOrEmpty(metaID) == false)
+                if (UnityEditorUtility.IsHasAnyMetaIDCollision == false)
                 {
-                    instance.InitUpdate();
-                    if (_metaIDScriptPathPairs.TryGetValue(metaID, out string assetPath))
+                    if (meta.IsHasMetaID())
                     {
-                        if (assetPath == null)
+                        instance.InitUpdate();
+
+                        string metaID = meta.MetaID;
+                        if (_metaIDScriptPathPairs.TryGetValue(metaID, out string assetPath))
                         {
-                            _metaIDScriptPathPairs.Remove(metaID);
-                        }
-                        else
-                        {
-                            MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
-                            if (textAsset != null)
+                            if (assetPath == null)
                             {
-                                script = textAsset;
+                                _metaIDScriptPathPairs.Remove(metaID);
+                            }
+                            else
+                            {
+                                MonoScript textAsset = AssetDatabase.LoadAssetAtPath<MonoScript>(assetPath);
+                                if (textAsset != null)
+                                {
+                                    script = textAsset;
+                                }
                             }
                         }
                     }
                 }
+
 
                 if (script == null)
                 {
@@ -170,7 +204,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                         if (assetPath.IndexOf("Packages/com.unity.") == 0)
                         {
-                            if(skippedCount == 0)
+                            if (skippedCount == 0)
                             {
                                 skipped = new string[guids.Length];
                             }
@@ -185,7 +219,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
 
-                    if(script == null)
+                    if (script == null)
                     {
                         foreach (var assetPath in new ReadOnlySpan<string>(skipped, 0, skippedCount))
                         {
@@ -199,7 +233,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
 
                 }
-                _scriptsAssets.Add(uniqueID, script);
+
+
+                _scriptsAssets.Add(metaUniqueID, script);
             }
             return script != null;
         }

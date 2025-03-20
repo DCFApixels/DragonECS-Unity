@@ -42,7 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
             {
                 foreach (var type in assembly.GetTypes())
                 {
-                    if (TypeMeta.IsHasMeta(type))
+                    if (TypeMeta.IsHasCustomMeta(type))
                     {
                         result.Add(type);
                     }

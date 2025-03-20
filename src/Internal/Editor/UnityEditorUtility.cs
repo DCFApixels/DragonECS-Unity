@@ -1,10 +1,8 @@
-﻿using DCFApixels.DragonECS.Unity.Internal;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
-using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -101,6 +99,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    using DCFApixels.DragonECS.Unity.Internal;
     using UnityEditor;
     using Assembly = System.Reflection.Assembly;
 
@@ -109,12 +108,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         static UnityEditorUtility()
         {
+            const int PREWARMUP_LIST_SIZE = 64;
             EcsWorld.ResetStaticState();
+            UnityDebugService.Activate();
 
             _integrationAssembly = typeof(UnityEditorUtility).Assembly;
 
-            List<Type> serializableTypes = new List<Type>();
-            List<EntityEditorBlockDrawer> entityEditorBlockDrawers = new List<EntityEditorBlockDrawer>();
+            List<Type> serializableTypes = new List<Type>(PREWARMUP_LIST_SIZE);
+            List<TypeMeta> typeWithMetaIDMetas = new List<TypeMeta>(PREWARMUP_LIST_SIZE);
+            List<TypeMeta> serializableTypeWithMetaIDMetas = new List<TypeMeta>(PREWARMUP_LIST_SIZE);
+            List<EntityEditorBlockDrawer> entityEditorBlockDrawers = new List<EntityEditorBlockDrawer>(PREWARMUP_LIST_SIZE);
+
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 //var targetTypes = assembly.GetTypes().Where(type =>
@@ -124,29 +128,75 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 foreach (var type in assembly.GetTypes())
                 {
-                    if ((type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
-                        typeof(EntityEditorBlockDrawer).IsAssignableFrom(type))
+                    bool hasMetaID = false;
+                    if (TypeMeta.TryGetCustomMeta(type, out TypeMeta meta) && meta.IsHasMetaID())
                     {
-                        var drawer = (EntityEditorBlockDrawer)Activator.CreateInstance(type);
-                        entityEditorBlockDrawers.Add(drawer);
+                        typeWithMetaIDMetas.Add(meta);
+                        hasMetaID = true;
+                    }
+
+                    if (type.IsConcreteType())
+                    {
+                        if (typeof(EntityEditorBlockDrawer).IsAssignableFrom(type))
+                        {
+                            var drawer = (EntityEditorBlockDrawer)Activator.CreateInstance(type);
+                            entityEditorBlockDrawers.Add(drawer);
+                        }
+
+                        if (type.IsUnityObject() == false && type.GetConstructor(Type.EmptyTypes) != null)
+                        {
+                            serializableTypes.Add(type);
+                            if (hasMetaID)
+                            {
+                                serializableTypeWithMetaIDMetas.Add(meta);
+                            }
+                        }
+                    }
+                }
+            }
+            _serializableTypes = serializableTypes.ToArray();
+            _typeWithMetaIDMetas = typeWithMetaIDMetas.ToArray();
+            _serializableTypeWithMetaIDMetas = serializableTypeWithMetaIDMetas.ToArray();
+            _entityEditorBlockDrawers = entityEditorBlockDrawers.ToArray();
+
+            _metaIDCollisions = MetaID.FindMetaIDCollisions(_typeWithMetaIDMetas);
+            IsHasAnyMetaIDCollision = _metaIDCollisions.IsHasAnyCollision;
+            if (_metaIDCollisions.IsHasAnyCollision)
+            {
+                StringBuilder log = new StringBuilder();
+                log.Append("MetaID identifier collisions detected. Some functions that use MetaID were disabled until the collisions were fixed. List of collisions:\r\n");
+
+                {
+                    int i = 0;
+                    foreach (var collision in _metaIDCollisions)
+                    {
+                        i++;
+                        log.Append('├');
+                        log.Append($"ID: {collision.MetaID}\r\n");
+                        int j = 0;
+                        foreach (var meta in collision)
+                        {
+                            j++;
+                            log.Append('│');
+
+
+                            if (j == collision.Count)
+                            {
+                                log.Append('└');
+                            }
+                            else
+                            {
+                                log.Append('├');
+                            }
+
+                            log.Append($"Type: {meta.TypeName}\r\n");
+                        }
                     }
                 }
 
-                var targetTypes = assembly.GetTypes().Where(type =>
-                    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
-                    type.IsSubclassOf(typeof(UnityObject)) == false &&
-                    type.GetConstructor(Type.EmptyTypes) != null);
-
-                serializableTypes.AddRange(targetTypes);
+                Debug.LogError(log.ToString());
             }
-            _serializableTypes = serializableTypes.ToArray();
-            _entityEditorBlockDrawers = entityEditorBlockDrawers.ToArray();
-            _serializableTypeWithMetaIDMetas = serializableTypes
-                .Where(TypeMeta.IsHasMetaID)
-                .Select(type => type.ToMeta())
-                .ToArray();
-
-            foreach (var item in _serializableTypeWithMetaIDMetas)
+            foreach (var item in _typeWithMetaIDMetas)
             {
                 _metaIDTypePairs[item.MetaID] = item.Type;
             }
@@ -160,8 +210,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         internal static readonly Assembly _integrationAssembly;
         internal static readonly Type[] _serializableTypes;
-        internal static readonly EntityEditorBlockDrawer[] _entityEditorBlockDrawers;
+        internal static readonly TypeMeta[] _typeWithMetaIDMetas;
         internal static readonly TypeMeta[] _serializableTypeWithMetaIDMetas;
+        internal static readonly EntityEditorBlockDrawer[] _entityEditorBlockDrawers;
+
+        internal static readonly MetaID.CollisionList _metaIDCollisions;
+        public static readonly bool IsHasAnyMetaIDCollision;
         private static readonly Dictionary<string, Type> _metaIDTypePairs = new Dictionary<string, Type>();
 
         public static bool TryGetTypeForMetaID(string metaID, out Type type)
