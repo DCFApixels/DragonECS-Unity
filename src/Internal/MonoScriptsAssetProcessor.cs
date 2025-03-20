@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using UnityEditor;
@@ -50,11 +51,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private static List<string> _removedScriptGuids = new List<string>();
         private static List<string> _newScriptIDs = new List<string>();
-        public static IReadOnlyCollection<string> RemovedScriptPaths
+        public static ReadOnlyList<string> RemovedScriptPaths
         {
             get { return _removedScriptGuids; }
         }
-        public static IReadOnlyCollection<string> NewScriptPaths
+        public static ReadOnlyList<string> NewScriptPaths
         {
             get { return _newScriptIDs; }
         }

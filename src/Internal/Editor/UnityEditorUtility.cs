@@ -224,12 +224,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
         //private static Type[] _noHiddenSerializableTypes;
-
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
         private static Dictionary<Type, MonoScript> _scriptsAssets = new Dictionary<Type, MonoScript>(256);
-
 
         internal static void ResetValues(this SerializedProperty property, bool isExpand = false)
         {

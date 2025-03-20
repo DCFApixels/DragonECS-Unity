@@ -28,11 +28,18 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         private Pair[] _typeKeyMetaIDPairsSerializable;
         #endregion
         private Dictionary<TypeData, string> _typeKeyMetaIDPairs = new Dictionary<TypeData, string>();
+        internal IReadOnlyDictionary<TypeData, string> TypeKeyMetaIDPairs => _typeKeyMetaIDPairs;
         private bool _isChanged = false;
 
         public bool TryGetMetaID(TypeData key, out string metaID)
         {
-            return _typeKeyMetaIDPairs.TryGetValue(key, out metaID);
+            bool result = _typeKeyMetaIDPairs.TryGetValue(key, out metaID);
+            if(result && string.IsNullOrEmpty(metaID))
+            {
+                result = false;
+                _typeKeyMetaIDPairs.Remove(key);
+            }
+            return result;
         }
 
 
@@ -43,7 +50,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         private static void BeforeCompilation()
         {
             EditorApplication.update -= BeforeCompilation;
-            instance.TryGetMetaID(default, out _);
+            instance.TryGetMetaID(TypeData.Empty, out _);
             instance.Update();
         }
 
@@ -55,25 +62,26 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         private void Update()
         {
-            var typeMetas = UnityEditorUtility._serializableTypeWithMetaIDMetas;
+            if (UnityEditorUtility.IsHasAnyMetaIDCollision) { return; }
+            var typeMetas = UnityEditorUtility._typeWithMetaIDMetas;
             foreach (var meta in typeMetas)
             {
-                var key = new TypeData(meta.Type);
+                var typeKey = new TypeData(meta.Type);
                 var metaID = meta.MetaID;
 
                 //Debug.LogWarning(type + " " + metaID);
 
-                if (_typeKeyMetaIDPairs.TryGetValue(key, out string keyMetaID))
+                if (_typeKeyMetaIDPairs.TryGetValue(typeKey, out string storedMetaID))
                 {
-                    if (keyMetaID != metaID)
+                    if (storedMetaID != metaID)
                     {
-                        _typeKeyMetaIDPairs[key] = null; //Таким образом помечаются моменты когда не однозначно какой идентификатор принадлежит этому имени
+                        _typeKeyMetaIDPairs[typeKey] = string.Empty; //Таким образом помечаются моменты когда не однозначно какой идентификатор принадлежит этому имени
                         _isChanged = true;
                     }
                 }
                 else
                 {
-                    _typeKeyMetaIDPairs[key] = metaID;
+                    _typeKeyMetaIDPairs[typeKey] = metaID;
                     _isChanged = true;
                 }
             }
@@ -92,10 +100,9 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             _typeKeyMetaIDPairs.Clear();
             foreach (var pair in _typeKeyMetaIDPairsSerializable)
             {
-                if (string.IsNullOrEmpty(pair.value) == false)
-                {
-                    _typeKeyMetaIDPairs[pair.key] = pair.value;
-                }
+                if (string.IsNullOrEmpty(pair.value) || pair.key.IsEmpty) { continue; }
+
+                _typeKeyMetaIDPairs[pair.key] = pair.value;
             }
         }
         void ISerializationCallbackReceiver.OnBeforeSerialize()

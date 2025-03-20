@@ -1,7 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.RefRepairer.Internal;
 using System;
-using System.Reflection;
 
 namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 {
@@ -9,8 +8,13 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
     {
         public readonly TypeData OldTypeData;
         public readonly string OldSerializedInfoLine;
+
         private TypeData _newTypeData;
         private string _newSerializedInfoLine;
+
+        private Type _chachedNewType = null;
+        private bool _chachedNewTypeInited = false;
+
         public MissingsResolvingData(TypeData oldTypeData)
         {
             OldTypeData = oldTypeData;
@@ -18,13 +22,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         }
         public bool IsResolved
         {
-            get
-            {
-                //return
-                //    string.IsNullOrEmpty(_newTypeData.ClassName) == false &&
-                //    string.IsNullOrEmpty(_newTypeData.AssemblyName) == false;
-                return FindNewType() != null;
-            }
+            get { return FindNewType() != null; }
         }
         public bool IsEmpty
         {
@@ -34,34 +32,6 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                     string.IsNullOrEmpty(_newTypeData.ClassName) ||
                     string.IsNullOrEmpty(_newTypeData.AssemblyName);
             }
-        }
-        private Type _chachedNewType = null;
-        private bool _chachedNewTypeInited = false;
-        public Type FindNewType()
-        {
-            if (_chachedNewTypeInited == false)
-            {
-                if (string.IsNullOrEmpty(_newTypeData.AssemblyName) == false)
-                {
-                    Assembly assembly = null;
-                    try
-                    {
-                        assembly = Assembly.Load(_newTypeData.AssemblyName);
-                    }
-                    catch { }
-                    if (assembly == null)
-                    {
-                        _chachedNewType = null;
-                    }
-                    else
-                    {
-                        string fullTypeName = $"{_newTypeData.NamespaceName}.{_newTypeData.ClassName}";
-                        _chachedNewType = assembly.GetType(fullTypeName);
-                    }
-                    _chachedNewTypeInited = true;
-                }
-            }
-            return _chachedNewType;
         }
         public TypeData NewTypeData
         {
@@ -84,6 +54,15 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                 }
                 return _newSerializedInfoLine;
             }
+        }
+
+        public Type FindNewType()
+        {
+            if (_chachedNewTypeInited == false)
+            {
+                _chachedNewType = _newTypeData.ToType();
+            }
+            return _chachedNewType;
         }
     }
 }
