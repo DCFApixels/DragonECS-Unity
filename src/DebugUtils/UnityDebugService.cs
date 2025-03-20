@@ -34,6 +34,9 @@ namespace DCFApixels.DragonECS
         {
             return new UnityDebugService();
         }
+#if UNITY_2021_3_OR_NEWER
+        [HideInCallstack]
+#endif
         public override void Print(string tag, object v)
         {
             if (v is Exception e)
