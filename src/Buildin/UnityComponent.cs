@@ -9,7 +9,6 @@ using UnityEngine.Scripting.APIUpdating;
 namespace DCFApixels.DragonECS
 {
     using static EcsConsts;
-
     internal static class UnityComponentConsts
     {
         internal const string UNITY_COMPONENT_NAME = "UnityComponent";
@@ -44,13 +43,7 @@ namespace DCFApixels.DragonECS
             return $"UnityComponent<{typeof(T).ToMeta().TypeName}>";
         }
     }
-}
 
-namespace DCFApixels.DragonECS.Unity.Generated
-{
-    using static EcsConsts;
-
-    #region Unity Component Templates Base
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     [MetaDescription(AUTHOR, "Template for UnityComponent<T>")]
@@ -80,7 +73,11 @@ namespace DCFApixels.DragonECS.Unity.Generated
             }
         }
     }
-    #endregion
+}
+
+namespace DCFApixels.DragonECS.Unity.ComponentTemplates
+{
+    using static EcsConsts;
 
     #region Unity Component Templates
     [Serializable]
