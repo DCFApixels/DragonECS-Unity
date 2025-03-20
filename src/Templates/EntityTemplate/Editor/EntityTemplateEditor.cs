@@ -16,6 +16,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private SerializedProperty _componentsProp;
         private ReorderableList _reorderableComponentsList;
 
+        protected abstract bool IsSO { get; }
+
         //public virtual bool IsStaticData { get { return false; } }
 
         #region Init
@@ -161,6 +163,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
+            if (IsSO)
+            {
+                EcsGUI.Layout.ManuallySerializeButton(target);
+            }
+
             if (IsMultipleTargets == false && SerializationUtility.HasManagedReferencesWithMissingTypes(target))
             {
                 using (EcsGUI.Layout.BeginHorizontal(EditorStyles.helpBox))
@@ -206,11 +213,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class ScriptableEntityTemplateEditor : EntityTemplateEditorBase
     {
         //public override bool IsStaticData { get { return true; } }
+        protected override bool IsSO => true;
     }
     [CustomEditor(typeof(MonoEntityTemplate), true)]
     internal class MonoEntityTemplateEditor : EntityTemplateEditorBase
     {
         //public override bool IsStaticData { get { return false; } }
+        protected override bool IsSO => false;
     }
 }
 #endif    

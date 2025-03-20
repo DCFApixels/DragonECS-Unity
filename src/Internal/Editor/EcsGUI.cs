@@ -758,6 +758,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region Other Elements
+        public static void ManuallySerializeButton(Rect position, UnityEngine.Object obj)
+        {
+            if (GUI.Button(position, UnityEditorUtility.GetLabel("Manually serialize")))
+            {
+                var so = new SerializedObject(obj);
+                EditorUtility.SetDirty(obj);
+                so.UpdateIfRequiredOrScript();
+                so.ApplyModifiedProperties();
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+            }
+        }
         public static bool AddComponentButton(Rect position, out Rect dropDownRect)
         {
             dropDownRect = RectUtility.AddPadding(position, 20f, 20f, 1f, 1f); ;

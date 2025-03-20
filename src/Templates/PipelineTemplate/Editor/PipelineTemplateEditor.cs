@@ -8,8 +8,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    [CustomEditor(typeof(ScriptablePipelineTemplate))]
-    internal class PipelineTemplateEditorBase : ExtendedEditor<IPipelineTemplate>
+    internal abstract class PipelineTemplateEditorBase : ExtendedEditor<IPipelineTemplate>
     {
         private SerializedProperty _parametersProp;
         private SerializedProperty _layersProp;
@@ -22,6 +21,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get => _reorderableLayersList != null && _reorderableRecordsList != null;
         }
+
+        protected abstract bool IsSO { get; }
 
         protected override void OnStaticInit() { }
         protected override void OnInit()
@@ -143,6 +144,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom()
         {
+            if (IsSO)
+            {
+                EcsGUI.Layout.ManuallySerializeButton(target);
+            }
+
             EcsGUI.Changed = GUILayout.Button("Validate");
 
             DrawLayoutNameList(_layersProp);
@@ -199,8 +205,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
     }
 
     [CustomEditor(typeof(ScriptablePipelineTemplate), true)]
-    internal class ScriptablePipelineTemplateEditor : PipelineTemplateEditorBase { }
+    internal class ScriptablePipelineTemplateEditor : PipelineTemplateEditorBase
+    {
+        protected override bool IsSO => true;
+    }
     [CustomEditor(typeof(MonoPipelineTemplate), true)]
-    internal class MonoPipelineTemplateEditor : PipelineTemplateEditorBase { }
+    internal class MonoPipelineTemplateEditor : PipelineTemplateEditorBase
+    {
+        protected override bool IsSO => false;
+    }
 }
 #endif
