@@ -63,6 +63,34 @@ namespace DCFApixels.DragonECS
         protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
         protected static readonly bool _isHasIEcsComponentLifecycle;
         protected static readonly IEcsComponentLifecycle<T> _iEcsComponentLifecycle;
+
+        private static bool _defaultValueTypeInit = false;
+        private static T _defaultValueType;
+        protected static T DefaultValueType
+        {
+            get
+            {
+                if (_defaultValueTypeInit == false)
+                {
+                    Type type = typeof(T);
+                    if (type.IsValueType)
+                    {
+                        FieldInfo field;
+                        field = type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                        if (field != null && field.FieldType == type)
+                        {
+                            _defaultValueType = (T)field.GetValue(null);
+                        }
+                        field = type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
+                        if (field != null && field.FieldType == type)
+                        {
+                            _defaultValueType = (T)field.GetValue(null);
+                        }
+                    }
+                }
+                return _defaultValueType;
+            }
+        }
         static ComponentTemplateBase()
         {
             _isHasIEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.isHasHandler;
@@ -75,6 +103,7 @@ namespace DCFApixels.DragonECS
             {
                 _iEcsComponentLifecycle.Enable(ref result);
             }
+            result = DefaultValueType;
             return result;
         }
 
