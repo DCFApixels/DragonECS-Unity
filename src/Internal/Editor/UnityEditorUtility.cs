@@ -208,6 +208,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //}).ToArray();
         }
 
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void OnLoad()
+        {
+            EcsWorld.ResetStaticState();
+            UnityDebugService.Activate();
+        }
+
         internal static readonly Assembly _integrationAssembly;
         internal static readonly Type[] _serializableTypes;
         internal static readonly TypeMeta[] _typeWithMetaIDMetas;
