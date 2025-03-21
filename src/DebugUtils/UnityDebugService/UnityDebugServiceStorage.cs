@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+#if DRAGONECS_ENABLE_UNITY_CONSOLE_SHORTCUT_LINKS
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -51,7 +52,12 @@ namespace DCFApixels.DragonECS.Unity.Internal
         internal const int IntervalChecksTicksThreshold = 100;
         internal static int _consoleLogCounter;
         internal static int _intervalChecksTicks = 0;
-        internal static StructList<LogEntry> _logEntries = new StructList<LogEntry>(256);
+
+        [SerializeField]
+        internal StructList<LogEntry> _logEntries = new StructList<LogEntry>(256);
+        [SerializeField]
+        private int _hyperLinkIndex = 0;
+
         internal static object _lock = new object();
 
         internal static void EditorGUI_hyperLinkClicked(EditorWindow window, HyperLinkClickedEventArgs args)
@@ -60,34 +66,15 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
         internal static void OnProcessClickData(Dictionary<string, string> infos)
         {
+            var inst = instance;
             if (infos == null) return;
             if (!infos.TryGetValue("href", out var path)) return;
 
-            for (int i = 0; i < _logEntries.Count; i++)
+            for (int i = 0; i < inst._logEntries.Count; i++)
             {
-                ref var e = ref _logEntries._items[i];
+                ref var e = ref inst._logEntries._items[i];
                 if (CheckLogWithIndexedLink(e.LogString))
                 {
-                    //int indexof = e.LogString.LastIndexOf(INDEXED_LINK_PREV) - 1 + INDEXED_LINK_PREV.Length;// откатываю символ ∆
-                    //int stringIndexLength = e.LogString.Length - (indexof + INDEXED_LINK_POST.Length);
-                    //
-                    //if(stringIndexLength == path.Length)
-                    //{
-                    //    bool isSkip = false;
-                    //    for (int j = 1; j < stringIndexLength; j++)
-                    //    {
-                    //        var pathchar = path[j];
-                    //        var logchar = e.LogString[indexof + j];
-                    //        if (pathchar != logchar) { isSkip = true; break; }
-                    //    }
-                    //
-                    //    if (isSkip) { continue; }
-                    //
-                    //    OpenIDE(e);
-                    //
-                    //    break;
-                    //}
-
                     int indexof = INDEXED_LINK_PREV.Length - 1;// откатываю символ ∆
                     int stringIndexLength = e.LogString.IndexOf(INDEXED_LINK_POST) - indexof;
                     
@@ -139,12 +126,13 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         internal static void Application_logMessageReceived(string logString, string stackTrace, LogType type)
         {
-            if (_intervalChecksTicks >= IntervalChecksTicksThreshold || 
-                _logEntries.Count >= _logEntries.Capacity - 1)
+            var inst = instance;
+            if (_intervalChecksTicks >= IntervalChecksTicksThreshold ||
+                inst._logEntries.Count >= inst._logEntries.Capacity - 1)
             {
                 CheckConsoleClean();
             }
-            _logEntries.Add(new LogEntry(logString, stackTrace));
+            inst._logEntries.Add(new LogEntry(logString, stackTrace));
 
             _consoleLogCounter++;
             _intervalChecksTicks++;
@@ -155,14 +143,15 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             lock (_lock)
             {
+                var inst = instance;
                 if (_intervalChecksTicks < IntervalChecksTicksThreshold) { return false; }
                 int currentCount = GetConsoleLogCount();
                 if (_consoleLogCounter > currentCount)
                 {
                     var l = _consoleLogCounter - currentCount;
-                    if(l < _logEntries.Count)
+                    if(l < inst._logEntries.Count)
                     {
-                        _logEntries.FastRemoveSpan(0, l);
+                        inst._logEntries.FastRemoveSpan(0, l);
                     }
 
                     _consoleLogCounter = currentCount;
@@ -174,7 +163,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
 
         private const string INDEXED_LINK_PREV = "<a href=\"∆";
-        private const string INDEXED_LINK_POST = "\">∆ </a>";
+        private const string INDEXED_LINK_POST = "\">→ </a>";
         private static string CreateIndexedLink(int index)
         {
             return $"{INDEXED_LINK_PREV}{index}{INDEXED_LINK_POST}";
@@ -187,7 +176,6 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             return instance.GetHyperLink_Internal();
         }
-        private static int _hyperLinkIndex = 0;
         public string GetHyperLink_Internal()
         {
             var index = Interlocked.Increment(ref _hyperLinkIndex);
@@ -197,16 +185,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         private static bool CheckLogWithIndexedLink(string log)
         {
-            //if (log.Length < INDEXED_LINK_POST.Length) { return false; }
-            //for (int i = 0; i < INDEXED_LINK_POST.Length; i++)
-            //{
-            //    char constChar = INDEXED_LINK_POST[i];
-            //    char logChar = log[log.Length - INDEXED_LINK_POST.Length + i];
-            //    if (constChar != logChar) { return false; }
-            //}
-            //return true;
-
-
+            if (log == null) { return false; }
             if (log.Length < INDEXED_LINK_PREV.Length) { return false; }
             for (int i = 0; i < INDEXED_LINK_PREV.Length; i++)
             {
@@ -217,10 +196,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
             return true;
         }
 
-        internal readonly struct LogEntry
+        [Serializable]
+        internal struct LogEntry
         {
-            public readonly string LogString;
-            public readonly string StackTrace;
+            public string LogString;
+            public string StackTrace;
             public LogEntry(string logString, string stackTrace)
             {
                 LogString = logString;
@@ -229,4 +209,5 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
     }
 }
+#endif
 #endif

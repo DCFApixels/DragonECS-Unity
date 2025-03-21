@@ -45,9 +45,11 @@ namespace DCFApixels.DragonECS
                 Debug.LogException(e);
                 return;
             }
-            string msg = AutoConvertObjectToString(v);
-            string indexedLink = UnityDebugServiceStorage.NewIndexedLink();
             bool hasTag = string.IsNullOrEmpty(tag) == false;
+            string msg = AutoConvertObjectToString(v);
+
+#if DRAGONECS_ENABLE_UNITY_CONSOLE_SHORTCUT_LINKS
+            string indexedLink = UnityDebugServiceStorage.NewIndexedLink();
             if (hasTag)
             {
                 string taglower = tag.ToLower();
@@ -73,6 +75,33 @@ namespace DCFApixels.DragonECS
                 return;
             }
             Debug.Log($"{indexedLink}{msg}");
+#else
+            if (hasTag)
+            {
+                string taglower = tag.ToLower();
+                switch (taglower)
+                {
+                    case "pass":
+                        Debug.Log(
+                            $"[<color=#00ff00>{tag}</color>] {msg}");
+                        break;
+                    case "warning":
+                        Debug.LogWarning(
+                            $"[<color=#ffff00>{tag}</color>] {msg}");
+                        break;
+                    case "error":
+                        Debug.LogError(
+                            $"[<color=#ff4028>{tag}</color>] {msg}");
+                        break;
+                    default:
+                        Debug.Log(
+                            $"[{tag}] {msg}");
+                        break;
+                }
+                return;
+            }
+            Debug.Log($"{msg}");
+#endif
         }
         public override void Break()
         {
