@@ -154,6 +154,33 @@ namespace DCFApixels.DragonECS.Unity.Internal
             return false;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void FastRemoveSpan(int startIndex, int length)
+        {
+#if DEBUG
+            if (startIndex < 0) { Throw.ArgumentOutOfRange(); }
+            if (length < 0) { Throw.ArgumentOutOfRange(); }
+            if (startIndex + length > _count) { Throw.Argument("Invalid range specified"); }
+#endif
+
+            if (length == 0 || _count == 0) { return; }
+
+            int elementsToMove = _count - (startIndex + length);
+
+            if (elementsToMove > 0)
+            {
+                Array.Copy(
+                    sourceArray: _items,
+                    sourceIndex: startIndex + length,
+                    destinationArray: _items,
+                    destinationIndex: startIndex,
+                    length: elementsToMove
+                );
+            }
+            _count -= length;
+
+            //RuntimeHelpers.IsReferenceOrContainsReferences<T>();
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool RemoveWithOrder(T item)
         {
             int index = IndexOf(item);
@@ -222,17 +249,17 @@ namespace DCFApixels.DragonECS.Unity.Internal
             self._items[index] = item;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryDequeue_MultiAccess<T>(this ref StructList<T> self, T item)
-        {
-            var index = Interlocked.Increment(ref self._count);
-
-#if DEBUG
-            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
-#endif
-            T result = _items[--_count];
-            _items[_count] = default;
-            return result;
-        }
+//        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+//        public static bool TryDequeue_MultiAccess<T>(this ref StructList<T> self, T item)
+//        {
+//            var index = Interlocked.Increment(ref self._count);
+//
+//#if DEBUG
+//            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
+//#endif
+//            T result = _items[--_count];
+//            _items[_count] = default;
+//            return result;
+//        }
     }
 }

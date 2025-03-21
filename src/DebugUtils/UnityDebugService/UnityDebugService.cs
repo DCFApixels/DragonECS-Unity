@@ -30,27 +30,6 @@ namespace DCFApixels.DragonECS
             if (Instance.GetType() == typeof(UnityDebugService)) { return; }
             Set<UnityDebugService>();
         }
-        protected override void OnEnableBaseService(DebugService oldService)
-        {
-            EditorGUI.hyperLinkClicked -= EditorGUI_hyperLinkClicked;
-            EditorGUI.hyperLinkClicked += EditorGUI_hyperLinkClicked;
-            Application.logMessageReceived -= Application_logMessageReceived;
-            Application.logMessageReceived += Application_logMessageReceived;
-        }
-        protected override void OnDisableBaseService(DebugService nextService)
-        {
-            Application.logMessageReceived -= Application_logMessageReceived;
-            EditorGUI.hyperLinkClicked -= EditorGUI_hyperLinkClicked;
-        }
-        private void EditorGUI_hyperLinkClicked(EditorWindow editor, HyperLinkClickedEventArgs args)
-        {
-            throw new NotImplementedException();
-        }
-        private void Application_logMessageReceived(string logString, string stackTrace, LogType type)
-        {
-        }
-
-
 
         protected override DebugService CreateThreadInstance()
         {
@@ -67,6 +46,7 @@ namespace DCFApixels.DragonECS
                 return;
             }
             string msg = AutoConvertObjectToString(v);
+            string indexedLink = UnityDebugServiceStorage.NewIndexedLink();
             bool hasTag = string.IsNullOrEmpty(tag) == false;
             if (hasTag)
             {
@@ -75,24 +55,24 @@ namespace DCFApixels.DragonECS
                 {
                     case "pass":
                         Debug.Log(
-                            $"[<color=#00ff00>{tag}</color>] {msg}");
+                            $"[<color=#00ff00>{tag}</color>] {msg}{indexedLink}");
                         break;
                     case "warning":
                         Debug.LogWarning(
-                            $"[<color=#ffff00>{tag}</color>] {msg}");
+                            $"[<color=#ffff00>{tag}</color>] {msg}{indexedLink}");
                         break;
                     case "error":
                         Debug.LogError(
-                            $"[<color=#ff4028>{tag}</color>] {msg}");
+                            $"[<color=#ff4028>{tag}</color>] {msg}{indexedLink}");
                         break;
                     default:
                         Debug.Log(
-                            $"[{tag}] {msg}");
+                            $"[{tag}] {msg}{indexedLink}");
                         break;
                 }
                 return;
             }
-            Debug.Log(msg);
+            Debug.Log($"{msg}{indexedLink}");
         }
         public override void Break()
         {

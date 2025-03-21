@@ -8,5 +8,13 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             throw new ArgumentOutOfRangeException();
         }
+        internal static void Argument(string message)
+        {
+            throw new ArgumentException(message);
+        }
+        internal static void Exception()
+        {
+            throw new Exception();
+        }
     }
 }
