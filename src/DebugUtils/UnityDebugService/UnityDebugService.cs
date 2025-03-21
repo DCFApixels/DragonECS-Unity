@@ -55,24 +55,24 @@ namespace DCFApixels.DragonECS
                 {
                     case "pass":
                         Debug.Log(
-                            $"[<color=#00ff00>{tag}</color>] {msg}{indexedLink}");
+                            $"{indexedLink}[<color=#00ff00>{tag}</color>] {msg}");
                         break;
                     case "warning":
                         Debug.LogWarning(
-                            $"[<color=#ffff00>{tag}</color>] {msg}{indexedLink}");
+                            $"{indexedLink}[<color=#ffff00>{tag}</color>] {msg}");
                         break;
                     case "error":
                         Debug.LogError(
-                            $"[<color=#ff4028>{tag}</color>] {msg}{indexedLink}");
+                            $"{indexedLink}[<color=#ff4028>{tag}</color>] {msg}");
                         break;
                     default:
                         Debug.Log(
-                            $"[{tag}] {msg}{indexedLink}");
+                            $"{indexedLink}[{tag}] {msg}");
                         break;
                 }
                 return;
             }
-            Debug.Log($"{msg}{indexedLink}");
+            Debug.Log($"{indexedLink}{msg}");
         }
         public override void Break()
         {

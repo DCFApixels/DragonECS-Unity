@@ -62,16 +62,35 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             if (infos == null) return;
             if (!infos.TryGetValue("href", out var path)) return;
-            infos.TryGetValue("line", out var line);
 
             for (int i = 0; i < _logEntries.Count; i++)
             {
                 ref var e = ref _logEntries._items[i];
                 if (CheckLogWithIndexedLink(e.LogString))
                 {
-                    int indexof = e.LogString.LastIndexOf(INDEXED_LINK_PREV) - 1 + INDEXED_LINK_PREV.Length;// откатываю символ ∆
-                    int stringIndexLength = e.LogString.Length - (indexof + INDEXED_LINK_POST.Length);
+                    //int indexof = e.LogString.LastIndexOf(INDEXED_LINK_PREV) - 1 + INDEXED_LINK_PREV.Length;// откатываю символ ∆
+                    //int stringIndexLength = e.LogString.Length - (indexof + INDEXED_LINK_POST.Length);
+                    //
+                    //if(stringIndexLength == path.Length)
+                    //{
+                    //    bool isSkip = false;
+                    //    for (int j = 1; j < stringIndexLength; j++)
+                    //    {
+                    //        var pathchar = path[j];
+                    //        var logchar = e.LogString[indexof + j];
+                    //        if (pathchar != logchar) { isSkip = true; break; }
+                    //    }
+                    //
+                    //    if (isSkip) { continue; }
+                    //
+                    //    OpenIDE(e);
+                    //
+                    //    break;
+                    //}
 
+                    int indexof = INDEXED_LINK_PREV.Length - 1;// откатываю символ ∆
+                    int stringIndexLength = e.LogString.IndexOf(INDEXED_LINK_POST) - indexof;
+                    
                     if(stringIndexLength == path.Length)
                     {
                         bool isSkip = false;
@@ -81,14 +100,13 @@ namespace DCFApixels.DragonECS.Unity.Internal
                             var logchar = e.LogString[indexof + j];
                             if (pathchar != logchar) { isSkip = true; break; }
                         }
-
+                    
                         if (isSkip) { continue; }
-
+                    
                         OpenIDE(e);
-
+                    
                         break;
                     }
-
                 }
             }
         }
@@ -155,8 +173,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
             }
         }
 
-        private const string INDEXED_LINK_PREV = "\r\n\r\n<a href=\"∆";
-        private const string INDEXED_LINK_POST = "\">Open line</a>";
+        private const string INDEXED_LINK_PREV = "<a href=\"∆";
+        private const string INDEXED_LINK_POST = "\">∆ </a>";
         private static string CreateIndexedLink(int index)
         {
             return $"{INDEXED_LINK_PREV}{index}{INDEXED_LINK_POST}";
@@ -179,11 +197,21 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         private static bool CheckLogWithIndexedLink(string log)
         {
-            if (log.Length < INDEXED_LINK_POST.Length) { return false; }
-            for (int i = 0; i < INDEXED_LINK_POST.Length; i++)
+            //if (log.Length < INDEXED_LINK_POST.Length) { return false; }
+            //for (int i = 0; i < INDEXED_LINK_POST.Length; i++)
+            //{
+            //    char constChar = INDEXED_LINK_POST[i];
+            //    char logChar = log[log.Length - INDEXED_LINK_POST.Length + i];
+            //    if (constChar != logChar) { return false; }
+            //}
+            //return true;
+
+
+            if (log.Length < INDEXED_LINK_PREV.Length) { return false; }
+            for (int i = 0; i < INDEXED_LINK_PREV.Length; i++)
             {
-                char constChar = INDEXED_LINK_POST[i];
-                char logChar = log[log.Length - INDEXED_LINK_POST.Length + i];
+                char constChar = INDEXED_LINK_PREV[i];
+                char logChar = log[i];
                 if (constChar != logChar) { return false; }
             }
             return true;
