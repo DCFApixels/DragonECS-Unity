@@ -432,6 +432,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                     else if (current.type == EventType.MouseDown && current.clickCount >= 2)
                     {
+                        //UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(); //TODO
                         AssetDatabase.OpenAsset(script);
                     }
                 }

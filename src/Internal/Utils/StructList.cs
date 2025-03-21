@@ -3,13 +3,18 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
+    [Serializable]
     [DebuggerDisplay("Count: {Count}")]
     internal struct StructList<T>
     {
+        [SerializeField]
         internal T[] _items;
+        [SerializeField]
         internal int _count;
 
         public IEnumerable<T> Enumerable
@@ -39,7 +44,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             set
             {
                 if (value <= _items.Length) { return; }
-                value = ArrayUtility.NormalizeSizeToPowerOfTwo(value);
+                value = DragonArrayUtility.NextPow2(value);
                 Array.Resize(ref _items, value);
             }
         }
@@ -66,7 +71,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public StructList(int capacity)
         {
-            _items = new T[ArrayUtility.NormalizeSizeToPowerOfTwo(capacity)];
+            _items = new T[DragonArrayUtility.NextPow2(capacity)];
             _count = 0;
         }
 
@@ -90,6 +95,24 @@ namespace DCFApixels.DragonECS.Unity.Internal
             T tmp = _items[idnex1];
             _items[idnex1] = _items[idnex2];
             _items[idnex2] = tmp;
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ref T FastDequeue()
+        {
+#if DEBUG
+            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
+#endif
+            return ref _items[--_count];
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Dequeue()
+        {
+#if DEBUG
+            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
+#endif
+            T result = _items[--_count];
+            _items[_count] = default;
+            return result;
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void FastRemoveAt(int index)
@@ -176,6 +199,40 @@ namespace DCFApixels.DragonECS.Unity.Internal
             T[] result = new T[_count];
             Array.Copy(_items, result, _count);
             return _items;
+        }
+    }
+
+    internal static class StructListExt
+    {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void Add_MultiAccess<T>(this ref StructList<T> self, T item)
+        {
+            var index = Interlocked.Increment(ref self._count);
+            index -= 1;
+            if (index >= self._items.Length)
+            {
+                lock (self._items)
+                {
+                    if (index >= self._items.Length)
+                    {
+                        Array.Resize(ref self._items, self._items.Length << 1);
+                    }
+                }
+            }
+            self._items[index] = item;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool TryDequeue_MultiAccess<T>(this ref StructList<T> self, T item)
+        {
+            var index = Interlocked.Increment(ref self._count);
+
+#if DEBUG
+            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
+#endif
+            T result = _items[--_count];
+            _items[_count] = default;
+            return result;
         }
     }
 }

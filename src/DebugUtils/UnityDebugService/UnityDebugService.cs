@@ -1,5 +1,8 @@
-﻿using System;
+﻿using DCFApixels.DragonECS.Unity.Internal;
+using System;
+using System.Reflection;
 using Unity.Profiling;
+using UnityEditor;
 using UnityEngine;
 
 #region [InitializeOnLoad]
@@ -12,14 +15,12 @@ namespace DCFApixels.DragonECS
 }
 #endif
 #endregion
-
 namespace DCFApixels.DragonECS
 {
     // Методы юнитевского Debug и ProfilerMarker потоко безопасны
     public partial class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
-
         static UnityDebugService()
         {
             Activate();
@@ -29,6 +30,27 @@ namespace DCFApixels.DragonECS
             if (Instance.GetType() == typeof(UnityDebugService)) { return; }
             Set<UnityDebugService>();
         }
+        protected override void OnEnableBaseService(DebugService oldService)
+        {
+            EditorGUI.hyperLinkClicked -= EditorGUI_hyperLinkClicked;
+            EditorGUI.hyperLinkClicked += EditorGUI_hyperLinkClicked;
+            Application.logMessageReceived -= Application_logMessageReceived;
+            Application.logMessageReceived += Application_logMessageReceived;
+        }
+        protected override void OnDisableBaseService(DebugService nextService)
+        {
+            Application.logMessageReceived -= Application_logMessageReceived;
+            EditorGUI.hyperLinkClicked -= EditorGUI_hyperLinkClicked;
+        }
+        private void EditorGUI_hyperLinkClicked(EditorWindow editor, HyperLinkClickedEventArgs args)
+        {
+            throw new NotImplementedException();
+        }
+        private void Application_logMessageReceived(string logString, string stackTrace, LogType type)
+        {
+        }
+
+
 
         protected override DebugService CreateThreadInstance()
         {
