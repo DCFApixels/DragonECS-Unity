@@ -20,31 +20,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             foreach (string str in importedAssets)
             {
-                //Debug.Log("Reimported Asset: " + str);
                 ProcessAssetPath(str);
             }
             foreach (string str in deletedAssets)
             {
-                //Debug.Log("Deleted Asset: " + str);
                 RemoveAssetPath(str);
             }
-
-            for (int i = 0; i < movedFromAssetPaths.Length; i++)
+            foreach (var str in movedFromAssetPaths)
             {
-                RemoveAssetPath(movedFromAssetPaths[i]);
+                RemoveAssetPath(str);
             }
-            for (int i = 0; i < movedAssets.Length; i++)
+            foreach (string str in movedAssets)
             {
-                //Debug.Log("Moved Asset: " + movedAssets[i] + " from: " + movedFromAssetPaths[i]);
-                ProcessAssetPath(movedAssets[i]);
+                ProcessAssetPath(str);
             }
-
             //if (didDomainReload)
             //{
             //    Debug.Log("Domain has been reloaded");
             //}
-
-
             _timeTicks = DateTime.Now.Ticks;
         }
 
@@ -63,16 +56,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static void RemoveAssetPath(string filePath)
         {
             if (IsScript(filePath) == false) { return; }
-            //Debug.Log("RemoveAssetPath: " + filePath);
             _removedScriptGuids.Add(filePath);
         }
 
         private static void ProcessAssetPath(string filePath)
         {
             if (IsScript(filePath) == false) { return; }
-            //Debug.Log("ProcessAssetPath: " + filePath);
-
-            var script = AssetDatabase.LoadAssetAtPath<MonoScript>(filePath).text;
             _newScriptIDs.Add(filePath);
         }
 
