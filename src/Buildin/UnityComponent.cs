@@ -4,16 +4,11 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
-using UnityEngine.Scripting.APIUpdating;
 
 namespace DCFApixels.DragonECS
 {
     using static EcsConsts;
-    internal static class UnityComponentConsts
-    {
-        internal const string UNITY_COMPONENT_NAME = "UnityComponent";
-        public static readonly MetaGroup BaseGroup = new MetaGroup(UNITY_COMPONENT_NAME);
-    }
+
     [Serializable]
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, COMPONENTS_GROUP)]
@@ -41,6 +36,11 @@ namespace DCFApixels.DragonECS
         }
     }
 
+    internal static class UnityComponentConsts
+    {
+        internal const string UNITY_COMPONENT_NAME = "UnityComponent";
+        public static readonly MetaGroup BaseGroup = MetaGroup.FromName(UNITY_COMPONENT_NAME);
+    }
     [MetaColor(MetaColor.DragonCyan)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     [MetaDescription(AUTHOR, "Template for UnityComponent<T>")]
