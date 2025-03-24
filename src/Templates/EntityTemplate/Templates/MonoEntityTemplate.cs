@@ -4,6 +4,8 @@
 using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
@@ -23,50 +25,58 @@ namespace DCFApixels.DragonECS
     {
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
-        private IComponentTemplate[] _components;
+        private IComponentTemplate[] _componentTemplates;
 
         #region Properties
         string IEntityTemplateInternal.ComponentsPropertyName
         {
-            get { return nameof(_components); }
+            get { return nameof(_componentTemplates); }
         }
         #endregion
 
         #region Methods
+        public ReadOnlySpan<IComponentTemplate> GetComponentTemplates()
+        {
+            return _componentTemplates;
+        }
+        public void SetComponentTemplates(IEnumerable<IComponentTemplate> componentTemplates)
+        {
+            _componentTemplates = componentTemplates.ToArray();
+        }
         public override void Apply(short worldID, int entityID)
         {
-            foreach (var item in _components)
+            foreach (var item in _componentTemplates)
             {
                 item.Apply(worldID, entityID);
             }
         }
         public void Clear()
         {
-            _components = Array.Empty<IComponentTemplate>();
+            _componentTemplates = Array.Empty<IComponentTemplate>();
         }
         #endregion
 
         #region UnityEvents
         private void OnValidate()
         {
-            if (_components == null) { return; }
-            foreach (var item in _components)
+            if (_componentTemplates == null) { return; }
+            foreach (var item in _componentTemplates)
             {
                 item?.OnValidate(gameObject);
             }
         }
         private void OnDrawGizmos()
         {
-            if (_components == null) { return; }
-            foreach (var item in _components)
+            if (_componentTemplates == null) { return; }
+            foreach (var item in _componentTemplates)
             {
                 item?.OnGizmos(transform, IComponentTemplate.GizmosMode.Always);
             }
         }
         private void OnDrawGizmosSelected()
         {
-            if (_components == null) { return; }
-            foreach (var item in _components)
+            if (_componentTemplates == null) { return; }
+            foreach (var item in _componentTemplates)
             {
                 item?.OnGizmos(transform, IComponentTemplate.GizmosMode.Selected);
             }
