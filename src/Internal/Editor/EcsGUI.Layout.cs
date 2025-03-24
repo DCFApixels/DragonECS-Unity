@@ -16,15 +16,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public static partial class Layout
         {
-
+            public static void ManuallySerializeButton(IEnumerable<UnityObject> objects)
+            {
+                if (GUILayout.Button(UnityEditorUtility.GetLabel("Manually serialize")))
+                {
+                    foreach (var obj in objects)
+                    {
+                        EditorUtility.SetDirty(obj);
+                    }
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
+                }
+            }
             public static void ManuallySerializeButton(UnityObject obj)
             {
                 if (GUILayout.Button(UnityEditorUtility.GetLabel("Manually serialize")))
                 {
-                    var so = new SerializedObject(obj);
                     EditorUtility.SetDirty(obj);
-                    so.UpdateIfRequiredOrScript();
-                    so.ApplyModifiedProperties();
                     AssetDatabase.SaveAssets();
                     AssetDatabase.Refresh();
                 }

@@ -146,7 +146,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (IsSO)
             {
-                EcsGUI.Layout.ManuallySerializeButton(target);
+                EcsGUI.Layout.ManuallySerializeButton(targets);
+            }
+
+            if (IsMultipleTargets)
+            {
+                GUILayout.Label("Multi-object editing not supported.", EditorStyles.helpBox);
+                return;
             }
 
             EcsGUI.Changed = GUILayout.Button("Validate");

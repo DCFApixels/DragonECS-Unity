@@ -156,14 +156,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             Init();
 
-            if (_componentsProp == null)
-            {
-                return;
-            }
-
             if (IsSO)
             {
-                EcsGUI.Layout.ManuallySerializeButton(target);
+                EcsGUI.Layout.ManuallySerializeButton(targets);
+            }
+
+            if (IsMultipleTargets)
+            {
+                GUILayout.Label("Multi-object editing not supported.", EditorStyles.helpBox);
+                return;
             }
 
             if (IsMultipleTargets == false && SerializationUtility.HasManagedReferencesWithMissingTypes(target))
@@ -187,7 +188,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             iterator.NextVisible(true);
             while (iterator.NextVisible(false))
             {
-                if (iterator.name == _componentsProp.name)
+                if (_componentsProp != null && iterator.name == _componentsProp.name)
                 {
                     using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
                     {
@@ -220,12 +221,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
     }
 
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(ScriptableEntityTemplate), true)]
     internal class ScriptableEntityTemplateEditor : EntityTemplateEditorBase
     {
         //public override bool IsStaticData { get { return true; } }
         protected override bool IsSO => true;
     }
+    [CanEditMultipleObjects]
     [CustomEditor(typeof(MonoEntityTemplate), true)]
     internal class MonoEntityTemplateEditor : EntityTemplateEditorBase
     {
