@@ -109,8 +109,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         static UnityEditorUtility()
         {
             const int PREWARMUP_LIST_SIZE = 64;
-            EcsWorld.ResetStaticState();
-            UnityDebugService.Activate();
+            OnLoad();
 
             _integrationAssembly = typeof(UnityEditorUtility).Assembly;
 
@@ -212,7 +211,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static void OnLoad()
         {
             EcsWorld.ResetStaticState();
-            UnityDebugService.Activate();
+            if (DebugService.IsNullOrDefault)
+            {
+                UnityDebugService.Activate();
+            }
         }
 
         internal static readonly Assembly _integrationAssembly;

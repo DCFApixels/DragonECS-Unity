@@ -1,30 +1,15 @@
 ﻿using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Reflection;
 using Unity.Profiling;
-using UnityEditor;
 using UnityEngine;
 
-#region [InitializeOnLoad]
-#if UNITY_EDITOR
-namespace DCFApixels.DragonECS
-{
-    using UnityEditor;
-    [InitializeOnLoad]
-    public partial class UnityDebugService { }
-}
-#endif
-#endregion
 namespace DCFApixels.DragonECS
 {
     // Методы юнитевского Debug и ProfilerMarker потоко безопасны
     public partial class UnityDebugService : DebugService
     {
         private ProfilerMarker[] _profilerMarkers = new ProfilerMarker[64];
-        static UnityDebugService()
-        {
-            Activate();
-        }
+
         public static void Activate()
         {
             if (Instance.GetType() == typeof(UnityDebugService)) { return; }
