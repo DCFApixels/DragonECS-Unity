@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
     {
         public const int MIN_CAPACITY_BITS_OFFSET = 4;
         public const int MIN_CAPACITY = 1 << MIN_CAPACITY_BITS_OFFSET;
-        private const int EMPTY = -1;
+        private const int EMPTY_BUCKET = -1;
 
         private int[] _buckets = Array.Empty<int>();
         private Entry[] _entries = Array.Empty<Entry>();
@@ -37,7 +37,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
             minCapacity = NormalizeCapacity(minCapacity);
             _buckets = new int[minCapacity];
             for (int i = 0; i < minCapacity; i++)
-                _buckets[i] = EMPTY;
+            {
+                _buckets[i] = EMPTY_BUCKET;
+            }
             _entries = new Entry[minCapacity];
             _modBitMask = (minCapacity - 1) & 0x7FFFFFFF;
         }
@@ -60,7 +62,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private int FindEntry(int key)
         {
             for (int i = _buckets[key & _modBitMask]; i >= 0; i = _entries[i].next)
-                if (_entries[i].hashKey == key) return i;
+            {
+                if (_entries[i].hashKey == key) { return i; }
+            }
             return -1;
         }
         private void Insert(int key, TValue value)
@@ -154,10 +158,12 @@ namespace DCFApixels.DragonECS.Unity.Internal
             {
                 for (int i = 0; i < _buckets.Length; i++)
                 {
-                    _buckets[i] = -1;
+                    _buckets[i] = EMPTY_BUCKET;
                 }
-                Array.Clear(_entries, 0, _count);
+                Array.Clear(_entries, 0, _entries.Length);
                 _count = 0;
+                _freeList = 0;
+                _freeCount = 0;
             }
         }
         #endregion
@@ -171,7 +177,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             Contract.Assert(newSize >= _entries.Length);
             int[] newBuckets = new int[newSize];
             for (int i = 0; i < newBuckets.Length; i++)
-                newBuckets[i] = EMPTY;
+                newBuckets[i] = EMPTY_BUCKET;
 
             Entry[] newEntries = new Entry[newSize];
             Array.Copy(_entries, 0, newEntries, 0, _count);
