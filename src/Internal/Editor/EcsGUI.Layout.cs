@@ -324,12 +324,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             #region Default DrawRuntimeData
-            [InitializeOnLoadMethod]
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
             private static void ResetRuntimeComponentReflectionCache()
             {
+                foreach (var item in _runtimeComponentReflectionCaches)
+                {
+                    item.Value.Dispose();
+                }
                 _runtimeComponentReflectionCaches.Clear();
             }
-            internal class RuntimeComponentReflectionCache
+            internal class RuntimeComponentReflectionCache : IDisposable
             {
                 public readonly Type Type;
 
@@ -364,6 +368,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         }
                     }
                 }
+                public void Dispose()
+                {
+                    if(Wrapper != null)
+                    {
+                        UnityObject.DestroyImmediate(Wrapper);
+                    }
+                }
+
                 public readonly struct FieldInfoData
                 {
                     public readonly FieldInfo FieldInfo;
@@ -469,7 +481,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     else
                     {
                         EditorGUI.BeginChangeCheck();
-                        //WrapperBase wrapper = RefEditorWrapper.Take(data);
 
                         RefEditorWrapper wrapper = cache.Wrapper;
 
