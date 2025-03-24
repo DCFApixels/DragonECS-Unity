@@ -66,7 +66,7 @@ namespace DCFApixels.DragonECS
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(AUTHOR, nameof(MonoBehaviour) + ". Responsible for connecting the entity and GameObject using the EcsEntityConnect.ConnectWith method.")]
     [MetaID("DragonECS_FF7EB3809201DEC2F1977C00D3B3443B")]
-    public class EcsEntityConnect : MonoBehaviour
+    public class EcsEntityConnect : MonoBehaviour, ITemplateNode
     {
         private entlong _entity;
         private EcsWorld _world;
@@ -81,6 +81,12 @@ namespace DCFApixels.DragonECS
         private MonoEntityTemplateBase[] _monoTemplates;
 
         private bool _isConnectInvoked = false;
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void OnLoad()
+        {
+            _connectedEntities.Clear();
+        }
 
         #region Properties
         public entlong Entity
@@ -113,6 +119,10 @@ namespace DCFApixels.DragonECS
         #endregion
 
         #region Connect
+        void ITemplateNode.Apply(short worldID, int entityID)
+        {
+            ConnectWith((EcsWorld.GetWorld(worldID), entityID), true);
+        }
         public void ConnectWith(entlong entity, bool applyTemplates)
         {
             Disconnect();
