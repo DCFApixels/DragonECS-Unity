@@ -5,7 +5,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal abstract class Config<TSelf> : ScriptableObject where TSelf : ScriptableObject
     {
-        private static object _lock = new object();
+        private readonly static object _lock = new object();
         private static TSelf _instance;
         public static TSelf Instance
         {
