@@ -58,7 +58,7 @@ namespace DCFApixels.DragonECS
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
-    public abstract class ComponentTemplateBase<T> : ComponentTemplateBase
+    public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, ICloneable
     {
         protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
         protected static readonly bool _isHasIEcsComponentLifecycle;
@@ -96,19 +96,9 @@ namespace DCFApixels.DragonECS
             _isHasIEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.isHasHandler;
             _iEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.instance;
         }
-        private static T InitComponent()
-        {
-            T result = default;
-            if (_isHasIEcsComponentLifecycle)
-            {
-                _iEcsComponentLifecycle.Enable(ref result);
-            }
-            result = DefaultValueType;
-            return result;
-        }
 
         [SerializeField]
-        protected T component = InitComponent();
+        protected T component = DefaultValueType;
         [SerializeField]
         [HideInInspector]
         private byte _offset; // Avoids the error "Cannot get managed reference index with out bounds offset"
@@ -126,6 +116,13 @@ namespace DCFApixels.DragonECS
         #region Methods
         public sealed override object GetRaw() { return component; }
         public sealed override void SetRaw(object raw) { component = (T)raw; }
+        protected virtual T CloneComponent() { return component; }
+        object ICloneable.Clone()
+        {
+            ComponentTemplateBase<T> templateClone = (ComponentTemplateBase<T>)MemberwiseClone();
+            templateClone.component = CloneComponent();
+            return templateClone;
+        }
         #endregion
     }
 
@@ -154,6 +151,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private static MethodInfo memberwiseCloneMethdo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
         internal static IComponentTemplate Clone(this IComponentTemplate obj)
         {
+            if(obj is ICloneable cloneable)
+            {
+                return (IComponentTemplate)cloneable.Clone();
+            }
             return (IComponentTemplate)memberwiseCloneMethdo.Invoke(obj, null);
         }
     }
