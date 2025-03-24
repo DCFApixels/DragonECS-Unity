@@ -20,6 +20,8 @@ namespace DCFApixels.DragonECS
     [MetaID("DragonECS_7C4DBA809201D959401A5BDFB6363EC0")]
     public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, IEntityTemplateInternal
     {
+        [SerializeField]
+        private ScriptableEntityTemplateBase[] _templates;
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
         private IComponentTemplate[] _components;
@@ -34,6 +36,10 @@ namespace DCFApixels.DragonECS
         #region Methods
         public override void Apply(short worldID, int entityID)
         {
+            foreach (var template in _templates)
+            {
+                template.Apply(worldID, entityID);
+            }
             foreach (var item in _components)
             {
                 item.Apply(worldID, entityID);

@@ -30,7 +30,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateReferenceAttribute>
     {
         private const float DamagedComponentHeight = 18f * 2f;
-        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
         private static ComponentDropDown _componentDropDown;
 
         #region Properties

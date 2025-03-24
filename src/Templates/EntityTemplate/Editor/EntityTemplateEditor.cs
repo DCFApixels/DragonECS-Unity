@@ -9,8 +9,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal abstract class EntityTemplateEditorBase : ExtendedEditor<IEntityTemplateInternal>
     {
-        private static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
-
         private ComponentDropDown _componentDropDown;
 
         private SerializedProperty _componentsProp;
@@ -184,10 +182,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+
+            SerializedProperty iterator = serializedObject.GetIterator();
+            iterator.NextVisible(true);
+            while (iterator.NextVisible(false))
             {
-                DrawTop(Target, _componentsProp);
-                _reorderableComponentsList.DoLayoutList();
+                if (iterator.name == _componentsProp.name)
+                {
+                    using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+                    {
+                        DrawTop(Target, _componentsProp);
+                        _reorderableComponentsList.DoLayoutList();
+                    }
+                }
+                else
+                {
+                    EditorGUILayout.PropertyField(iterator, true);
+                }
             }
         }
         private void DrawTop(IEntityTemplateInternal target, SerializedProperty componentsProp)
