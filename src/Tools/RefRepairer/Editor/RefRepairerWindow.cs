@@ -65,6 +65,8 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             {
                 if (GUI.Button(rect, ""))
                 {
+                    GUIUtility.hotControl = -1;
+                    GUIUtility.keyboardControl = -1;
                     _selectedMissingsResolvingData = _cachedMissingsResolvingDatas[index];
                 }
             }
