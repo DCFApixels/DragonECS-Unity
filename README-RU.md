@@ -41,6 +41,10 @@
 > Проект в стадии разработки. API может меняться.  
 > Readme еще не завершен, если есть не ясные моменты, вопросы можно задать тут [Обратная связь](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D0%BD%D0%B0%D1%8F-%D1%81%D0%B2%D1%8F%D0%B7%D1%8C)
 
+> [!WARNING]
+> Встроенные реализации шаблоны UnityComponent<T> были перенесены [СЮДА](https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs) Так как некоторые модули Unity отключаемы, и например отключение модуля физики приведет к тому что код реализации UnityComponent<Rigidbody> или  UnityComponent<Collider> не будет компилироваться.
+
+//https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs
 # Оглавление
 - [Установка](#установка)
 - [Debug](#debug)
