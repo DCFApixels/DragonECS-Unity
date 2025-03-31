@@ -346,6 +346,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         void ISerializationCallbackReceiver.OnAfterDeserialize()
         {
             if (_serializableMetaIDScriptPathPairs == null) { return; }
+            _metaIDScriptPathPairs.Clear();
             foreach (var item in _serializableMetaIDScriptPathPairs)
             {
                 if (string.IsNullOrEmpty(item.scriptPath) == false)
