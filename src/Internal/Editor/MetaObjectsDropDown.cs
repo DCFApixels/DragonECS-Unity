@@ -86,9 +86,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
     }
-    internal class ComponentDropDown : MetaObjectsDropDown<IComponentTemplate>
+    internal class ComponentTemplatesDropDown : MetaObjectsDropDown<IComponentTemplate>
     {
-        public ComponentDropDown()
+        public ComponentTemplatesDropDown()
         {
             IEnumerable<(IComponentTemplate template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.Dummies.ToArray().Select(dummy =>
             {
@@ -168,9 +168,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
     }
-    internal class RuntimeComponentDropDown : MetaObjectsDropDown<IEcsPool>
+    internal class RuntimeComponentsDropDown : MetaObjectsDropDown<IEcsPool>
     {
-        public RuntimeComponentDropDown(IEnumerable<IEcsPool> pools)
+        public RuntimeComponentsDropDown(IEnumerable<IEcsPool> pools)
         {
             IEnumerable<(IEcsPool pool, ITypeMeta meta)> itemMetaPairs = pools.Select(pool =>
             {
@@ -268,6 +268,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void ItemSelected(AdvancedDropdownItem item)
         {
+            //EcsGUI.Changed = true;
             base.ItemSelected(item);
             var tType = (Item)item;
             ItemSelected(tType);

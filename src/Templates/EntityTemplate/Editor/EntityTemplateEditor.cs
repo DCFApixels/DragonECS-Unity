@@ -9,10 +9,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal abstract class EntityTemplateEditorBase : ExtendedEditor<IEntityTemplateInternal>
     {
-        private ComponentDropDown _componentDropDown;
+        private ComponentTemplatesDropDown _componentDropDown;
 
         private SerializedProperty _componentsProp;
         private ReorderableList _reorderableComponentsList;
+        private int _reorderableComponentsListLastCount;
 
         protected abstract bool IsSO { get; }
 
@@ -22,7 +23,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
         {
-            _componentDropDown = new ComponentDropDown();
+            _componentDropDown = new ComponentTemplatesDropDown();
 
             _componentsProp = serializedObject.FindProperty(Target.ComponentsPropertyName);
 
@@ -38,6 +39,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _reorderableComponentsList.footerHeight = 0f;
             _reorderableComponentsList.headerHeight = 0f;
             _reorderableComponentsList.elementHeight = 0f;
+
+            _reorderableComponentsListLastCount = _reorderableComponentsList.count;
         }
 
         #region ReorderableComponentsList
@@ -165,6 +168,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 GUILayout.Label("Multi-object editing not supported.", EditorStyles.helpBox);
                 return;
+            }
+            else
+            {
+                //костыль который насильно заставляет _reorderableComponentsList пересчитать высоту
+                if (_reorderableComponentsListLastCount != _reorderableComponentsList.count)
+                {
+                    EcsGUI.Changed = true;
+                    _reorderableComponentsListLastCount = _reorderableComponentsList.count;
+                }
             }
 
             if (IsMultipleTargets == false && SerializationUtility.HasManagedReferencesWithMissingTypes(target))

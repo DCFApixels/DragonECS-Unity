@@ -507,9 +507,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public struct WorldData
         {
-            public RuntimeComponentDropDown addComponentGenericMenu;
+            public RuntimeComponentsDropDown addComponentGenericMenu;
             public int poolsCount;
-            public WorldData(RuntimeComponentDropDown addComponentGenericMenu, int poolsCount)
+            public WorldData(RuntimeComponentsDropDown addComponentGenericMenu, int poolsCount)
             {
                 this.addComponentGenericMenu = addComponentGenericMenu;
                 this.poolsCount = poolsCount;
@@ -518,7 +518,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //world id
         private static Dictionary<EcsWorld, WorldData> _worldDatas = new Dictionary<EcsWorld, WorldData>();
 
-        public static RuntimeComponentDropDown GetAddComponentGenericMenu(EcsWorld world)
+        public static RuntimeComponentsDropDown GetAddComponentGenericMenu(EcsWorld world)
         {
             if (_worldDatas.TryGetValue(world, out WorldData data))
             {
@@ -541,7 +541,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static WorldData CreateWorldData(EcsWorld world)
         {
             IEnumerable<IEcsPool> pools = world.AllPools.ToArray().Where(o => o.IsNullOrDummy() == false);
-            RuntimeComponentDropDown genericMenu = new RuntimeComponentDropDown(pools);
+            RuntimeComponentsDropDown genericMenu = new RuntimeComponentsDropDown(pools);
             return new WorldData(genericMenu, world.PoolsCount);
         }
 

@@ -30,7 +30,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateReferenceAttribute>
     {
         private const float DamagedComponentHeight = 18f * 2f;
-        private static ComponentDropDown _componentDropDown;
+        private static ComponentTemplatesDropDown _componentDropDown;
 
         #region Properties
         private float SingleLineWithPadding => OneLineHeight + Padding * 4f;
@@ -41,14 +41,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Init
         protected override void OnStaticInit()
         {
-            _componentDropDown = new ComponentDropDown();
+            _componentDropDown = new ComponentTemplatesDropDown();
             _componentDropDown.OnSelected += SelectComponent;
         }
 
         [ThreadStatic]
         private static SerializedProperty currentProperty;
-        private static void SelectComponent(ComponentDropDown.Item item)
+        private static void SelectComponent(ComponentTemplatesDropDown.Item item)
         {
+            EcsGUI.Changed = true;
             currentProperty.managedReferenceValue = item.Obj.Clone();
             currentProperty.isExpanded = false;
             currentProperty.serializedObject.ApplyModifiedProperties();
