@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal class DeepDebuggerWindow : EditorWindow
     {
-        public const string TITLE = "DeepDebuggerWindow";
+        public const string TITLE = nameof(DeepDebuggerWindow);
 
 #if DRAGONECS_DEEP_DEBUG
         [MenuItem("Tools/" + EcsConsts.FRAMEWORK_NAME + "/" + TITLE)]
