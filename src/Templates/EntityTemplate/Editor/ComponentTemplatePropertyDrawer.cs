@@ -49,7 +49,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static SerializedProperty currentProperty;
         private static void SelectComponent(ComponentTemplatesDropDown.Item item)
         {
-            EcsGUI.Changed = true;
+            //EcsGUI.Changed = true;
             currentProperty.managedReferenceValue = item.Obj.Clone();
             currentProperty.isExpanded = false;
             currentProperty.serializedObject.ApplyModifiedProperties();
