@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public abstract void Release();
     }
     [Serializable]
-    internal abstract class WrapperBase<TSelf> : WrapperBase
+    internal abstract class WrapperBase<TSelf> : WrapperBase, IDisposable
         where TSelf : WrapperBase<TSelf>
     {
 
@@ -28,6 +28,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isReleased = false;
 
         private static Stack<TSelf> _wrappers = new Stack<TSelf>();
+        public static void ResetStaticState()
+        {
+            foreach (var item in _wrappers)
+            {
+                UnityEngine.Object.DestroyImmediate(item);
+            }
+            _wrappers.Clear();
+        }
 
         public sealed override bool IsExpanded
         {
@@ -87,6 +95,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public override void Release()
         {
             Release((TSelf)this);
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void Dispose()
+        {
+            Release();
         }
     }
 }

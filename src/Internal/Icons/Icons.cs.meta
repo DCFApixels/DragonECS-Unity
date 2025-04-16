@@ -21,6 +21,7 @@ MonoImporter:
   - _visibilityIconOff: {fileID: 2800000, guid: 1f25a5ca611092642a8ee4e08fafcd43, type: 3}
   - _labelIconType: {fileID: 2800000, guid: 5476d6e1435981e4cbc915a080f93ee6, type: 3}
   - _labelIconMeta: {fileID: 2800000, guid: ebb82b09315bde749a10dfa45e64067c, type: 3}
+  - _hyperlinkIcon: {fileID: 2800000, guid: 2a89f8c59dad13641b9c51337e8fd7ad, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

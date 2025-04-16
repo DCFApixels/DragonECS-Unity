@@ -43,7 +43,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private Texture _labelIconType = null;
         [SerializeField]
         private Texture _labelIconMeta = null;
-
+        [SerializeField]
+        private Texture _hyperlinkIcon = null;
 
         private Texture2D _dummy;
         private Texture2D _dummyRed;
@@ -117,6 +118,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         internal Texture VisibilityIconOff { get { return _visibilityIconOff != null ? _visibilityIconOff : Dummy; } }
         internal Texture LabelIconType { get { return _labelIconType != null ? _labelIconType : Dummy; } }
         internal Texture LabelIconMeta { get { return _labelIconMeta != null ? _labelIconMeta : Dummy; } }
+        internal Texture HyperlinkIcon { get { return _hyperlinkIcon != null ? _hyperlinkIcon : Dummy; } }
 #endif
     }
 }

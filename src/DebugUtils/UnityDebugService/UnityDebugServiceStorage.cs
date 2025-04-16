@@ -77,8 +77,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 {
                     int indexof = INDEXED_LINK_PREV.Length - 1;// откатываю символ ∆
                     int stringIndexLength = e.LogString.IndexOf(INDEXED_LINK_POST) - indexof;
-                    
-                    if(stringIndexLength == path.Length)
+
+                    if (stringIndexLength == path.Length)
                     {
                         bool isSkip = false;
                         for (int j = 1; j < stringIndexLength; j++)
@@ -87,11 +87,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
                             var logchar = e.LogString[indexof + j];
                             if (pathchar != logchar) { isSkip = true; break; }
                         }
-                    
+
                         if (isSkip) { continue; }
-                    
+
                         OpenIDE(e);
-                    
+
                         break;
                     }
                 }
@@ -149,7 +149,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 if (_consoleLogCounter > currentCount)
                 {
                     var l = _consoleLogCounter - currentCount;
-                    if(l < inst._logEntries.Count)
+                    if (l < inst._logEntries.Count)
                     {
                         inst._logEntries.FastRemoveSpan(0, l);
                     }

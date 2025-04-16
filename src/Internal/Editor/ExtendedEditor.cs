@@ -44,7 +44,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get { return UserSettingsPrefs.instance.IsShowHidden; }
             set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
-        private static ComponentColorMode ComponentColorMode
+        protected bool IsShowRuntimeComponents
+        {
+            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+        }
+        protected static ComponentColorMode ComponentColorMode
         {
             get { return UserSettingsPrefs.instance.ComponentColorMode; }
             set { UserSettingsPrefs.instance.ComponentColorMode = value; }
@@ -190,7 +195,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get { return UserSettingsPrefs.instance.IsShowHidden; }
             set { UserSettingsPrefs.instance.IsShowHidden = value; }
         }
-        private static ComponentColorMode ComponentColorMode
+        protected bool IsShowRuntimeComponents
+        {
+            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+        }
+        protected static ComponentColorMode ComponentColorMode
         {
             get { return UserSettingsPrefs.instance.ComponentColorMode; }
             set { UserSettingsPrefs.instance.ComponentColorMode = value; }

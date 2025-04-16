@@ -19,7 +19,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     world.DelEntity(id);
                 }
             }
-            EcsGUI.Layout.EntityBarForAlive(isAlive ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive, id, gen, worldID);
+            //EcsGUI.Layout.EntityBarForAlive(isAlive ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive, id, gen, worldID);
+            EcsGUI.Layout.EntityField(entity);
 
             var drawers = UnityEditorUtility._entityEditorBlockDrawers;
             if (drawers.Length > 0)

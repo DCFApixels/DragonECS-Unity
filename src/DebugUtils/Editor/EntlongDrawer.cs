@@ -8,17 +8,62 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomPropertyDrawer(typeof(entlong))]
     internal class EntlongDrawer : ExtendedPropertyDrawer
     {
+        private float heightCache = 0;
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (EcsGUI.Disable)
-            {
-                EntitySlotInfo slotInfo = new EntitySlotInfo(property.FindPropertyRelative("_full").longValue);
-                var (labelRect, barRect) = position.HorizontalSliceLeft(EditorGUIUtility.labelWidth * 0.65f);
+            Rect labelRect, hyperlinkButtonRect;
+            (labelRect, position) = position.HorizontalSliceLeft(EditorGUIUtility.labelWidth * 0.65f);
+            (position, hyperlinkButtonRect) = position.HorizontalSliceRight(18f);
 
-                EditorGUI.LabelField(labelRect, label);
-                bool isAlive = EcsWorld.GetWorld(slotInfo.world).IsAlive(slotInfo.id, slotInfo.gen);
-                EcsGUI.EntityBar(barRect, false, isAlive ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive, slotInfo.id, slotInfo.gen, slotInfo.world);
+            bool drawFoldout = property.hasMultipleDifferentValues == false;
+
+            bool isExpanded = false;
+            if (drawFoldout)
+            {
+                EditorGUI.BeginChangeCheck();
+                isExpanded = EditorGUI.Foldout(labelRect, property.isExpanded, label);
+                if (EditorGUI.EndChangeCheck())
+                {
+                    property.isExpanded = isExpanded;
+                }
             }
+            else
+            {
+                EditorGUI.LabelField(labelRect, label);
+            }
+
+            EntitySlotInfo entity = new EntitySlotInfo(property.FindPropertyRelative("_full").longValue);
+            EcsWorld.TryGetWorld(entity.world, out EcsWorld world);
+
+            if (drawFoldout && isExpanded)
+            {
+                using (EcsGUI.UpIndentLevel())
+                {
+                    if (world != null && world.IsAlive(entity.id, entity.gen))
+                    {
+                        EcsGUI.Layout.DrawRuntimeComponents(entity.id, world, false, false);
+                        if (Event.current.type == EventType.Layout)
+                        {
+                            heightCache = GUILayoutUtility.GetLastRect().height;
+                        }
+                    }
+                }
+            }
+            EcsGUI.EntityField(position, property);
+            using (EcsGUI.SetEnable(world != null))
+            {
+                EcsGUI.EntityHyperlinkButton(hyperlinkButtonRect, world, entity.id);
+            }
+        }
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            const float UNITY_HEIGHT_CONSTANT = 18f;
+            if (property.hasMultipleDifferentValues)
+            {
+                return UNITY_HEIGHT_CONSTANT;
+            }
+            return Mathf.Max(heightCache, UNITY_HEIGHT_CONSTANT);
         }
     }
 }

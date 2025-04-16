@@ -9,6 +9,7 @@ using UnityEngine;
 using DCFApixels.DragonECS.Unity.Internal;
 #if UNITY_EDITOR
 using UnityEditor;
+using DCFApixels.DragonECS.Unity.Editors;
 #endif
 
 namespace DCFApixels.DragonECS
@@ -132,6 +133,9 @@ namespace DCFApixels.DragonECS
                 _isConnectInvoked = true;
                 _entity = entity;
                 _world = world;
+#if UNITY_EDITOR
+                world.Get<EcsGUI.EntityLinksComponent>().SetConnectLink(entity.GetIDUnchecked(), this);
+#endif
                 _connectedEntities.Add(GetInstanceID(), this);
                 var goConnects = world.GetPool<GameObjectConnect>();
                 if (goConnects.Has(newEntityID))

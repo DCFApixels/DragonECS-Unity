@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using DCFApixels.DragonECS.Unity.Editors;
+using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
@@ -17,6 +18,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
         public void Set(entlong entity)
         {
             _entity = entity;
+#if UNITY_EDITOR
+            var world = entity.GetWorldUnchecked();
+            world.Get<EcsGUI.EntityLinksComponent>().SetMonitorLink(entity.GetIDUnchecked(), this);
+#endif
         }
     }
 }

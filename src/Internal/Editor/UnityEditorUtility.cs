@@ -312,8 +312,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     break;
                 case SerializedPropertyType.Gradient:
 #if UNITY_2022_1_OR_NEWER
-                    property.gradientValue = new Gradient();;
-           
+                    property.gradientValue = new Gradient(); ;
+
 #else
                     Debug.LogWarning($"Unsupported SerializedPropertyType: {property.propertyType}");
 #endif
@@ -401,6 +401,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _singletonContent.tooltip = string.Empty;
             _singletonContent.image = null;
             return _singletonContent;
+        }
+        public static GUIContent GetLabelOrNull(string name, string tooltip = null)
+        {
+            if (string.IsNullOrEmpty(name))
+            {
+                return null;
+            }
+            return GetLabel(name, tooltip);
+        }
+        public static GUIContent GetLabelOrNull(Texture value, string tooltip = null)
+        {
+            if (value == null)
+            {
+                return null;
+            }
+            return GetLabel(value, tooltip);
         }
         public static GUIContent GetLabel(string name, string tooltip = null)
         {
