@@ -6,9 +6,10 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     [CustomPropertyDrawer(typeof(entlong))]
-    internal class EntlongDrawer : ExtendedPropertyDrawer
+    internal unsafe class EntlongDrawer : ExtendedPropertyDrawer
     {
         private float heightCache = 0;
+        private static readonly int s_ObjectFieldHash = "s_ObjectFieldHash".GetHashCode();
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
             Rect labelRect, hyperlinkButtonRect;
@@ -32,7 +33,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 EditorGUI.LabelField(labelRect, label);
             }
 
-            EntitySlotInfo entity = new EntitySlotInfo(property.FindPropertyRelative("_full").longValue);
+            SerializedProperty fulleProperty = property.FindPropertyRelative("_full");
+            EntitySlotInfo entity = new EntitySlotInfo(fulleProperty.longValue);
             EcsWorld.TryGetWorld(entity.world, out EcsWorld world);
 
             if (drawFoldout && isExpanded)
@@ -54,6 +56,67 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 EcsGUI.EntityHyperlinkButton(hyperlinkButtonRect, world, entity.id);
             }
+
+
+            Rect dropRect = position;
+            dropRect.yMax = position.yMin + EditorGUIUtility.singleLineHeight;
+
+
+            var eventType = Event.current.type;
+            int controlID = GUIUtility.GetControlID(s_ObjectFieldHash, FocusType.Keyboard, position);
+            if (!dropRect.Contains(Event.current.mousePosition) || !GUI.enabled)
+            {
+                return;
+            }
+            if (DragAndDrop.visualMode == DragAndDropVisualMode.None)
+            {
+                DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
+            }
+
+            if (eventType == EventType.DragPerform)
+            {
+                entlong ent = default;
+                var dragged = DragAndDrop.objectReferences[0];
+                if(dragged is GameObject go)
+                {
+                    if (go.TryGetComponent(out EcsEntityConnect connect))
+                    {
+                        ent = connect.Entity;
+                    }
+                    else if (go.TryGetComponent(out EntityMonitor monitor))
+                    {
+                        ent = monitor.Entity;
+                    }
+                }
+                else
+                {
+                    if (dragged is EcsEntityConnect connect)
+                    {
+                        ent = connect.Entity;
+                    }
+                    else if (dragged is EntityMonitor monitor)
+                    {
+                        ent = monitor.Entity;
+                    }
+                }
+                
+                long entityLong = *(long*)&ent;
+                if(entityLong != 0)
+                {
+                    fulleProperty.longValue = entityLong;
+                }
+
+
+                EcsGUI.Changed = true;
+                DragAndDrop.AcceptDrag();
+                DragAndDrop.activeControlID = 0;
+            }
+            else
+            {
+                DragAndDrop.activeControlID = controlID;
+            }
+
+            //Event.current.Use();
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
