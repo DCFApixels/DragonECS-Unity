@@ -76,16 +76,19 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (eventType == EventType.DragPerform)
             {
                 entlong ent = default;
+                bool isValide = false;
                 var dragged = DragAndDrop.objectReferences[0];
                 if(dragged is GameObject go)
                 {
                     if (go.TryGetComponent(out EcsEntityConnect connect))
                     {
                         ent = connect.Entity;
+                        isValide = true;
                     }
                     else if (go.TryGetComponent(out EntityMonitor monitor))
                     {
                         ent = monitor.Entity;
+                        isValide = true;
                     }
                 }
                 else
@@ -93,16 +96,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (dragged is EcsEntityConnect connect)
                     {
                         ent = connect.Entity;
+                        isValide = true;
                     }
                     else if (dragged is EntityMonitor monitor)
                     {
                         ent = monitor.Entity;
+                        isValide = true;
                     }
                 }
                 
-                long entityLong = *(long*)&ent;
-                if(entityLong != 0)
+                if(isValide)
                 {
+                    long entityLong = *(long*)&ent;
                     fulleProperty.longValue = entityLong;
                 }
 
