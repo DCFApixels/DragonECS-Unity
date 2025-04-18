@@ -145,22 +145,6 @@ namespace DCFApixels.DragonECS
     }
 }
 
-namespace DCFApixels.DragonECS.Unity.Internal
-{
-    internal static class ComponentTemplateExtensions
-    {
-        private static MethodInfo memberwiseCloneMethdo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
-        internal static IComponentTemplate Clone(this IComponentTemplate obj)
-        {
-            if(obj is ICloneable cloneable)
-            {
-                return (IComponentTemplate)cloneable.Clone();
-            }
-            return (IComponentTemplate)memberwiseCloneMethdo.Invoke(obj, null);
-        }
-    }
-}
-
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -182,10 +166,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Type interfaceType = typeof(IComponentTemplate);
 
             _types = UnityEditorUtility._serializableTypes.Where(type => interfaceType.IsAssignableFrom(type)).ToArray();
-            foreach (var type in _types)
-            {
-                EcsDebugUtility.GetTypeMeta(type);
-            }
+            //foreach (var type in _types)
+            //{
+            //    EcsDebugUtility.GetTypeMeta(type);
+            //}
             _dummies = new IComponentTemplate[_types.Length];
 
             for (int i = 0; i < _types.Length; i++)

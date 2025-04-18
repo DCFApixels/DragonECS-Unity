@@ -33,6 +33,20 @@ namespace DCFApixels.DragonECS.Unity.Internal
         {
             return self.IsSubclassOf(typeof(UnityObject));
         }
+
+        private static MethodInfo memberwiseCloneMethdo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
+        internal static object Clone_Reflection(this object obj)
+        {
+            if (obj is ICloneable cloneable)
+            {
+                return cloneable.Clone();
+            }
+            return memberwiseCloneMethdo.Invoke(obj, null);
+        }
+        internal static object Clone_Reflection<T>(this T obj)
+        {
+            return Clone_Reflection((object)obj);
+        }
     }
 }
 #endif

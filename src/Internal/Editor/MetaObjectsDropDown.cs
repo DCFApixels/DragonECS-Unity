@@ -163,7 +163,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (_fieldProperty != null)
             {
-                _fieldProperty.managedReferenceValue = cmptmp.Clone();
+                _fieldProperty.managedReferenceValue = cmptmp.Clone_Reflection();
                 _fieldProperty.serializedObject.ApplyModifiedProperties();
             }
         }
