@@ -87,6 +87,7 @@ namespace DCFApixels.DragonECS
                             _defaultValueType = (T)field.GetValue(null);
                         }
                     }
+                    _defaultValueTypeInit = true;
                 }
                 return _defaultValueType;
             }
