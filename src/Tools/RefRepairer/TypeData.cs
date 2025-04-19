@@ -79,12 +79,12 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Internal
                 AssemblyName == other.AssemblyName;
         }
         public override bool Equals(object obj) { return Equals((TypeData)obj); }
-        public override int GetHashCode() 
+        public override int GetHashCode()
         {
             int hash1 = ClassName.GetHashCode();
             int hash2 = NamespaceName.GetHashCode();
             int hash3 = AssemblyName.GetHashCode();
-            return hash1 ^ hash2 ^ hash3; 
+            return hash1 ^ hash2 ^ hash3;
         }
         public override string ToString() { return $"{{{AssemblyName}, {NamespaceName}, {ClassName}}}"; }
     }

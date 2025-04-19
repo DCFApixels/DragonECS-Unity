@@ -34,7 +34,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
         public bool TryGetMetaID(TypeData key, out string metaID)
         {
             bool result = _typeKeyMetaIDPairs.TryGetValue(key, out metaID);
-            if(result && string.IsNullOrEmpty(metaID))
+            if (result && string.IsNullOrEmpty(metaID))
             {
                 result = false;
                 _typeKeyMetaIDPairs.Remove(key);

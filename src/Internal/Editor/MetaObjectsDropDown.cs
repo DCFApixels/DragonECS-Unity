@@ -333,7 +333,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     var x = Group.Splited.GetEnumerator();
                     x.MoveNext();
                     return x.Current.GetHashCode() ^ state;
-                };
+                }
             }
         }
         #endregion

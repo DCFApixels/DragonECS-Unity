@@ -78,7 +78,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 entlong ent = default;
                 bool isValide = false;
                 var dragged = DragAndDrop.objectReferences[0];
-                if(dragged is GameObject go)
+                if (dragged is GameObject go)
                 {
                     if (go.TryGetComponent(out EcsEntityConnect connect))
                     {
@@ -104,8 +104,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         isValide = true;
                     }
                 }
-                
-                if(isValide)
+
+                if (isValide)
                 {
                     long entityLong = *(long*)&ent;
                     fulleProperty.longValue = entityLong;

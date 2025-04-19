@@ -5,7 +5,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal readonly struct ReadOnlyList<T> : IEnumerable<T>, IReadOnlyList<T>
     {
-        private  readonly List<T> _list;
+        private readonly List<T> _list;
         public ReadOnlyList(List<T> list)
         {
             _list = list;

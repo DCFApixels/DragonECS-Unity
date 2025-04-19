@@ -249,17 +249,17 @@ namespace DCFApixels.DragonECS.Unity.Internal
             self._items[index] = item;
         }
 
-//        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-//        public static bool TryDequeue_MultiAccess<T>(this ref StructList<T> self, T item)
-//        {
-//            var index = Interlocked.Increment(ref self._count);
-//
-//#if DEBUG
-//            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
-//#endif
-//            T result = _items[--_count];
-//            _items[_count] = default;
-//            return result;
-//        }
+        //        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //        public static bool TryDequeue_MultiAccess<T>(this ref StructList<T> self, T item)
+        //        {
+        //            var index = Interlocked.Increment(ref self._count);
+        //
+        //#if DEBUG
+        //            if (_count <= 0) { Throw.ArgumentOutOfRange(); }
+        //#endif
+        //            T result = _items[--_count];
+        //            _items[_count] = default;
+        //            return result;
+        //        }
     }
 }

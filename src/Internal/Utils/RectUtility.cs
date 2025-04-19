@@ -62,7 +62,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
                 state ^= state >> 17;
                 state ^= state << 5;
                 return state;
-            };
+            }
         }
         public static void DebugRect_Editor(params Rect[] rects)
         {
