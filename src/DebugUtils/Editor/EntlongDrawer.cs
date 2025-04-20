@@ -22,11 +22,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             int controlID = GUIUtility.GetControlID(s_ObjectFieldHash, FocusType.Keyboard, position);
 
             bool containsMouse = dropRect.Contains(Event.current.mousePosition);
-            bool dragPerform = eventType == EventType.DragPerform;
 
-            if(containsMouse && eventType == EventType.Repaint)
+            if(containsMouse && eventType == EventType.Repaint && DragAndDrop.activeControlID == controlID)
             {
-                EditorStyles.selectionRect.Draw(dropRect.AddPadding(-1), UnityEditorUtility.GetLabelTemp(), controlID, DragAndDrop.activeControlID == controlID, position.Contains(Event.current.mousePosition));
+                EditorStyles.selectionRect.Draw(dropRect.AddPadding(-1), GUIContent.none, controlID, false, false);
             }
 
 
@@ -85,75 +84,77 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
             }
 
-            if (dragPerform)
+            if (eventType == EventType.DragPerform || eventType == EventType.DragUpdated)
             {
-                entlong ent = default;
-                bool isValide = false;
-                var dragged = DragAndDrop.objectReferences[0];
-                if (dragged is GameObject go)
+                if (eventType == EventType.DragPerform)
                 {
-                    if (go.TryGetComponent(out EcsEntityConnect connect))
+                    entlong ent = default;
+                    bool isValide = false;
+                    var dragged = DragAndDrop.objectReferences[0];
+                    if (dragged is GameObject go)
                     {
-                        ent = connect.Entity;
-                        isValide = true;
-                    }
-                    else if (go.TryGetComponent(out EntityMonitor monitor))
-                    {
-                        ent = monitor.Entity;
-                        isValide = true;
-                    }
-                    else
-                    {
-                        foreach (var beh in go.GetComponents<MonoBehaviour>())
+                        if (go.TryGetComponent(out EcsEntityConnect connect))
                         {
-                            if(TryFindEntlong(beh, out ent))
+                            ent = connect.Entity;
+                            isValide = true;
+                        }
+                        else if (go.TryGetComponent(out EntityMonitor monitor))
+                        {
+                            ent = monitor.Entity;
+                            isValide = true;
+                        }
+                        else
+                        {
+                            foreach (var beh in go.GetComponents<MonoBehaviour>())
                             {
-                                isValide = true;
-                                break;
+                                if (TryFindEntlong(beh, out ent))
+                                {
+                                    isValide = true;
+                                    break;
+                                }
                             }
                         }
                     }
+                    else
+                    {
+                        if (dragged is EcsEntityConnect connect)
+                        {
+                            ent = connect.Entity;
+                            isValide = true;
+                        }
+                        else if (dragged is EntityMonitor monitor)
+                        {
+                            ent = monitor.Entity;
+                            isValide = true;
+                        }
+                        else
+                        {
+                            if (TryFindEntlong(dragged, out ent))
+                            {
+                                isValide = true;
+                            }
+                        }
+                    }
+
+
+
+                    if (isValide)
+                    {
+                        long entityLong = *(long*)&ent;
+                        fulleProperty.longValue = entityLong;
+                    }
+
+
+                    EcsGUI.Changed = true;
+                    DragAndDrop.AcceptDrag();
+                    DragAndDrop.activeControlID = 0;
                 }
                 else
                 {
-                    if (dragged is EcsEntityConnect connect)
-                    {
-                        ent = connect.Entity;
-                        isValide = true;
-                    }
-                    else if (dragged is EntityMonitor monitor)
-                    {
-                        ent = monitor.Entity;
-                        isValide = true;
-                    }
-                    else
-                    {
-                        if (TryFindEntlong(dragged, out ent))
-                        {
-                            isValide = true;
-                        }
-                    }
+                    DragAndDrop.activeControlID = controlID;
                 }
-
-
-
-                if (isValide)
-                {
-                    long entityLong = *(long*)&ent;
-                    fulleProperty.longValue = entityLong;
-                }
-
-
-                EcsGUI.Changed = true;
-                DragAndDrop.AcceptDrag();
-                DragAndDrop.activeControlID = 0;
-            }
-            else
-            {
-                DragAndDrop.activeControlID = controlID;
             }
 
-            //Event.current.Use();
         }
 
         private bool TryFindEntlong(Object uniObj, out entlong ent)
