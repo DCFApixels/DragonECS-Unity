@@ -277,7 +277,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static LabelWidthScope SetLabelWidth(float value) => new LabelWidthScope(value);
         #endregion
 
-        private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        //private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
 
         internal readonly static Color GrayColor = new Color32(100, 100, 100, 255);
         internal readonly static Color GreenColor = new Color32(75, 255, 0, 255);

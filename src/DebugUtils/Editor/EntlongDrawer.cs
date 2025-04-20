@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -90,6 +91,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         ent = monitor.Entity;
                         isValide = true;
                     }
+                    else
+                    {
+                        foreach (var beh in go.GetComponents<MonoBehaviour>())
+                        {
+                            if(TryFindEntlong(beh, out ent))
+                            {
+                                isValide = true;
+                                break;
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -103,10 +115,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         ent = monitor.Entity;
                         isValide = true;
                     }
+                    else
+                    {
+                        if (TryFindEntlong(dragged, out ent))
+                        {
+                            isValide = true;
+                        }
+                    }
                 }
+
+
 
                 if (isValide)
                 {
+                    EditorGUI.ObjectField
                     long entityLong = *(long*)&ent;
                     fulleProperty.longValue = entityLong;
                 }
@@ -122,6 +144,34 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             //Event.current.Use();
+        }
+
+        private bool TryFindEntlong(Object uniObj, out entlong ent)
+        {
+            var fields = uniObj.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            foreach (var field in fields)
+            {
+                if(field.FieldType == typeof(entlong))
+                {
+                    ent = (entlong)field.GetValue(uniObj);
+                    return true;
+                }
+            }
+
+            var iterator = new SerializedObject(uniObj).GetIterator();
+            iterator.NextVisible(true);
+            while (iterator.Next(true))
+            {
+                if (iterator.propertyType == SerializedPropertyType.Integer &&
+                    iterator.propertyPath.Contains(nameof(entlong)))
+                {
+                    var l = iterator.longValue;
+                    ent = *(entlong*)&l;
+                    return true;
+                }
+            }
+            ent = entlong.NULL;
+            return false;
         }
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
