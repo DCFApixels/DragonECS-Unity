@@ -82,7 +82,14 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 ResetWrappers();
                 IsUnmanaged = UnsafeUtility.IsUnmanaged(type);
                 IsUnityObjectType = typeof(UnityObject).IsAssignableFrom(type);
-                IsUnitySerializable = IsUnityObjectType || (!type.IsGenericType && type.IsSerializable);
+                IsUnitySerializable =
+                    IsUnityObjectType ||
+                    //typeof(Array).IsAssignableFrom(type) ||
+                    //(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) ||
+                    //type.IsPrimitive ||
+                    //type == typeof(string) ||
+                    //type.IsEnum ||
+                    (!type.IsGenericType && type.IsSerializable && type.HasAttribute<System.SerializableAttribute>());
 
                 if (type == typeof(void)) { return; }
 
@@ -108,7 +115,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 public readonly Type FieldType;
                 public readonly string UnityFormatName;
                 public readonly bool IsUnityObjectField;
-                public readonly bool IsPassToSerialize;
+                public readonly bool IsPassToUnitySerialize;
                 public readonly RuntimeComponentReflectionCache ValueTypeReflectionCache;
                 public FieldInfoData(FieldInfo fieldInfo)
                 {
@@ -116,7 +123,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     FieldType = fieldInfo.FieldType;
                     IsUnityObjectField = typeof(UnityObject).IsAssignableFrom(fieldInfo.FieldType);
                     UnityFormatName = UnityEditorUtility.TransformFieldName(fieldInfo.Name);
-                    IsPassToSerialize =
+                    IsPassToUnitySerialize =
                         (fieldInfo.IsPublic || fieldInfo.HasAttribute<SerializeField>() || fieldInfo.HasAttribute<SerializeReference>()) &&
                         (fieldInfo.IsInitOnly || fieldInfo.HasAttribute<System.NonSerializedAttribute>()) == false;
                     ValueTypeReflectionCache = FieldType.IsValueType ? GetRuntimeComponentReflectionCache(FieldType) : null;
@@ -127,7 +134,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     FieldType = fieldType;
                     UnityFormatName = unityFormatName;
                     IsUnityObjectField = typeof(UnityObject).IsAssignableFrom(fieldType);
-                    IsPassToSerialize = isPassToSerialize;
+                    IsPassToUnitySerialize = isPassToSerialize;
                     ValueTypeReflectionCache = FieldType.IsValueType ? GetRuntimeComponentReflectionCache(FieldType) : null;
                 }
                 public RuntimeComponentReflectionCache GetReflectionCache(Type type)
@@ -374,16 +381,20 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 {
                     using (EcsGUI.UpIndentLevel())
                     {
-                        for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
+                        if (cache != null)
                         {
-                            var field = cache.Fields[j];
-                            if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData))
+                            for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
                             {
-                                field.FieldInfo.SetValue(data, fieldData);
-                                outData = data;
-                                changed = true;
+                                var field = cache.Fields[j];
+                                if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData))
+                                {
+                                    field.FieldInfo.SetValue(data, fieldData);
+                                    outData = data;
+                                    changed = true;
+                                }
                             }
                         }
+
                     }
                 }
             }
@@ -428,7 +439,14 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     wrapper.IsExpanded = isExpanded;
                     try
                     {
-                        EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                        if (fieldInfoData.IsPassToUnitySerialize)
+                        {
+                            EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                        }
+                        else
+                        {
+                            EditorGUILayout.LabelField(label, " ");
+                        }
                     }
                     catch (ArgumentException)
                     {
