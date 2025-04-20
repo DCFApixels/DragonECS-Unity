@@ -15,6 +15,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             Rect labelRect, hyperlinkButtonRect;
             (labelRect, position) = position.HorizontalSliceLeft(EditorGUIUtility.labelWidth * 0.65f);
+
+            var eventType = Event.current.type;
+            Rect dropRect = position;
+            dropRect.yMax = position.yMin + EditorGUIUtility.singleLineHeight;
+            int controlID = GUIUtility.GetControlID(s_ObjectFieldHash, FocusType.Keyboard, position);
+
+            bool containsMouse = dropRect.Contains(Event.current.mousePosition);
+            bool dragPerform = eventType == EventType.DragPerform;
+
+            if(containsMouse && eventType == EventType.Repaint)
+            {
+                EditorStyles.selectionRect.Draw(dropRect.AddPadding(-1), UnityEditorUtility.GetLabelTemp(), controlID, DragAndDrop.activeControlID == controlID, position.Contains(Event.current.mousePosition));
+            }
+
+
             (position, hyperlinkButtonRect) = position.HorizontalSliceRight(18f);
 
             bool drawFoldout = property.hasMultipleDifferentValues == false;
@@ -59,13 +74,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
 
-            Rect dropRect = position;
-            dropRect.yMax = position.yMin + EditorGUIUtility.singleLineHeight;
 
 
-            var eventType = Event.current.type;
-            int controlID = GUIUtility.GetControlID(s_ObjectFieldHash, FocusType.Keyboard, position);
-            if (!dropRect.Contains(Event.current.mousePosition) || !GUI.enabled)
+            if (!containsMouse || !GUI.enabled)
             {
                 return;
             }
@@ -74,7 +85,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 DragAndDrop.visualMode = DragAndDropVisualMode.Generic;
             }
 
-            if (eventType == EventType.DragPerform)
+            if (dragPerform)
             {
                 entlong ent = default;
                 bool isValide = false;
