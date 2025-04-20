@@ -128,7 +128,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (isValide)
                 {
-                    EditorGUI.ObjectField
                     long entityLong = *(long*)&ent;
                     fulleProperty.longValue = entityLong;
                 }
