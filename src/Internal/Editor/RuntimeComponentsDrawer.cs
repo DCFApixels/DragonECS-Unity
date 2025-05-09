@@ -247,12 +247,17 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
             }
             _runtimeComponentsDepth++;
 
-            _drawers[_runtimeComponentsDepth].DrawRuntimeComponents(entityID, world, isWithFoldout);
-
-            _runtimeComponentsDepth--;
-            if (_runtimeComponentsDepth < RuntimeComponentsDepthRoot)
+            try
             {
-                _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
+                _drawers[_runtimeComponentsDepth].DrawRuntimeComponents(entityID, world, isWithFoldout);
+            }
+            finally
+            {
+                _runtimeComponentsDepth--;
+                if (_runtimeComponentsDepth < RuntimeComponentsDepthRoot)
+                {
+                    _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
+                }
             }
         }
         private void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout)
