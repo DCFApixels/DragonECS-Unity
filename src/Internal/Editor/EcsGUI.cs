@@ -1,5 +1,6 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Core;
+using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
@@ -592,11 +593,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static void EntityField(Rect position, DragonGUIContent label, EntitySlotInfo entity)
         {
             bool isAlive = false;
-            if (EcsWorld.TryGetWorld(entity.world, out EcsWorld world))
+            if (EcsWorld.TryGetWorld(entity.worldID, out EcsWorld world))
             {
                 isAlive = world.IsAlive(entity.id, entity.gen);
             }
-            EntityField_Internal(position, label, entity.id == 0, isAlive ? EntityStatus.Alive : EntityStatus.NotAlive, entity.id, entity.gen, entity.world);
+            EntityField_Internal(position, label, entity.id == 0, isAlive ? EntityStatus.Alive : EntityStatus.NotAlive, entity.id, entity.gen, entity.worldID);
         }
         public static void EntityField(Rect position, SerializedProperty property)
         {
@@ -613,11 +614,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             else
             {
                 bool isAlive = false;
-                if (EcsWorld.TryGetWorld(entity.world, out EcsWorld world))
+                if (EcsWorld.TryGetWorld(entity.worldID, out EcsWorld world))
                 {
                     isAlive = world.IsAlive(entity.id, entity.gen);
                 }
-                EntityField_Internal(position, label, entity.id == 0, isAlive ? EntityStatus.Alive : EntityStatus.NotAlive, entity.id, entity.gen, entity.world);
+                EntityField_Internal(position, label, entity.id == 0, isAlive ? EntityStatus.Alive : EntityStatus.NotAlive, entity.id, entity.gen, entity.worldID);
             }
         }
 

@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using System.Reflection;
 using UnityEditor;
@@ -50,7 +51,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             SerializedProperty fulleProperty = property.FindPropertyRelative("_full");
             EntitySlotInfo entity = new EntitySlotInfo(fulleProperty.longValue);
-            EcsWorld.TryGetWorld(entity.world, out EcsWorld world);
+            EcsWorld.TryGetWorld(entity.worldID, out EcsWorld world);
 
             if (drawFoldout && isExpanded)
             {
