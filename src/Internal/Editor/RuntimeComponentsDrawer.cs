@@ -66,6 +66,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
             public readonly bool IsUnityObjectType;
             public readonly bool IsUnitySerializable;
+            public readonly bool IsCompositeType;
             public readonly bool IsUnmanaged;
 
             public readonly FieldInfoData[] Fields;
@@ -90,7 +91,12 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     //type.IsPrimitive ||
                     //type == typeof(string) ||
                     //type.IsEnum ||
-                    (!type.IsGenericType && type.IsSerializable && type.HasAttribute<System.SerializableAttribute>());
+                    (!type.IsGenericType && type.HasAttribute<System.SerializableAttribute>() && type.IsArray == false);
+
+                IsCompositeType =
+                    type.IsPrimitive == false &&
+                    type.IsArray == false &&
+                    type != typeof(string);
 
                 if (type == typeof(void)) { return; }
 
@@ -379,9 +385,12 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
             bool changed = false;
 
 
-            if (cache.IsUnitySerializable == false)
+            if (cache.IsUnitySerializable == false && cache.IsCompositeType)
             {
-                isExpanded = EditorGUILayout.BeginFoldoutHeaderGroup(isExpanded, label, EditorStyles.foldout);
+                var foldoutStyle = EditorStyles.foldout;
+                Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
+                rect.xMin += EcsGUI.Indent;
+                isExpanded = EditorGUI.BeginFoldoutHeaderGroup(rect, isExpanded, label, foldoutStyle, null, null);
                 EditorGUILayout.EndFoldoutHeaderGroup();
 
                 if (isExpanded)
@@ -401,8 +410,8 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                                 }
                             }
                         }
-
                     }
+
                 }
             }
             else
@@ -437,22 +446,21 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 else
                 {
                     EditorGUI.BeginChangeCheck();
-
                     RefEditorWrapper wrapper = cache.GetWrapper(_runtimeComponentsDepth);
-
                     wrapper.data = data;
-                    wrapper.SO.Update();
 
-                    wrapper.IsExpanded = isExpanded;
                     try
                     {
-                        if (fieldInfoData.IsPassToUnitySerialize)
+                        if (cache.IsCompositeType && fieldInfoData.IsPassToUnitySerialize)
                         {
+                            wrapper.SO.Update();
+                            wrapper.IsExpanded = isExpanded;
                             EditorGUILayout.PropertyField(wrapper.Property, label, true);
                         }
                         else
                         {
-                            EditorGUILayout.LabelField(label, " ");
+                            //EcsGUI.
+                            EditorGUILayout.LabelField(label);
                         }
                     }
                     catch (ArgumentException)
