@@ -27,8 +27,9 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
             //_runtimeComponentReflectionCaches.Clear();
         }
         private const int RuntimeComponentsMaxDepth = 2;
+        private const int RuntimeComponentsDepthRoot = -1;
         private static RuntimeComponentsDrawer[] _drawers;
-        private static int _runtimeComponentsDepth = 2;
+        private static int _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
         static RuntimeComponentsDrawer()
         {
             _drawers = new RuntimeComponentsDrawer[RuntimeComponentsMaxDepth + 1];
@@ -162,9 +163,9 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         #region draw world component
         public static void DrawWorldComponents(EcsWorld world)
         {
-            if (_runtimeComponentsDepth == 0)
+            if (_runtimeComponentsDepth == RuntimeComponentsDepthRoot)
             {
-                _drawers[_runtimeComponentsDepth].DrawWorldComponents_Internal(world);
+                _drawers[0].DrawWorldComponents_Internal(world);
             }
         }
         private void DrawWorldComponents_Internal(EcsWorld world)
@@ -242,16 +243,17 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         {
             if (isRoot)
             {
-                _runtimeComponentsDepth = 0;
+                _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
             }
-            else
-            {
-                _runtimeComponentsDepth++;
-            }
+            _runtimeComponentsDepth++;
 
             _drawers[_runtimeComponentsDepth].DrawRuntimeComponents(entityID, world, isWithFoldout);
 
             _runtimeComponentsDepth--;
+            if (_runtimeComponentsDepth < RuntimeComponentsDepthRoot)
+            {
+                _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
+            }
         }
         private void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout)
         {
