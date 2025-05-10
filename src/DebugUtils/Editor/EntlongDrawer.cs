@@ -24,7 +24,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             bool containsMouse = dropRect.Contains(Event.current.mousePosition);
 
-            if(containsMouse && eventType == EventType.Repaint && DragAndDrop.activeControlID == controlID)
+            if (containsMouse && eventType == EventType.Repaint && DragAndDrop.activeControlID == controlID)
             {
                 EditorStyles.selectionRect.Draw(dropRect.AddPadding(-1), GUIContent.none, controlID, false, false);
             }
@@ -163,7 +163,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var fields = uniObj.GetType().GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
             foreach (var field in fields)
             {
-                if(field.FieldType == typeof(entlong))
+                if (field.FieldType == typeof(entlong))
                 {
                     ent = (entlong)field.GetValue(uniObj);
                     return true;

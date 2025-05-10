@@ -363,7 +363,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                     if (_searchingSample.Length == 0)
                     {
-                        EditorGUI.indentLevel = groupInfo.Depth;
+                        EcsGUI.IndentLevel = groupInfo.Depth;
                     }
 
                     GUIContent label = UnityEditorUtility.GetLabel(_searchingSample.Length == 0 ? groupInfo.Name : groupInfo.Path);

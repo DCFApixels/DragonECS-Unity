@@ -143,10 +143,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             private readonly int _value;
             public IndentLevelScope(int value)
             {
-                _value = EditorGUI.indentLevel;
-                EditorGUI.indentLevel = value;
+                _value = IndentLevel;
+                IndentLevel = value;
             }
-            public void Dispose() { EditorGUI.indentLevel = _value; }
+            public void Dispose() { IndentLevel = _value; }
         }
         public struct AlignmentScope : IDisposable
         {
@@ -261,7 +261,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public static AlignmentScope SetAlignment(TextAnchor value) => new AlignmentScope(GUI.skin.label, value);
         public static AlignmentScope SetAlignment(GUIStyle target) => new AlignmentScope(target);
         public static IndentLevelScope SetIndentLevel(int level) => new IndentLevelScope(level);
-        public static IndentLevelScope UpIndentLevel() => new IndentLevelScope(EditorGUI.indentLevel + 1);
+        public static IndentLevelScope UpIndentLevel() => new IndentLevelScope(IndentLevel + 1);
         public static ContentColorScope SetContentColor(Color value) => new ContentColorScope(value);
         public static ContentColorScope SetContentColor(Color value, float a) => new ContentColorScope(value.r, value.g, value.b, a);
         public static ContentColorScope SetContentColor(float r, float g, float b, float a = 1f) => new ContentColorScope(r, g, b, a);
@@ -286,12 +286,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         internal static readonly Rect HeadIconsRect = new Rect(0f, 0f, 19f, 19f);
 
-        public static float EntityBarHeight => EditorGUIUtility.singleLineHeight + 3f;
-
-        private static float indent => (float)EditorGUI.indentLevel * 15f;
-        private static float indentLevel => EditorGUI.indentLevel;
-
         #region Properties
+        public static float EntityBarHeight
+        {
+            get => EditorGUIUtility.singleLineHeight + 3f;
+        }
+        public static float Indent
+        {
+            get => EditorGUI.indentLevel * 15f;
+        }
+        public static int IndentLevel
+        {
+            get => EditorGUI.indentLevel;
+            set => EditorGUI.indentLevel = value;
+        }
+        public static float OneLineHeight
+        {
+            get => EditorGUIUtility.singleLineHeight;
+        }
+        public static float Spacing
+        {
+            get => EditorGUIUtility.standardVerticalSpacing;
+        }
         private static ComponentColorMode AutoColorMode
         {
             get { return UserSettingsPrefs.instance.ComponentColorMode; }
@@ -312,14 +328,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //    get { return UserSettingsPrefs.instance.IsFastModeRuntimeComponents; }
         //    set { UserSettingsPrefs.instance.IsFastModeRuntimeComponents = value; }
         //}
-        private static float OneLineHeight
-        {
-            get => EditorGUIUtility.singleLineHeight;
-        }
-        private static float Spacing
-        {
-            get => EditorGUIUtility.standardVerticalSpacing;
-        }
         #endregion
 
         #region enums

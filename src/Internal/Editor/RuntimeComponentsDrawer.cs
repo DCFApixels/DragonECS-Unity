@@ -69,6 +69,26 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
             public readonly bool IsCompositeType;
             public readonly bool IsUnmanaged;
 
+            public readonly bool IsLeaf;
+            public readonly LeafType LeafPropertyType;
+            public enum LeafType
+            {
+                NONE = 0,
+                Enum,
+                Bool,
+                String,
+                Float,
+                Double,
+                Byte,
+                SByte,
+                Short,
+                UShort,
+                Int,
+                UInt,
+                Long,
+                ULong,
+            }
+
             public readonly FieldInfoData[] Fields;
 
             private RefEditorWrapper[] _wrappers = new RefEditorWrapper[2];
@@ -79,11 +99,71 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
             public RuntimeComponentReflectionCache(Type type)
             {
-
                 Type = type;
                 ResetWrappers();
                 IsUnmanaged = UnsafeUtility.IsUnmanaged(type);
                 IsUnityObjectType = typeof(UnityObject).IsAssignableFrom(type);
+
+                LeafPropertyType = LeafType.NONE;
+                IsLeaf = type.IsPrimitive || type == typeof(string) || type.IsEnum;
+
+                if (IsLeaf)
+                {
+                    if (type.IsEnum)
+                    {
+                        LeafPropertyType = LeafType.Enum;
+                    }
+                    else if (type == typeof(bool))
+                    {
+                        LeafPropertyType = LeafType.Bool;
+                    }
+                    else if (type == typeof(string))
+                    {
+                        LeafPropertyType = LeafType.String;
+                    }
+                    else if (type == typeof(float))
+                    {
+                        LeafPropertyType = LeafType.Float;
+                    }
+                    else if (type == typeof(double))
+                    {
+                        LeafPropertyType = LeafType.Double;
+                    }
+                    else if (type == typeof(byte))
+                    {
+                        LeafPropertyType = LeafType.Byte;
+                    }
+                    else if (type == typeof(sbyte))
+                    {
+                        LeafPropertyType = LeafType.SByte;
+                    }
+                    else if (type == typeof(short))
+                    {
+                        LeafPropertyType = LeafType.Short;
+                    }
+                    else if (type == typeof(ushort))
+                    {
+                        LeafPropertyType = LeafType.UShort;
+                    }
+                    else if (type == typeof(int))
+                    {
+                        LeafPropertyType = LeafType.Int;
+                    }
+                    else if (type == typeof(uint))
+                    {
+                        LeafPropertyType = LeafType.UInt;
+                    }
+                    else if (type == typeof(long))
+                    {
+                        LeafPropertyType = LeafType.Long;
+                    }
+                    else if (type == typeof(ulong))
+                    {
+                        LeafPropertyType = LeafType.ULong;
+                    }
+                }
+
+
                 IsUnitySerializable =
                     IsUnityObjectType ||
                     //typeof(Array).IsAssignableFrom(type) ||
@@ -232,7 +312,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                             }
 
                             RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
-                            if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
+                            if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData, 0))
                             {
                                 cmp.SetRaw(worldID, resultData);
                             }
@@ -354,7 +434,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
                     RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
 
-                    if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData))
+                    if (DrawRuntimeData(ref componentInfoData, UnityEditorUtility.GetLabel(meta.Name), expandMatrix, data, out object resultData, 0))
                     {
                         pool.SetRaw(entityID, resultData);
                     }
@@ -366,8 +446,9 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
 
         #region draw data
-        private bool DrawRuntimeData(ref RuntimeComponentReflectionCache.FieldInfoData fieldInfoData, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData)
+        private bool DrawRuntimeData(ref RuntimeComponentReflectionCache.FieldInfoData fieldInfoData, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData, int depth)
         {
+            const int DEPTH_MAX = 64;
             outData = data;
             Type type = data == null ? typeof(void) : data.GetType();
 
@@ -379,14 +460,19 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 EditorGUILayout.TextField(label, "Null");
                 return false;
             }
+            if (depth >= DEPTH_MAX || cache == null)
+            {
+                EditorGUILayout.TextField(label, "error");
+                return false;
+            }
             bool isUnityObjectType = cache.IsUnityObjectType;
 
             ref bool isExpanded = ref expandMatrix.Down();
             bool changed = false;
 
-
             if (cache.IsUnitySerializable == false && cache.IsCompositeType)
             {
+                GUILayout.Space(EcsGUI.Spacing);
                 var foldoutStyle = EditorStyles.foldout;
                 Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
                 rect.xMin += EcsGUI.Indent;
@@ -397,17 +483,14 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 {
                     using (EcsGUI.UpIndentLevel())
                     {
-                        if (cache != null)
+                        for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
                         {
-                            for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
+                            var field = cache.Fields[j];
+                            if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData, depth + 1))
                             {
-                                var field = cache.Fields[j];
-                                if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData))
-                                {
-                                    field.FieldInfo.SetValue(data, fieldData);
-                                    outData = data;
-                                    changed = true;
-                                }
+                                field.FieldInfo.SetValue(data, fieldData);
+                                outData = data;
+                                changed = true;
                             }
                         }
                     }
@@ -451,15 +534,154 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
                     try
                     {
-                        if (cache.IsCompositeType && fieldInfoData.IsPassToUnitySerialize)
+                        if (fieldInfoData.IsPassToUnitySerialize)
                         {
-                            wrapper.SO.Update();
-                            wrapper.IsExpanded = isExpanded;
-                            EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                            if (cache.IsCompositeType)
+                            {
+                                wrapper.SO.Update();
+                                wrapper.IsExpanded = isExpanded;
+                                EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                                if (GUI.changed)
+                                {
+                                    wrapper.SO.ApplyModifiedProperties();
+                                }
+                            }
+                            else if (cache.IsLeaf)
+                            {
+                                var eventType = Event.current.type;
+                                switch (cache.LeafPropertyType)
+                                {
+                                    //case RuntimeComponentReflectionCache.LeafType.Enum:
+                                    //    break;
+                                    case RuntimeComponentReflectionCache.LeafType.Bool:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = EditorGUILayout.Toggle(label, (bool)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.Toggle(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.String:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = EditorGUILayout.TextField(label, (string)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.TextField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Float:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = EditorGUILayout.FloatField(label, (float)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.FloatField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Double:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = EditorGUILayout.DoubleField(label, (double)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.DoubleField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Byte:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (byte)EditorGUILayout.IntField(label, (byte)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.SByte:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (sbyte)EditorGUILayout.IntField(label, (sbyte)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Short:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (short)EditorGUILayout.IntField(label, (short)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.UShort:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (ushort)EditorGUILayout.IntField(label, (ushort)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Int:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (int)EditorGUILayout.IntField(label, (int)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.UInt:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (uint)EditorGUILayout.IntField(label, (int)(uint)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.IntField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.Long:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = EditorGUILayout.LongField(label, (long)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.LongField(label, default);
+                                        }
+                                        break;
+                                    case RuntimeComponentReflectionCache.LeafType.ULong:
+                                        if (eventType != EventType.Layout)
+                                        {
+                                            wrapper.data = (ulong)EditorGUILayout.LongField(label, (long)(ulong)data);
+                                        }
+                                        else
+                                        {
+                                            EditorGUILayout.LongField(label, default);
+                                        }
+                                        break;
+                                    default:
+                                        EditorGUILayout.LabelField(label);
+                                        break;
+                                }
+                            }
+
                         }
                         else
                         {
-                            //EcsGUI.
                             EditorGUILayout.LabelField(label);
                         }
                     }
@@ -474,7 +696,6 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     {
                         if (EditorGUI.EndChangeCheck())
                         {
-                            wrapper.SO.ApplyModifiedProperties();
                             outData = wrapper.Data;
                             changed = true;
                         }

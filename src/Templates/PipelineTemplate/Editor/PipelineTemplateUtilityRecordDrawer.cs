@@ -21,7 +21,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            using (EcsGUI.SetIndentLevel(IsArrayElement ? EditorGUI.indentLevel : EditorGUI.indentLevel + 1))
+            using (EcsGUI.SetIndentLevel(IsArrayElement ? EcsGUI.IndentLevel : EcsGUI.IndentLevel + 1))
             {
                 Rect subPosition = position;
                 int depth = -1;
