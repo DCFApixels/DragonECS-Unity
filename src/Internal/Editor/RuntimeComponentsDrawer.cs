@@ -64,41 +64,8 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         internal class RuntimeComponentReflectionCache
         {
             public readonly Type Type;
-
-            //public readonly bool IsUnityObjectType;
-            //public readonly bool IsCompositeType;
-            //public readonly bool IsLeaf;
-            //public readonly bool IsUnitySerializable;
             public readonly bool IsUnmanaged;
-
-            private GUIContent templabel;
-
             public readonly DrawerType Drawer;
-            public enum DrawerType
-            {
-                UNDEFINED = 0,
-                Ignored,
-                // Composite
-                UnitySerializableComposite,
-                UnityNotSerializableComposite,
-                // Leaft types
-                UnityObject,
-                Enum,
-                EnumFlags,
-                Bool,
-                String,
-                Float,
-                Double,
-                Byte,
-                SByte,
-                Short,
-                UShort,
-                Int,
-                UInt,
-                Long,
-                ULong,
-            }
-
             public readonly FieldInfoData[] Fields;
 
             private RefEditorWrapper[] _wrappers = new RefEditorWrapper[RuntimeComponentsMaxDepth];
@@ -116,9 +83,6 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 bool isVoideType = type == typeof(void);
                 bool isUnityObjectType = typeof(UnityObject).IsAssignableFrom(type);
                 bool isLeaf = isUnityObjectType || type.IsPrimitive || type == typeof(string) || type.IsEnum;
-
-                //(type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>)) ||
-                //IsUnitySerializable = (!type.IsGenericType && type.HasAttribute<SerializableAttribute>() && type.IsArray == false);
 
                 Drawer = DrawerType.UNDEFINED;
 
@@ -247,6 +211,30 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     }
                     return GetRuntimeComponentReflectionCache(type);
                 }
+            }
+            public enum DrawerType
+            {
+                UNDEFINED = 0,
+                Ignored,
+                // Composite
+                UnitySerializableComposite,
+                UnityNotSerializableComposite,
+                // Leaft types
+                UnityObject,
+                Enum,
+                EnumFlags,
+                Bool,
+                String,
+                Float,
+                Double,
+                Byte,
+                SByte,
+                Short,
+                UShort,
+                Int,
+                UInt,
+                Long,
+                ULong,
             }
         }
         private static Dictionary<Type, RuntimeComponentReflectionCache> _runtimeComponentReflectionCaches = new Dictionary<Type, RuntimeComponentReflectionCache>();
@@ -730,249 +718,6 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 return true;
             }
             return false;
-
-
-
-            //bool isUnityObjectType = cache.IsUnityObjectType;
-            //
-            //
-            //
-            //if (cache.IsUnitySerializable == false && cache.IsCompositeType)
-            //{
-            //    GUILayout.Space(EcsGUI.Spacing);
-            //    var foldoutStyle = EditorStyles.foldout;
-            //    Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
-            //    rect.xMin += EcsGUI.Indent;
-            //    isExpanded = EditorGUI.BeginFoldoutHeaderGroup(rect, isExpanded, label, foldoutStyle, null, null);
-            //    EditorGUILayout.EndFoldoutHeaderGroup();
-            //
-            //    if (isExpanded)
-            //    {
-            //        using (EcsGUI.UpIndentLevel())
-            //        {
-            //            for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
-            //            {
-            //                var field = cache.Fields[j];
-            //                if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData, depth + 1))
-            //                {
-            //                    field.FieldInfo.SetValue(data, fieldData);
-            //                    outData = data;
-            //                    childElementChanged = true;
-            //                }
-            //            }
-            //        }
-            //
-            //    }
-            //}
-            //else
-            //{
-            //    Type fieldType = fieldInfoData.FieldType;
-            //    if (isUnityObjectType || isUnityObjectField)
-            //    {
-            //        EditorGUI.BeginChangeCheck();
-            //        var uobj = UnsafeUtility.As<object, UnityObject>(ref data);
-            //
-            //        bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldType);
-            //        if (isComponent)
-            //        {
-            //            uobj = EditorGUILayout.ObjectField(label, uobj, typeof(UnityObject), true);
-            //        }
-            //        else
-            //        {
-            //            uobj = EditorGUILayout.ObjectField(label, uobj, fieldType, true);
-            //        }
-            //
-            //        if (EditorGUI.EndChangeCheck())
-            //        {
-            //            if (isComponent && uobj is GameObject go)
-            //            {
-            //                uobj = go.GetComponent(fieldType);
-            //            }
-            //
-            //            outData = uobj;
-            //            childElementChanged = true;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        EditorGUI.BeginChangeCheck();
-            //        RefEditorWrapper wrapper = cache.GetWrapper(_runtimeComponentsDepth);
-            //        wrapper.data = data;
-            //
-            //        try
-            //        {
-            //            if (fieldInfoData.IsPassToUnitySerialize)
-            //            {
-            //                if (cache.IsCompositeType)
-            //                {
-            //                    wrapper.SO.Update();
-            //                    wrapper.IsExpanded = isExpanded;
-            //                    EditorGUILayout.PropertyField(wrapper.Property, label, true);
-            //                    if (GUI.changed)
-            //                    {
-            //                        wrapper.SO.ApplyModifiedProperties();
-            //                    }
-            //                }
-            //                else if (cache.IsLeaf)
-            //                {
-            //                    var eventType = Event.current.type;
-            //                    switch (cache.Drawer)
-            //                    {
-            //                        //case RuntimeComponentReflectionCache.LeafType.Enum:
-            //                        //    break;
-            //                        case DrawerType.Bool:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = EditorGUILayout.Toggle(label, (bool)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.Toggle(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.String:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = EditorGUILayout.TextField(label, (string)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.TextField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Float:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = EditorGUILayout.FloatField(label, (float)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.FloatField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Double:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = EditorGUILayout.DoubleField(label, (double)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.DoubleField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Byte:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (byte)EditorGUILayout.IntField(label, (byte)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.SByte:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (sbyte)EditorGUILayout.IntField(label, (sbyte)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Short:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (short)EditorGUILayout.IntField(label, (short)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.UShort:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (ushort)EditorGUILayout.IntField(label, (ushort)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Int:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (int)EditorGUILayout.IntField(label, (int)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.UInt:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (uint)EditorGUILayout.IntField(label, (int)(uint)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.IntField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.Long:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = EditorGUILayout.LongField(label, (long)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.LongField(label, default);
-            //                            }
-            //                            break;
-            //                        case DrawerType.ULong:
-            //                            if (eventType != EventType.Layout)
-            //                            {
-            //                                wrapper.data = (ulong)EditorGUILayout.LongField(label, (long)(ulong)data);
-            //                            }
-            //                            else
-            //                            {
-            //                                EditorGUILayout.LongField(label, default);
-            //                            }
-            //                            break;
-            //                        default:
-            //                            EditorGUILayout.LabelField(label);
-            //                            break;
-            //                    }
-            //                }
-            //
-            //            }
-            //            else
-            //            {
-            //                EditorGUILayout.LabelField(label);
-            //            }
-            //        }
-            //        catch (ArgumentException)
-            //        {
-            //            if (Event.current.type != EventType.Repaint)
-            //            {
-            //                throw;
-            //            }
-            //        }
-            //        finally
-            //        {
-            //            if (EditorGUI.EndChangeCheck())
-            //            {
-            //                outData = wrapper.Data;
-            //                childElementChanged = true;
-            //            }
-            //            isExpanded = wrapper.IsExpanded;
-            //        }
-            //    }
-            //}
-            //
-            //expandMatrix.Up();
-            //return childElementChanged;
         }
         #endregion
     }
