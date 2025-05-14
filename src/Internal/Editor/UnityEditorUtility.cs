@@ -235,6 +235,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         //private static Type[] _noHiddenSerializableTypes;
         private static GUIContent _singletonIconContent = null;
         private static GUIContent _singletonContent = null;
+        private static GUIContent _singleton2Content = null;
         private static GUIStyle _inputFieldCenterAnhor = null;
         private static Dictionary<Type, MonoScript> _scriptsAssets = new Dictionary<Type, MonoScript>(256);
 
@@ -440,6 +441,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _singletonIconContent.tooltip = tooltip;
             return _singletonIconContent;
         }
+        public static GUIContent GetLabel2(string name, string tooltip = null)
+        {
+            if (_singleton2Content == null)
+            {
+                _singleton2Content = new GUIContent();
+            }
+            _singleton2Content.text = name;
+            _singleton2Content.image = null;
+            _singleton2Content.tooltip = tooltip;
+            return _singleton2Content;
+        }
         #endregion
 
         #region GetDefaultStyle
@@ -517,6 +529,37 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return result;
         }
         #endregion
+
+
+        //private static StructList<GUIContent> _stackLabels = new StructList<GUIContent>(4);
+        //public static StackTempLabelScope GetStackLabel(string text, string tooltip = null)
+        //{
+        //    StackTempLabelScope result = default;
+        //    if (_stackLabels.Count <= 0)
+        //    {
+        //        result = new StackTempLabelScope(new GUIContent());
+        //    }
+        //    else
+        //    {
+        //        var l = _stackLabels[_stackLabels.Count - 1];
+        //        _stackLabels.RemoveAt(_stackLabels.Count - 1);
+        //        result = new StackTempLabelScope(l);
+        //    }
+        //    result.Label.text = text;
+        //    result.Label.tooltip = tooltip;
+        //    return result;
+        //}
+        //private static void ReturnStackLabel(GUIContent label)
+        //{
+        //    _stackLabels.Add(label);
+        //}
+        //public readonly struct StackTempLabelScope : IDisposable
+        //{
+        //    public readonly GUIContent Label;
+        //    public StackTempLabelScope(GUIContent label) { Label = label; }
+        //    public void Dispose() { ReturnStackLabel(Label); }
+        //    public static implicit operator GUIContent(StackTempLabelScope a) { return a.Label; }
+        //}
     }
 
     internal static class RuntimeComponentsUtility
