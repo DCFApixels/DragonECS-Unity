@@ -13,7 +13,6 @@ using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors.X
 {
-    using static RuntimeComponentsDrawer.RuntimeComponentReflectionCache;
     internal class RuntimeComponentsDrawer
     {
         private const BindingFlags INSTANCE_FIELD_FLAGS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
@@ -30,6 +29,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         }
         private const int RuntimeComponentsMaxDepth = 2;
         private const int RuntimeComponentsDepthRoot = -1;
+
         private static RuntimeComponentsDrawer[] _drawers;
         private static int _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
         static RuntimeComponentsDrawer()
@@ -66,7 +66,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         {
             public readonly Type Type;
             public readonly bool IsUnmanaged;
-            public readonly DrawerType Drawer;
+            public readonly DrawerType DrawerType;
             public readonly FieldInfoData[] Fields;
 
             private RefEditorWrapper[] _wrappers = new RefEditorWrapper[RuntimeComponentsMaxDepth];
@@ -85,81 +85,81 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 bool isUnityObjectType = typeof(UnityObject).IsAssignableFrom(type);
                 bool isLeaf = isUnityObjectType || type.IsPrimitive || type == typeof(string) || type.IsEnum;
 
-                Drawer = DrawerType.UNDEFINED;
+                DrawerType = DrawerType.UNDEFINED;
 
                 if(type.IsArray || isVoideType)
                 {
-                    Drawer = DrawerType.Ignored;
+                    DrawerType = DrawerType.Ignored;
                 }
 
-                if (Drawer == DrawerType.UNDEFINED && isLeaf)
+                if (DrawerType == DrawerType.UNDEFINED && isLeaf)
                 {
                     if (type.IsEnum)
                     {
-                        Drawer = type.HasAttribute<FlagsAttribute>() ? DrawerType.EnumFlags : DrawerType.Enum;
+                        DrawerType = type.HasAttribute<FlagsAttribute>() ? DrawerType.EnumFlags : DrawerType.Enum;
                     }
                     else if (isUnityObjectType)
                     {
-                        Drawer = DrawerType.UnityObject;
+                        DrawerType = DrawerType.UnityObject;
                     }
                     else if (type == typeof(bool))
                     {
-                        Drawer = DrawerType.Bool;
+                        DrawerType = DrawerType.Bool;
                     }
                     else if (type == typeof(string))
                     {
-                        Drawer = DrawerType.String;
+                        DrawerType = DrawerType.String;
                     }
                     else if (type == typeof(float))
                     {
-                        Drawer = DrawerType.Float;
+                        DrawerType = DrawerType.Float;
                     }
                     else if (type == typeof(double))
                     {
-                        Drawer = DrawerType.Double;
+                        DrawerType = DrawerType.Double;
                     }
                     else if (type == typeof(byte))
                     {
-                        Drawer = DrawerType.Byte;
+                        DrawerType = DrawerType.Byte;
                     }
                     else if (type == typeof(sbyte))
                     {
-                        Drawer = DrawerType.SByte;
+                        DrawerType = DrawerType.SByte;
                     }
                     else if (type == typeof(short))
                     {
-                        Drawer = DrawerType.Short;
+                        DrawerType = DrawerType.Short;
                     }
                     else if (type == typeof(ushort))
                     {
-                        Drawer = DrawerType.UShort;
+                        DrawerType = DrawerType.UShort;
                     }
                     else if (type == typeof(int))
                     {
-                        Drawer = DrawerType.Int;
+                        DrawerType = DrawerType.Int;
                     }
                     else if (type == typeof(uint))
                     {
-                        Drawer = DrawerType.UInt;
+                        DrawerType = DrawerType.UInt;
                     }
                     else if (type == typeof(long))
                     {
-                        Drawer = DrawerType.Long;
+                        DrawerType = DrawerType.Long;
                     }
                     else if (type == typeof(ulong))
                     {
-                        Drawer = DrawerType.ULong;
+                        DrawerType = DrawerType.ULong;
                     }
                 }
 
-                if (Drawer == DrawerType.UNDEFINED)
+                if (DrawerType == DrawerType.UNDEFINED)
                 {
-                    Drawer = type.IsGenericType ? DrawerType.UnityNotSerializableComposite : DrawerType.UnitySerializableComposite;
+                    DrawerType = type.IsGenericType ? DrawerType.UnityNotSerializableComposite : DrawerType.UnitySerializableComposite;
                 }
 
                 if (isVoideType) { return; }
 
-                if (Drawer == DrawerType.UnityNotSerializableComposite)
+                if (DrawerType == DrawerType.UnityNotSerializableComposite)
                 {
                     var fieldInfos = type.GetFields(INSTANCE_FIELD_FLAGS);
                     Fields = new FieldInfoData[fieldInfos.Length];
@@ -212,30 +212,6 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     }
                     return GetRuntimeComponentReflectionCache(type);
                 }
-            }
-            public enum DrawerType
-            {
-                UNDEFINED = 0,
-                Ignored,
-                // Composite
-                UnitySerializableComposite,
-                UnityNotSerializableComposite,
-                // Leaft types
-                UnityObject,
-                Enum,
-                EnumFlags,
-                Bool,
-                String,
-                Float,
-                Double,
-                Byte,
-                SByte,
-                Short,
-                UShort,
-                Int,
-                UInt,
-                Long,
-                ULong,
             }
         }
         private static Dictionary<Type, RuntimeComponentReflectionCache> _runtimeComponentReflectionCaches = new Dictionary<Type, RuntimeComponentReflectionCache>();
@@ -479,13 +455,13 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 var eventType = Event.current.type;
 
                 var label2 = UnityEditorUtility.GetLabel2(cache.Type.FullName + " " + type.FullName);
-                var drawer = cache.Drawer;
+                var drawerType = cache.DrawerType;
 
                 if (isUnityObjectField)
                 {
-                    drawer = DrawerType.UnityObject;
+                    drawerType = DrawerType.UnityObject;
                 }
-                switch (drawer)
+                switch (drawerType)
                 {
                     case DrawerType.UNDEFINED:
                         EditorGUILayout.LabelField(label, label2);
@@ -722,6 +698,31 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
             return false;
         }
         #endregion
+
+        public enum DrawerType
+        {
+            UNDEFINED = 0,
+            Ignored,
+            // Composite
+            UnitySerializableComposite,
+            UnityNotSerializableComposite,
+            // Leaft types
+            UnityObject,
+            Enum,
+            EnumFlags,
+            Bool,
+            String,
+            Float,
+            Double,
+            Byte,
+            SByte,
+            Short,
+            UShort,
+            Int,
+            UInt,
+            Long,
+            ULong,
+        }
     }
 }
 #endif
