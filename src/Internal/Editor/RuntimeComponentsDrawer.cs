@@ -16,7 +16,8 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
     using static RuntimeComponentsDrawer.RuntimeComponentReflectionCache;
     internal class RuntimeComponentsDrawer
     {
-        private static readonly BindingFlags fieldFlags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+        private const BindingFlags INSTANCE_FIELD_FLAGS = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic;
+
         [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
         private static void ResetRuntimeComponentReflectionCache()
         {
@@ -160,7 +161,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
                 if (Drawer == DrawerType.UnityNotSerializableComposite)
                 {
-                    var fieldInfos = type.GetFields(fieldFlags);
+                    var fieldInfos = type.GetFields(INSTANCE_FIELD_FLAGS);
                     Fields = new FieldInfoData[fieldInfos.Length];
                     for (int i = 0; i < fieldInfos.Length; i++)
                     {
@@ -451,272 +452,273 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         #region draw data
         private bool DrawRuntimeData(ref RuntimeComponentReflectionCache.FieldInfoData fieldInfoData, GUIContent label, ExpandMatrix expandMatrix, object data, out object outData, int depth)
         {
-            const int DEPTH_MAX = 16;
+            const int DEPTH_MAX = 24;
 
-            EditorGUI.BeginChangeCheck();
-
-            outData = data;
-            object newData = data;
-            Type type = data == null ? typeof(void) : data.GetType();
-
-            RuntimeComponentReflectionCache cache = fieldInfoData.GetReflectionCache(type);
-
-            bool isUnityObjectField = fieldInfoData.IsUnityObjectField;
-            if (isUnityObjectField == false && data == null)
+            using (EcsGUI.CheckChanged())
             {
-                EditorGUILayout.TextField(label, "Null");
-                return false;
-            }
-            if (depth >= DEPTH_MAX || cache == null)
-            {
-                EditorGUILayout.TextField(label, "error");
-                return false;
-            }
 
-            ref bool isExpanded = ref expandMatrix.Down();
-            bool childElementChanged = false;
-            var eventType = Event.current.type;
+                outData = data;
+                object newData = data;
+                Type type = data == null ? typeof(void) : data.GetType();
+                bool isUnityObjectField = fieldInfoData.IsUnityObjectField;
+                if (isUnityObjectField == false && data == null)
+                {
+                    EditorGUILayout.TextField(label, "Null");
+                    return false;
+                }
 
-            var label2 = UnityEditorUtility.GetLabel2(cache.Type.FullName + " " + type.FullName);
-            var drawer = cache.Drawer;
+                RuntimeComponentReflectionCache cache = fieldInfoData.GetReflectionCache(type);
+                if (depth >= DEPTH_MAX || cache == null)
+                {
+                    EditorGUILayout.TextField(label, "error");
+                    return false;
+                }
 
-            if (isUnityObjectField)
-            {
-                drawer = DrawerType.UnityObject;
-            }
-            switch (drawer)
-            {
-                case DrawerType.UNDEFINED:
-                    EditorGUILayout.LabelField(label, label2);
-                    break;
-                case DrawerType.Ignored:
-                    EditorGUILayout.LabelField(label, label2);
-                    break;
-                case DrawerType.UnitySerializableComposite:
+                ref bool isExpanded = ref expandMatrix.Down();
+                bool childElementChanged = false;
+                var eventType = Event.current.type;
 
-                    using (EcsGUI.CheckChanged())
-                    {
-                        RefEditorWrapper wrapper = cache.GetWrapper(_runtimeComponentsDepth);
-                        wrapper.data = data;
-                        wrapper.SO.Update();
-                        wrapper.IsExpanded = isExpanded;
-                        EditorGUILayout.PropertyField(wrapper.Property, label, true);
+                var label2 = UnityEditorUtility.GetLabel2(cache.Type.FullName + " " + type.FullName);
+                var drawer = cache.Drawer;
 
-                        if (EcsGUI.Changed)
+                if (isUnityObjectField)
+                {
+                    drawer = DrawerType.UnityObject;
+                }
+                switch (drawer)
+                {
+                    case DrawerType.UNDEFINED:
+                        EditorGUILayout.LabelField(label, label2);
+                        break;
+                    case DrawerType.Ignored:
+                        EditorGUILayout.LabelField(label, label2);
+                        break;
+                    case DrawerType.UnitySerializableComposite:
+
+                        using (EcsGUI.CheckChanged())
                         {
-                            wrapper.SO.ApplyModifiedProperties();
-                            newData = wrapper.Data;
-                            childElementChanged = true;
-                        }
-                        isExpanded = wrapper.IsExpanded;
-                    }
+                            RefEditorWrapper wrapper = cache.GetWrapper(_runtimeComponentsDepth);
+                            wrapper.data = data;
+                            wrapper.SO.Update();
+                            wrapper.IsExpanded = isExpanded;
+                            EditorGUILayout.PropertyField(wrapper.Property, label, true);
 
-                    break;
-                case DrawerType.UnityNotSerializableComposite:
-
-                    GUILayout.Space(EcsGUI.Spacing);
-                    var foldoutStyle = EditorStyles.foldout;
-                    Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
-                    //rect.xMin += EcsGUI.Indent;
-                    isExpanded = EditorGUI.BeginFoldoutHeaderGroup(rect, isExpanded, label, foldoutStyle, null, null);
-                    EditorGUILayout.EndFoldoutHeaderGroup();
-
-                    if (isExpanded)
-                    {
-                        using (EcsGUI.UpIndentLevel())
-                        {
-                            for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
+                            if (EcsGUI.Changed)
                             {
-                                var field = cache.Fields[j];
-                                if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData, depth + 1))
+                                wrapper.SO.ApplyModifiedProperties();
+                                newData = wrapper.Data;
+                                childElementChanged = true;
+                            }
+                            isExpanded = wrapper.IsExpanded;
+                        }
+
+                        break;
+                    case DrawerType.UnityNotSerializableComposite:
+
+                        GUILayout.Space(EcsGUI.Spacing);
+                        var foldoutStyle = EditorStyles.foldout;
+                        Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
+                        //rect.xMin += EcsGUI.Indent;
+                        isExpanded = EditorGUI.BeginFoldoutHeaderGroup(rect, isExpanded, label, foldoutStyle, null, null);
+                        EditorGUILayout.EndFoldoutHeaderGroup();
+
+                        if (isExpanded)
+                        {
+                            using (EcsGUI.UpIndentLevel())
+                            {
+                                for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
                                 {
-                                    field.FieldInfo.SetValue(data, fieldData);
-                                    newData = data;
-                                    childElementChanged = true;
+                                    var field = cache.Fields[j];
+                                    if (DrawRuntimeData(ref field, UnityEditorUtility.GetLabel(field.UnityFormatName), expandMatrix, field.FieldInfo.GetValue(data), out object fieldData, depth + 1))
+                                    {
+                                        field.FieldInfo.SetValue(data, fieldData);
+                                        newData = data;
+                                        childElementChanged = true;
+                                    }
                                 }
                             }
                         }
-                    }
 
-                    break;
-                case DrawerType.UnityObject:
+                        break;
+                    case DrawerType.UnityObject:
 
-                    using (EcsGUI.CheckChanged())
-                    {
-                        var uobj = UnsafeUtility.As<object, UnityObject>(ref data);
-                        bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldInfoData.FieldType);
-                        var newuobj = EditorGUILayout.ObjectField(label, uobj, fieldInfoData.FieldType, true);
-
-                        if (uobj != newuobj)
+                        using (EcsGUI.CheckChanged())
                         {
-                            if (isComponent && newuobj is GameObject go)
+                            var uobj = UnsafeUtility.As<object, UnityObject>(ref data);
+                            bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldInfoData.FieldType);
+                            var newuobj = EditorGUILayout.ObjectField(label, uobj, fieldInfoData.FieldType, true);
+
+                            if (uobj != newuobj)
                             {
-                                newuobj = go.GetComponent(fieldInfoData.FieldType);
+                                if (isComponent && newuobj is GameObject go)
+                                {
+                                    newuobj = go.GetComponent(fieldInfoData.FieldType);
+                                }
+                                newData = newuobj;
+                                childElementChanged = true;
                             }
-                            newData = newuobj;
-                            childElementChanged = true;
                         }
-                    }
 
-                    break;
-                case DrawerType.Enum:
+                        break;
+                    case DrawerType.Enum:
 
-                    if (eventType != EventType.Layout)
-                    {
-                        var enumData = UnsafeUtility.As<object, Enum>(ref data);
-                        newData = EditorGUILayout.EnumPopup(label, enumData);
-                    }
-                    else
-                    {
-                        EditorGUILayout.EnumPopup(label, default);
-                    }
+                        if (eventType != EventType.Layout)
+                        {
+                            var enumData = UnsafeUtility.As<object, Enum>(ref data);
+                            newData = EditorGUILayout.EnumPopup(label, enumData);
+                        }
+                        else
+                        {
+                            EditorGUILayout.EnumPopup(label, default);
+                        }
 
-                    break;
-                case DrawerType.EnumFlags:
+                        break;
+                    case DrawerType.EnumFlags:
 
-                    if (eventType != EventType.Layout)
-                    {
-                        var enumData = UnsafeUtility.As<object, Enum>(ref data);
-                        newData = EditorGUILayout.EnumFlagsField(label, enumData);
-                    }
-                    else
-                    {
-                        EditorGUILayout.EnumFlagsField(label, default);
-                    }
+                        if (eventType != EventType.Layout)
+                        {
+                            var enumData = UnsafeUtility.As<object, Enum>(ref data);
+                            newData = EditorGUILayout.EnumFlagsField(label, enumData);
+                        }
+                        else
+                        {
+                            EditorGUILayout.EnumFlagsField(label, default);
+                        }
 
-                    break;
-                case DrawerType.Bool:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = EditorGUILayout.Toggle(label, (bool)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.Toggle(label, default);
-                    }
-                    break;
-                case DrawerType.String:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = EditorGUILayout.TextField(label, (string)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.TextField(label, default);
-                    }
-                    break;
-                case DrawerType.Float:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = EditorGUILayout.FloatField(label, (float)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.FloatField(label, default);
-                    }
-                    break;
-                case DrawerType.Double:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = EditorGUILayout.DoubleField(label, (double)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.DoubleField(label, default);
-                    }
-                    break;
-                case DrawerType.Byte:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (byte)EditorGUILayout.IntField(label, (byte)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.SByte:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (sbyte)EditorGUILayout.IntField(label, (sbyte)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.Short:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (short)EditorGUILayout.IntField(label, (short)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.UShort:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (ushort)EditorGUILayout.IntField(label, (ushort)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.Int:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (int)EditorGUILayout.IntField(label, (int)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.UInt:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (uint)EditorGUILayout.IntField(label, (int)(uint)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.IntField(label, default);
-                    }
-                    break;
-                case DrawerType.Long:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = EditorGUILayout.LongField(label, (long)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.LongField(label, default);
-                    }
-                    break;
-                case DrawerType.ULong:
-                    if (eventType != EventType.Layout)
-                    {
-                        newData = (ulong)EditorGUILayout.LongField(label, (long)(ulong)data);
-                    }
-                    else
-                    {
-                        EditorGUILayout.LongField(label, default);
-                    }
-                    break;
-                default:
-                    EditorGUILayout.LabelField(label, label2);
-                    break;
+                        break;
+                    case DrawerType.Bool:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = EditorGUILayout.Toggle(label, (bool)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.Toggle(label, default);
+                        }
+                        break;
+                    case DrawerType.String:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = EditorGUILayout.TextField(label, (string)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.TextField(label, default);
+                        }
+                        break;
+                    case DrawerType.Float:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = EditorGUILayout.FloatField(label, (float)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.FloatField(label, default);
+                        }
+                        break;
+                    case DrawerType.Double:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = EditorGUILayout.DoubleField(label, (double)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.DoubleField(label, default);
+                        }
+                        break;
+                    case DrawerType.Byte:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (byte)EditorGUILayout.IntField(label, (byte)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.SByte:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (sbyte)EditorGUILayout.IntField(label, (sbyte)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.Short:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (short)EditorGUILayout.IntField(label, (short)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.UShort:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (ushort)EditorGUILayout.IntField(label, (ushort)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.Int:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (int)EditorGUILayout.IntField(label, (int)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.UInt:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (uint)EditorGUILayout.IntField(label, (int)(uint)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.IntField(label, default);
+                        }
+                        break;
+                    case DrawerType.Long:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = EditorGUILayout.LongField(label, (long)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.LongField(label, default);
+                        }
+                        break;
+                    case DrawerType.ULong:
+                        if (eventType != EventType.Layout)
+                        {
+                            newData = (ulong)EditorGUILayout.LongField(label, (long)(ulong)data);
+                        }
+                        else
+                        {
+                            EditorGUILayout.LongField(label, default);
+                        }
+                        break;
+                    default:
+                        EditorGUILayout.LabelField(label, label2);
+                        break;
+                }
+
+                expandMatrix.Up();
+                if (childElementChanged || EcsGUI.Changed)
+                {
+                    outData = newData;
+                    return true;
+                }
             }
 
-
-            expandMatrix.Up();
-            if (childElementChanged || EditorGUI.EndChangeCheck())
-            {
-                outData = newData;
-                return true;
-            }
             return false;
         }
         #endregion
