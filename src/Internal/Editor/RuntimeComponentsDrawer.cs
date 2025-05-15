@@ -231,7 +231,15 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         {
             if (_runtimeComponentsDepth == RuntimeComponentsDepthRoot)
             {
-                _drawers[0].DrawWorldComponents_Internal(world);
+                try
+                {
+                    _runtimeComponentsDepth = 0;
+                    _drawers[0].DrawWorldComponents_Internal(world);
+                }
+                finally
+                {
+                    _runtimeComponentsDepth = RuntimeComponentsDepthRoot;
+                }
             }
         }
         private void DrawWorldComponents_Internal(EcsWorld world)
