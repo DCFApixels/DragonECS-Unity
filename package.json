@@ -8,7 +8,7 @@
     "displayName": "DragonECS-Unity",
     "description": "Integration with Unity for DragonECS",
     "unity": "2021.2",
-    "version": "0.5.14_1",
+    "version": "0.5.14",
     "repository": {
         "type": "git",
         "url": "https://github.com/DCFApixels/DragonECS-Unity.git"
