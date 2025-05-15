@@ -454,7 +454,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 bool childElementChanged = false;
                 var eventType = Event.current.type;
 
-                var label2 = UnityEditorUtility.GetLabel2(cache.Type.FullName + " " + type.FullName);
+                var label2 = "-";
                 var drawerType = cache.DrawerType;
 
                 if (isUnityObjectField)

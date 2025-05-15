@@ -529,37 +529,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return result;
         }
         #endregion
-
-
-        //private static StructList<GUIContent> _stackLabels = new StructList<GUIContent>(4);
-        //public static StackTempLabelScope GetStackLabel(string text, string tooltip = null)
-        //{
-        //    StackTempLabelScope result = default;
-        //    if (_stackLabels.Count <= 0)
-        //    {
-        //        result = new StackTempLabelScope(new GUIContent());
-        //    }
-        //    else
-        //    {
-        //        var l = _stackLabels[_stackLabels.Count - 1];
-        //        _stackLabels.RemoveAt(_stackLabels.Count - 1);
-        //        result = new StackTempLabelScope(l);
-        //    }
-        //    result.Label.text = text;
-        //    result.Label.tooltip = tooltip;
-        //    return result;
-        //}
-        //private static void ReturnStackLabel(GUIContent label)
-        //{
-        //    _stackLabels.Add(label);
-        //}
-        //public readonly struct StackTempLabelScope : IDisposable
-        //{
-        //    public readonly GUIContent Label;
-        //    public StackTempLabelScope(GUIContent label) { Label = label; }
-        //    public void Dispose() { ReturnStackLabel(Label); }
-        //    public static implicit operator GUIContent(StackTempLabelScope a) { return a.Label; }
-        //}
     }
 
     internal static class RuntimeComponentsUtility
