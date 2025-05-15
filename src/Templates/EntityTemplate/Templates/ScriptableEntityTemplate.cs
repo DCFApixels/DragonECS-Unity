@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace DCFApixels.DragonECS
 {
@@ -26,6 +27,7 @@ namespace DCFApixels.DragonECS
         private ScriptableEntityTemplateBase[] _templates;
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
+        [FormerlySerializedAs("_components")]
         private IComponentTemplate[] _componentTemplates;
 
         #region Properties
