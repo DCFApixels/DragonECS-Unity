@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS
         void IEcsModule.Import(EcsPipeline.Builder b)
         {
             UnityDebugService.Activate();
-            b.Layers.Insert(EcsConsts.POST_END_LAYER, EcsUnityConsts.DEBUG_LAYER);
+            b.Layers.Add(EcsUnityConsts.DEBUG_LAYER).Before(EcsConsts.POST_END_LAYER);
             b.AddUnique(new PipelineMonitorSystem(), EcsUnityConsts.DEBUG_LAYER);
             foreach (var world in _worlds)
             {

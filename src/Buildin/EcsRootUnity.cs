@@ -72,7 +72,7 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
             if (_enablePipelineDebug)
             {
-                pipelineBuilder.Layers.Insert(EcsConsts.POST_END_LAYER, EcsUnityConsts.DEBUG_LAYER);
+                pipelineBuilder.Layers.Add(EcsUnityConsts.DEBUG_LAYER).Before(EcsConsts.POST_END_LAYER);
                 pipelineBuilder.AddUnique(new PipelineMonitorSystem(), EcsUnityConsts.DEBUG_LAYER);
             }
 #endif
