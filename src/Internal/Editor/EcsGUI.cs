@@ -855,6 +855,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             return result;
         }
+        internal static bool HasSerializableData(this SerializedProperty property)
+        {
+            var propsCounter = property.Copy();
+            int lastDepth = propsCounter.depth;
+            bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
+            while (next)
+            {
+                if(propsCounter.propertyType != SerializedPropertyType.Generic)
+                {
+                    return true;
+                }
+                next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
+            }
+            return false;
+        }
         #endregion
 
         #region SelectPanelColor

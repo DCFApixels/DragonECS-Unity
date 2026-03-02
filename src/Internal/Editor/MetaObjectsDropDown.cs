@@ -99,7 +99,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    meta = dummy.Type.GetMeta();
+                    meta = dummy.Type.ToMeta();
                 }
                 return (dummy, meta);
             });
