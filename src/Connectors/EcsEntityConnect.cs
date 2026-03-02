@@ -19,44 +19,47 @@ namespace DCFApixels.DragonECS
     public static class EcsConnect
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this Component cmp, entlong entity, bool applyTemplates)
+        public static EcsEntityConnect Connect(this Component cmp, entlong entity, bool applyTemplates)
         {
-            Connect(entity, cmp, applyTemplates);
+            return Connect(entity, cmp, applyTemplates);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this entlong entity, Component cmp, bool applyTemplates)
+        public static EcsEntityConnect Connect(this entlong entity, Component cmp, bool applyTemplates)
         {
             if (cmp.TryGetComponent(out EcsEntityConnect connect) == false)
             {
                 connect = cmp.gameObject.AddComponent<EcsEntityConnect>();
             }
             connect.ConnectWith(entity, applyTemplates);
+            return connect;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this GameObject go, entlong entity, bool applyTemplates)
+        public static EcsEntityConnect Connect(this GameObject go, entlong entity, bool applyTemplates)
         {
-            Connect(entity, go, applyTemplates);
+            return Connect(entity, go, applyTemplates);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this entlong entity, GameObject go, bool applyTemplates)
+        public static EcsEntityConnect Connect(this entlong entity, GameObject go, bool applyTemplates)
         {
             if (go.TryGetComponent(out EcsEntityConnect connect) == false)
             {
                 connect = go.AddComponent<EcsEntityConnect>();
             }
             connect.ConnectWith(entity, applyTemplates);
+            return connect;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this EcsEntityConnect connect, entlong entity, bool applyTemplates)
+        public static EcsEntityConnect Connect(this EcsEntityConnect connect, entlong entity, bool applyTemplates)
         {
-            Connect(entity, connect, applyTemplates);
+            return Connect(entity, connect, applyTemplates);
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Connect(this entlong entity, EcsEntityConnect connect, bool applyTemplates)
+        public static EcsEntityConnect Connect(this entlong entity, EcsEntityConnect connect, bool applyTemplates)
         {
             connect.ConnectWith(entity, applyTemplates);
+            return connect;
         }
     }
 
@@ -77,9 +80,9 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private bool _deleteEntityWithDestroy = false;
         [SerializeField]
-        private ScriptableEntityTemplateBase[] _scriptableTemplates;
+        private ScriptableEntityTemplateBase[] _scriptableTemplates = System.Array.Empty<ScriptableEntityTemplateBase>();
         [SerializeField]
-        private MonoEntityTemplateBase[] _monoTemplates;
+        private MonoEntityTemplateBase[] _monoTemplates = System.Array.Empty<MonoEntityTemplateBase>();
 
         private bool _isConnectInvoked = false;
 
@@ -226,12 +229,12 @@ namespace DCFApixels.DragonECS
         #region Editor
 #if UNITY_EDITOR
         [ContextMenu("Autoset")]
-        internal void Autoset_Editor()
+        public void Autoset_Editor()
         {
             Autoset(this);
         }
         [ContextMenu("Autoset Cascade")]
-        internal void AutosetCascade_Editor()
+        public void AutosetCascade_Editor()
         {
             foreach (var item in GetComponentsInChildren<EcsEntityConnect>())
             {
@@ -258,27 +261,34 @@ namespace DCFApixels.DragonECS
             IEnumerable<MonoEntityTemplateBase> result;
             if (target.MonoTemplates != null && target.MonoTemplates.Count() > 0)
             {
-                result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform));
+                result = target.MonoTemplates.Where(o => o != null).Union(GetTemplatesFor(target.transform).Range);
             }
             else
             {
-                result = GetTemplatesFor(target.transform);
+                result = GetTemplatesFor(target.transform).Range;
             }
 
             target._monoTemplates = result.ToArray();
             EditorUtility.SetDirty(target);
         }
-        private static IEnumerable<MonoEntityTemplateBase> GetTemplatesFor(Transform parent)
+        private static (int Count, IEnumerable<MonoEntityTemplateBase> Range) GetTemplatesFor(Transform parent)
         {
-            IEnumerable<MonoEntityTemplateBase> result = parent.GetComponents<MonoEntityTemplateBase>();
+            (int Count, IEnumerable<MonoEntityTemplateBase> Range) result;
+            result.Count = 0;
+            result.Range = parent.GetComponents<MonoEntityTemplateBase>();
+
             for (int i = 0; i < parent.childCount; i++)
             {
                 var child = parent.GetChild(i);
-                if (child.TryGetComponent<EcsEntityConnect>(out _))
+                if (child.TryGetComponent<EcsEntityConnect>(out _) == false)
                 {
-                    return Enumerable.Empty<MonoEntityTemplateBase>();
+                    var concated = GetTemplatesFor(child);
+                    if (concated.Count > 0)
+                    {
+                        result.Range = result.Range.Concat(concated.Range);
+                        result.Count += concated.Count;
+                    }
                 }
-                result = result.Concat(GetTemplatesFor(child));
             }
             return result;
         }
