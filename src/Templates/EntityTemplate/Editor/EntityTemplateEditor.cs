@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal abstract class EntityTemplateEditorBase : ExtendedEditor<IEntityTemplateInternal>
+    internal abstract class EntityTemplateEditorBase : ExtendedEditor<ITemplateNode>
     {
         private ComponentTemplatesDropDown _componentDropDown;
 
@@ -17,15 +17,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected abstract bool IsSO { get; }
 
-        //public virtual bool IsStaticData { get { return false; } }
-
         #region Init
         protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
         {
             _componentDropDown = new ComponentTemplatesDropDown();
 
-            _componentsProp = serializedObject.FindProperty(Target.ComponentsPropertyName);
+            _componentsProp = serializedObject.FindProperty("_componentTemplates");
 
             _reorderableComponentsList = new ReorderableList(serializedObject, _componentsProp, true, false, false, false);
             _reorderableComponentsList.onAddCallback += OnReorderableComponentsListAdd;
@@ -142,19 +140,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         #endregion
 
-        #region Add/Remove
-        private void OnRemoveComponentAt(int index)
-        {
-            if (this.target is IEntityTemplateInternal target)
-            {
-                SerializedProperty componentsProp = serializedObject.FindProperty(target.ComponentsPropertyName);
-                componentsProp.DeleteArrayElementAtIndex(index);
-                serializedObject.ApplyModifiedProperties();
-                EditorUtility.SetDirty(this.target);
-            }
-        }
-        #endregion
-
         protected override void DrawCustom()
         {
             Init();
@@ -204,7 +189,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
                     {
-                        DrawTop(Target, _componentsProp);
+                        DrawTop(_componentsProp);
                         _reorderableComponentsList.DoLayoutList();
                     }
                 }
@@ -214,7 +199,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
-        private void DrawTop(IEntityTemplateInternal target, SerializedProperty componentsProp)
+        private void DrawTop(SerializedProperty componentsProp)
         {
             GUILayout.Space(2f);
 

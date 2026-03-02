@@ -113,9 +113,9 @@ namespace DCFApixels.DragonECS
         {
             get { return _monoTemplates; }
         }
-        public IEnumerable<IEntityTemplate> AllTemplates
+        public IEnumerable<ITemplateNode> AllTemplates
         {
-            get { return ((IEnumerable<IEntityTemplate>)_scriptableTemplates).Concat(_monoTemplates); }
+            get { return ((IEnumerable<ITemplateNode>)_scriptableTemplates).Concat(_monoTemplates); }
         }
         #endregion
 

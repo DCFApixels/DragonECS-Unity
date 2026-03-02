@@ -33,7 +33,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static ComponentTemplatesDropDown _componentDropDown;
 
         #region Properties
-        private float SingleLineWithPadding => OneLineHeight + Padding * 4f;
         private float Padding => Spacing;
         protected override bool IsStaticInit => _componentDropDown != null;
         #endregion

@@ -84,6 +84,12 @@ namespace DCFApixels.DragonECS
 
     public static class GameObjectRefExt
     {
+        public static entlong NewEntityWithGameObject(this EcsWorld world, ITemplateNode template, string name = "Entity", GameObjectIcon icon = GameObjectIcon.NONE)
+        {
+            entlong e = world.NewEntityWithGameObject(name, icon);
+            template.Apply(world.ID, e.ID);
+            return e;
+        }
         public static entlong NewEntityWithGameObject(this EcsWorld self, string name = "Entity", GameObjectIcon icon = GameObjectIcon.NONE)
         {
             entlong result = self.NewEntityLong();

@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 
 namespace DCFApixels.DragonECS
 {
-    public abstract class MonoEntityTemplateBase : MonoBehaviour, IEntityTemplate
+    public abstract class MonoEntityTemplateBase : MonoBehaviour, ITemplateNode
     {
         public abstract void Apply(short worldID, int entityID);
     }
@@ -22,19 +22,12 @@ namespace DCFApixels.DragonECS
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsUnityConsts.ENTITY_BUILDING_GROUP)]
     [MetaDescription(EcsConsts.AUTHOR, nameof(MonoBehaviour) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     [MetaID("DragonECS_C734BA8092014833C14F21E05D7B1551")]
-    public class MonoEntityTemplate : MonoEntityTemplateBase, IEntityTemplateInternal
+    public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateNode
     {
         [SerializeReference]
         [ReferenceButton(true, typeof(IComponentTemplate))]
         [FormerlySerializedAs("_components")]
         private IComponentTemplate[] _componentTemplates;
-
-        #region Properties
-        string IEntityTemplateInternal.ComponentsPropertyName
-        {
-            get { return nameof(_componentTemplates); }
-        }
-        #endregion
 
         #region Methods
         public ReadOnlySpan<IComponentTemplate> GetComponentTemplates()

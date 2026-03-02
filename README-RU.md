@@ -48,10 +48,10 @@
 # Оглавление
 - [Установка](#установка)
 - [Debug](#debug)
-  - [Debug Модуль](#debug-модуль)
   - [Debug Сервис](#debug-сервис)
+  - [Debug Модуль](#debug-модуль)
   - [Визуальная отладка](#визуальная-отладка)
-- [Шаблон Сущности](#шаблон-сущности)
+- [Шаблоны](#шаблоны)
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [Шаблон Пайплайна](#шаблон-пайплайна)
@@ -85,21 +85,8 @@ https://github.com/DCFApixels/DragonECS-Unity.git
 </br>
 
 # Debug
-## Debug Модуль
-Подключение модуля отладки в Unity.
-```c#
-EcsDefaultWorld _world = new EcsDefaultWorld();
-EcsEventWorld _eventWorld = new EcsDefaultWorld();
-
-_pipeline = EcsPipeline.New()
-    //...
-    // Подключение и инициализация отладки для миров _world и _eventWorld
-    .AddUnityDebug(_world, _eventWorld)
-    //...
-    .BuildAndInit();
-```
 ## Debug Сервис
-`UnityDebugService`- реализация [Debug-сервиса для `EcsDebug`](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#ecsdebug). В редакторе по умолчанию автоматически инициализируется и связывает `EcsDebug.Print` с консолью Unity, `EcsProfilerMarker` c профайлером и т.д.
+`UnityDebugService` - реализация [Debug-сервиса для `EcsDebug`](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#ecsdebug). В редакторе он инициализируется автоматически и обеспечивает интеграцию: например, вызовы `EcsDebug.Print` направляются в консоль Unity, а `EcsProfilerMarker` подключается к встроенному профайлеру и т.д.
 ```c#
 //Ручная активация.
 UnityDebugService.Activate();
@@ -115,8 +102,19 @@ someMarker.End();
 //Остановка игрового режима.
 EcsDebug.Break();
 ```
+
 ## Визуальная отладка
-Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных аспектов фреймворка. Найти эти мониторы можно в Play Mode в разделе `DontDestroyOnLoad`. 
+
+Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных частей фреймворка. Найти эти мониторы можно в `Play Mode` в разделе `DontDestroyOnLoad`.
+
+```c#
+_pipeline = EcsPipeline.New()
+    //...
+    // Инициализация отладки для пайплайна и миров
+    .AddUnityDebug(_world, _eventWorld)
+    //...
+    .BuildAndInit();
+```
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/54e3f6d1-13c4-4226-a983-c672a29d33bb">   
@@ -143,7 +141,7 @@ EcsDebug.Break();
 -----
 
 * ### `WorldMonitor` 
-Показывает состояние `EcsWorld`. на каждый казанный мир создается отдельный монитор.
+Показывает состояние `EcsWorld`. на каждый мир, переданный в `AddUnityDebug(...)`, создается отдельный монитор.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543">   
@@ -162,26 +160,11 @@ EcsDebug.Break();
 
 </br>
 
-# Шаблон Сущности
-Настраиваемый набор компонентов которые можно применить к сущностям. Шаблоны должны реализовывать интерфейс `ITemplateNode`. 
-```c#
-ITemplateNode someTemplate = /*...*/;
-//...
-foreach (var e in _world.Where(out Aspect a))
-{
-    // Применение шаблона сущности.
-    someTemplate.Apply(e, _world.id);
-}
-```
-```c#
-// Применение шаблона сразу при создании сущности.
-int e = _world.NewEntity(someTemplate);
-```
-По умолчанию расширение содержит 2 вида шаблонов: `ScriptableEntityTemplate`, `MonoEntityTemplate`. 
+# Шаблоны
+Интеграция содержит шаблоны расширяющие `ITemplateNode`, предназначенные для настройки сущностей из редактора.
 
 ## ScriptableEntityTemplate
 Хранится как отдельный ассет. Наследуется от `ScriptableObject`.
-Действия чтобы создать `ScriptableEntityTemplate` ассет: 
 
 <details>
 <summary>Создать ассет: Asset > Create > DragonECS > ScriptableEntityTemplate.</summary>
@@ -222,8 +205,9 @@ int e = _world.NewEntity(someTemplate);
 
 ## Шаблон компонента
 
+Чтобы компонент попал в меню `Add Component` требуется шаблон. Шаблоны компонента это типы реализующие `IComponentTemplate`. 
+
 ### Реализация
-Чтобы компонент попал в меню `Add Component` нужно реализовать шаблон компонента. Шаблоны компонента это типы реализующие `IComponentTemplate`. 
 
 * Упрощенная реализация:
 ```c#
@@ -243,6 +227,8 @@ class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 <details>
 <summary>* Полная реализация:</summary>
 
+Если не подходят `ComponentTemplate<T>` или `TagComponentTemplate<T>`, можно напрямую реализовать интерфейс `IComponentTemplate`. Например это может пригодиться для работы в связке с кастомной реализацией пула. В большинстве случаев достаточно упрощенной.
+
 ```c#
 [Serializable] 
 struct SomeComponent : IEcsComponent { /* ... */ }
@@ -251,6 +237,7 @@ class SomeComponentTemplate : IComponentTemplate
     [SerializeField]
     protected SomeComponent component;
     public Type Type { get { return typeof(SomeComponent); } }
+    public bool IsUnique { get { return true; } }
     public void Apply(int worldID, int entityID)
     {
         EcsWorld.GetPoolInstance<EcsPool<SomeComponent>>(worldID).TryAddOrGet(entityID) = component;
@@ -268,28 +255,37 @@ class SomeComponentTemplate : IComponentTemplate
 ### Кастомизация отображения типов
 В раскрывающемся при нажатии `Add Component` меню выбора компонента поддерживается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
 
-Компоненты в инспекторе по умолчанию отображаются окрашенными в случайный цвет сгенерированный на основе имени компонента, выбрать другой режим окраски можно в [окне настроек](#окно-настроек) фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
+Компоненты в инспекторе по умолчанию отображаются со случайным цветом, зависящим от его имени, выбрать другой режим окраски можно в [окне настроек](#окно-настроек) фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
 
-Если редактор смог автоматически определить связанный с компонентом скрипт, то слева от крестика удаления компонента будет иконка файла. Клик по иконке выделит файл скрипта в папке проекта, двойной клик откроет скрип для редактирования. Связанный файл ищется по сопоставлению имени типа и имени файла скрипта. 
+Если интеграции удается найти соответствующий скрипт (по совпадению имени типа и файла, либо при наличии `[MetaID]`), рядом с крестиком удаления появляется иконка файла — клик выделяет скрипт в проекте, двойной клик открывает его.
 
-Если у компонента есть мета-атрибут `[MetaDescription]`, то слева от крестика удаления компонента будет иконка подсказки, при наведении курсора покажется информация из `[MetaDescription]`.
+При наличии атрибута `[MetaDescription]` показывается иконка подсказки с текстом из него.
 
 </br>
 
 ### Применение шаблонов компонентов вне стандартных шаблонов сущностей
-При необходимости создания пользовательского шаблона, шаблоны компонентов поддерживают отображение вне стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`.
+Шаблоны компонентов можно использовать не только внутри стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`, но и в любых пользовательских классах. Для этого предусмотрены два способа:
+
+Атрибут `[ComponentTemplateReference]`:
 ```c#
-// ComponentTemplateReference добавляет кнопку выбора доступной реализации IComponentTemplate
+// Добавляет кнопку выбора доступной реализации IComponentTemplate
 // и отображает шаблон компонента аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
 [SerializeReference, ComponentTemplateReference]
-private IComponentTempalte _someComponent1;
+private IComponentTemplate _someComponent1;
+```
 
-// Обертка над IComponentTempalte, которая работает аналогично примеру с атрибутом ComponentTemplateReference.
+Обертка `ComponentTemplateProperty`:
+```c#
+// Обертка над IComponentTemplate, аналогично примеру с атрибутом ComponentTemplateReference.
 private ComponentTemplateProperty _someComponent2;
+```
 
-// Все это работает и для массивов.
+Оба подхода работают и для массивов:
+```c#
 [SerializeReference, ComponentTemplateReference]
-private IComponentTempalte[] _components;
+private IComponentTemplate[] _components;
+// или
+private ComponentTemplateProperty[] _components;
 ```
 
 </br>

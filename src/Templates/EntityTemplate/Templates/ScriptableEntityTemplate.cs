@@ -11,7 +11,7 @@ using UnityEngine.Serialization;
 
 namespace DCFApixels.DragonECS
 {
-    public abstract class ScriptableEntityTemplateBase : ScriptableObject, IEntityTemplate
+    public abstract class ScriptableEntityTemplateBase : ScriptableObject, ITemplateNode
     {
         public abstract void Apply(short worldID, int entityID);
     }
@@ -21,7 +21,7 @@ namespace DCFApixels.DragonECS
     [MetaDescription(EcsConsts.AUTHOR, nameof(ScriptableObject) + " implementation of an entity template. Templates are a set of components that are applied to entities.")]
     [CreateAssetMenu(fileName = nameof(ScriptableEntityTemplate), menuName = EcsConsts.FRAMEWORK_NAME + "/" + nameof(ScriptableEntityTemplate), order = 1)]
     [MetaID("DragonECS_7C4DBA809201D959401A5BDFB6363EC0")]
-    public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, IEntityTemplateInternal
+    public class ScriptableEntityTemplate : ScriptableEntityTemplateBase, ITemplateNode
     {
         [SerializeField]
         private ScriptableEntityTemplateBase[] _templates;
@@ -29,13 +29,6 @@ namespace DCFApixels.DragonECS
         [ReferenceButton(true, typeof(IComponentTemplate))]
         [FormerlySerializedAs("_components")]
         private IComponentTemplate[] _componentTemplates;
-
-        #region Properties
-        string IEntityTemplateInternal.ComponentsPropertyName
-        {
-            get { return nameof(_componentTemplates); }
-        }
-        #endregion
 
         #region Methods
         public ReadOnlySpan<ScriptableEntityTemplateBase> GetTemplates()
