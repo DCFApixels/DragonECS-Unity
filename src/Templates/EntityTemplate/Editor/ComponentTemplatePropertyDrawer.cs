@@ -128,7 +128,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
+            ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
 
             Rect rect = position;
             if (EcsGUI.DrawTypeMetaBlock(ref rect, rootProperty, meta))

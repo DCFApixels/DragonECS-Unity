@@ -93,7 +93,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var componentProp = GetTargetProperty(prop);
 
 
-                ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.ToMeta();
+                ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
 
                 if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _componentsProp, index, componentProp, meta))
                 {

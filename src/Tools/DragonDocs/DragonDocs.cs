@@ -27,7 +27,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
             List<DragonDocsMeta> metas = new List<DragonDocsMeta>(256);
             foreach (var type in GetTypes())
             {
-                metas.Add(new DragonDocsMeta(type.ToMeta()));
+                metas.Add(new DragonDocsMeta(type.GetMeta()));
             }
             DragonDocsMeta[] array = metas.ToArray();
             Array.Sort(array);

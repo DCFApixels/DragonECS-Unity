@@ -33,7 +33,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var system = _systemsList[i];
                 foreach (var interfaceType in system.meta.Type.GetInterfaces())
                 {
-                    TypeMeta meta = interfaceType.ToMeta();
+                    TypeMeta meta = interfaceType.GetMeta();
                     if (SYSTEM_INTERFACE_TYPE.IsAssignableFrom(interfaceType) && SYSTEM_INTERFACE_TYPE != interfaceType && (IsShowHidden || meta.IsHidden == false))
                     {
                         ProcessData data;

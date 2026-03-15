@@ -1,7 +1,6 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
-using DCFApixels.DragonECS.Core;
 using System;
 using System.Buffers;
 using System.Collections.Generic;
@@ -60,10 +59,9 @@ namespace DCFApixels.DragonECS
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, ICloneable
+        where T : struct
     {
         protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
-        protected static readonly bool _isHasIEcsComponentLifecycle;
-        protected static readonly IEcsComponentLifecycle<T> _iEcsComponentLifecycle;
 
         private static bool _defaultValueTypeInit = false;
         private static T _defaultValueType;
@@ -92,11 +90,6 @@ namespace DCFApixels.DragonECS
                 }
                 return _defaultValueType;
             }
-        }
-        static ComponentTemplateBase()
-        {
-            _isHasIEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.isHasHandler;
-            _iEcsComponentLifecycle = EcsComponentLifecycleHandler<T>.instance;
         }
 
         [SerializeField]

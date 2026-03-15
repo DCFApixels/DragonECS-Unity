@@ -57,7 +57,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 sb.Append($"{SEPARATOR}");
                 if (pool.IsNullOrDummy() == false)
                 {
-                    sb.Append(pool.ComponentType.ToMeta().TypeName);
+                    sb.Append(pool.ComponentType.GetMeta().TypeName);
                 }
                 else
                 {

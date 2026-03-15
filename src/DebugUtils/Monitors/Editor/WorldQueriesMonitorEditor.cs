@@ -54,7 +54,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 sb.Append($"{SEPARATOR}");
                 if (pool.IsNullOrDummy() == false)
                 {
-                    sb.Append(pool.ComponentType.ToMeta().TypeName);
+                    sb.Append(pool.ComponentType.GetMeta().TypeName);
                 }
                 else
                 {
@@ -185,7 +185,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     foreach (var inc in ids)
                     {
                         Type type = Target.World.GetComponentType(inc);
-                        TypeMeta meta = type.ToMeta();
+                        TypeMeta meta = type.GetMeta();
 
                         Color color = EcsGUI.SelectPanelColor(meta, i, 9);
 

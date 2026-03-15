@@ -34,7 +34,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
         public void Init()
         {
-            TypeMeta meta = typeof(EcsPipeline).ToMeta();
+            TypeMeta meta = typeof(EcsPipeline).GetMeta();
             _monitor = new GameObject($"{UnityEditorUtility.TransformToUpperName(meta.Name)}").AddComponent<PipelineMonitor>();
             Object.DontDestroyOnLoad(_monitor);
             _monitor.Set(Pipeline);
