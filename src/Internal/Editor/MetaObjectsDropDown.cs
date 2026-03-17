@@ -35,7 +35,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 return result;
-            }).Select(o => (o, (ITypeMeta)o.ToMeta()));
+            }).Select(o => (o, (ITypeMeta)o.GetMeta()));
             Setup(itemMetaPairs);
         }
 
@@ -99,7 +99,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    meta = dummy.Type.ToMeta();
+                    meta = dummy.Type.GetMeta();
                 }
                 return (dummy, meta);
             });
@@ -174,7 +174,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             IEnumerable<(IEcsPool pool, ITypeMeta meta)> itemMetaPairs = pools.Select(pool =>
             {
-                return (pool, (ITypeMeta)pool.ComponentType.ToMeta());
+                return (pool, (ITypeMeta)pool.ComponentType.GetMeta());
             });
             Setup(itemMetaPairs);
         }

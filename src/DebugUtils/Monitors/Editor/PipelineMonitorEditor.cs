@@ -139,7 +139,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             Type type = system.GetType();
-            TypeMeta meta = type.ToMeta();
+            TypeMeta meta = type.GetMeta();
 
             if (CheckIsHidden(meta))
             {
@@ -162,7 +162,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawRunner(IEcsRunner runner, int index)
         {
             Type type = runner.GetType();
-            TypeMeta meta = type.ToMeta();
+            TypeMeta meta = type.GetMeta();
 
             if (CheckIsHidden(meta))
             {

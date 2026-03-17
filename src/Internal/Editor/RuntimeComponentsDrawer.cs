@@ -259,7 +259,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 foreach (var cmp in cmps)
                 {
                     index++;
-                    var meta = cmp.ComponentType.ToMeta();
+                    var meta = cmp.ComponentType.GetMeta();
                     if (meta.IsHidden == false || IsShowHidden)
                     {
                         Type componentType = cmp.ComponentType;
@@ -372,7 +372,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         }
         private void DrawRuntimeComponent(int entityID, IEcsPool pool, int total, int index)
         {
-            var meta = pool.ComponentType.ToMeta();
+            var meta = pool.ComponentType.GetMeta();
             if (meta.IsHidden == false || IsShowHidden)
             {
                 Type componentType = pool.ComponentType;

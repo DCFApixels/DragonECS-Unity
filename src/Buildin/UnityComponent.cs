@@ -32,7 +32,7 @@ namespace DCFApixels.DragonECS
         public static implicit operator UnityComponent<T>(T a) { return new UnityComponent<T>(a); }
         public override string ToString()
         {
-            return $"UnityComponent<{typeof(T).ToMeta().TypeName}>";
+            return $"UnityComponent<{typeof(T).GetMeta().TypeName}>";
         }
     }
 

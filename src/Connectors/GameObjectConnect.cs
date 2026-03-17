@@ -31,11 +31,11 @@ namespace DCFApixels.DragonECS
             Connect = connect;
         }
 
-        void IEcsComponentLifecycle<GameObjectConnect>.Enable(ref GameObjectConnect component)
+        void IEcsComponentLifecycle<GameObjectConnect>.OnAdd(ref GameObjectConnect component, short worldID, int entityID)
         {
             component = default;
         }
-        void IEcsComponentLifecycle<GameObjectConnect>.Disable(ref GameObjectConnect component)
+        void IEcsComponentLifecycle<GameObjectConnect>.OnDel(ref GameObjectConnect component, short worldID, int entityID)
         {
             if (component.Connect != null)
             {

@@ -875,7 +875,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region SelectPanelColor
         public static Color SelectPanelColor(ITypeMeta meta, int index, int total)
         {
-            var trueMeta = meta.Type.ToMeta();
+            var trueMeta = meta.Type.GetMeta();
             bool isCustomColor = trueMeta.IsCustomColor || meta.Color != trueMeta.Color;
             return SelectPanelColor(meta.Color, isCustomColor, index, total);
         }
@@ -1087,7 +1087,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                     if (isAssignable)
                     {
-                        ITypeMeta meta = type.ToMeta();
+                        ITypeMeta meta = type.GetMeta();
                         string description = meta.Description.Text;
                         MetaGroup group = meta.Group;
                         var splitedGroup = group.Splited;
