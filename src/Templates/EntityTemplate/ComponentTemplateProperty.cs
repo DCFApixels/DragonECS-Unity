@@ -12,13 +12,13 @@ namespace DCFApixels.DragonECS
     public struct ComponentTemplateProperty : IEquatable<ComponentTemplateProperty>
     {
         [SerializeReference]
-        private IComponentTemplate _template;
+        private ITemplateNode _template;
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ComponentTemplateProperty(IComponentTemplate template)
+        public ComponentTemplateProperty(ITemplateNode template)
         {
             _template = template;
         }
-        public IComponentTemplate Template
+        public ITemplateNode Template
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _template; }
@@ -28,23 +28,41 @@ namespace DCFApixels.DragonECS
         public Type Type
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _template.Type; }
+            get { return _template is IComponentTemplate tml ? tml.Type : _template.GetType(); }
         }
         public bool IsNull
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get { return _template == null; }
         }
+        private IComponentTemplate Tmpl
+        {
+            get { return _template as IComponentTemplate; }
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Apply(short worldID, int entityID) { _template.Apply(worldID, entityID); }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public object GetRaw() { return _template.GetRaw(); }
+        public void OnGizmos(Transform transform, IComponentTemplate.GizmosMode mode) { Tmpl?.OnGizmos(transform, mode); }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OnGizmos(Transform transform, IComponentTemplate.GizmosMode mode) { _template.OnGizmos(transform, mode); }
+        public void OnValidate(UnityEngine.Object obj) { Tmpl?.OnValidate(obj); }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void OnValidate(UnityEngine.Object obj) { _template.OnValidate(obj); }
+        public object GetRaw()
+        {
+            if(_template is IComponentTemplate tmpl)
+            {
+                return tmpl.GetRaw();
+            }
+            return _template;
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetRaw(object raw) { _template.SetRaw(raw); }
+        public void SetRaw(object raw) 
+        {
+            if (_template is IComponentTemplate tmpl)
+            {
+                tmpl.SetRaw(raw);
+            }
+            _template = (IComponentTemplate)raw;
+        }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Equals(ComponentTemplateProperty other) { return _template == other._template; }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -67,15 +85,10 @@ namespace DCFApixels.DragonECS
 
     public sealed class ComponentTemplateReferenceAttribute : PropertyAttribute, IReferenceButtonAttribute
     {
-        public readonly Type[] PredicateTypes;
-        public readonly bool IsHideButtonIfNotNull;
+        public Type[] PredicateTypes;
         Type[] IReferenceButtonAttribute.PredicateTypes { get { return PredicateTypes; } }
-        bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
-        public ComponentTemplateReferenceAttribute()
-        {
-            PredicateTypes = new Type[] { typeof(IComponentTemplate) };
-            IsHideButtonIfNotNull = true;
-        }
+        bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return true; } }
+        public ComponentTemplateReferenceAttribute() { }
     }
     public sealed class ComponentTemplateAttribute : PropertyAttribute { }
 }

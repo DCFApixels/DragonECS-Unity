@@ -142,7 +142,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             entityEditorBlockDrawers.Add(drawer);
                         }
 
-                        if (type.IsUnityObject() == false && type.GetConstructor(Type.EmptyTypes) != null)
+                        if (type.IsUnityObject() == false && 
+                            (type.IsValueType || type.GetConstructor(Type.EmptyTypes) != null))
                         {
                             serializableTypes.Add(type);
                             if (hasMetaID)

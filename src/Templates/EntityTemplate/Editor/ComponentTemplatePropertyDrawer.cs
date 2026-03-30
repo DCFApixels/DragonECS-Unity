@@ -9,7 +9,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomPropertyDrawer(typeof(ComponentTemplateProperty), true)]
     internal class ComponentTemplatePropertyDrawer : ExtendedPropertyDrawer
     {
-        private ComponentTemplateReferenceDrawer _drawer = new ComponentTemplateReferenceDrawer();
+        private ComponentTemplateReferenceDrawer _drawer = new ComponentTemplateReferenceDrawer(new PredicateTypesKey(new Type[] { typeof(ITemplateNode) }));
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             property.Next(true);
@@ -30,17 +30,48 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateReferenceAttribute>
     {
         private const float DamagedComponentHeight = 18f * 2f;
-        private static ComponentTemplatesDropDown _componentDropDown;
+        private ComponentTemplatesDropDown _componentDropDown;
+        private PredicateTypesKey? _predicateOverride;
+
 
         #region Properties
         private float Padding => Spacing;
-        protected override bool IsStaticInit => _componentDropDown != null;
+        protected override bool IsInit => _componentDropDown != null;
         #endregion
 
-        #region Init
-        protected override void OnStaticInit()
+        public ComponentTemplateReferenceDrawer() { }
+        public ComponentTemplateReferenceDrawer(PredicateTypesKey key)
         {
-            _componentDropDown = new ComponentTemplatesDropDown();
+            _predicateOverride = key;
+        }
+
+        #region Init
+        protected override void OnInit()
+        {
+            PredicateTypesKey key;
+            if(_predicateOverride == null)
+            {
+                Type[] withOutTypes = Type.EmptyTypes;
+                if (fieldInfo != null)
+                {
+                    withOutTypes = fieldInfo.TryGetAttribute(out ReferenceButtonWithOutAttribute a) ? a.PredicateTypes : Array.Empty<Type>();
+                }
+                if (Attribute != null)
+                {
+                    var types = Attribute.PredicateTypes;
+                    if(types == null || types.Length == 0)
+                    {
+                        types = new Type[] { typeof(ITemplateNode) };
+                    }
+                    key = new PredicateTypesKey(types, withOutTypes);
+                }
+                else
+                {
+                    key = new PredicateTypesKey(new Type[] { typeof(object) }, withOutTypes);
+                }
+                _predicateOverride = key;
+            }
+            _componentDropDown = ComponentTemplatesDropDown.Get(_predicateOverride.Value);
             _componentDropDown.OnSelected += SelectComponent;
         }
 
@@ -49,11 +80,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static void SelectComponent(ComponentTemplatesDropDown.Item item)
         {
             //EcsGUI.Changed = true;
-            currentProperty.managedReferenceValue = item.Obj.Clone_Reflection();
+            object inst = item.Obj.CreateInstance();
+            currentProperty.managedReferenceValue = inst;
             currentProperty.isExpanded = false;
             currentProperty.serializedObject.ApplyModifiedProperties();
         }
-
         #endregion
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
@@ -134,7 +165,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     return;
                 }
 
-                meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
+                meta = template is ITypeMeta metaOverride ? metaOverride : _predicateOverride.Value.Types[0].GetMeta();
             }
             else
             {

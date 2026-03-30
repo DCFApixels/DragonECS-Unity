@@ -1,10 +1,9 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Buffers;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -142,34 +141,103 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal static class ComponentTemplateTypeCache
+    internal class ComponentTemplateTypeCache
     {
-        private static Type[] _types;
-        private static IComponentTemplate[] _dummies;
-        internal static ReadOnlySpan<Type> Types
+        private static ComponentTemplateTypeCache[] _all;
+        internal static ReadOnlySpan<ComponentTemplateTypeCache> All
         {
-            get { return _types; }
-        }
-        internal static ReadOnlySpan<IComponentTemplate> Dummies
-        {
-            get { return _dummies; }
+            get { return _all; }
         }
 
         static ComponentTemplateTypeCache()
         {
-            Type interfaceType = typeof(IComponentTemplate);
-
-            _types = UnityEditorUtility._serializableTypes.Where(type => interfaceType.IsAssignableFrom(type)).ToArray();
-            //foreach (var type in _types)
-            //{
-            //    EcsDebugUtility.GetTypeMeta(type);
-            //}
-            _dummies = new IComponentTemplate[_types.Length];
-
-            for (int i = 0; i < _types.Length; i++)
+            List<ComponentTemplateTypeCache> list = new List<ComponentTemplateTypeCache>(256);
+            foreach (var type in UnityEditorUtility._serializableTypes)
             {
-                _dummies[i] = (IComponentTemplate)Activator.CreateInstance(_types[i]);
+                //Debug.Log(type.Name);
+                if (typeof(ITemplateNode).IsAssignableFrom(type) && (typeof(IComponentTemplate).IsAssignableFrom(type) || typeof(IEcsComponentMember).IsAssignableFrom(type)))
+                {
+                    ComponentTemplateTypeCache element = new ComponentTemplateTypeCache(type);
+                    list.Add(element);
+                }
             }
+            _all = list.ToArray();
+        }
+
+
+        public readonly Type Type;
+        public readonly Type ComponentType;
+        public readonly bool IsUnique;
+        private ITypeMeta _meta;
+        public ITypeMeta Meta
+        {
+            get
+            {
+                if (_meta == null)
+                {
+                    _meta = ComponentType.GetMeta();
+                }
+                return _meta;
+            }
+        }
+        private bool _defaultValueTypeInit = false;
+        private object _defaultValueDummy;
+        public object DefaultValue
+        {
+            get
+            {
+                if (_defaultValueTypeInit == false)
+                {
+                    if (Type.IsValueType)
+                    {
+                        FieldInfo field;
+                        field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                        if (field != null && field.FieldType == Type)
+                        {
+                            _defaultValueDummy = field.GetValue(null);
+                        }
+
+                        if(_defaultValueDummy == null)
+                        {
+                            field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
+                            if (field != null && field.FieldType == Type)
+                            {
+                                _defaultValueDummy = field.GetValue(null);
+                            }
+                        }
+                    }
+                    _defaultValueTypeInit = true;
+                }
+                return _defaultValueDummy;
+            }
+        }
+        public ComponentTemplateTypeCache(Type type)
+        {
+            Type = type;
+
+            IsUnique = false;
+            if (typeof(IComponentTemplate).IsAssignableFrom(type))
+            {
+                var ct = (IComponentTemplate)Activator.CreateInstance(type);
+                IsUnique = ct.IsUnique;
+                ComponentType = ct.Type;
+                if (ct is ITypeMeta metaOverride)
+                {
+                    _meta = metaOverride;
+                }
+            }
+            else
+            {
+                ComponentType = Type;
+            }
+        }
+        public object CreateInstance()
+        {
+            if(DefaultValue != null)
+            {
+                return DefaultValue.Clone_Reflection();
+            }
+            return Activator.CreateInstance(Type);
         }
     }
 }

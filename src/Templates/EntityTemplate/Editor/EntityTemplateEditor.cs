@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Internal;
 using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
+using System;
 using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
@@ -15,13 +16,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private ReorderableList _reorderableComponentsList;
         private int _reorderableComponentsListLastCount;
 
+        private static readonly Type[] _predicateTypes = new Type[] { typeof(ITemplateNode) };
+
         protected abstract bool IsSO { get; }
 
         #region Init
         protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
         {
-            _componentDropDown = new ComponentTemplatesDropDown();
+            _componentDropDown = ComponentTemplatesDropDown.Get(new PredicateTypesKey(_predicateTypes, Type.EmptyTypes));
 
             _componentsProp = serializedObject.FindProperty("_componentTemplates");
 

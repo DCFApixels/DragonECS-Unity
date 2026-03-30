@@ -1005,48 +1005,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
-        #region PredicateTypesKey
-        private readonly struct PredicateTypesKey : IEquatable<PredicateTypesKey>
-        {
-            public readonly Type[] types;
-            public readonly Type[] withoutTypes;
-            public PredicateTypesKey(Type[] types, Type[] withoutTypes)
-            {
-                this.types = types;
-                this.withoutTypes = withoutTypes;
-            }
-            public bool Equals(PredicateTypesKey other)
-            {
-                if (types.Length != other.types.Length) { return false; }
-                if (withoutTypes.Length != other.withoutTypes.Length) { return false; }
-                for (int i = 0; i < types.Length; i++)
-                {
-                    if (types[i] != other.types[i])
-                    {
-                        return false;
-                    }
-                }
-                for (int i = 0; i < withoutTypes.Length; i++)
-                {
-                    if (withoutTypes[i] != other.withoutTypes[i])
-                    {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            public override bool Equals(object obj)
-            {
-                return obj is PredicateTypesKey key && Equals(key);
-            }
-            public override int GetHashCode()
-            {
-                return HashCode.Combine(types);
-            }
-            public static implicit operator PredicateTypesKey((Type[], Type[]) types) { return new PredicateTypesKey(types.Item1, types.Item2); }
-        }
-        #endregion
-
         #region ReferenceDropDown
         private class ReferenceDropDown : AdvancedDropdown
         {
