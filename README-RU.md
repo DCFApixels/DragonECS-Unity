@@ -35,7 +35,7 @@
 
 </br>
 
-Расширение добавит набор инструментов для отладки и связи с движком Unity.
+Этот пакет делает работу с DragonECS в Unity более удобной и наглядной: визуальная отладка и профайлинг, редакторские шаблоны и инструменты для привязки сущностей к GameObject.
 
 > [!WARNING]
 > Проект в стадии разработки. API может меняться.  
@@ -63,7 +63,7 @@
 </br>
 
 # Установка
-Семантика версионирования - [Открыть](https://gist.github.com/DCFApixels/e53281d4628b19fe5278f3e77a7da9e8#file-dcfapixels_versioning_ru-md)
+Семантика версионирования - [Открыть](https://gist.github.com/DCFApixels/af79284955bf40e9476cdcac79d7b098#file-dcfapixels_versioning-md)
 ## Окружение
 Обязательные требования:
 + Зависимость: [DragonECS](https://github.com/DCFApixels/DragonECS)
@@ -75,12 +75,17 @@
 
 ## Установка для Unity
 * ### Unity-модуль
-Поддерживается установка в виде Unity-модуля в  при помощи добавления git-URL [в PackageManager](https://docs.unity3d.com/2023.2/Documentation/Manual/upm-ui-giturl.html) или ручного добавления в `Packages/manifest.json`: 
+Поддерживается установка в виде Unity-модуля при помощи добавления git-URL [в PackageManager](https://docs.unity3d.com/2023.2/Documentation/Manual/upm-ui-giturl.html): 
 ```
 https://github.com/DCFApixels/DragonECS-Unity.git
 ```
+Или ручного добавления этой строчки в `Packages/manifest.json`:
+```
+"com.dcfa_pixels.dragonecs-unity": "https://github.com/DCFApixels/DragonECS-Unity.git",
+```
+
 * ### В виде исходников
-Пакет так же может быть добавлен в проект в виде исходников.
+Можно также напрямую скопировать исходники пакета в проект.
 
 </br>
 
@@ -105,7 +110,7 @@ EcsDebug.Break();
 
 ## Визуальная отладка
 
-Выполнена в виде специальных объектов-мониторов в которых отображается состояние разных частей фреймворка. Найти эти мониторы можно в `Play Mode` в разделе `DontDestroyOnLoad`.
+Реализовано в виде объектов-мониторов, в которых отображается состояние разных частей фреймворка. Найти эти мониторы можно в `Play Mode` в разделе `DontDestroyOnLoad`.
 
 ```c#
 _pipeline = EcsPipeline.New()
@@ -141,7 +146,7 @@ _pipeline = EcsPipeline.New()
 -----
 
 * ### `WorldMonitor` 
-Показывает состояние `EcsWorld`. на каждый мир, переданный в `AddUnityDebug(...)`, создается отдельный монитор.
+Показывает состояние `EcsWorld`. На каждый мир, переданный в `AddUnityDebug(...)`, создается отдельный монитор.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543">   
@@ -161,7 +166,7 @@ _pipeline = EcsPipeline.New()
 </br>
 
 # Шаблоны
-Интеграция содержит шаблоны расширяющие `ITemplateNode`, предназначенные для настройки сущностей из редактора.
+Интеграция содержит шаблоны, расширяющие `ITemplateNode`, предназначенные для настройки сущностей из редактора.
 
 ## ScriptableEntityTemplate
 Хранится как отдельный ассет. Наследуется от `ScriptableObject`.
@@ -433,7 +438,7 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 </br>
 
 # EcsRootUnity
-Упрощенная реализация Ecs Root для юнити, собирает пайплайн из шаблонов пайплайна. Наследуется от `MonoBehaviour`. Чтобы повесить GameObject: `Add Component > DragonECS > EcsRootUnity`.
+Упрощённая реализация Ecs Root для Unity; собирает пайплайн из шаблонов. Наследуется от `MonoBehaviour`. Чтобы добавить на GameObject: `Add Component > DragonECS > EcsRootUnity`.
 
 <p align="center">
 <img width="450" src="https://github.com/user-attachments/assets/3ff42747-0366-4db8-8015-9ea254d72feb">   
@@ -443,7 +448,7 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 </br>
 
 
-# FixedUpdate LateUpdate 
+# FixedUpdate и LateUpdate 
 ```c#
 using DCFApixels.DragonECS;
 using UnityEngine;
@@ -473,7 +478,7 @@ public class EcsRoot : MonoBehaviour
 </br>
 
 # Документация проекта
-В интеграции так же есть окно документации проекта на основе Мета-Атрибутов. Открыть документацию: `Tools > DragonECS > Documentation`. Документация формируется при первом открытии окна и при нажатии кнопки `Update`.
+В интеграции также есть окно документации проекта на основе мета-атрибутов. Открыть документацию: `Tools > DragonECS > Documentation`. Документация формируется при первом открытии окна и при нажатии кнопки `Update`.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/f5795823-aeae-45df-8e25-db64df837513">   
@@ -482,7 +487,7 @@ public class EcsRoot : MonoBehaviour
 </br>
 
 # Окно настроек
-В окне настроек есть несколько опций, включая возможность менять режимы отображения компонентов в инспекторе. Внизу расположены удобные переключатели для используемых в фреймворке define значения для директив процессора. Открыть документацию: `Tools > DragonECS > Settings`.
+В окне настроек доступно несколько опций, включая режимы отображения компонентов в инспекторе. Внизу находятся переключатели для define-переменных, используемых в фреймворке. Открыть окно настроек: `Tools > DragonECS > Settings`.
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
@@ -491,8 +496,8 @@ public class EcsRoot : MonoBehaviour
 </br>
 
 # Инструмент для восстановления Missing Reference
-Расширение активно задействует `[SerializeReference]`, у которого есть известная проблема с потерей типов при переименовании. Чтобы упростить восстановление потерянных типов имеется специальный инструмент `Reference Repairer`. Он может собирать все ассеты с потерянными типами, после предоставляет окно для указания новых имен потерянны типов. Далее проведет восстановление потерянных типов в собранных ассетах. Открыть окно инструмента: `Tools > DragonECS > Reference Repairer`.
-> Если потерянные типы были с атрибутом `[MetaID(id)]` то инструмент автоматически определит новое имя типа.
+Некоторые части интеграции активно задействует `[SerializeReference]`, у которого есть известная проблема с потерей типов при переименовании. Чтобы упростить восстановление потерянных типов имеется специальный инструмент `Reference Repairer`. Он может собирать все ассеты с потерянными типами, после этого предоставляет окно для указания новых имён потерянных типов и выполнит их восстановление в собранных ассетах. Открыть окно инструмента: `Tools > DragonECS > Reference Repairer`.
+> Если потерянные типы имеют атрибут `[MetaID(id)]`, инструмент попытается автоматически сопоставить новое имя типа.
 <p align="center">
 <img width="700" src="https://github.com/user-attachments/assets/ffb2b78a-db43-445d-a371-6358250b8cee">   
 </p>
@@ -500,5 +505,5 @@ public class EcsRoot : MonoBehaviour
 </br>
 
 # FAQ
-## Не могу повесить EcsEntityConncet или другие компоненты
-Такое иногда может происходить после обновления пакета, решается либо через `Assets -> Reimport All` или перезапуск окна Unity с удалением папки `*project name*/Library`.
+## Не могу повесить `EcsEntityConnect` или другие компоненты
+Иногда это происходит после обновления пакета. Решения: выполните `Assets -> Reimport All` или перезапустите Unity после удаления папки `Library` в корне проекта.
