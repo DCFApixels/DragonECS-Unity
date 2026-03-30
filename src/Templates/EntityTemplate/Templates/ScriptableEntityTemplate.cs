@@ -2,7 +2,6 @@
 #undef DEBUG
 #endif
 using DCFApixels.DragonECS.Unity;
-using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,9 +25,9 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private ScriptableEntityTemplateBase[] _templates;
         [SerializeReference]
-        [ReferenceButton(true, typeof(IComponentTemplate))]
+        [ReferenceButton(true, typeof(ITemplateNode))]
         [FormerlySerializedAs("_components")]
-        private IComponentTemplate[] _componentTemplates;
+        private ITemplateNode[] _componentTemplates;
 
         #region Methods
         public ReadOnlySpan<ScriptableEntityTemplateBase> GetTemplates()
@@ -39,7 +38,7 @@ namespace DCFApixels.DragonECS
         {
             _templates = templates.ToArray();
         }
-        public ReadOnlySpan<IComponentTemplate> GetComponentTemplates()
+        public ReadOnlySpan<ITemplateNode> GetComponentTemplates()
         {
             return _componentTemplates;
         }
@@ -70,7 +69,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                item?.OnValidate(this);
+                if (item is IComponentTemplate ct) { ct.OnValidate(this); }
             }
         }
         #endregion

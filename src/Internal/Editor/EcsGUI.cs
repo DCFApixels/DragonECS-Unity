@@ -714,48 +714,48 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return DrawTypeMetaBlockPadding * 2 + contentHeight;
         }
-        public static bool DrawTypeMetaElementBlock(ref Rect position, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementRootProperty, ITypeMeta meta)
+
+        public static bool DrawTypeMetaElementBlock(ref Rect rect, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementRootProperty, ITypeMeta meta)
         {
-            var result = DrawTypeMetaBlock_Internal(ref position, elementRootProperty, meta, elementIndex, arrayProperty.arraySize);
-            if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
+            var result = DrawTypeMetaBlock_Internal(ref rect, elementRootProperty, meta, elementIndex, arrayProperty.arraySize);
+            if (result.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
             {
                 arrayProperty.DeleteArrayElementAtIndex(elementIndex);
             }
-            return result != DrawTypeMetaBlockResult.None;
+            return result != DrawTypeMetaBlockResultFlags.None;
         }
-        public static bool DrawTypeMetaBlock(ref Rect position, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
+        public static bool DrawTypeMetaBlock(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
-            var result = DrawTypeMetaBlock_Internal(ref position, rootProperty, meta, index, total);
-            if (result.HasFlag(DrawTypeMetaBlockResult.CloseButtonClicked))
+            var result = DrawTypeMetaBlock_Internal(ref rect, rootProperty, meta, index, total);
+            if (result.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
             {
                 rootProperty.ResetValues();
             }
-            return result.HasFlag(DrawTypeMetaBlockResult.Drop);
+            return result.HasFlag(DrawTypeMetaBlockResultFlags.DropExpanded);
         }
 
-        private enum DrawTypeMetaBlockResult
+        [Flags]
+        private enum DrawTypeMetaBlockResultFlags
         {
             None = 0,
-            Drop = 1 << 0,
+            DropExpanded = 1 << 0,
             CloseButtonClicked = 1 << 1,
         }
-        private static DrawTypeMetaBlockResult DrawTypeMetaBlock_Internal(ref Rect position, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
+       
+
+        private static DrawTypeMetaBlockResultFlags DrawTypeMetaBlock_Internal(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
-            Color alphaPanelColor;
             if (meta == null)
             {
-                alphaPanelColor = Color.black;
-                alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
-                EditorGUI.DrawRect(position, alphaPanelColor);
-                position = position.AddPadding(DrawTypeMetaBlockPadding * 2f);
-                return DrawTypeMetaBlockResult.None;
+                EditorGUI.DrawRect(rect, Color.black.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA));
+                return DrawTypeMetaBlockResultFlags.None;
             }
 
-            string name = meta.Name;
+            //string name = meta.Name;
             string description = meta.Description.Text;
 
-            int positionIndex;
-            if (index < 0)
+            int positionIndex = index;
+            if (positionIndex < 0)
             {
                 positionIndex = int.MaxValue;
                 var counter = rootProperty.Copy();
@@ -765,53 +765,51 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     positionIndex--;
                 }
             }
-            else
-            {
-                positionIndex = index;
-            }
 
-            alphaPanelColor = SelectPanelColor(meta, positionIndex, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE).SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
+            Color panelColor = SelectPanelColor(meta, positionIndex, total)
+                .Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE)
+                .SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
 
-            DrawTypeMetaBlockResult result = DrawTypeMetaBlockResult.None;
+            EditorGUI.DrawRect(rect, panelColor);
+
+            Rect optionRect = rect;
+            rect = rect.AddPadding(DrawTypeMetaBlockPadding * 2f);
+
+            optionRect.center -= new Vector2(0, optionRect.height);
+            optionRect.yMin = optionRect.yMax;
+            optionRect.yMax += HeadIconsRect.height;
+            optionRect.xMin = optionRect.xMax - 64;
+            optionRect.center += Vector2.up * DrawTypeMetaBlockPadding;
+
+            DrawTypeMetaBlockResultFlags result = DrawTypeMetaBlockResultFlags.None;
             using (CheckChanged())
             {
-                EditorGUI.DrawRect(position, alphaPanelColor);
-
-                Rect optionButton = position;
-                position = position.AddPadding(DrawTypeMetaBlockPadding * 2f);
-
-                optionButton.center -= new Vector2(0, optionButton.height);
-                optionButton.yMin = optionButton.yMax;
-                optionButton.yMax += HeadIconsRect.height;
-                optionButton.xMin = optionButton.xMax - 64;
-                optionButton.center += Vector2.up * DrawTypeMetaBlockPadding;
-
                 //Canceling isExpanded
                 bool oldIsExpanded = rootProperty.isExpanded;
-                if (ClickTest(optionButton))
+                if (ClickTest(optionRect))
                 {
                     rootProperty.isExpanded = oldIsExpanded;
-                    result |= DrawTypeMetaBlockResult.Drop;
+                    result |= DrawTypeMetaBlockResultFlags.DropExpanded;
                 }
 
                 //Close button
-                optionButton.xMin = optionButton.xMax - HeadIconsRect.width;
-                if (CloseButton(optionButton))
+                optionRect.xMin = optionRect.xMax - HeadIconsRect.width;
+                if (CloseButton(optionRect))
                 {
-                    result |= DrawTypeMetaBlockResult.CloseButtonClicked;
+                    result |= DrawTypeMetaBlockResultFlags.CloseButtonClicked;
                     return result;
                 }
                 //Edit script button
                 if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
                 {
-                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                    ScriptAssetButton(optionButton, script);
+                    optionRect = HeadIconsRect.MoveTo(optionRect.center - (Vector2.right * optionRect.width));
+                    ScriptAssetButton(optionRect, script);
                 }
                 //Description icon
                 if (string.IsNullOrEmpty(description) == false)
                 {
-                    optionButton = HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                    DescriptionIcon(optionButton, description);
+                    optionRect = HeadIconsRect.MoveTo(optionRect.center - (Vector2.right * optionRect.width));
+                    DescriptionIcon(optionRect, description);
                 }
             }
             return result;
@@ -890,19 +888,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 switch (AutoColorMode)
                 {
                     case ComponentColorMode.Auto:
-                        return color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
+                        {
+                            return color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
+                        }
                     case ComponentColorMode.Rainbow:
-                        int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
-                        Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
-                        return hsv.Desaturate(0.48f) / 1.18f;
+                        {
+                            int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
+                            Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);
+                            return hsv.Desaturate(0.48f) / 1.18f;
+                        }
                     default:
-                        return GetGenericPanelColor(index);
+                        {
+                            return index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
+                        }
                 }
             }
-        }
-        public static Color GetGenericPanelColor(int index)
-        {
-            return index % 2 == 0 ? new Color(0.40f, 0.40f, 0.40f) : new Color(0.54f, 0.54f, 0.54f);
         }
         #endregion
 

@@ -37,7 +37,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     using UnityEditor;
     using UnityEngine;
 
-    [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
     [CustomPropertyDrawer(typeof(ReferenceButtonAttribute), true)]
     internal sealed class ReferenceButtonAttributeDrawer : ExtendedPropertyDrawer<IReferenceButtonAttribute>
     {
@@ -68,7 +67,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
             Init();
-            if (property.managedReferenceValue != null &&
+            if (property.propertyType == SerializedPropertyType.ManagedReference &&
+                property.managedReferenceValue != null &&
                 Cahce(property).HasSerializableData_Editor)
             {
                 return EditorGUI.GetPropertyHeight(property, label, true);
@@ -81,6 +81,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
+            if(property.propertyType != SerializedPropertyType.ManagedReference)
+            {
+                GUI.Label(position, label);
+                return;
+            }
             if (IsArrayElement)
             {
                 label = UnityEditorUtility.GetLabelTemp();

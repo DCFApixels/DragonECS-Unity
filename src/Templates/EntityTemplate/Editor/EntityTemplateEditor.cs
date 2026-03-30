@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal abstract class EntityTemplateEditorBase : ExtendedEditor<ITemplateNode>
+    internal abstract class EntityTemplateEditorBase : ExtendedEditor
     {
         private ComponentTemplatesDropDown _componentDropDown;
 

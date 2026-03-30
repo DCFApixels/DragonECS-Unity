@@ -77,4 +77,5 @@ namespace DCFApixels.DragonECS
             IsHideButtonIfNotNull = true;
         }
     }
+    public sealed class ComponentTemplateAttribute : PropertyAttribute { }
 }

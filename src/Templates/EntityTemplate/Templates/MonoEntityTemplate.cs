@@ -2,7 +2,6 @@
 #undef DEBUG
 #endif
 using DCFApixels.DragonECS.Unity;
-using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,12 +24,12 @@ namespace DCFApixels.DragonECS
     public class MonoEntityTemplate : MonoEntityTemplateBase, ITemplateNode
     {
         [SerializeReference]
-        [ReferenceButton(true, typeof(IComponentTemplate))]
+        [ReferenceButton(true, typeof(ITemplateNode))]
         [FormerlySerializedAs("_components")]
-        private IComponentTemplate[] _componentTemplates;
+        private ITemplateNode[] _componentTemplates;
 
         #region Methods
-        public ReadOnlySpan<IComponentTemplate> GetComponentTemplates()
+        public ReadOnlySpan<ITemplateNode> GetComponentTemplates()
         {
             return _componentTemplates;
         }
@@ -57,7 +56,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                item?.OnValidate(gameObject);
+                if(item is IComponentTemplate ct) { ct.OnValidate(gameObject); }
             }
         }
         private void OnDrawGizmos()
@@ -65,7 +64,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                item?.OnGizmos(transform, IComponentTemplate.GizmosMode.Always);
+                if(item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Always); }
             }
         }
         private void OnDrawGizmosSelected()
@@ -73,7 +72,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                item?.OnGizmos(transform, IComponentTemplate.GizmosMode.Selected);
+                if(item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Selected); }
             }
         }
         #endregion

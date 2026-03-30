@@ -58,37 +58,40 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            #region No SerializeReference
-            if (property.propertyType != SerializedPropertyType.ManagedReference)
-            {
-                return EditorGUI.GetPropertyHeight(property, label);
-            }
-            #endregion
+            bool isSerializeReference = property.propertyType == SerializedPropertyType.ManagedReference;
+            //#region No SerializeReference
+            //if (property.propertyType != SerializedPropertyType.ManagedReference)
+            //{
+            //    return EditorGUI.GetPropertyHeight(property, label);
+            //}
+            //#endregion
 
-            var instance = property.managedReferenceValue;
-            IComponentTemplate template = instance as IComponentTemplate;
-
-            if (template == null || instance == null)
+            if (isSerializeReference)
             {
-                return EditorGUIUtility.singleLineHeight + Padding * 2f;
-            }
-
-            try
-            {
-                if (instance is ComponentTemplateBase customTemplate)
+                var instance = property.managedReferenceValue;
+                IComponentTemplate template = instance as IComponentTemplate;
+                if (instance == null)
                 {
-                    property = property.FindPropertyRelative("component");
+                    return EditorGUIUtility.singleLineHeight + Padding * 2f;
+                }
+
+                try
+                {
+                    if (instance is ComponentTemplateBase customTemplate)
+                    {
+                        property = property.FindPropertyRelative("component");
+                    }
+                }
+                catch
+                {
+                    property = null;
+                }
+                if (property == null)
+                {
+                    return DamagedComponentHeight;
                 }
             }
-            catch
-            {
-                property = null;
-            }
-            if (property == null)
-            {
-                return DamagedComponentHeight;
-            }
-
+            
             int propCount = EcsGUI.GetChildPropertiesCount(property);
 
             return (propCount <= 0 ? EditorGUIUtility.singleLineHeight : EditorGUI.GetPropertyHeight(property, label)) + Padding * 4f;
@@ -98,39 +101,47 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             Draw(position, property, property, label);
         }
-        public void Draw(Rect position, SerializedProperty rootProperty, SerializedProperty property, GUIContent label)
+        public void Draw(Rect rect, SerializedProperty rootProperty, SerializedProperty property, GUIContent label)
         {
-            #region No SerializeReference
-            if (property.propertyType != SerializedPropertyType.ManagedReference)
-            {
-                EditorGUI.PropertyField(position, property, label, true);
-                return;
-            }
-            #endregion
+            bool isSerializeReference = property.propertyType == SerializedPropertyType.ManagedReference;
+            //#region No SerializeReference
+            //if (isSerializeReference == false)
+            //{
+            //    EditorGUI.PropertyField(position, property, label, true);
+            //    return;
+            //}
+            //#endregion
 
-            var instance = property.managedReferenceValue;
-            IComponentTemplate template = instance as IComponentTemplate;
-
-            if (template == null || instance == null)
-            {
-                DrawSelectionPopup(position, property, label);
-                return;
-            }
-
+            ITypeMeta meta = null;
             SerializedProperty componentProp = property;
-            if (componentProp.managedReferenceValue is ComponentTemplateBase customTemplate)
+            if (isSerializeReference)
             {
-                componentProp = property.FindPropertyRelative("component");
+                var instance = property.managedReferenceValue;
+                if (instance == null)
+                {
+                    DrawSelectionPopup(rect, property, label);
+                    return;
+                }
+
+                IComponentTemplate template = instance as IComponentTemplate;
+                if (componentProp.managedReferenceValue is ComponentTemplateBase customTemplate)
+                {
+                    componentProp = property.FindPropertyRelative("component");
+                }
+                if (componentProp == null)
+                {
+                    DrawDamagedComponent(rect, "Damaged component template.");
+                    return;
+                }
+
+                meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
             }
-            if (componentProp == null)
+            else
             {
-                DrawDamagedComponent(position, "Damaged component template.");
-                return;
+                meta = fieldInfo.FieldType.GetMeta();
             }
 
-            ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
 
-            Rect rect = position;
             if (EcsGUI.DrawTypeMetaBlock(ref rect, rootProperty, meta))
             {
                 return;
