@@ -35,7 +35,7 @@
 
 </br>
 
-Этот пакет делает работу с DragonECS в Unity более удобной и наглядной: визуальная отладка и профайлинг, редакторские шаблоны и инструменты для привязки сущностей к GameObject.
+Этот пакет делает работу с DragonECS в Unity удобнее и нагляднее: встроенная визуальная отладка и профайлинг, редакторские шаблоны и инструменты для привязки сущностей к `GameObject`.
 
 > [!WARNING]
 > Проект в стадии разработки. API может меняться.  
@@ -55,7 +55,7 @@
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [Шаблон Пайплайна](#шаблон-пайплайна)
-- [FixedUpdate LateUpdate ](#fixedupdate-lateupdate)
+- [FixedUpdate LateUpdate](#fixedupdate-lateupdate)
 - [Документация проекта](#документация-проекта)
 - [Окно настроек](#окно-настроек)
 - [FAQ](#faq)
@@ -70,8 +70,8 @@
 + Минимальная версия C# 8.0;
 + Минимальная версия Unity 2021.2.0;
 
-Протестировано:
-+ **Unity:** Минимальная версия 2021.2.0;
+Протестировано на:
+* **Unity:** Минимальная версия 2021.2.0.
 
 ## Установка для Unity
 * ### Unity-модуль
@@ -180,7 +180,7 @@ _pipeline = EcsPipeline.New()
 
 </details>
 
-Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента). Пример:
+Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента).
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/26379ee5-cadd-4838-a3b6-5b46771012c1">   
@@ -200,7 +200,7 @@ _pipeline = EcsPipeline.New()
 
 </details>
 
-Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента). Пример:
+Чтобы добавить компонент в меню `Add Component` Нужен [Шаблон компонента](#шаблон-компонента).
 
 <p align="center">
 <img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7f6b722e-6f98-4d13-b2cd-5d576a3610bd">   
@@ -261,7 +261,7 @@ class SomeComponentTemplate : IComponentTemplate
     public bool IsUnique { get { return true; } }
     public void Apply(int worldID, int entityID)
     {
-        EcsPool<SomeComponent>>.Apply(worldID, entityID) = component;
+        EcsPool<SomeComponent>.Apply(worldID, entityID) = component;
     }
     public object GetRaw() { return component; }
     public void SetRaw(object raw) { component = (SomeComponent)raw; }
