@@ -210,7 +210,7 @@ _pipeline = EcsPipeline.New()
 
 ## Шаблон компонента
 
-Чтобы компонент попал в меню `Add Component` требуется шаблон. Шаблоны компонента это типы реализующие `IComponentTemplate`. 
+Чтобы компонент попал в меню `Add Component` требуется шаблон. Шаблоны компонента это типы реализующие `IComponentTemplate` или `ITemplateNode` вместе с `IEcsComponentMember`. 
 
 ### Реализация
 
@@ -230,9 +230,25 @@ class SomeTagComponentTemplate : TagComponentTemplate<SomeComponent> { }
 ```
 
 <details>
-<summary>* Полная реализация:</summary>
+<summary>Другие способы</summary>
 
-Если не подходят `ComponentTemplate<T>` или `TagComponentTemplate<T>`, можно напрямую реализовать интерфейс `IComponentTemplate`. Например это может пригодиться для работы в связке с кастомной реализацией пула. В большинстве случаев достаточно упрощенной.
+#### Реализация `ITemplateNode` у компонента
+
+Такой способ может быть удобен тем что не требует создания отдельного класса шаблона, компонент сам выступает как шаблон, и он так же прост в реализации. Минус данного подхода, что проще случайно переименовать компонент и получить Missing Reference в местах с атрибутом `[SerializeReference]`.
+```c#
+public struct Health : IEcsComponent, ITemplateNode
+{
+    public float Points;
+    public void Apply(short worldID, int entityID)
+    {
+        EcsPool<Health>.Apply(worldID, entityID) = this;
+    }
+}
+```
+
+#### Реализация кастомного шаблона
+
+Если не подходят встроенные `ComponentTemplate<T>` или `TagComponentTemplate<T>`, можно создать свой шаблон реализующий `IComponentTemplate`. Например это может пригодиться для кастомного пула. В большинстве случаев достаточно использовать встроенные шаблоны.
 
 ```c#
 [Serializable] 
@@ -245,7 +261,7 @@ class SomeComponentTemplate : IComponentTemplate
     public bool IsUnique { get { return true; } }
     public void Apply(int worldID, int entityID)
     {
-        EcsWorld.GetPoolInstance<EcsPool<SomeComponent>>(worldID).TryAddOrGet(entityID) = component;
+        EcsPool<SomeComponent>>.Apply(worldID, entityID) = component;
     }
     public object GetRaw() { return component; }
     public void SetRaw(object raw) { component = (SomeComponent)raw; }
@@ -271,23 +287,28 @@ class SomeComponentTemplate : IComponentTemplate
 ### Применение шаблонов компонентов вне стандартных шаблонов сущностей
 Шаблоны компонентов можно использовать не только внутри стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`, но и в любых пользовательских классах. Для этого предусмотрены два способа:
 
-Атрибут `[ComponentTemplateReference]`:
+Атрибут `[ComponentTemplateField]`:
 ```c#
-// Добавляет кнопку выбора доступной реализации IComponentTemplate
-// и отображает шаблон компонента аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
-[SerializeReference, ComponentTemplateReference]
-private IComponentTemplate _someComponent1;
+// Отображение поля как компонента, настраиваемая мета атрибутами.
+// Аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
+[SerializeField, ComponentTemplateField]
+private SomeComponent _someComponent1;
+```
+```c#
+// Для SerializeReference добавляет кнопку выбора доступной реализации ITemplateNode
+[SerializeReference, ComponentTemplateField]
+private ITemplateNode _someComponent1;
 ```
 
 Обертка `ComponentTemplateProperty`:
 ```c#
-// Обертка над IComponentTemplate, аналогично примеру с атрибутом ComponentTemplateReference.
+// Обертка над ITemplateNode, аналогично примеру с атрибутом ComponentTemplateField.
 private ComponentTemplateProperty _someComponent2;
 ```
 
 Оба подхода работают и для массивов:
 ```c#
-[SerializeReference, ComponentTemplateReference]
+[SerializeReference, ComponentTemplateField]
 private IComponentTemplate[] _components;
 // или
 private ComponentTemplateProperty[] _components;
