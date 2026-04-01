@@ -83,12 +83,12 @@ namespace DCFApixels.DragonECS
         public readonly struct Null { }
     }
 
-    public sealed class ComponentTemplateReferenceAttribute : PropertyAttribute, IReferenceButtonAttribute
+    public sealed class ComponentTemplateFieldAttribute : PropertyAttribute, IReferenceButtonAttribute
     {
         public Type[] PredicateTypes;
         Type[] IReferenceButtonAttribute.PredicateTypes { get { return PredicateTypes; } }
         bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return true; } }
-        public ComponentTemplateReferenceAttribute() { }
+        public ComponentTemplateFieldAttribute() { }
     }
     public sealed class ComponentTemplateAttribute : PropertyAttribute { }
 }

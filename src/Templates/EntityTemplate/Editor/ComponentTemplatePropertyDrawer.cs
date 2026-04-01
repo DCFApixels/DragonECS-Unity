@@ -26,8 +26,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _drawer.Draw(position, root, property, label);
         }
     }
-    [CustomPropertyDrawer(typeof(ComponentTemplateReferenceAttribute), true)]
-    internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateReferenceAttribute>
+    [CustomPropertyDrawer(typeof(ComponentTemplateFieldAttribute), true)]
+    internal class ComponentTemplateReferenceDrawer : ExtendedPropertyDrawer<ComponentTemplateFieldAttribute>
     {
         private const float DamagedComponentHeight = 18f * 2f;
         private ComponentTemplatesDropDown _componentDropDown;
