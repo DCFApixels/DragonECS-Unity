@@ -107,6 +107,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUIUtility.systemCopyBuffer = sb.ToString();
         }
 
+        public bool HasSearchPattern = false;
         protected override void DrawCustom()
         {
             if (_headerStyle == null)
@@ -126,6 +127,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             EditorGUILayout.IntField("Count: ", executors.Count);
+
+
+            HasSearchPattern = true;
+            if (string.IsNullOrEmpty(Target.SearchPattern))
+            {
+                Target.SearchPattern = string.Empty;
+                HasSearchPattern = false;
+            }
+
+            Target.SearchPattern = EditorGUILayout.TextField("Search: ", Target.SearchPattern);
+
+
+            string searchPattern = Target.SearchPattern;
+
             GUILayout.Space(20);
 
             //using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
@@ -133,7 +148,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 int i = 0;
                 foreach (var executor in executors)
                 {
-                    DrawQueryInfo(executor, i++);
+                    bool cheack(ReadOnlySpan<Type> types, string searchPattern)
+                    {
+                        foreach (var type in types)
+                        {
+                            if(type.Name.Contains(searchPattern, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
+                        }
+                        return false;
+                    }
+                    if (!HasSearchPattern || 
+                        cheack(executor.Mask.GetIncTypes_Debug(), searchPattern) ||
+                        cheack(executor.Mask.GetExcTypes_Debug(), searchPattern) ||
+                        cheack(executor.Mask.GetAnyTypes_Debug(), searchPattern))
+                    {
+                        DrawQueryInfo(executor, i++);
+                    }
                 }
             }
         }
@@ -144,6 +176,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawQueryInfo(MaskQueryExecutor executor, int index)
         {
             //GUILayout.Space(10f);
+
 
             //using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(GetGenericPanelColor(index))))
             using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))

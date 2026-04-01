@@ -14,7 +14,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         private EcsWorld _world;
         private List<MaskQueryExecutor> _maskQueryExecutors = new List<MaskQueryExecutor>();
         private int _maskQueryExecutorsVersion = 0;
-
+        public string SearchPattern;
         public EcsWorld World
         {
             get { return _world; }
