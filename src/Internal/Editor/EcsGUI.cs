@@ -788,14 +788,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DrawTypeMetaBlockResultFlags result = DrawTypeMetaBlockResultFlags.None;
             using (CheckChanged())
             {
-                //Canceling isExpanded
-                //bool oldIsExpanded = rootProperty.isExpanded;
-                //if (ClickTest(optionRect))
-                //{
-                //    rootProperty.isExpanded = oldIsExpanded;
-                //    result |= DrawTypeMetaBlockResultFlags.DropExpanded;
-                //}
-
                 //Close button
                 optionRect.xMin = optionRect.xMax - HeadIconsRect.width;
                 optionsWidth += optionRect.width;

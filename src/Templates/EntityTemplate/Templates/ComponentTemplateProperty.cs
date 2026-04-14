@@ -1,7 +1,6 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
-using DCFApixels.DragonECS.Unity.Editors;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -84,21 +83,5 @@ namespace DCFApixels.DragonECS
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Null? a, ComponentTemplateProperty b) { return !b.IsNull; }
         public readonly struct Null { }
-    }
-
-    public sealed class ComponentTemplateFieldAttribute : PropertyAttribute, IReferenceDropDownAttribute
-    {
-        public Type[] PredicateTypes;
-        public readonly bool IsHideButtonIfNotNull = true;
-        Type[] IReferenceDropDownAttribute.PredicateTypes { get { return PredicateTypes; } }
-        bool IReferenceDropDownAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
-        public ComponentTemplateFieldAttribute(bool isHideButtonIfNotNull = false) : this(isHideButtonIfNotNull, Array.Empty<Type>()) { }
-        public ComponentTemplateFieldAttribute(params Type[] predicateTypes) : this(false, predicateTypes) { }
-        public ComponentTemplateFieldAttribute(bool isHideButtonIfNotNull, params Type[] predicateTypes)
-        {
-            IsHideButtonIfNotNull = isHideButtonIfNotNull;
-            PredicateTypes = predicateTypes;
-            Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
-        }
     }
 }

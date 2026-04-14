@@ -1,55 +1,19 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
-using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
 {
-    internal interface IReferenceDropDownAttribute
-    {
-        Type[] PredicateTypes { get; }
-        bool IsHideButtonIfNotNull { get; }
-    }
-    //public sealed class ReferenceButtonAttribute : PropertyAttribute, IReferenceDropDownAttribute
-    //{
-    //    public readonly Type[] PredicateTypes;
-    //    public readonly bool IsHideButtonIfNotNull;
-    //    Type[] IReferenceDropDownAttribute.PredicateTypes { get { return PredicateTypes; } }
-    //    bool IReferenceDropDownAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
-    //    public ReferenceButtonAttribute(bool isHideButtonIfNotNull = false) : this(isHideButtonIfNotNull, Array.Empty<Type>()) { }
-    //    public ReferenceButtonAttribute(params Type[] predicateTypes) : this(false, predicateTypes) { }
-    //    public ReferenceButtonAttribute(bool isHideButtonIfNotNull, params Type[] predicateTypes)
-    //    {
-    //        IsHideButtonIfNotNull = isHideButtonIfNotNull;
-    //        PredicateTypes = predicateTypes;
-    //        Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
-    //    }
-    //}
-    //public sealed class ReferenceButtonWithOutAttribute : Attribute
-    //{
-    //    public readonly Type[] PredicateTypes;
-    //    [Obsolete("With empty parameters, this attribute makes no sense.", true)]
-    //    public ReferenceButtonWithOutAttribute() : this(Array.Empty<Type>()) { }
-    //    public ReferenceButtonWithOutAttribute(params Type[] predicateTypes)
-    //    {
-    //        PredicateTypes = predicateTypes;
-    //        Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
-    //    }
-    //}
-
-    public sealed class ReferenceDropDownAttribute : PropertyAttribute, IReferenceDropDownAttribute
+    public sealed class ReferenceDropDownAttribute : PropertyAttribute
     {
         public readonly Type[] AllowTypes;
         public readonly bool IsHideButtonIfNotNull;
-        Type[] IReferenceDropDownAttribute.PredicateTypes { get { return AllowTypes; } }
-        bool IReferenceDropDownAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
         public ReferenceDropDownAttribute(bool isHideButtonIfNotNull = false) : this(isHideButtonIfNotNull, Array.Empty<Type>()) { }
         public ReferenceDropDownAttribute(params Type[] predicateTypes) : this(false, predicateTypes) { }
         public ReferenceDropDownAttribute(bool isHideButtonIfNotNull, params Type[] predicateTypes)
@@ -77,12 +41,11 @@ namespace DCFApixels.DragonECS
 
 
 
-
-
-
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    using UnityEditor;
+
     [CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
     [CustomPropertyDrawer(typeof(TypeMetaBlockAttribute), true)]
     internal class EcsDragonFieldDrawer : ExtendedPropertyDrawer
@@ -98,6 +61,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isInit = false;
         private bool _hasSerializableData;
 
+        #region CheckSkip
         [ThreadStatic]
         private static int _skips = 0;
         private bool CheckSkip()
@@ -114,6 +78,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _skips = count - 1;
             return false;
         }
+        #endregion
 
         #region Properties
         private float Padding => Spacing;
@@ -121,12 +86,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool IsDrawDropDown => ReferenceDropDownAttribute != null;
         private bool IsDrawMetaBlock => TypeMetaBlockAttribute != null;
         #endregion
-
-        public EcsDragonFieldDrawer() { }
-        public EcsDragonFieldDrawer(PredicateTypesKey key)
-        {
-            _predicateOverride = key;
-        }
 
         #region Init
         protected override void OnInit(SerializedProperty property)
@@ -259,15 +218,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
-        {
-            Draw(position, property, property, label);
-        }
-        public void Draw(Rect rect, SerializedProperty rootProperty, SerializedProperty property, GUIContent label)
+        protected override void DrawCustom(Rect rect, SerializedProperty property, GUIContent label)
         {
             if (CheckSkip()) { EditorGUI.PropertyField(rect, property, label, true); return; }
             bool isSerializeReference = property.propertyType == SerializedPropertyType.ManagedReference;
             var e = Event.current;
+            var rootProperty = property;
 
             ITypeMeta meta = null;
             SerializedProperty componentProp = property;
