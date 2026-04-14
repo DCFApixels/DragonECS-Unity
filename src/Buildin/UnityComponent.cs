@@ -15,6 +15,7 @@ namespace DCFApixels.DragonECS
     [MetaDescription(AUTHOR, "Component-reference to Unity object for EcsPool.")]
     [MetaID("DragonECS_734F667C9201B80F1913388C2A8BB689")]
     [MetaTags(MetaTags.ENGINE_MEMBER)]
+    [MetaProxy(typeof(UnityComponent<>.MetaProxy))]
     public struct UnityComponent<T> : IEcsComponent, IEnumerable<T>//IntelliSense hack
         where T : Component
     {
@@ -33,6 +34,16 @@ namespace DCFApixels.DragonECS
         public override string ToString()
         {
             return $"UnityComponent<{typeof(T).GetMeta().TypeName}>";
+        }
+        private class MetaProxy : MetaProxyBase
+        {
+            protected TypeMeta Meta = typeof(T).GetMeta();
+            public override string Name { get { return Meta?.Name; } }
+            public override MetaColor? Color { get { return Meta != null && Meta.IsCustomColor ? Meta.Color : null; } }
+            public override MetaGroup Group { get { return Meta?.Group; } }
+            public override MetaDescription Description { get { return Meta?.Description; } }
+            public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
+            public MetaProxy(Type type) : base(type) { }
         }
     }
 

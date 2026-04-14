@@ -1,6 +1,7 @@
 ﻿#if DISABLE_DEBUG
 #undef DEBUG
 #endif
+using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
@@ -8,10 +9,23 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
-using static DCFApixels.DragonECS.IComponentTemplate;
+
+namespace DCFApixels.DragonECS.Unity
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true, AllowMultiple = false)]
+    public sealed class DragonMemnberWrapperAttribute : Attribute
+    {
+        public string WrappedFieldName;
+        public DragonMemnberWrapperAttribute(string wrappedFieldName)
+        {
+            WrappedFieldName = wrappedFieldName;
+        }
+    }
+}
 
 namespace DCFApixels.DragonECS
 {
+
     public interface IComponentTemplate : ITemplateNode
     {
         #region Properties
@@ -35,6 +49,7 @@ namespace DCFApixels.DragonECS
 
     [Serializable]
     [MetaProxy(typeof(ComponentTemplateMetaProxy))]
+    [DragonMemnberWrapper("component")]
     public abstract class ComponentTemplateBase : IComponentTemplate
     {
         #region Properties
@@ -45,17 +60,18 @@ namespace DCFApixels.DragonECS
         #region Methods
         public abstract object GetRaw();
         public abstract void SetRaw(object raw);
-        public virtual void OnGizmos(Transform transform, GizmosMode mode) { }
+        public virtual void OnGizmos(Transform transform, IComponentTemplate.GizmosMode mode) { }
         public virtual void OnValidate(UnityEngine.Object obj) { }
 
         public abstract void Apply(short worldID, int entityID);
         #endregion
 
+        #region MetaProxy
         protected class ComponentTemplateMetaProxy : MetaProxyBase
         {
             protected TypeMeta Meta;
             public override string Name { get { return Meta?.Name; } }
-            public override MetaColor? Color { get { return Meta?.Color; } }
+            public override MetaColor? Color { get { return Meta != null && Meta.IsCustomColor ? Meta.Color : null; } }
             public override MetaGroup Group { get { return Meta?.Group; } }
             public override MetaDescription Description { get { return Meta?.Description; } }
             public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
@@ -74,6 +90,7 @@ namespace DCFApixels.DragonECS
 
             }
         }
+        #endregion
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]

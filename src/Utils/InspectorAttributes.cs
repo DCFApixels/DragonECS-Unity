@@ -178,9 +178,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 try
                 {
-                    if (instance is ComponentTemplateBase customTemplate)
+                    if(DragonFieldCahce.RuntimeDict.TryGetValue(instance.GetType(), out var info) && info.HasWrappedFieldName)
                     {
-                        componentProp = property.FindPropertyRelative("component");
+                        componentProp = property.FindPropertyRelative(info.WrappedFieldName);
                     }
                 }
                 catch
@@ -194,15 +194,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                var fieldType = fieldInfo.FieldType;
-                if (typeof(ComponentTemplateBase).IsAssignableFrom(fieldType))
+                var fieldType = PropertyType;
+                if (DragonFieldCahce.RuntimeDict.TryGetValue(fieldType, out var info) && info.HasWrappedFieldName)
                 {
-                    componentProp = property.FindPropertyRelative("component");
-                    if (componentProp == null)
-                    {
-                        componentProp = property;
-                    }
+                    componentProp = property.FindPropertyRelative(info.WrappedFieldName);
                 }
+            }
+            if (componentProp == null)
+            {
+                componentProp = property;
             }
 
             {
@@ -239,18 +239,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Rect srcRect = rect;
             if (isSerializeReference)
             {
-                var template = property.managedReferenceValue;
-
-                if (template is ComponentTemplateBase)
+                var instance = property.managedReferenceValue;
+                if (DragonFieldCahce.TryGetInfoFor(instance.GetType(), out var info) && info.HasWrappedFieldName)
                 {
-                    componentProp = property.FindPropertyRelative("component");
+                    componentProp = property.FindPropertyRelative(info.WrappedFieldName);
                 }
                 if (componentProp == null)
                 {
                     DrawDamagedComponent(rect, "Damaged component template.");
                     return;
                 }
-                if (template == null)
+                if (instance == null)
                 {
                     isDrawProperty = false;
                 }
@@ -258,33 +257,35 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 //meta = template as ITypeMeta;
                 if (meta == null)
                 {
-                    if (template is IComponentTemplate componentTemplate)
+                    if (info != null)
                     {
-                        meta = componentTemplate.ComponentType.GetMeta();
+                        meta = info.ComponentType.GetMeta();
                     }
                     else
                     {
-                        meta = template.GetMeta();
+                        meta = instance.GetMeta();
                     }
                 }
 
-                if (isDrawDropDown && template != null && ReferenceDropDownAttribute.IsHideButtonIfNotNull)
+                EcsDebug.PrintJson(meta);
+
+                if (isDrawDropDown && instance != null && ReferenceDropDownAttribute.IsHideButtonIfNotNull)
                 {
                     isDrawDropDown = false;
                 }
             }
             else
             {
-                var fieldType = fieldInfo.FieldType;
-                if (typeof(ComponentTemplateBase).IsAssignableFrom(fieldType))
+                var fieldType = PropertyType;
+                if (DragonFieldCahce.RuntimeDict.TryGetValue(fieldType, out var info) && info.HasWrappedFieldName)
                 {
-                    componentProp = property.FindPropertyRelative("component");
-                    if (componentProp == null)
-                    {
-                        componentProp = property;
-                    }
+                    componentProp = property.FindPropertyRelative(info.WrappedFieldName);
                 }
                 meta = fieldType.GetMeta();
+            }
+            if (componentProp == null)
+            {
+                componentProp = property;
             }
 
 

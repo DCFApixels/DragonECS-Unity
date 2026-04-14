@@ -11,7 +11,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal class DragonFieldDropDown : MetaObjectsDropDown<DragonFieldDropDown.Cahce>
+    internal class DragonFieldDropDown : MetaObjectsDropDown<DragonFieldCahce>
     {
         private DragonFieldDropDown() { }
 
@@ -25,15 +25,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (_dropDownsCache.TryGetValue(key, out var result) == false)
             {
                 result = new DragonFieldDropDown();
-                IEnumerable<(Cahce template, ITypeMeta meta)> itemMetaPairs = Cahce.All.ToArray()
+                IEnumerable<(DragonFieldCahce template, ITypeMeta meta)> itemMetaPairs = DragonFieldCahce.All.ToArray()
                     .Where(o =>
                     {
-                        return key.Check(o.Type);
-
+                        return key.Check(o);
                     })
                     .Select(o =>
                     {
-                        return (o, (ITypeMeta)o.Meta);
+                        var info = DragonFieldCahce.GetInfoFor(o);
+                        return (info, (ITypeMeta)info.Meta);
                     });
 
                 //TODO оптимизировать или вырезать
@@ -99,106 +99,145 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             //Event.current.Use();
         }
+    }
 
-        internal class Cahce
+    internal class DragonFieldCahce
+    {
+        internal static Type[] All => UnityEditorUtility._serializableTypes;
+        internal static HashSet<Type> AllDict;
+        internal static Dictionary<Type, DragonFieldCahce> RuntimeDict;
+
+        static DragonFieldCahce() { StaticInit(); }
+
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+        private static void StaticInit()
         {
-            private static Cahce[] _all;
-            internal static IReadOnlyList<Cahce> All
+            AllDict = new HashSet<Type>(All);
+            RuntimeDict = new Dictionary<Type, DragonFieldCahce>();
+        }
+        public static DragonFieldCahce GetInfoFor(Type type)
+        {
+            if (RuntimeDict.TryGetValue(type, out var info))
             {
-                get { return _all; }
+                return info;
             }
-            static Cahce() { StaticInit(); }
-
-            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-            private static void StaticInit()
+            if (AllDict.Contains(type))
             {
-                List<Cahce> list = new List<Cahce>(UnityEditorUtility._serializableTypes.Length);
-                foreach (var type in UnityEditorUtility._serializableTypes)
-                {
-                    Cahce element = new Cahce(type);
-                    list.Add(element);
-                }
-                _all = list.ToArray();
+                info = new DragonFieldCahce(type);
+                RuntimeDict.Add(type, info);
+                return info;
             }
-
-
-            public readonly Type Type;
-            public readonly Type ComponentType;
-            public readonly bool IsUnique;
-            private TypeMeta _meta;
-            public TypeMeta Meta
+            return null;
+        }
+        public static bool TryGetInfoFor(Type type, out DragonFieldCahce info)
+        {
+            if (RuntimeDict.TryGetValue(type, out info))
             {
-                get
+                return true;
+            }
+            if (AllDict.Contains(type))
+            {
+                info = new DragonFieldCahce(type);
+                RuntimeDict.Add(type, info);
+                return true;
+            }
+            info = null;
+            return false;
+        }
+
+
+        public readonly Type Type;
+        public readonly Type ComponentType;
+        public readonly string WrappedFieldName;
+        public bool HasWrappedFieldName
+        {
+            get { return string.IsNullOrEmpty(WrappedFieldName) == false; }
+        }
+        public readonly bool IsUnique;
+        private TypeMeta _meta;
+        public TypeMeta Meta
+        {
+            get
+            {
+                if (_meta == null)
                 {
-                    if (_meta == null)
                     {
-                        {
-                            _meta = Type.GetMeta();
-                        }
+                        _meta = Type.GetMeta();
                     }
-                    return _meta;
                 }
+                return _meta;
             }
-            private bool _defaultValueTypeInit = false;
-            private object _defaultValueDummy;
-            public object DefaultValue
+        }
+        private bool _defaultValueTypeInit = false;
+        private object _defaultValueDummy;
+        public object DefaultValue
+        {
+            get
             {
-                get
+                if (_defaultValueTypeInit == false)
                 {
-                    if (_defaultValueTypeInit == false)
+                    if (Type.IsValueType)
                     {
-                        if (Type.IsValueType)
+                        FieldInfo field;
+                        field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                        if (field != null && field.FieldType == Type)
                         {
-                            FieldInfo field;
-                            field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                            _defaultValueDummy = field.GetValue(null).Clone_Reflection();
+                        }
+
+                        if (_defaultValueDummy == null)
+                        {
+                            field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
                             if (field != null && field.FieldType == Type)
                             {
                                 _defaultValueDummy = field.GetValue(null).Clone_Reflection();
                             }
-
-                            if (_defaultValueDummy == null)
-                            {
-                                field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                                if (field != null && field.FieldType == Type)
-                                {
-                                    _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                                }
-                            }
                         }
-                        _defaultValueTypeInit = true;
                     }
-                    return _defaultValueDummy;
+                    _defaultValueTypeInit = true;
                 }
+                return _defaultValueDummy;
             }
-            public Cahce(Type type)
-            {
-                Type = type;
-                IsUnique = false;
+        }
+        public DragonFieldCahce(Type type)
+        {
+            Type = type;
+            IsUnique = false;
 
-                if (type.GetInterfaces().Contains(typeof(IComponentTemplate)))
-                {
-                    var ct = (IComponentTemplate)Activator.CreateInstance(type);
-                    IsUnique = ct.IsUnique;
-                    ComponentType = ct.ComponentType;
-                }
-                else
-                {
-                    ComponentType = Type;
-                }
-            }
-            public object CreateInstance()
+            if(type.TryGetAttribute<DragonMemnberWrapperAttribute>(out var atr))
             {
-                if (DefaultValue != null)
+                WrappedFieldName = atr.WrappedFieldName;
+                var field = type.GetField(atr.WrappedFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                if (field != null && field.FieldType.IsConcreteType())
                 {
-                    return DefaultValue.Clone_Reflection();
+                    ComponentType = field.FieldType;
                 }
-                return Activator.CreateInstance(Type);
             }
 
-            public override string ToString()
+            if (type.GetInterfaces().Contains(typeof(IComponentTemplate)))
             {
-                return Type.ToString();
+                var ct = (IComponentTemplate)Activator.CreateInstance(type);
+                IsUnique = ct.IsUnique;
+                ComponentType = ct.ComponentType;
             }
+
+            if(ComponentType == null)
+            {
+                ComponentType = Type;
+            }
+        }
+        public object CreateInstance()
+        {
+            if (DefaultValue != null)
+            {
+                return DefaultValue.Clone_Reflection();
+            }
+            return Activator.CreateInstance(Type);
+        }
+
+        public override string ToString()
+        {
+            return Type.ToString();
         }
     }
 
