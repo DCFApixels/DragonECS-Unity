@@ -1,8 +1,8 @@
 ﻿using UnityEngine;
 
-namespace DCFApixels.DragonECS
+namespace DCFApixels.DragonECS.Unity
 {
-    public static class MetaColorExstensions
+    public static class MetaColorExtensions
     {
         public static Color ToUnityColor<T>(this T self) where T : IMetaColor
         {

@@ -746,6 +746,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (result.flags.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
             {
                 rootProperty.ResetValues();
+                rootProperty.DeleteCommand();
             }
             return (result.flags.HasFlag(DrawTypeMetaBlockResultFlags.DropExpanded), result.optionsWidth);
         }
