@@ -25,7 +25,7 @@ namespace DCFApixels.DragonECS
         [SerializeField]
         private ScriptableEntityTemplateBase[] _templates;
         [SerializeReference]
-        [ReferenceButton(true, typeof(ITemplateNode))]
+        [ReferenceDropDown(true)]
         [FormerlySerializedAs("_components")]
         private ITemplateNode[] _componentTemplates;
 

@@ -86,93 +86,94 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
     }
-    internal class ComponentTemplatesDropDown : MetaObjectsDropDown<ComponentTemplateTypeCache>
-    {
-        private ComponentTemplatesDropDown() { }
-
-        private bool _isCheckUnique;
-        private SerializedProperty _arrayProperty;
-        private SerializedProperty _fieldProperty;
-
-        public static Dictionary<PredicateTypesKey, ComponentTemplatesDropDown> _dropDownsCache = new Dictionary<PredicateTypesKey, ComponentTemplatesDropDown>(32);
-        public static ComponentTemplatesDropDown Get(PredicateTypesKey key)
-        {
-            if(_dropDownsCache.TryGetValue(key, out var result) == false)
-            {
-                result = new ComponentTemplatesDropDown();
-                IEnumerable<(ComponentTemplateTypeCache template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.All.ToArray()
-                    .Where(o =>
-                    {
-                        return key.Check(o.Type);
-                    })
-                    .Select(o =>
-                    {
-                        return (o, o.Meta);
-                    });
-                //TODO оптимизировать или вырезать
-                itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
-                result.Setup(itemMetaPairs);
-                _dropDownsCache[key] = result;
-            }
-            return result;
-        }
-
-        public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
-        {
-            _isCheckUnique = isCheckUnique;
-            _arrayProperty = arrayProperty;
-            _fieldProperty = null;
-            Show(position);
-        }
-        public void OpenForField(Rect position, SerializedProperty fieldProperty)
-        {
-            _isCheckUnique = false;
-            _arrayProperty = null;
-            _fieldProperty = fieldProperty;
-            Show(position);
-        }
-
-        protected override void ItemSelected(Item item)
-        {
-            base.ItemSelected(item);
-
-            if (item.Obj == null)
-            {
-                _fieldProperty.managedReferenceValue = null;
-                _fieldProperty.serializedObject.ApplyModifiedProperties();
-                return;
-            }
-
-            Type componentType = item.Obj.GetType();
-            var data = item.Obj;
-
-            if (_arrayProperty != null && data != null)
-            {
-                int index = _arrayProperty.arraySize;
-                if (_isCheckUnique)
-                {
-                    if (data.IsUnique)
-                    {
-                        for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
-                        {
-                            if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-                _arrayProperty.arraySize += 1;
-                _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
-            }
-
-            if (_fieldProperty != null)
-            {
-                _fieldProperty.managedReferenceValue = data.CreateInstance();
-                _fieldProperty.serializedObject.ApplyModifiedProperties();
-            }
-        }
-    }
+    //internal class ComponentTemplatesDropDown : MetaObjectsDropDown<ComponentTemplateTypeCache>
+    //{
+    //    private ComponentTemplatesDropDown() { }
+    //
+    //    private bool _isCheckUnique;
+    //    private SerializedProperty _arrayProperty;
+    //    private SerializedProperty _fieldProperty;
+    //
+    //    public static Dictionary<PredicateTypesKey, ComponentTemplatesDropDown> _dropDownsCache = new Dictionary<PredicateTypesKey, ComponentTemplatesDropDown>(32);
+    //    public static ComponentTemplatesDropDown Get(PredicateTypesKey key)
+    //    {
+    //        if(_dropDownsCache.TryGetValue(key, out var result) == false)
+    //        {
+    //            result = new ComponentTemplatesDropDown();
+    //            IEnumerable<(ComponentTemplateTypeCache template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.All.ToArray()
+    //                .Where(o =>
+    //                {
+    //                    return key.Check(o.Type);
+    //                })
+    //                .Select(o =>
+    //                {
+    //                    return (o, o.Meta);
+    //                });
+    //
+    //            //TODO оптимизировать или вырезать
+    //            itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
+    //            result.Setup(itemMetaPairs);
+    //            _dropDownsCache[key] = result;
+    //        }
+    //        return result;
+    //    }
+    //
+    //    public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
+    //    {
+    //        _isCheckUnique = isCheckUnique;
+    //        _arrayProperty = arrayProperty;
+    //        _fieldProperty = null;
+    //        Show(position);
+    //    }
+    //    public void OpenForField(Rect position, SerializedProperty fieldProperty)
+    //    {
+    //        _isCheckUnique = false;
+    //        _arrayProperty = null;
+    //        _fieldProperty = fieldProperty;
+    //        Show(position);
+    //    }
+    //
+    //    protected override void ItemSelected(Item item)
+    //    {
+    //        base.ItemSelected(item);
+    //
+    //        if (item.Obj == null)
+    //        {
+    //            _fieldProperty.managedReferenceValue = null;
+    //            _fieldProperty.serializedObject.ApplyModifiedProperties();
+    //            return;
+    //        }
+    //
+    //        Type componentType = item.Obj.GetType();
+    //        var data = item.Obj;
+    //
+    //        if (_arrayProperty != null && data != null)
+    //        {
+    //            int index = _arrayProperty.arraySize;
+    //            if (_isCheckUnique)
+    //            {
+    //                if (data.IsUnique)
+    //                {
+    //                    for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
+    //                    {
+    //                        if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+    //                        {
+    //                            return;
+    //                        }
+    //                    }
+    //                }
+    //            }
+    //            _arrayProperty.arraySize += 1;
+    //            _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
+    //        }
+    //
+    //        if (_fieldProperty != null)
+    //        {
+    //            _fieldProperty.managedReferenceValue = data.CreateInstance();
+    //            _fieldProperty.serializedObject.ApplyModifiedProperties();
+    //        }
+    //    }
+    //}
     internal class RuntimeComponentsDropDown : MetaObjectsDropDown<IEcsPool>
     {
         public RuntimeComponentsDropDown(IEnumerable<IEcsPool> pools)
@@ -215,6 +216,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isContainsNull;
         public IEnumerable<(T, ITypeMeta)> _itemMetaPairs;
 
+        public virtual bool IsStaticList { get { return true; } }
         public MetaObjectsDropDown() : base(new AdvancedDropdownState())
         {
             minimumSize = new Vector2(220f, EditorGUIUtility.singleLineHeight * 20);
@@ -225,6 +227,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _name = name;
             _isContainsNull = isContainsNull;
             _itemMetaPairs = itemMetaPairs;
+            if (IsStaticList)
+            {
+                _itemMetaPairs = _itemMetaPairs.ToArray();
+            }
         }
         protected override AdvancedDropdownItem BuildRoot()
         {
@@ -235,10 +241,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 root.AddChild(new Item(default, "<NULL>", increment++));
             }
-
             Dictionary<Key, Item> dict = new Dictionary<Key, Item>();
 
-
+            var list = _itemMetaPairs.ToArray();
             foreach (var pair in _itemMetaPairs)
             {
                 ITypeMeta meta = pair.Item2;

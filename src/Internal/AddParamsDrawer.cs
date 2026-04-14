@@ -29,8 +29,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             { (byte)AddParamsFlags.NoImport | 7, "NoImport, Layer, Order, IsUnique" },
             { byte.MaxValue, "NoImport, Layer, Order, IsUnique" },
         };
-
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
         {
             //return !property.isExpanded ? 
             //    EditorGUIUtility.singleLineHeight + Spacing : 

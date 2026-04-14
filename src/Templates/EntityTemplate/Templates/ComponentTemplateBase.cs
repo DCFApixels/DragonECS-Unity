@@ -4,6 +4,7 @@
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace DCFApixels.DragonECS
     public interface IComponentTemplate : ITemplateNode
     {
         #region Properties
-        Type Type { get; }
+        Type ComponentType { get; }
         bool IsUnique { get; }
         #endregion
 
@@ -33,16 +34,11 @@ namespace DCFApixels.DragonECS
     }
 
     [Serializable]
-    public abstract class ComponentTemplateBase : IComponentTemplate, ITypeMeta
+    [MetaProxy(typeof(ComponentTemplateMetaProxy))]
+    public abstract class ComponentTemplateBase : IComponentTemplate
     {
         #region Properties
-        public abstract Type Type { get; }
-        public virtual ITypeMeta BaseMeta { get { return null; } }
-        public virtual string Name { get { return string.Empty; } }
-        public virtual MetaColor Color { get { return new MetaColor(MetaColor.Black); } }
-        public virtual MetaGroup Group { get { return MetaGroup.Empty; } }
-        public virtual MetaDescription Description { get { return MetaDescription.Empty; } }
-        public virtual IReadOnlyList<string> Tags { get { return Array.Empty<string>(); } }
+        public abstract Type ComponentType { get; }
         public virtual bool IsUnique { get { return true; } }
         #endregion
 
@@ -54,67 +50,136 @@ namespace DCFApixels.DragonECS
 
         public abstract void Apply(short worldID, int entityID);
         #endregion
+
+        protected class ComponentTemplateMetaProxy : MetaProxy
+        {
+            protected static TypeMeta Meta;
+            public override string Name { get { return Meta?.Name; } }
+            public override MetaColor? Color { get { return Meta?.Color; } }
+            public override MetaGroup Group { get { return Meta?.Group; } }
+            public override MetaDescription Description { get { return Meta?.Description; } }
+            public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
+            public ComponentTemplateMetaProxy(Type type) : base(type)
+            {
+                if (type.IsGenericType && type.ContainsGenericParameters == false)
+                {
+                    var g = type.GetGenericArguments();
+                    if (g.Length == 1)
+                    {
+                        Meta = g[0].GetMeta();
+                    }
+                }
+            }
+        }
     }
     [Serializable]
     [StructLayout(LayoutKind.Sequential)]
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, ICloneable
-        where T : struct
     {
         protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
 
-        private static bool _defaultValueTypeInit = false;
-        private static T _defaultValueType;
-        protected static T DefaultValueType
+        private static bool _defaultValueInit = false;
+        private static bool _hasDefaultValue = false;
+        private static T _defaultValue;
+        private static ICloneable _defaultValueCloneable;
+        private static CloneMethod _defaultValueCloneMethod;
+        private enum CloneMethod
+        {
+            Set,
+            Clone_Reflection,
+            ICloneable,
+        }
+        protected static void InitStatic()
+        {
+            if (_defaultValueInit == false)
+            {
+                _hasDefaultValue = false;
+                Type type = typeof(T);
+                FieldInfo field;
+                field = type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                if (field != null && field.FieldType == type)
+                {
+                    _defaultValue = (T)field.GetValue(null);
+                    _hasDefaultValue = true;
+                }
+                if(_hasDefaultValue == false)
+                {
+                    field = type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
+                    if (field != null && field.FieldType == type)
+                    {
+                        _defaultValue = (T)field.GetValue(null);
+                        _hasDefaultValue = true;
+                    }
+                }
+                if (_defaultValue == null)
+                {
+                    _hasDefaultValue = false;
+                }
+
+                if (_hasDefaultValue)
+                {
+                    _defaultValueCloneable = _defaultValue as ICloneable;
+                    _defaultValueCloneMethod = CloneMethod.Set;
+
+                    if (type.IsValueType == false)
+                    {
+                        _defaultValueCloneMethod = CloneMethod.Clone_Reflection;
+                    }
+                    if (_defaultValueCloneable != null)
+                    {
+                        _defaultValueCloneMethod = CloneMethod.ICloneable;
+                    }
+                }
+
+                _defaultValueInit = true;
+            }
+        }
+        protected virtual T DefaultComponent
         {
             get
             {
-                if (_defaultValueTypeInit == false)
+                if (_hasDefaultValue)
                 {
-                    Type type = typeof(T);
-                    if (type.IsValueType)
-                    {
-                        FieldInfo field;
-                        field = type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
-                        if (field != null && field.FieldType == type)
-                        {
-                            _defaultValueType = (T)field.GetValue(null);
-                        }
-                        field = type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                        if (field != null && field.FieldType == type)
-                        {
-                            _defaultValueType = (T)field.GetValue(null);
-                        }
-                    }
-                    _defaultValueTypeInit = true;
+                    return CloneComponent(_defaultValue);
                 }
-                return _defaultValueType;
+                return default;
             }
         }
 
         [SerializeField]
-        protected T component = DefaultValueType;
+        protected T component;
         [SerializeField]
         [HideInInspector]
         private byte _offset; // Avoids the error "Cannot get managed reference index with out bounds offset"
 
-        #region Properties
-        public sealed override ITypeMeta BaseMeta { get { return Meta; } }
-        public sealed override Type Type { get { return typeof(T); } }
-        public override string Name { get { return Meta.Name; } }
-        public override MetaColor Color { get { return Meta.Color; } }
-        public override MetaGroup Group { get { return Meta.Group; } }
-        public override MetaDescription Description { get { return Meta.Description; } }
-        public override IReadOnlyList<string> Tags { get { return Meta.Tags; } }
-        #endregion
+        public ComponentTemplateBase()
+        {
+            InitStatic();
+            component = DefaultComponent;
+        }
+
+        public sealed override Type ComponentType { get { return typeof(T); } }
 
         #region Methods
         public sealed override object GetRaw() { return component; }
         public sealed override void SetRaw(object raw) { component = (T)raw; }
-        protected virtual T CloneComponent() { return component; }
+        protected virtual T CloneComponent(T component)
+        {
+            switch (_defaultValueCloneMethod)
+            {
+                case CloneMethod.Set:
+                    return component;
+                case CloneMethod.Clone_Reflection:
+                    return (T)component.Clone_Reflection();
+                case CloneMethod.ICloneable:
+                    return (T)_defaultValueCloneable.Clone();
+            }
+            return default;
+        }
         object ICloneable.Clone()
         {
             ComponentTemplateBase<T> templateClone = (ComponentTemplateBase<T>)MemberwiseClone();
-            templateClone.component = CloneComponent();
+            templateClone.component = CloneComponent(component);
             return templateClone;
         }
         #endregion
@@ -175,7 +240,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (_meta == null)
                 {
-                    _meta = ComponentType.GetMeta();
+                    {
+                        _meta = ComponentType.GetMeta();
+                    }
                 }
                 return _meta;
             }
@@ -194,7 +261,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
                         if (field != null && field.FieldType == Type)
                         {
-                            _defaultValueDummy = field.GetValue(null);
+                            _defaultValueDummy = field.GetValue(null).Clone_Reflection();
                         }
 
                         if(_defaultValueDummy == null)
@@ -202,7 +269,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
                             if (field != null && field.FieldType == Type)
                             {
-                                _defaultValueDummy = field.GetValue(null);
+                                _defaultValueDummy = field.GetValue(null).Clone_Reflection();
                             }
                         }
                     }
@@ -216,15 +283,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Type = type;
 
             IsUnique = false;
-            if (typeof(IComponentTemplate).IsAssignableFrom(type))
+            if (type.GetInterfaces().Contains(typeof(ITypeMeta)))
+            {
+                var metaOverride = (ITypeMeta)Activator.CreateInstance(type);
+                _meta = metaOverride;
+            }
+
+            if (type.GetInterfaces().Contains(typeof(IComponentTemplate)))
             {
                 var ct = (IComponentTemplate)Activator.CreateInstance(type);
                 IsUnique = ct.IsUnique;
-                ComponentType = ct.Type;
-                if (ct is ITypeMeta metaOverride)
-                {
-                    _meta = metaOverride;
-                }
+                ComponentType = ct.ComponentType;
             }
             else
             {

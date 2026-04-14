@@ -426,8 +426,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (SetAlpha(0))
             {
                 bool result = GUI.Button(position, string.Empty, EditorStyles.miniButtonMid);
-                var current = Event.current;
-                return (GUI.enabled && HitTest(position, current), result);
+                var currentEvent = Event.current;
+                return (GUI.enabled && HitTest(position, currentEvent), result);
             }
         }
         public static bool IconHoverScan(Rect position, Event current)
@@ -486,11 +486,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     if (current.type == EventType.MouseUp)
                     {
                         EditorGUIUtility.PingObject(script);
+                        Event.current.Use();
                     }
                     else if (current.type == EventType.MouseDown && current.clickCount >= 2)
                     {
                         //UnityEditorInternal.InternalEditorUtility.OpenFileAtLineExternal(); //TODO
                         AssetDatabase.OpenAsset(script);
+                        Event.current.Use();
                     }
                 }
             }
@@ -715,23 +717,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return DrawTypeMetaBlockPadding * 2 + contentHeight;
         }
 
-        public static bool DrawTypeMetaElementBlock(ref Rect rect, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementRootProperty, ITypeMeta meta)
+        public static (bool skip, float optionsWidth) DrawTypeMetaElementBlock(ref Rect rect, SerializedProperty arrayProperty, int elementIndex, SerializedProperty elementRootProperty, ITypeMeta meta)
         {
             var result = DrawTypeMetaBlock_Internal(ref rect, elementRootProperty, meta, elementIndex, arrayProperty.arraySize);
-            if (result.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
+            if (result.flags.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
             {
                 arrayProperty.DeleteArrayElementAtIndex(elementIndex);
             }
-            return result != DrawTypeMetaBlockResultFlags.None;
+            return (result.flags != DrawTypeMetaBlockResultFlags.None, result.optionsWidth);
         }
-        public static bool DrawTypeMetaBlock(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
+        public static (bool skip, float optionsWidth) DrawTypeMetaBlock(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
             var result = DrawTypeMetaBlock_Internal(ref rect, rootProperty, meta, index, total);
-            if (result.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
+            if (result.flags.HasFlag(DrawTypeMetaBlockResultFlags.CloseButtonClicked))
             {
                 rootProperty.ResetValues();
             }
-            return result.HasFlag(DrawTypeMetaBlockResultFlags.DropExpanded);
+            return (result.flags.HasFlag(DrawTypeMetaBlockResultFlags.DropExpanded), result.optionsWidth);
         }
 
         [Flags]
@@ -743,12 +745,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
        
 
-        private static DrawTypeMetaBlockResultFlags DrawTypeMetaBlock_Internal(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
+        private static (DrawTypeMetaBlockResultFlags flags, float optionsWidth) DrawTypeMetaBlock_Internal(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
             if (meta == null)
             {
                 EditorGUI.DrawRect(rect, Color.black.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA));
-                return DrawTypeMetaBlockResultFlags.None;
+                return (DrawTypeMetaBlockResultFlags.None, 0f);
             }
 
             //string name = meta.Name;
@@ -772,6 +774,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             EditorGUI.DrawRect(rect, panelColor);
 
+            float optionsWidth = 0f;
             Rect optionRect = rect;
             rect = rect.AddPadding(DrawTypeMetaBlockPadding * 2f);
 
@@ -781,38 +784,45 @@ namespace DCFApixels.DragonECS.Unity.Editors
             optionRect.xMin = optionRect.xMax - 64;
             optionRect.center += Vector2.up * DrawTypeMetaBlockPadding;
 
+
             DrawTypeMetaBlockResultFlags result = DrawTypeMetaBlockResultFlags.None;
             using (CheckChanged())
             {
                 //Canceling isExpanded
-                bool oldIsExpanded = rootProperty.isExpanded;
-                if (ClickTest(optionRect))
-                {
-                    rootProperty.isExpanded = oldIsExpanded;
-                    result |= DrawTypeMetaBlockResultFlags.DropExpanded;
-                }
+                //bool oldIsExpanded = rootProperty.isExpanded;
+                //if (ClickTest(optionRect))
+                //{
+                //    rootProperty.isExpanded = oldIsExpanded;
+                //    result |= DrawTypeMetaBlockResultFlags.DropExpanded;
+                //}
 
                 //Close button
                 optionRect.xMin = optionRect.xMax - HeadIconsRect.width;
+                optionsWidth += optionRect.width;
+
                 if (CloseButton(optionRect))
                 {
                     result |= DrawTypeMetaBlockResultFlags.CloseButtonClicked;
-                    return result;
+                    return (result, optionsWidth);
                 }
                 //Edit script button
                 if (ScriptsCache.TryGetScriptAsset(meta.FindRootTypeMeta(), out MonoScript script))
                 {
                     optionRect = HeadIconsRect.MoveTo(optionRect.center - (Vector2.right * optionRect.width));
+                    optionsWidth += optionRect.width;
+
                     ScriptAssetButton(optionRect, script);
                 }
                 //Description icon
                 if (string.IsNullOrEmpty(description) == false)
                 {
                     optionRect = HeadIconsRect.MoveTo(optionRect.center - (Vector2.right * optionRect.width));
+                    optionsWidth += optionRect.width;
+
                     DescriptionIcon(optionRect, description);
                 }
             }
-            return result;
+            return (result, optionsWidth);
         }
         #endregion
 
@@ -978,11 +988,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region Init
         private static ReferenceDropDown GetReferenceDropDown(Type[] predicatTypes, Type[] sortedWithOutTypes)
         {
-            if (_predicatTypesMenus.TryGetValue((predicatTypes, sortedWithOutTypes), out ReferenceDropDown menu) == false)
+            if (_predicatTypesMenus.TryGetValue(new PredicateTypesKey(predicatTypes[0], predicatTypes, sortedWithOutTypes), out ReferenceDropDown menu) == false)
             {
                 menu = new ReferenceDropDown(predicatTypes, sortedWithOutTypes);
                 menu.OnSelected += SelectComponent;
-                _predicatTypesMenus.Add((predicatTypes, sortedWithOutTypes), menu);
+                _predicatTypesMenus.Add(new PredicateTypesKey(predicatTypes[0], predicatTypes, sortedWithOutTypes), menu);
             }
 
             return menu;

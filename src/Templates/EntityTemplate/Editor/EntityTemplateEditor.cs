@@ -10,13 +10,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal abstract class EntityTemplateEditorBase : ExtendedEditor
     {
-        private ComponentTemplatesDropDown _componentDropDown;
+        private DragonFieldDropDown _componentDropDown;
 
-        private SerializedProperty _componentsProp;
+        private SerializedProperty _componentTemplatesProp;
+        private SerializedProperty _templatesProp;
         private ReorderableList _reorderableComponentsList;
         private int _reorderableComponentsListLastCount;
 
-        private static readonly Type[] _predicateTypes = new Type[] { typeof(ITemplateNode) };
+        private static readonly Type[] _predicateTypes = new Type[] { typeof(IComponentTemplate), typeof(IEcsComponentMember) };
 
         protected abstract bool IsSO { get; }
 
@@ -24,11 +25,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override bool IsInit { get { return _componentDropDown != null; } }
         protected override void OnInit()
         {
-            _componentDropDown = ComponentTemplatesDropDown.Get(new PredicateTypesKey(_predicateTypes, Type.EmptyTypes));
+            _componentDropDown = DragonFieldDropDown.Get(new PredicateTypesKey(typeof(ITemplateNode), _predicateTypes, Type.EmptyTypes));
 
-            _componentsProp = serializedObject.FindProperty("_componentTemplates");
+            _componentTemplatesProp = serializedObject.FindProperty("_componentTemplates");
+            _templatesProp = serializedObject.FindProperty("_templates");
 
-            _reorderableComponentsList = new ReorderableList(serializedObject, _componentsProp, true, false, false, false);
+            _reorderableComponentsList = new ReorderableList(serializedObject, _componentTemplatesProp, true, false, false, false);
             _reorderableComponentsList.onAddCallback += OnReorderableComponentsListAdd;
             _reorderableComponentsList.onRemoveCallback += OnReorderableListRemove;
             _reorderableComponentsList.drawElementCallback += OnReorderableListDrawEmptyElement;
@@ -73,48 +75,67 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private float OnReorderableComponentsListElementHeight(int index)
         {
-            var componentProperty = GetTargetProperty(_componentsProp.GetArrayElementAtIndex(index));
-            float result = EditorGUI.GetPropertyHeight(componentProperty);
-            return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
+            SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
+            GUIContent label = UnityEditorUtility.GetLabelTemp();
+            return EditorGUI.GetPropertyHeight(prop, label) + Spacing * 2f;
+            //var componentProperty = GetTargetProperty(_componentTemplatesProp.GetArrayElementAtIndex(index));
+            //float result = EditorGUI.GetPropertyHeight(componentProperty);
+            //return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
         }
         private void OnReorderableComponentsListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            if (index < 0 || Event.current.type == EventType.Used) { return; }
+            SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
+            GUIContent label = UnityEditorUtility.GetLabelTemp();
             rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
-            using (EcsGUI.CheckChanged())
-            {
-                SerializedProperty prop = _componentsProp.GetArrayElementAtIndex(index);
 
-                IComponentTemplate template = prop.managedReferenceValue as IComponentTemplate;
-                if (template == null || prop.managedReferenceValue == null)
-                {
-                    //DrawDamagedComponent_Replaced(prop, index);
-                    EditorGUI.PropertyField(rect, prop, UnityEditorUtility.GetLabel(prop.displayName), true);
-                    return;
-                }
-
-                var componentProp = GetTargetProperty(prop);
-
-
-                ITypeMeta meta = template is ITypeMeta metaOverride ? metaOverride : template.Type.GetMeta();
-
-                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _componentsProp, index, componentProp, meta))
-                {
-                    return;
-                }
-
-
-                GUIContent label = UnityEditorUtility.GetLabel(meta.Name);
-                if (componentProp.propertyType == SerializedPropertyType.Generic)
-                {
-                    EditorGUI.PropertyField(rect, componentProp, label, true);
-                }
-                else
-                {
-                    EditorGUI.PropertyField(rect.AddPadding(0, 20f, 0, 0), componentProp, label, true);
-                }
-
-            }
+            EditorGUI.PropertyField(rect, prop, label);
+            return;
+            //if (index < 0 || Event.current.type == EventType.Used) { return; }
+            //rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
+            //using (EcsGUI.CheckChanged())
+            //{
+            //    SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
+            //
+            //    var template = prop.managedReferenceValue;
+            //    if (template == null)
+            //    {
+            //        //DrawDamagedComponent_Replaced(prop, index);
+            //        EditorGUI.PropertyField(rect, prop, UnityEditorUtility.GetLabel(prop.displayName), true);
+            //        return;
+            //    }
+            //    IComponentTemplate componentTemplate = template as IComponentTemplate;
+            //    var componentProp = GetTargetProperty(prop);
+            //
+            //    ITypeMeta meta = template as ITypeMeta;
+            //    if(meta == null)
+            //    {
+            //        if (componentTemplate != null)
+            //        {
+            //            meta = componentTemplate.ComponentType.GetMeta();
+            //        }
+            //        else
+            //        {
+            //            meta = template.GetMeta();
+            //        }
+            //    }
+            //
+            //    if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _componentTemplatesProp, index, componentProp, meta).skip)
+            //    {
+            //        return;
+            //    }
+            //
+            //
+            //    GUIContent label = UnityEditorUtility.GetLabel(meta.Name);
+            //    if (componentProp.propertyType == SerializedPropertyType.Generic)
+            //    {
+            //        EditorGUI.PropertyField(rect, componentProp, label, true);
+            //    }
+            //    else
+            //    {
+            //        EditorGUI.PropertyField(rect.AddPadding(0, 20f, 0, 0), componentProp, label, true);
+            //    }
+            //
+            //}
         }
 
         private void OnReorderableComponentsListAdd(ReorderableList list)
@@ -146,6 +167,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override void DrawCustom()
         {
             Init();
+
+
 
             if (IsSO)
             {
@@ -186,20 +209,31 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             SerializedProperty iterator = serializedObject.GetIterator();
             iterator.NextVisible(true);
+            using (EcsGUI.Disable)
+            {
+                EditorGUILayout.PropertyField(iterator, true);
+            }
             while (iterator.NextVisible(false))
             {
-                if (_componentsProp != null && iterator.name == _componentsProp.name)
+                if ((_componentTemplatesProp != null && iterator.name == _componentTemplatesProp.name) ||
+                    (_templatesProp != null && iterator.name == _templatesProp.name))
                 {
-                    using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
-                    {
-                        DrawTop(_componentsProp);
-                        _reorderableComponentsList.DoLayoutList();
-                    }
+
                 }
                 else
                 {
                     EditorGUILayout.PropertyField(iterator, true);
                 }
+            }
+
+            if (_templatesProp != null)
+            {
+                EditorGUILayout.PropertyField(_templatesProp, true);
+            }
+            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+            {
+                DrawTop(_componentTemplatesProp);
+                _reorderableComponentsList.DoLayoutList();
             }
         }
         private void DrawTop(SerializedProperty componentsProp)

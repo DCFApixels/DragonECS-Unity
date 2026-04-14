@@ -17,6 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     using System.Reflection;
     using UnityEditor;
     using UnityEngine;
+    using UnityEngine.UIElements;
     using UnityObject = UnityEngine.Object;
 
 
@@ -213,21 +214,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _isStaticInit = true;
             OnStaticInit();
         }
-        public void Init()
+        public void Init(SerializedProperty property)
         {
             if (IsInit) { return; }
             _isInit = true;
-            OnInit();
+            OnInit(property);
         }
         protected virtual void OnStaticInit() { }
-        protected virtual void OnInit() { }
+        protected virtual void OnInit(SerializedProperty property) { }
+
+
+        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        {
+            StaticInit();
+            Init(property);
+            return GetCustomHeight(property, label);
+        }
+        protected abstract float GetCustomHeight(SerializedProperty property, GUIContent label);
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
             using (EcsGUI.CheckChanged(property.serializedObject))
             {
                 StaticInit();
-                Init();
+                Init(property);
                 DrawCustom(position, property, label);
             }
         }

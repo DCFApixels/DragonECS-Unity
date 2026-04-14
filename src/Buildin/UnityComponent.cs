@@ -45,16 +45,9 @@ namespace DCFApixels.DragonECS
     [MetaGroup(EcsUnityConsts.PACK_GROUP, OTHER_GROUP)]
     [MetaDescription(AUTHOR, "Template for UnityComponent<T>")]
     [MetaID("DragonECS_13DAACF9910155DD27F822442987E0AE")]
+    [MetaProxy(typeof(UnityComponentTemplate<>.UnityComponentMetaProxy))]
     public abstract class UnityComponentTemplate<T> : ComponentTemplateBase<UnityComponent<T>> where T : Component
     {
-        public override string Name
-        {
-            get { return typeof(T).Name; }
-        }
-        public override MetaGroup Group
-        {
-            get { return UnityComponentConsts.BaseGroup; }
-        }
         public sealed override void Apply(short worldID, int entityID)
         {
             EcsWorld.GetPoolInstance<EcsPool<UnityComponent<T>>>(worldID).TryAddOrGet(entityID) = component;
@@ -68,6 +61,12 @@ namespace DCFApixels.DragonECS
                     component.obj = go.GetComponent<T>();
                 }
             }
+        }
+        protected class UnityComponentMetaProxy : ComponentTemplateMetaProxy
+        {
+            public override string Name { get { return typeof(T).GetMeta().Name; } }
+            public override MetaGroup Group { get { return UnityComponentConsts.BaseGroup; } }
+            public UnityComponentMetaProxy(Type type) : base(type) { }
         }
     }
 }

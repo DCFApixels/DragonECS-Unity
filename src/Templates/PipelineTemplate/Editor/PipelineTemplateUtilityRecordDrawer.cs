@@ -41,7 +41,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
         {
             float result = 0f;
             if (IsArrayElement == false)

@@ -119,7 +119,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 bool isNull = targetProp.managedReferenceValue == null;
                 ITypeMeta meta = isNull ? null : targetProp.managedReferenceValue.GetMeta();
 
-                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _recordsProp, index, prop, meta))
+                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _recordsProp, index, prop, meta).skip)
                 {
                     return;
                 }

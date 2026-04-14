@@ -105,10 +105,6 @@ namespace DCFApixels.DragonECS.Unity.Internal
             }
             return _memberwiseCloneMethdo.Invoke(obj, null);
         }
-        internal static object Clone_Reflection<T>(this T obj)
-        {
-            return Clone_Reflection((object)obj);
-        }
     }
 
     internal partial class UnityReflectionCache

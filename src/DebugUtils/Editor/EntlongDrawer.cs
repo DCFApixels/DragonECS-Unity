@@ -186,7 +186,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             return false;
         }
 
-        public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
+        protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
         {
             const float UNITY_HEIGHT_CONSTANT = 18f;
             if (property.hasMultipleDifferentValues)

@@ -18,6 +18,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomPropertyDrawer(typeof(CustomToggleAttribute))]
     internal class LeftToggleAttributeDrawer : ExtendedPropertyDrawer<CustomToggleAttribute>
     {
+        protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
+        {
+            return OneLineHeight + Spacing;
+        }
         protected override void DrawCustom(Rect position, SerializedProperty property, GUIContent label)
         {
             if (property.propertyType != SerializedPropertyType.Boolean)

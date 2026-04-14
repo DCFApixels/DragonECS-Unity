@@ -12,7 +12,10 @@ namespace DCFApixels.DragonECS
     public struct ComponentTemplateProperty : IEquatable<ComponentTemplateProperty>
     {
         [SerializeReference]
+        [ReferenceDropDown]
+        [TypeMetaBlock]
         private ITemplateNode _template;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ComponentTemplateProperty(ITemplateNode template)
         {
@@ -28,7 +31,7 @@ namespace DCFApixels.DragonECS
         public Type Type
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return _template is IComponentTemplate tml ? tml.Type : _template.GetType(); }
+            get { return _template is IComponentTemplate tml ? tml.ComponentType : _template.GetType(); }
         }
         public bool IsNull
         {
@@ -83,12 +86,19 @@ namespace DCFApixels.DragonECS
         public readonly struct Null { }
     }
 
-    public sealed class ComponentTemplateFieldAttribute : PropertyAttribute, IReferenceButtonAttribute
+    public sealed class ComponentTemplateFieldAttribute : PropertyAttribute, IReferenceDropDownAttribute
     {
         public Type[] PredicateTypes;
-        Type[] IReferenceButtonAttribute.PredicateTypes { get { return PredicateTypes; } }
-        bool IReferenceButtonAttribute.IsHideButtonIfNotNull { get { return true; } }
-        public ComponentTemplateFieldAttribute() { }
+        public readonly bool IsHideButtonIfNotNull = true;
+        Type[] IReferenceDropDownAttribute.PredicateTypes { get { return PredicateTypes; } }
+        bool IReferenceDropDownAttribute.IsHideButtonIfNotNull { get { return IsHideButtonIfNotNull; } }
+        public ComponentTemplateFieldAttribute(bool isHideButtonIfNotNull = false) : this(isHideButtonIfNotNull, Array.Empty<Type>()) { }
+        public ComponentTemplateFieldAttribute(params Type[] predicateTypes) : this(false, predicateTypes) { }
+        public ComponentTemplateFieldAttribute(bool isHideButtonIfNotNull, params Type[] predicateTypes)
+        {
+            IsHideButtonIfNotNull = isHideButtonIfNotNull;
+            PredicateTypes = predicateTypes;
+            Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
+        }
     }
-    public sealed class ComponentTemplateAttribute : PropertyAttribute { }
 }
