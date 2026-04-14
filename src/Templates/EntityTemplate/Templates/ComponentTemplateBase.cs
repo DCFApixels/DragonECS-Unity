@@ -13,10 +13,10 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true, AllowMultiple = false)]
-    public sealed class DragonMemnberWrapperAttribute : Attribute
+    public sealed class DragonMemberWrapperAttribute : Attribute
     {
         public string WrappedFieldName;
-        public DragonMemnberWrapperAttribute(string wrappedFieldName)
+        public DragonMemberWrapperAttribute(string wrappedFieldName)
         {
             WrappedFieldName = wrappedFieldName;
         }
@@ -49,7 +49,7 @@ namespace DCFApixels.DragonECS
 
     [Serializable]
     [MetaProxy(typeof(ComponentTemplateMetaProxy))]
-    [DragonMemnberWrapper("component")]
+    [DragonMemberWrapper("component")]
     public abstract class ComponentTemplateBase : IComponentTemplate
     {
         #region Properties

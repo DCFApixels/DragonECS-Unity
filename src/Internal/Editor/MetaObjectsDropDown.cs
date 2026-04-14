@@ -204,7 +204,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             Type = type;
             IsUnique = false;
 
-            if(type.TryGetAttribute<DragonMemnberWrapperAttribute>(out var atr))
+            if(type.TryGetAttribute<DragonMemberWrapperAttribute>(out var atr))
             {
                 WrappedFieldName = atr.WrappedFieldName;
                 var field = type.GetField(atr.WrappedFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
