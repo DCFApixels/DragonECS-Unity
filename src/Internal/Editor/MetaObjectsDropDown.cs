@@ -4,12 +4,204 @@ using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
+    internal class DragonFieldDropDown : MetaObjectsDropDown<DragonFieldDropDown.Cahce>
+    {
+        private DragonFieldDropDown() { }
+
+        private bool _isCheckUnique;
+        private SerializedProperty _arrayProperty;
+        private SerializedProperty _fieldProperty;
+
+        public static Dictionary<PredicateTypesKey, DragonFieldDropDown> _dropDownsCache = new Dictionary<PredicateTypesKey, DragonFieldDropDown>(32);
+        public static DragonFieldDropDown Get(PredicateTypesKey key)
+        {
+            if (_dropDownsCache.TryGetValue(key, out var result) == false)
+            {
+                result = new DragonFieldDropDown();
+                IEnumerable<(Cahce template, ITypeMeta meta)> itemMetaPairs = Cahce.All.ToArray()
+                    .Where(o =>
+                    {
+                        return key.Check(o.Type);
+
+                    })
+                    .Select(o =>
+                    {
+                        return (o, (ITypeMeta)o.Meta);
+                    });
+
+                //TODO оптимизировать или вырезать
+                itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
+                result.Setup(itemMetaPairs);
+                _dropDownsCache[key] = result;
+            }
+            return result;
+        }
+
+        public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
+        {
+            _isCheckUnique = isCheckUnique;
+            _arrayProperty = arrayProperty;
+            _fieldProperty = null;
+            Show(position);
+        }
+        public void OpenForField(Rect position, SerializedProperty fieldProperty)
+        {
+            _isCheckUnique = false;
+            _arrayProperty = null;
+            _fieldProperty = fieldProperty;
+            Show(position);
+        }
+
+        protected override void ItemSelected(Item item)
+        {
+            if (item.Obj == null)
+            {
+                _fieldProperty.managedReferenceValue = null;
+                _fieldProperty.serializedObject.ApplyModifiedProperties();
+                return;
+            }
+
+            Type componentType = item.Obj.GetType();
+            var data = item.Obj;
+
+            if (_arrayProperty != null && data != null)
+            {
+                int index = _arrayProperty.arraySize;
+                if (_isCheckUnique)
+                {
+                    if (data.IsUnique)
+                    {
+                        for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
+                        {
+                            if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
+                            {
+                                return;
+                            }
+                        }
+                    }
+                }
+                _arrayProperty.arraySize += 1;
+                _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
+            }
+
+            if (_fieldProperty != null)
+            {
+                _fieldProperty.managedReferenceValue = data.CreateInstance();
+                _fieldProperty.serializedObject.ApplyModifiedProperties();
+            }
+
+            //Event.current.Use();
+        }
+
+        internal class Cahce
+        {
+            private static Cahce[] _all;
+            internal static IReadOnlyList<Cahce> All
+            {
+                get { return _all; }
+            }
+            static Cahce() { StaticInit(); }
+
+            [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+            private static void StaticInit()
+            {
+                List<Cahce> list = new List<Cahce>(UnityEditorUtility._serializableTypes.Length);
+                foreach (var type in UnityEditorUtility._serializableTypes)
+                {
+                    Cahce element = new Cahce(type);
+                    list.Add(element);
+                }
+                _all = list.ToArray();
+            }
+
+
+            public readonly Type Type;
+            public readonly Type ComponentType;
+            public readonly bool IsUnique;
+            private TypeMeta _meta;
+            public TypeMeta Meta
+            {
+                get
+                {
+                    if (_meta == null)
+                    {
+                        {
+                            _meta = Type.GetMeta();
+                        }
+                    }
+                    return _meta;
+                }
+            }
+            private bool _defaultValueTypeInit = false;
+            private object _defaultValueDummy;
+            public object DefaultValue
+            {
+                get
+                {
+                    if (_defaultValueTypeInit == false)
+                    {
+                        if (Type.IsValueType)
+                        {
+                            FieldInfo field;
+                            field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
+                            if (field != null && field.FieldType == Type)
+                            {
+                                _defaultValueDummy = field.GetValue(null).Clone_Reflection();
+                            }
+
+                            if (_defaultValueDummy == null)
+                            {
+                                field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
+                                if (field != null && field.FieldType == Type)
+                                {
+                                    _defaultValueDummy = field.GetValue(null).Clone_Reflection();
+                                }
+                            }
+                        }
+                        _defaultValueTypeInit = true;
+                    }
+                    return _defaultValueDummy;
+                }
+            }
+            public Cahce(Type type)
+            {
+                Type = type;
+                IsUnique = false;
+
+                if (type.GetInterfaces().Contains(typeof(IComponentTemplate)))
+                {
+                    var ct = (IComponentTemplate)Activator.CreateInstance(type);
+                    IsUnique = ct.IsUnique;
+                    ComponentType = ct.ComponentType;
+                }
+                else
+                {
+                    ComponentType = Type;
+                }
+            }
+            public object CreateInstance()
+            {
+                if (DefaultValue != null)
+                {
+                    return DefaultValue.Clone_Reflection();
+                }
+                return Activator.CreateInstance(Type);
+            }
+
+            public override string ToString()
+            {
+                return Type.ToString();
+            }
+        }
+    }
+
     internal class SystemsDropDown : MetaObjectsDropDown<Type>
     {
         public SystemsDropDown()
@@ -86,94 +278,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
     }
-    //internal class ComponentTemplatesDropDown : MetaObjectsDropDown<ComponentTemplateTypeCache>
-    //{
-    //    private ComponentTemplatesDropDown() { }
-    //
-    //    private bool _isCheckUnique;
-    //    private SerializedProperty _arrayProperty;
-    //    private SerializedProperty _fieldProperty;
-    //
-    //    public static Dictionary<PredicateTypesKey, ComponentTemplatesDropDown> _dropDownsCache = new Dictionary<PredicateTypesKey, ComponentTemplatesDropDown>(32);
-    //    public static ComponentTemplatesDropDown Get(PredicateTypesKey key)
-    //    {
-    //        if(_dropDownsCache.TryGetValue(key, out var result) == false)
-    //        {
-    //            result = new ComponentTemplatesDropDown();
-    //            IEnumerable<(ComponentTemplateTypeCache template, ITypeMeta meta)> itemMetaPairs = ComponentTemplateTypeCache.All.ToArray()
-    //                .Where(o =>
-    //                {
-    //                    return key.Check(o.Type);
-    //                })
-    //                .Select(o =>
-    //                {
-    //                    return (o, o.Meta);
-    //                });
-    //
-    //            //TODO оптимизировать или вырезать
-    //            itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
-    //            result.Setup(itemMetaPairs);
-    //            _dropDownsCache[key] = result;
-    //        }
-    //        return result;
-    //    }
-    //
-    //    public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
-    //    {
-    //        _isCheckUnique = isCheckUnique;
-    //        _arrayProperty = arrayProperty;
-    //        _fieldProperty = null;
-    //        Show(position);
-    //    }
-    //    public void OpenForField(Rect position, SerializedProperty fieldProperty)
-    //    {
-    //        _isCheckUnique = false;
-    //        _arrayProperty = null;
-    //        _fieldProperty = fieldProperty;
-    //        Show(position);
-    //    }
-    //
-    //    protected override void ItemSelected(Item item)
-    //    {
-    //        base.ItemSelected(item);
-    //
-    //        if (item.Obj == null)
-    //        {
-    //            _fieldProperty.managedReferenceValue = null;
-    //            _fieldProperty.serializedObject.ApplyModifiedProperties();
-    //            return;
-    //        }
-    //
-    //        Type componentType = item.Obj.GetType();
-    //        var data = item.Obj;
-    //
-    //        if (_arrayProperty != null && data != null)
-    //        {
-    //            int index = _arrayProperty.arraySize;
-    //            if (_isCheckUnique)
-    //            {
-    //                if (data.IsUnique)
-    //                {
-    //                    for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
-    //                    {
-    //                        if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
-    //                        {
-    //                            return;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //            _arrayProperty.arraySize += 1;
-    //            _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
-    //        }
-    //
-    //        if (_fieldProperty != null)
-    //        {
-    //            _fieldProperty.managedReferenceValue = data.CreateInstance();
-    //            _fieldProperty.serializedObject.ApplyModifiedProperties();
-    //        }
-    //    }
-    //}
+
     internal class RuntimeComponentsDropDown : MetaObjectsDropDown<IEcsPool>
     {
         public RuntimeComponentsDropDown(IEnumerable<IEcsPool> pools)
@@ -329,10 +434,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 return true;
             }
-            public override bool Equals(object obj)
-            {
-                return obj is Key key && Equals(key);
-            }
+            public override bool Equals(object obj) { return obj is Key key && Equals(key); }
             public override int GetHashCode()
             {
                 unchecked

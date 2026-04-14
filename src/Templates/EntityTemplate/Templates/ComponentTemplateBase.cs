@@ -184,8 +184,8 @@ namespace DCFApixels.DragonECS
         }
         #endregion
     }
-
-    public abstract class ComponentTemplate<T> : ComponentTemplateBase<T>
+    [System.Serializable]
+    public class ComponentTemplate<T> : ComponentTemplateBase<T>
         where T : struct, IEcsComponent
     {
         public override void Apply(short worldID, int entityID)
@@ -193,7 +193,8 @@ namespace DCFApixels.DragonECS
             EcsPool<T>.Apply(ref component, entityID, worldID);
         }
     }
-    public abstract class TagComponentTemplate<T> : ComponentTemplateBase<T>
+    [System.Serializable]
+    public class TagComponentTemplate<T> : ComponentTemplateBase<T>
         where T : struct, IEcsTagComponent
     {
         public override void Apply(short worldID, int entityID)

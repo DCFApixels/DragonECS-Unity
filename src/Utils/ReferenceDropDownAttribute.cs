@@ -3,9 +3,6 @@
 #endif
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS
@@ -38,9 +35,6 @@ namespace DCFApixels.DragonECS
 }
 
 
-
-
-
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -61,24 +55,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isInit = false;
         private bool _hasSerializableData;
 
-        #region CheckSkip
-        [ThreadStatic]
-        private static int _skips = 0;
-        private bool CheckSkip()
-        {
-            if (_skips > 0)
-            {
-                _skips--;
-                return true;
-            }
-            int count = 0;
-            if (ReferenceDropDownAttribute != null) { count++; }
-            if (TypeMetaBlockAttribute != null) { count++; }
-
-            _skips = count - 1;
-            return false;
-        }
-        #endregion
+        // this is a damn hack to prevent the drawer from being called recursively when multiple attributes are attached to it
+        private static GUIContent _unrecursiveLable;
 
         #region Properties
         private float Padding => Spacing;
@@ -88,6 +66,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region Init
+        protected override void OnStaticInit()
+        {
+            if(_unrecursiveLable == null)
+            {
+                _unrecursiveLable = new GUIContent();
+            }
+        }
         protected override void OnInit(SerializedProperty property)
         {
             PredicateTypesKey key;
@@ -170,7 +155,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
         {
-            if (CheckSkip()) { return EditorGUI.GetPropertyHeight(property, label); }
+            if (ReferenceEquals(_unrecursiveLable, label)) { return EditorGUI.GetPropertyHeight(property, label); }
+            _unrecursiveLable.text = label.text;
+            _unrecursiveLable.tooltip = label.tooltip;
+            label = _unrecursiveLable;
+            //if (CheckSkip()) { return EditorGUI.GetPropertyHeight(property, label); }
             bool isSerializeReference = property.propertyType == SerializedPropertyType.ManagedReference;
 
             SerializedProperty componentProp = property;
@@ -203,6 +192,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     return DamagedComponentHeight;
                 }
             }
+            else
+            {
+                var fieldType = fieldInfo.FieldType;
+                if (typeof(ComponentTemplateBase).IsAssignableFrom(fieldType))
+                {
+                    componentProp = property.FindPropertyRelative("component");
+                    if (componentProp == null)
+                    {
+                        componentProp = property;
+                    }
+                }
+            }
 
             {
                 float result = EditorGUIUtility.singleLineHeight;
@@ -220,8 +221,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom(Rect rect, SerializedProperty property, GUIContent label)
         {
-            if (CheckSkip()) { EditorGUI.PropertyField(rect, property, label, true); return; }
+            if (ReferenceEquals(_unrecursiveLable, label)) { EditorGUI.PropertyField(rect, property, label, true); return; }
+            _unrecursiveLable.text = label.text;
+            _unrecursiveLable.tooltip = label.tooltip;
+            label = _unrecursiveLable;
+            //if (CheckSkip()) { EditorGUI.PropertyField(rect, property, label, true); return; }
             bool isSerializeReference = property.propertyType == SerializedPropertyType.ManagedReference;
+
             var e = Event.current;
             var rootProperty = property;
 
@@ -268,7 +274,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                meta = fieldInfo.FieldType.GetMeta();
+                var fieldType = fieldInfo.FieldType;
+                if (typeof(ComponentTemplateBase).IsAssignableFrom(fieldType))
+                {
+                    componentProp = property.FindPropertyRelative("component");
+                    if (componentProp == null)
+                    {
+                        componentProp = property;
+                    }
+                }
+                meta = fieldType.GetMeta();
             }
 
 
@@ -377,217 +392,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawDamagedComponent(Rect position, string message)
         {
             EditorGUI.HelpBox(position, message, MessageType.Warning);
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-    internal class DragonFieldDropDown : MetaObjectsDropDown<DragonFieldCahce>
-    {
-        private DragonFieldDropDown() { }
-
-        private bool _isCheckUnique;
-        private SerializedProperty _arrayProperty;
-        private SerializedProperty _fieldProperty;
-
-        public static Dictionary<PredicateTypesKey, DragonFieldDropDown> _dropDownsCache = new Dictionary<PredicateTypesKey, DragonFieldDropDown>(32);
-        public static DragonFieldDropDown Get(PredicateTypesKey key)
-        {
-            if (_dropDownsCache.TryGetValue(key, out var result) == false)
-            {
-                result = new DragonFieldDropDown();
-                IEnumerable<(DragonFieldCahce template, ITypeMeta meta)> itemMetaPairs = DragonFieldCahce.All.ToArray()
-                    .Where(o =>
-                    {
-                        return key.Check(o.Type);
-
-                    })
-                    .Select(o =>
-                    {
-                        return (o, (ITypeMeta)o.Meta);
-                    });
-
-                //TODO оптимизировать или вырезать
-                itemMetaPairs = itemMetaPairs.OrderBy(o => o.meta.Group.Name);
-                result.Setup(itemMetaPairs);
-                _dropDownsCache[key] = result;
-            }
-            return result;
-        }
-
-        public void OpenForArray(Rect position, SerializedProperty arrayProperty, bool isCheckUnique)
-        {
-            _isCheckUnique = isCheckUnique;
-            _arrayProperty = arrayProperty;
-            _fieldProperty = null;
-            Show(position);
-        }
-        public void OpenForField(Rect position, SerializedProperty fieldProperty)
-        {
-            _isCheckUnique = false;
-            _arrayProperty = null;
-            _fieldProperty = fieldProperty;
-            Show(position);
-        }
-
-        protected override void ItemSelected(Item item)
-        {
-            if (item.Obj == null)
-            {
-                _fieldProperty.managedReferenceValue = null;
-                _fieldProperty.serializedObject.ApplyModifiedProperties();
-                return;
-            }
-
-            Type componentType = item.Obj.GetType();
-            var data = item.Obj;
-
-            if (_arrayProperty != null && data != null)
-            {
-                int index = _arrayProperty.arraySize;
-                if (_isCheckUnique)
-                {
-                    if (data.IsUnique)
-                    {
-                        for (int i = 0, iMax = _arrayProperty.arraySize; i < iMax; i++)
-                        {
-                            if (_arrayProperty.GetArrayElementAtIndex(i).managedReferenceValue.GetType() == componentType)
-                            {
-                                return;
-                            }
-                        }
-                    }
-                }
-                _arrayProperty.arraySize += 1;
-                _fieldProperty = _arrayProperty.GetArrayElementAtIndex(index);
-            }
-
-            if (_fieldProperty != null)
-            {
-                _fieldProperty.managedReferenceValue = data.CreateInstance();
-                _fieldProperty.serializedObject.ApplyModifiedProperties();
-            }
-
-            //Event.current.Use();
-        }
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-    internal class DragonFieldCahce
-    {
-        private static DragonFieldCahce[] _all;
-        internal static IReadOnlyList<DragonFieldCahce> All
-        {
-            get { return _all; }
-        }
-        static DragonFieldCahce() { StaticInit(); }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void StaticInit()
-        {
-            List<DragonFieldCahce> list = new List<DragonFieldCahce>(UnityEditorUtility._serializableTypes.Length);
-            foreach (var type in UnityEditorUtility._serializableTypes)
-            {
-                DragonFieldCahce element = new DragonFieldCahce(type);
-                list.Add(element);
-            }
-            _all = list.ToArray();
-        }
-
-
-        public readonly Type Type;
-        public readonly Type ComponentType;
-        public readonly bool IsUnique;
-        private TypeMeta _meta;
-        public TypeMeta Meta
-        {
-            get
-            {
-                if (_meta == null)
-                {
-                    {
-                        _meta = Type.GetMeta();
-                    }
-                }
-                return _meta;
-            }
-        }
-        private bool _defaultValueTypeInit = false;
-        private object _defaultValueDummy;
-        public object DefaultValue
-        {
-            get
-            {
-                if (_defaultValueTypeInit == false)
-                {
-                    if (Type.IsValueType)
-                    {
-                        FieldInfo field;
-                        field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
-                        if (field != null && field.FieldType == Type)
-                        {
-                            _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                        }
-
-                        if (_defaultValueDummy == null)
-                        {
-                            field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                            if (field != null && field.FieldType == Type)
-                            {
-                                _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                            }
-                        }
-                    }
-                    _defaultValueTypeInit = true;
-                }
-                return _defaultValueDummy;
-            }
-        }
-        public DragonFieldCahce(Type type)
-        {
-            Type = type;
-            IsUnique = false;
-
-            if (type.GetInterfaces().Contains(typeof(IComponentTemplate)))
-            {
-                var ct = (IComponentTemplate)Activator.CreateInstance(type);
-                IsUnique = ct.IsUnique;
-                ComponentType = ct.ComponentType;
-            }
-            else
-            {
-                ComponentType = Type;
-            }
-        }
-        public object CreateInstance()
-        {
-            if (DefaultValue != null)
-            {
-                return DefaultValue.Clone_Reflection();
-            }
-            return Activator.CreateInstance(Type);
-        }
-
-        public override string ToString()
-        {
-            return Type.ToString();
         }
     }
 }
