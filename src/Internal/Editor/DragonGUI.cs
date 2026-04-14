@@ -8,6 +8,7 @@ using System.Reflection;
 using UnityEditor;
 using UnityEditor.IMGUI.Controls;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Color = UnityEngine.Color;
 
 namespace DCFApixels.DragonECS.Unity.Editors
@@ -850,6 +851,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 depth = property.depth;
             }
             return property.Next(child) && property.depth >= depth;
+        }
+        internal static bool IsNullManagedReference(this SerializedProperty property)
+        {
+            return property.managedReferenceId == ManagedReferenceUtility.RefIdNull;
         }
         internal static int GetChildPropertiesCount(this SerializedProperty property, Type type, out bool isEmpty)
         {
