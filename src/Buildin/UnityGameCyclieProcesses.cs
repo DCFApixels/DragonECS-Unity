@@ -1,4 +1,4 @@
-﻿using DCFApixels.DragonECS.RunnersCore;
+﻿using DCFApixels.DragonECS.Core;
 using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Internal;
 

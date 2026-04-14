@@ -36,7 +36,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
 
         private static List<Type> GetTypes()
         {
-            Type metaAttributeType = typeof(EcsMetaAttribute);
+            Type metaAttributeType = typeof(DragonMetaAttribute);
             List<Type> result = new List<Type>(512);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {

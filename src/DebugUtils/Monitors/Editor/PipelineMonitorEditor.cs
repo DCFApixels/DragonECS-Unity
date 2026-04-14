@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-using DCFApixels.DragonECS.RunnersCore;
+using DCFApixels.DragonECS.Core;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Linq;
