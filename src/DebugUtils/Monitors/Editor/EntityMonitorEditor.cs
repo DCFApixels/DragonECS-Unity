@@ -12,7 +12,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             var entity = Target.Entity;
             bool isAlive = entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
-            using (EcsGUI.SetEnable(isAlive))
+            using (DragonGUI.SetEnable(isAlive))
             {
                 if (GUILayout.Button("Delete Entity", GUILayout.Height(36f)))
                 {
@@ -20,18 +20,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
             //EcsGUI.Layout.EntityBarForAlive(isAlive ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive, id, gen, worldID);
-            EcsGUI.Layout.EntityField(entity);
+            DragonGUI.Layout.EntityField(entity);
 
             var drawers = UnityEditorUtility._entityEditorBlockDrawers;
             if (drawers.Length > 0)
             {
-                using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+                using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
                 {
                     bool isExpand = false;
-                    using (EcsGUI.CheckChanged())
+                    using (DragonGUI.CheckChanged())
                     {
                         isExpand = EditorGUILayout.Foldout(UserSettingsPrefs.instance.IsShowEntityOtherData, "Other data");
-                        if (EcsGUI.Changed)
+                        if (DragonGUI.Changed)
                         {
                             UserSettingsPrefs.instance.IsShowEntityOtherData = isExpand;
                         }
@@ -48,7 +48,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             }
 
-            EcsGUI.Layout.DrawRuntimeComponents(entity, false);
+            DragonGUI.Layout.DrawRuntimeComponents(entity, false);
         }
     }
 }

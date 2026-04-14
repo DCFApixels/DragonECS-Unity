@@ -10,7 +10,7 @@ using UnityObject = UnityEngine.Object;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal static partial class EcsGUI
+    internal static partial class DragonGUI
     {
         public static partial class Layout
         {
@@ -38,7 +38,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             public static void ScriptAssetButton(MonoScript script, params GUILayoutOption[] options)
             {
-                EcsGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);
+                DragonGUI.ScriptAssetButton(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabelTemp(), EditorStyles.miniButton, options), script);
             }
 
 
@@ -85,11 +85,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             public static void DrawEmptyComponentProperty(SerializedProperty property, string name, bool isDisplayEmpty)
             {
-                EcsGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabel(name), EditorStyles.label), property, name, isDisplayEmpty);
+                DragonGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(UnityEditorUtility.GetLabel(name), EditorStyles.label), property, name, isDisplayEmpty);
             }
             public static void DrawEmptyComponentProperty(SerializedProperty property, GUIContent label, bool isDisplayEmpty)
             {
-                EcsGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(label, EditorStyles.label), property, label, isDisplayEmpty);
+                DragonGUI.DrawEmptyComponentProperty(GUILayoutUtility.GetRect(label, EditorStyles.label), property, label, isDisplayEmpty);
             }
             public static void DrawWorldBaseInfo(EcsWorld world)
             {
@@ -125,7 +125,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;
-                EcsGUI.EntityField(GUILayoutUtility.GetRect(width, height), label, entity);
+                DragonGUI.EntityField(GUILayoutUtility.GetRect(width, height), label, entity);
             }
             public static void EntityField(EntitySlotInfo entity)
             {
@@ -139,7 +139,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;
-                EcsGUI.EntityField(GUILayoutUtility.GetRect(width, height), label, entity);
+                DragonGUI.EntityField(GUILayoutUtility.GetRect(width, height), label, entity);
             }
             public static void EntityField(SerializedProperty property)
             {
@@ -153,21 +153,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;
-                EcsGUI.EntityField(GUILayoutUtility.GetRect(width, height), property, label);
+                DragonGUI.EntityField(GUILayoutUtility.GetRect(width, height), property, label);
             }
             #endregion
 
             public static bool AddComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
+                return DragonGUI.AddComponentButton(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static AddClearButton AddClearComponentButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
+                return DragonGUI.AddClearComponentButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static AddClearButton AddClearSystemButtons(out Rect dropDownRect)
             {
-                return EcsGUI.AddClearSystemButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
+                return DragonGUI.AddClearSystemButtons(GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 24f), out dropDownRect);
             }
             public static void DrawRuntimeComponents(entlong entity, bool isWithFoldout, bool isRoot = true)
             {

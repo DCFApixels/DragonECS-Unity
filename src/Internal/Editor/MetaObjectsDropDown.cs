@@ -274,7 +274,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
 
                 _fieldProperty.serializedObject.ApplyModifiedProperties();
-                EcsGUI.DelayedChanged = true;
+                DragonGUI.DelayedChanged = true;
             }
         }
     }

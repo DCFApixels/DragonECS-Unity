@@ -83,7 +83,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawTemplates()
         {
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 var iterator = serializedObject.GetIterator();
                 iterator.NextVisible(true);
@@ -92,7 +92,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorGUILayout.PropertyField(iterator, true);
                 }
 
-                if (EcsGUI.Changed)
+                if (DragonGUI.Changed)
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
@@ -102,12 +102,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawControlButtons()
         {
-            float height = EcsGUI.EntityBarHeight;
+            float height = DragonGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
             rect = rect.AddPadding(2f, 0f);
             var (_, buttonRect) = rect.HorizontalSliceRight(height);
-            if (EcsGUI.ValidateButton(buttonRect))
+            if (DragonGUI.ValidateButton(buttonRect))
             {
                 foreach (var target in Targets)
                 {
@@ -115,7 +115,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
             buttonRect = RectUtility.Move(buttonRect, -height, 0);
-            if (EcsGUI.AutosetButton(buttonRect))
+            if (DragonGUI.AutosetButton(buttonRect))
             {
                 foreach (var target in Targets)
                 {

@@ -40,12 +40,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            using (EcsGUI.SetBackgroundColor(labelBackColor))
+            using (DragonGUI.SetBackgroundColor(labelBackColor))
             {
                 GUILayout.Box("Is Empty", UnityEditorUtility.GetWhiteStyle(), GUILayout.ExpandWidth(true));
             }
 
-            EcsGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
+            DragonGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());
 
             base.OnInspectorGUI();
 
@@ -67,7 +67,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUI.DrawRect(r, c);
             GUILayout.Space(10);
 
-            EcsGUI.Layout.DrawWorldComponents(Target.GetCurrentWorldRaw());
+            DragonGUI.Layout.DrawWorldComponents(Target.GetCurrentWorldRaw());
         }
     }
 }

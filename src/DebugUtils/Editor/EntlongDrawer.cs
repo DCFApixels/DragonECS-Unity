@@ -55,11 +55,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             if (drawFoldout && isExpanded)
             {
-                using (EcsGUI.UpIndentLevel())
+                using (DragonGUI.UpIndentLevel())
                 {
                     if (world != null && world.IsAlive(entity.id, entity.gen))
                     {
-                        EcsGUI.Layout.DrawRuntimeComponents(entity.id, world, false, false);
+                        DragonGUI.Layout.DrawRuntimeComponents(entity.id, world, false, false);
                         if (Event.current.type == EventType.Layout)
                         {
                             heightCache = GUILayoutUtility.GetLastRect().height;
@@ -67,10 +67,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
             }
-            EcsGUI.EntityField(position, property);
-            using (EcsGUI.SetEnable(world != null))
+            DragonGUI.EntityField(position, property);
+            using (DragonGUI.SetEnable(world != null))
             {
-                EcsGUI.EntityHyperlinkButton(hyperlinkButtonRect, world, entity.id);
+                DragonGUI.EntityHyperlinkButton(hyperlinkButtonRect, world, entity.id);
             }
 
 
@@ -146,7 +146,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
 
 
-                    EcsGUI.Changed = true;
+                    DragonGUI.Changed = true;
                     DragAndDrop.AcceptDrag();
                     DragAndDrop.activeControlID = 0;
                 }

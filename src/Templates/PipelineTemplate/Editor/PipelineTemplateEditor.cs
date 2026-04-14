@@ -62,7 +62,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void OnReorderableListDrawEmptyElement(Rect rect, int index, bool isActive, bool isFocused) { }
         private void OnReorderableListReorder(ReorderableList list)
         {
-            EcsGUI.Changed = true;
+            DragonGUI.Changed = true;
         }
         private void OnReorderableListRemove(ReorderableList list)
         {
@@ -78,7 +78,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 list.serializedProperty.DeleteArrayElementAtIndex(list.selectedIndices[i]);
             }
-            EcsGUI.Changed = true;
+            DragonGUI.Changed = true;
         }
         #endregion
 
@@ -86,11 +86,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static readonly HashSet<string> _defaultLayersSet = new HashSet<string>(PipelineTemplateUtility.DefaultLayers);
         private void OnReorderableLayersListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 var elementProp = _layersProp.GetArrayElementAtIndex(index);
                 string str = elementProp.stringValue;
-                using (EcsGUI.SetEnable(_defaultLayersSet.Contains(str) == false))
+                using (DragonGUI.SetEnable(_defaultLayersSet.Contains(str) == false))
                 {
                     elementProp.stringValue = EditorGUI.TextField(rect, str);
                 }
@@ -102,7 +102,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var added = list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1);
             added.stringValue = $"Layer-{DateTime.Now.Ticks}";
             added.serializedObject.ApplyModifiedProperties();
-            EcsGUI.Changed = true;
+            DragonGUI.Changed = true;
         }
         #endregion
 
@@ -111,7 +111,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (index < 0 || Event.current.type == EventType.Used) { return; }
             rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 SerializedProperty prop = _recordsProp.GetArrayElementAtIndex(index);
                 var targetProp = prop.FindPropertyRelative(nameof(PipelineTemplateUtility.Record.target));
@@ -119,7 +119,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 bool isNull = targetProp.managedReferenceValue == null;
                 ITypeMeta meta = isNull ? null : targetProp.managedReferenceValue.GetMeta();
 
-                if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _recordsProp, index, prop, meta).skip)
+                if (DragonGUI.DrawTypeMetaElementBlock(ref rect, _recordsProp, index, prop, meta).skip)
                 {
                     return;
                 }
@@ -130,14 +130,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             float result;
             result = EditorGUI.GetPropertyHeight(_recordsProp.GetArrayElementAtIndex(index));
-            return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
+            return DragonGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
         }
 
         private void OnReorderableRecordsListAdd(ReorderableList list)
         {
             list.serializedProperty.arraySize += 1;
             list.serializedProperty.GetArrayElementAtIndex(list.serializedProperty.arraySize - 1).ResetValues();
-            EcsGUI.Changed = true;
+            DragonGUI.Changed = true;
         }
 
         #endregion
@@ -146,7 +146,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (IsSO)
             {
-                EcsGUI.Layout.ManuallySerializeButton(targets);
+                DragonGUI.Layout.ManuallySerializeButton(targets);
             }
 
             if (IsMultipleTargets)
@@ -155,13 +155,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            EcsGUI.Changed = GUILayout.Button("Validate");
+            DragonGUI.Changed = GUILayout.Button("Validate");
 
             DrawLayoutNameList(_layersProp);
             EditorGUILayout.PropertyField(_parametersProp, UnityEditorUtility.GetLabel(_parametersProp.displayName));
             DrawRecordList(_recordsProp);
 
-            if (EcsGUI.Changed)
+            if (DragonGUI.Changed)
             {
                 serializedObject.ApplyModifiedProperties();
                 Validate();
@@ -181,7 +181,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawLayoutNameList(SerializedProperty layersProp)
         {
-            using (EcsGUI.Layout.BeginVertical())
+            using (DragonGUI.Layout.BeginVertical())
             {
                 GUILayout.Label(UnityEditorUtility.GetLabel(layersProp.displayName), EditorStyles.boldLabel);
                 _reorderableLayersList.DoLayoutList();
@@ -190,16 +190,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void DrawRecordList(SerializedProperty recordsProp)
         {
             GUILayout.Label(UnityEditorUtility.GetLabel(recordsProp.displayName), EditorStyles.boldLabel);
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+            using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 GUILayout.Space(4f);
 
-                switch (EcsGUI.Layout.AddClearSystemButtons(out Rect dropDownRect))
+                switch (DragonGUI.Layout.AddClearSystemButtons(out Rect dropDownRect))
                 {
-                    case EcsGUI.AddClearButton.Add:
+                    case DragonGUI.AddClearButton.Add:
                         _systemsDropDown.OpenForArray(dropDownRect, recordsProp);
                         break;
-                    case EcsGUI.AddClearButton.Clear:
+                    case DragonGUI.AddClearButton.Clear:
                         recordsProp.ClearArray();
                         recordsProp.serializedObject.ApplyModifiedProperties();
                         break;

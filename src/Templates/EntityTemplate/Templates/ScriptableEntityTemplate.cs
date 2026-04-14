@@ -2,6 +2,7 @@
 #undef DEBUG
 #endif
 using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +27,7 @@ namespace DCFApixels.DragonECS
         private ScriptableEntityTemplateBase[] _templates;
         [SerializeReference]
         [ReferenceDropDown(true)]
-        [FormerlySerializedAs("_components")]
+        [DragonMetaBlock]
         private ITemplateNode[] _componentTemplates;
 
         #region Methods

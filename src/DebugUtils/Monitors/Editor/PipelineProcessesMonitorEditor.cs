@@ -61,10 +61,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom()
         {
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
-                if (EcsGUI.Changed)
+                if (DragonGUI.Changed)
                 {
                     Init();
                 }
@@ -104,7 +104,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 color = NormalizeGridColor(i, color);
                 EditorGUI.DrawRect(lineRect, color);
 
-                if (EcsGUI.HitTest(lineRect))
+                if (DragonGUI.HitTest(lineRect))
                 {
                     GUI.Button(lineRect, "", EditorStyles.selectionRect);
                     _selectedPointMeta.process = meta;
@@ -135,7 +135,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 color = NormalizeGridColor(i, color);
                 EditorGUI.DrawRect(lineRect, color);
 
-                if (EcsGUI.HitTest(lineRect))
+                if (DragonGUI.HitTest(lineRect))
                 {
                     GUI.Button(lineRect, "", EditorStyles.selectionRect);
                     _selectedPointMeta.system = meta;

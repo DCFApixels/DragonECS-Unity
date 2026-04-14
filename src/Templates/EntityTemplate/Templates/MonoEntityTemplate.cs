@@ -26,9 +26,7 @@ namespace DCFApixels.DragonECS
     {
         [SerializeReference]
         [ReferenceDropDown(true)]
-        [TypeMetaBlock]
-        [FormerlySerializedAs("_components")]
-        [ArrayElement]
+        [DragonMetaBlock]
         private ITemplateNode[] _componentTemplates;
 
         #region Methods

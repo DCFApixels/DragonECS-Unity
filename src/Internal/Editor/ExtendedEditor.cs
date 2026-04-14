@@ -9,15 +9,12 @@
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    using DCFApixels.DragonECS.Unity.Internal;
     using global::Unity.Collections.LowLevel.Unsafe;
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using UnityEditor;
     using UnityEngine;
-    using UnityEngine.UIElements;
     using UnityObject = UnityEngine.Object;
 
 
@@ -79,7 +76,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (AutoChechChanges)
             {
-                using (EcsGUI.CheckChanged(serializedObject))
+                using (DragonGUI.CheckChanged(serializedObject))
                 {
                     StaticInit();
                     Init();
@@ -154,16 +151,28 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private IEnumerable<Attribute> _attributes = null;
 
-        private bool? _isArrayElement = null;
+        private Type _propertyType = null;
+        private bool _isArrayElement;
+        private SerializedProperty _trackedArrayProperty = null;
         protected bool IsArrayElement
         {
             get
             {
-                if (_isArrayElement == null)
-                {
-                    _isArrayElement = Attributes.Any(o => o is ArrayElementAttribute);
-                }
-                return _isArrayElement.Value;
+                return _isArrayElement;
+            }
+        }
+        protected Type PropertyType
+        {
+            get
+            {
+                return _propertyType;
+            }
+        }
+        protected SerializedProperty TrackedArrayProperty
+        {
+            get
+            {
+                return _trackedArrayProperty;
             }
         }
 
@@ -218,6 +227,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (IsInit) { return; }
             _isInit = true;
+
+            _isArrayElement = false;
+            if (fieldInfo != null)
+            {
+                _propertyType = fieldInfo.FieldType;
+                if (_propertyType.IsArray)
+                {
+                    _propertyType = _propertyType.GetElementType();
+                    _isArrayElement = true;
+                }
+                if (_propertyType.IsGenericType && _propertyType.GetGenericTypeDefinition() == typeof(List<>))
+                {
+                    _propertyType = _propertyType.GetGenericArguments()[0];
+                    _isArrayElement = true;
+                }
+            }
+
             OnInit(property);
         }
         protected virtual void OnStaticInit() { }
@@ -226,15 +252,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         public override float GetPropertyHeight(SerializedProperty property, GUIContent label)
         {
-            StaticInit();
-            Init(property);
-            return GetCustomHeight(property, label);
+            _trackedArrayProperty = DragonGUI.CurrentTrackedArrayProperty;
+            using (new DragonGUI.TrackArrayPropertyScope(null))
+            {
+                StaticInit();
+                Init(property);
+                return GetCustomHeight(property, label);
+            }
         }
         protected abstract float GetCustomHeight(SerializedProperty property, GUIContent label);
 
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            using (EcsGUI.CheckChanged(property.serializedObject))
+            _trackedArrayProperty = DragonGUI.CurrentTrackedArrayProperty;
+            using (new DragonGUI.TrackArrayPropertyScope(null)) using (DragonGUI.CheckChanged(property.serializedObject))
             {
                 StaticInit();
                 Init(property);

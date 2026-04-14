@@ -12,7 +12,7 @@ using Color = UnityEngine.Color;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal static partial class EcsGUI
+    internal static partial class DragonGUI
     {
         #region Scores
         private static int _changedCounter = 0;
@@ -70,6 +70,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     _changed = _delayedChanged;
                     _delayedChanged = false;
                 }
+            }
+        }
+        public static SerializedProperty CurrentTrackedArrayProperty;
+        public readonly struct TrackArrayPropertyScope : IDisposable
+        {
+            private readonly SerializedProperty _sp;
+            public TrackArrayPropertyScope(SerializedProperty sp)
+            {
+                _sp = sp;
+                CurrentTrackedArrayProperty = null;
+            }
+            public void Dispose()
+            {
+                CurrentTrackedArrayProperty = _sp;
             }
         }
         public readonly struct CheckChangedScopeWithAutoApply : IDisposable

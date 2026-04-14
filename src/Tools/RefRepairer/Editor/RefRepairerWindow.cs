@@ -61,7 +61,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             if (index < 0 || index >= _cachedMissingsResolvingDatas.Length) { return; }
             ref var data = ref _cachedMissingsResolvingDatas[index];
 
-            using (EcsGUI.SetAlpha(0))
+            using (DragonGUI.SetAlpha(0))
             {
                 if (GUI.Button(rect, ""))
                 {
@@ -75,7 +75,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             {
                 EditorGUI.DrawRect(rect, _activedColor);
             }
-            if (EcsGUI.HitTest(rect))
+            if (DragonGUI.HitTest(rect))
             {
                 EditorGUI.DrawRect(rect, _dragColor);
             }
@@ -122,7 +122,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
             GUI.Label(nameRect, name);
             EditorGUI.DrawRect(oldRect, new Color(0, 0, 0, 0.16f));
             GUI.Label(oldRect, oldStr);
-            using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleCenter))
+            using (DragonGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleCenter))
             {
                 GUI.Label(arrowRect, "->");
             }
@@ -160,16 +160,16 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                 _panel = new GUIStyle();
                 _panel.padding = new RectOffset(5, 5, 5, 5);
             }
-            using (EcsGUI.Layout.BeginVertical(_panel))
+            using (DragonGUI.Layout.BeginVertical(_panel))
             {
                 const string LIST_EMPTY_MESSAGE = "List of Missings is Empty";
                 const string COLLECT_BUTTON = "Collect Missings";
                 if (_missingRefContainer.IsEmpty)
                 {
                     GUILayout.Label("", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
-                    using (EcsGUI.SetFontSize(14))
-                    using (EcsGUI.SetFontSize(GUI.skin.button, 14))
-                    using (EcsGUI.SetAlignment(value: TextAnchor.MiddleCenter))
+                    using (DragonGUI.SetFontSize(14))
+                    using (DragonGUI.SetFontSize(GUI.skin.button, 14))
+                    using (DragonGUI.SetAlignment(value: TextAnchor.MiddleCenter))
                     {
                         Vector2 center = GUILayoutUtility.GetLastRect().center;
                         Vector2 labelSize = GUI.skin.label.CalcSize(UnityEditorUtility.GetLabel(LIST_EMPTY_MESSAGE));
@@ -184,7 +184,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                         r = new Rect(Vector2.zero, buttonSize);
                         r.center = center;
                         r.y += buttonSize.y / 2f;
-                        if (Event.current.type == EventType.MouseDown && EcsGUI.HitTest(r))
+                        if (Event.current.type == EventType.MouseDown && DragonGUI.HitTest(r))
                         {
                             _isNoFound = false;
                         }
@@ -222,8 +222,8 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                     InitList();
                 }
 
-                var bc = EcsGUI.SetBackgroundColor(Color.black, 0.5f);
-                using (EcsGUI.Layout.BeginVertical(EditorStyles.helpBox))
+                var bc = DragonGUI.SetBackgroundColor(Color.black, 0.5f);
+                using (DragonGUI.Layout.BeginVertical(EditorStyles.helpBox))
                 {
                     bc.Dispose();
                     _scrollViewPosition = GUILayout.BeginScrollView(_scrollViewPosition, GUILayout.ExpandHeight(true));
@@ -232,7 +232,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                 }
                 GUILayout.Space(4f);
 
-                using (EcsGUI.Layout.BeginVertical(GUILayout.ExpandHeight(false)))
+                using (DragonGUI.Layout.BeginVertical(GUILayout.ExpandHeight(false)))
                 {
                     //GUILayout.BeginVertical(EditorStyles.helpBox, GUILayout.ExpandHeight(false));
 
@@ -245,14 +245,14 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
 
                     if (data == null)
                     {
-                        using (EcsGUI.SetAlignment(TextAnchor.MiddleCenter))
+                        using (DragonGUI.SetAlignment(TextAnchor.MiddleCenter))
                         {
                             GUI.Label(rect, "Select any record");
                         }
                     }
                     else
                     {
-                        using (EcsGUI.CheckChanged())
+                        using (DragonGUI.CheckChanged())
                         {
                             rect.height = EditorGUIUtility.singleLineHeight;
                             rect = rect.Move(0, EditorGUIUtility.standardVerticalSpacing);
@@ -261,7 +261,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                             string NamespaceName = DrawEditableLine(rect, "Namespace:", data.OldTypeData.NamespaceName, data.NewTypeData.NamespaceName);
                             rect = rect.Move(0, EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing);
                             string AssemblyName = DrawEditableLine(rect, "Assembly:", data.OldTypeData.AssemblyName, data.NewTypeData.AssemblyName);
-                            if (EcsGUI.Changed)
+                            if (DragonGUI.Changed)
                             {
                                 data.NewTypeData = new Internal.TypeData(ClassName, NamespaceName, AssemblyName);
                             }
@@ -269,7 +269,7 @@ namespace DCFApixels.DragonECS.Unity.RefRepairer.Editors
                     }
                 }
 
-                using (EcsGUI.Layout.BeginHorizontal(GUILayout.Height(26f)))
+                using (DragonGUI.Layout.BeginHorizontal(GUILayout.Height(26f)))
                 {
                     if (GUILayout.Button("Re-Collect", GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(false)))
                     {

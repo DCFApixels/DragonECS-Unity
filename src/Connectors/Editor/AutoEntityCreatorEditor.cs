@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 EditorGUILayout.PropertyField(iterator, true);
             }
-            if (EcsGUI.Changed)
+            if (DragonGUI.Changed)
             {
                 serializedObject.ApplyModifiedProperties();
             }
@@ -27,7 +27,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawControlButtons()
         {
-            float height = EcsGUI.EntityBarHeight;
+            float height = DragonGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
             rect = rect.AddPadding(2f, 0f);
@@ -36,7 +36,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //var (left, autosetCascadeRect) = rect.HorizontalSliceRight(height);
             //var (_, autosetRect) = rect.HorizontalSliceRight(height);
 
-            if (EcsGUI.AutosetCascadeButton(buttonRect))
+            if (DragonGUI.AutosetCascadeButton(buttonRect))
             {
                 foreach (AutoEntityCreator target in targets)
                 {
@@ -44,17 +44,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
             buttonRect = buttonRect.Move(-height, 0);
-            if (EcsGUI.AutosetButton(buttonRect))
+            if (DragonGUI.AutosetButton(buttonRect))
             {
                 foreach (AutoEntityCreator target in targets)
                 {
                     target.Autoset_Editor();
                 }
             }
-            using (EcsGUI.SetEnable(Application.isPlaying))
+            using (DragonGUI.SetEnable(Application.isPlaying))
             {
                 buttonRect = buttonRect.Move(-height, 0);
-                if (EcsGUI.NewEntityButton(buttonRect))
+                if (DragonGUI.NewEntityButton(buttonRect))
                 {
                     foreach (AutoEntityCreator target in targets)
                     {

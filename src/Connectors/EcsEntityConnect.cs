@@ -137,7 +137,7 @@ namespace DCFApixels.DragonECS
                 _entity = entity;
                 _world = world;
 #if UNITY_EDITOR
-                world.Get<EcsGUI.EntityLinksComponent>().SetConnectLink(entity.GetIDUnchecked(), this);
+                world.Get<DragonGUI.EntityLinksComponent>().SetConnectLink(entity.GetIDUnchecked(), this);
 #endif
                 _connectedEntities.Add(GetInstanceID(), this);
                 var goConnects = world.GetPool<GameObjectConnect>();

@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             _entity = entity;
 #if UNITY_EDITOR
             var world = entity.GetWorldUnchecked();
-            world.Get<EcsGUI.EntityLinksComponent>().SetMonitorLink(entity.GetIDUnchecked(), this);
+            world.Get<DragonGUI.EntityLinksComponent>().SetMonitorLink(entity.GetIDUnchecked(), this);
 #endif
         }
     }

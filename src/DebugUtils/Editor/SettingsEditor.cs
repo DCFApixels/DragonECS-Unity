@@ -33,7 +33,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //float checkBoxWidth = 20f;
 
             GUILayout.Space(20f);
-            using (new EcsGUI.ColorScope(Color.white * 0.5f))
+            using (new DragonGUI.ColorScope(Color.white * 0.5f))
                 GUILayout.BeginVertical(EditorStyles.helpBox);
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
             GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
@@ -69,7 +69,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             GUILayout.EndVertical();
 
             GUILayout.Space(20f);
-            using (EcsGUI.SetColor(Color.white * 0.5f))
+            using (DragonGUI.SetColor(Color.white * 0.5f))
             {
                 GUILayout.BeginVertical(EditorStyles.helpBox);
             }

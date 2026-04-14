@@ -85,7 +85,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             GUILayout.BeginHorizontal(GUILayout.ExpandHeight(true));
 
             MetaGroupInfo selectedGroupInfo;
-            using (EcsGUI.Layout.BeginScrollView(ref ButtonsScrolPosition, UnityEditorUtility.GetClearBackgrounStyle(), GUILayout.Width(_buttonsWidth)))
+            using (DragonGUI.Layout.BeginScrollView(ref ButtonsScrolPosition, UnityEditorUtility.GetClearBackgrounStyle(), GUILayout.Width(_buttonsWidth)))
             {
                 selectedGroupInfo = DrawGroups();
             }
@@ -94,7 +94,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
             GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -2f);
 
-            using (EcsGUI.Layout.BeginScrollView(ref DataScrolPosition, UnityEditorUtility.GetTransperentBlackBackgrounStyle(), GUILayout.ExpandWidth(true)))
+            using (DragonGUI.Layout.BeginScrollView(ref DataScrolPosition, UnityEditorUtility.GetTransperentBlackBackgrounStyle(), GUILayout.ExpandWidth(true)))
             {
                 DrawSelectedGroupMeta(selectedGroupInfo);
             }
@@ -119,7 +119,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
         private void DrawToolbar()
         {
-            using (EcsGUI.SetColor(GUI.color * 0.8f))
+            using (DragonGUI.SetColor(GUI.color * 0.8f))
                 GUILayout.BeginHorizontal(EditorStyles.toolbar);
             GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * 2f);
 
@@ -129,12 +129,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 DragonDocsPrefs.instance.Save(docs);
             }
 
-            if (EcsGUI.Layout.IconButton(IsShowHidden ? Icons.Instance.VisibilityIconOn : Icons.Instance.VisibilityIconOff, 0f, IsShowHidden ? "Show Hidden" : "Don't Show Hidden", EditorStyles.toolbarButton, GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
+            if (DragonGUI.Layout.IconButton(IsShowHidden ? Icons.Instance.VisibilityIconOn : Icons.Instance.VisibilityIconOff, 0f, IsShowHidden ? "Show Hidden" : "Don't Show Hidden", EditorStyles.toolbarButton, GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
             {
                 IsShowHidden = !IsShowHidden;
             }
 
-            if (EcsGUI.Layout.IconButton(IsUseCustomNames ? Icons.Instance.LabelIconMeta : Icons.Instance.LabelIconType, 1f, IsUseCustomNames ? "Use Meta Name" : "Use Type Name", EditorStyles.toolbarButton, GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
+            if (DragonGUI.Layout.IconButton(IsUseCustomNames ? Icons.Instance.LabelIconMeta : Icons.Instance.LabelIconType, 1f, IsUseCustomNames ? "Use Meta Name" : "Use Type Name", EditorStyles.toolbarButton, GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
             {
                 IsUseCustomNames = !IsUseCustomNames;
             }
@@ -147,7 +147,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                 _searchingSampleChanged = true;
             }
             if ((_searchingSampleChanged && Event.current.keyCode == KeyCode.Return) ||
-                EcsGUI.Layout.IconButton(Icons.Instance.SearchIcon, 1f, null, EditorStyles.toolbarButton, GUILayout.ExpandHeight(true), GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
+                DragonGUI.Layout.IconButton(Icons.Instance.SearchIcon, 1f, null, EditorStyles.toolbarButton, GUILayout.ExpandHeight(true), GUILayout.Width(EditorGUIUtility.singleLineHeight * 1.6f)))
             {
                 Searh();
             }
@@ -246,29 +246,29 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
         private void DrawMeta(DragonDocsMeta meta, int index, int total)
         {
-            using (EcsGUI.SetIndentLevel(0))
+            using (DragonGUI.SetIndentLevel(0))
             {
-                Color panelColor = EcsGUI.SelectPanelColor(meta.Color.ToMetaColor(), meta.IsCustomColor, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
+                Color panelColor = DragonGUI.SelectPanelColor(meta.Color.ToMetaColor(), meta.IsCustomColor, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
                 Color alphaPanelColor = panelColor;
                 alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
 
-                using (EcsGUI.Layout.BeginVertical(alphaPanelColor))
+                using (DragonGUI.Layout.BeginVertical(alphaPanelColor))
                 {
                     GUILayout.Space(1f);
 
                     //draw title block
-                    using (EcsGUI.Layout.BeginHorizontal())
+                    using (DragonGUI.Layout.BeginHorizontal())
                     {
                         GUILayout.TextArea(IsUseCustomNames ? meta.Name : meta.TypeName, EditorStyles.boldLabel, GUILayout.ExpandWidth(false));
 
                         if (meta.TryGetSourceType(out System.Type targetType) && ScriptsCache.TryGetScriptAsset(targetType.GetMeta(), out MonoScript script))
                         {
-                            EcsGUI.Layout.ScriptAssetButton(script, GUILayout.Width(18f));
+                            DragonGUI.Layout.ScriptAssetButton(script, GUILayout.Width(18f));
                         }
 
                         if (meta.IsCustomName)
                         {
-                            using (EcsGUI.SetAlpha(0.64f)) using (EcsGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
+                            using (DragonGUI.SetAlpha(0.64f)) using (DragonGUI.SetAlignment(GUI.skin.label, TextAnchor.MiddleRight))
                             {
                                 GUILayout.TextArea(IsUseCustomNames ? meta.TypeName : meta.Name, GUI.skin.label);
                             }
@@ -282,7 +282,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                         if (string.IsNullOrEmpty(meta.MetaID) == false)
                         {
                             GUILayout.Space(-EditorGUIUtility.standardVerticalSpacing);
-                            EcsGUI.Layout.CopyMetaIDButton(meta.MetaID, GUILayout.Width(18f));
+                            DragonGUI.Layout.CopyMetaIDButton(meta.MetaID, GUILayout.Width(18f));
                         }
                     }
 
@@ -315,7 +315,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                         GUILayout.Space(3f);
 
                         var tagsstring = string.Join(',', meta._tags);
-                        using (EcsGUI.SetAlpha(0.5f))
+                        using (DragonGUI.SetAlpha(0.5f))
                         {
                             GUILayout.TextArea(tagsstring, EditorStyles.wordWrappedMiniLabel);
                         }
@@ -333,7 +333,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             var infos = Prefs.Infos;
             var isExpands = Prefs.IsExpands;
 
-            using (EcsGUI.SetIndentLevel(0))
+            using (DragonGUI.SetIndentLevel(0))
             {
                 int clippingDepth = int.MaxValue;
 
@@ -363,7 +363,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                     if (_searchingSample.Length == 0)
                     {
-                        EcsGUI.IndentLevel = groupInfo.Depth;
+                        DragonGUI.IndentLevel = groupInfo.Depth;
                     }
 
                     GUIContent label = UnityEditorUtility.GetLabel(_searchingSample.Length == 0 ? groupInfo.Name : groupInfo.Path);
@@ -374,10 +374,10 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                         EditorGUI.DrawRect(r, new Color(0.12f, 0.5f, 1f, 0.40f));
                     }
 
-                    using (EcsGUI.SetColor(0, 0, 0, 0)) using (EcsGUI.Disable) { GUI.Button(r, ""); }
+                    using (DragonGUI.SetColor(0, 0, 0, 0)) using (DragonGUI.Disable) { GUI.Button(r, ""); }
 
                     bool isClick = false;
-                    if (EcsGUI.HitTest(r))
+                    if (DragonGUI.HitTest(r))
                     {
                         EditorGUI.DrawRect(r, new Color(1f, 1f, 1f, 0.12f));
                         if (current.type == EventType.MouseUp)
@@ -391,7 +391,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
 
                     if (_searchingSample.Length != 0 || (i + 1 == infos.Length || infos[i + 1].Depth <= groupInfo.Depth))
                     {
-                        using (EcsGUI.SetBackgroundColor(0, 0, 0, 0))
+                        using (DragonGUI.SetBackgroundColor(0, 0, 0, 0))
                         {
                             EditorGUI.Foldout(r, false, label, EditorStyles.foldout);
                         }
@@ -451,7 +451,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             switch (current.type)
             {
                 case EventType.MouseDown:
-                    if (EcsGUI.HitTest(rect))
+                    if (DragonGUI.HitTest(rect))
                     {
                         _buttonsWidthDragStartPos = current.mousePosition;
                         _buttonsWidthDragStartValue = _buttonsWidth;

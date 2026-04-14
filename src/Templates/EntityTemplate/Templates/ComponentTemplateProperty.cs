@@ -12,7 +12,7 @@ namespace DCFApixels.DragonECS
     {
         [SerializeReference]
         [ReferenceDropDown]
-        [TypeMetaBlock]
+        [DragonMetaBlock]
         private ITemplateNode _template;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

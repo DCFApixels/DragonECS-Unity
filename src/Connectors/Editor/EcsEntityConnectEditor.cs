@@ -24,12 +24,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             //bool isConnected = Target.Entity.TryUnpackForUnityEditor(out int id, out short gen, out short worldID, out EcsWorld world);
             //EcsGUI.EntityStatus status = IsMultipleTargets ? EcsGUI.EntityStatus.Undefined : isConnected ? EcsGUI.EntityStatus.Alive : EcsGUI.EntityStatus.NotAlive;
             //EcsGUI.Layout.EntityField(status, id, gen, worldID);
-            EcsGUI.Layout.EntityField(Target.Entity);
+            DragonGUI.Layout.EntityField(Target.Entity);
         }
 
         private void DrawTemplates()
         {
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 var iterator = serializedObject.GetIterator();
                 iterator.NextVisible(true);
@@ -38,7 +38,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     EditorGUILayout.PropertyField(iterator, true);
                 }
 
-                if (EcsGUI.Changed)
+                if (DragonGUI.Changed)
                 {
                     serializedObject.ApplyModifiedProperties();
                 }
@@ -47,12 +47,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void DrawControlButtons()
         {
-            float height = EcsGUI.EntityBarHeight;
+            float height = DragonGUI.EntityBarHeight;
             Rect rect = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, height);
             EditorGUI.DrawRect(rect, new Color(0f, 0f, 0f, 0.1f));
             rect = rect.AddPadding(2f, 0f);
             var (_, buttonRect) = rect.HorizontalSliceRight(height);
-            if (EcsGUI.AutosetCascadeButton(buttonRect))
+            if (DragonGUI.AutosetCascadeButton(buttonRect))
             {
                 foreach (var target in Targets)
                 {
@@ -60,17 +60,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
             buttonRect = RectUtility.Move(buttonRect, -height, 0);
-            if (EcsGUI.AutosetButton(buttonRect))
+            if (DragonGUI.AutosetButton(buttonRect))
             {
                 foreach (var target in Targets)
                 {
                     target.Autoset_Editor();
                 }
             }
-            using (EcsGUI.SetEnable(Application.isPlaying))
+            using (DragonGUI.SetEnable(Application.isPlaying))
             {
                 buttonRect = buttonRect.Move(-height, 0);
-                if (EcsGUI.DelEntityButton(buttonRect))
+                if (DragonGUI.DelEntityButton(buttonRect))
                 {
                     foreach (var target in Targets)
                     {
@@ -78,7 +78,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 buttonRect = buttonRect.Move(-height, 0);
-                if (EcsGUI.UnlinkButton(buttonRect))
+                if (DragonGUI.UnlinkButton(buttonRect))
                 {
                     foreach (var target in Targets)
                     {
@@ -105,7 +105,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (world.IsNullOrDetroyed() == false)
                 {
-                    EcsGUI.Layout.DrawRuntimeComponents(entityID, world, true, true);
+                    DragonGUI.Layout.DrawRuntimeComponents(entityID, world, true, true);
                 }
             }
         }

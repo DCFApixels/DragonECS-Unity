@@ -185,7 +185,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             var executors = Target.MaskQueryExecutors;
 
-            using (EcsGUI.Layout.BeginHorizontal())
+            using (DragonGUI.Layout.BeginHorizontal())
             {
                 GUILayout.Label("[Queries]", _headerStyle, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
@@ -268,7 +268,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
             //using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(GetGenericPanelColor(index))))
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+            using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 var mask = executor.Mask;
                 DrawConstraint("+", mask.Incs);
@@ -294,24 +294,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            using (EcsGUI.Layout.BeginHorizontal())
+            using (DragonGUI.Layout.BeginHorizontal())
             {
-                using (EcsGUI.SetAlignment(value: TextAnchor.MiddleCenter))
-                using (EcsGUI.SetFontStyle(value: FontStyle.Bold))
-                using (EcsGUI.SetFontSize(value: 18))
-                using (EcsGUI.SetColor(Color.white, 0.3f))
+                using (DragonGUI.SetAlignment(value: TextAnchor.MiddleCenter))
+                using (DragonGUI.SetFontStyle(value: FontStyle.Bold))
+                using (DragonGUI.SetFontSize(value: 18))
+                using (DragonGUI.SetColor(Color.white, 0.3f))
                     GUILayout.Label(title, GUILayout.Width(12));
 
-                using (EcsGUI.Layout.BeginVertical())
+                using (DragonGUI.Layout.BeginVertical())
                 {
                     foreach (var inc in ids)
                     {
                         Type type = Target.World.GetComponentType(inc);
                         TypeMeta meta = type.GetMeta();
 
-                        Color color = EcsGUI.SelectPanelColor(meta, i, 9);
+                        Color color = DragonGUI.SelectPanelColor(meta, i, 9);
 
-                        using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
+                        using (DragonGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
                         {
                             GUILayout.Label(meta.TypeName);
                         }

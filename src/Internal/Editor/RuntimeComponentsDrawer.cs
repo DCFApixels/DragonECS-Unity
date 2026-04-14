@@ -246,7 +246,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         {
             bool isNull = world == null || world.IsDestroyed || world.ID == 0;
             if (isNull) { return; }
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+            using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 IsShowRuntimeComponents = EditorGUILayout.BeginFoldoutHeaderGroup(IsShowRuntimeComponents, "RUNTIME COMPONENTS", EditorStyles.foldout);
                 EditorGUILayout.EndFoldoutHeaderGroup();
@@ -271,32 +271,32 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                         float padding = EditorGUIUtility.standardVerticalSpacing;
                         Rect optionButton = GUILayoutUtility.GetLastRect();
                         optionButton.yMin = optionButton.yMax;
-                        optionButton.yMax += EcsGUI.HeadIconsRect.height;
+                        optionButton.yMax += DragonGUI.HeadIconsRect.height;
                         optionButton.xMin = optionButton.xMax - 64;
                         optionButton.center += Vector2.up * padding * 2f;
                         //Canceling isExpanded
-                        if (EcsGUI.ClickTest(optionButton))
+                        if (DragonGUI.ClickTest(optionButton))
                         {
                             ref bool isExpanded = ref expandMatrix.Down();
                             isExpanded = !isExpanded;
                         }
 
-                        Color panelColor = EcsGUI.SelectPanelColor(meta, index, total);
-                        using (EcsGUI.Layout.BeginVertical(panelColor.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA)))
+                        Color panelColor = DragonGUI.SelectPanelColor(meta, index, total);
+                        using (DragonGUI.Layout.BeginVertical(panelColor.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA)))
                         {
                             EditorGUI.BeginChangeCheck();
 
                             //Edit script button
                             if (ScriptsCache.TryGetScriptAsset(meta, out MonoScript script))
                             {
-                                optionButton = EcsGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                                EcsGUI.ScriptAssetButton(optionButton, script);
+                                optionButton = DragonGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                                DragonGUI.ScriptAssetButton(optionButton, script);
                             }
                             //Description icon
                             if (string.IsNullOrEmpty(meta.Description.Text) == false)
                             {
-                                optionButton = EcsGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                                EcsGUI.DescriptionIcon(optionButton, meta.Description.Text);
+                                optionButton = DragonGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                                DragonGUI.DescriptionIcon(optionButton, meta.Description.Text);
                             }
 
                             RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
@@ -336,7 +336,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         }
         private void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout)
         {
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle())) using (EcsGUI.SetIndentLevel(0))
+            using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle())) using (DragonGUI.SetIndentLevel(0))
             {
                 if (_runtimeComponentsDepth >= RuntimeComponentsMaxDepth)
                 {
@@ -350,12 +350,12 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 }
                 if (isWithFoldout == false || IsShowRuntimeComponents)
                 {
-                    if (EcsGUI.Layout.AddComponentButtons(out Rect dropDownRect))
+                    if (DragonGUI.Layout.AddComponentButtons(out Rect dropDownRect))
                     {
                         RuntimeComponentsUtility.GetAddComponentGenericMenu(world).Open(dropDownRect, entityID);
                     }
 
-                    using (EcsGUI.SetBackgroundColor(GUI.color.SetAlpha(0.16f)))
+                    using (DragonGUI.SetBackgroundColor(GUI.color.SetAlpha(0.16f)))
                     {
                         GUILayout.Box("", UnityEditorUtility.GetWhiteStyle(), GUILayout.ExpandWidth(true));
                     }
@@ -384,25 +384,25 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 float padding = EditorGUIUtility.standardVerticalSpacing;
                 Rect optionButton = GUILayoutUtility.GetLastRect();
                 optionButton.yMin = optionButton.yMax;
-                optionButton.yMax += EcsGUI.HeadIconsRect.height;
+                optionButton.yMax += DragonGUI.HeadIconsRect.height;
                 optionButton.xMin = optionButton.xMax - 64;
                 optionButton.center += Vector2.up * padding * 2f;
                 //Canceling isExpanded
-                if (EcsGUI.ClickTest(optionButton))
+                if (DragonGUI.ClickTest(optionButton))
                 {
                     ref bool isExpanded = ref expandMatrix.Down();
                     isExpanded = !isExpanded;
                 }
 
-                Color panelColor = EcsGUI.SelectPanelColor(meta, index, total);
+                Color panelColor = DragonGUI.SelectPanelColor(meta, index, total);
 
-                using (EcsGUI.Layout.BeginVertical(panelColor.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA)))
+                using (DragonGUI.Layout.BeginVertical(panelColor.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA)))
                 {
                     EditorGUI.BeginChangeCheck();
 
                     //Close button
-                    optionButton.xMin = optionButton.xMax - EcsGUI.HeadIconsRect.width;
-                    if (EcsGUI.CloseButton(optionButton))
+                    optionButton.xMin = optionButton.xMax - DragonGUI.HeadIconsRect.width;
+                    if (DragonGUI.CloseButton(optionButton))
                     {
                         pool.Del(entityID);
                         return;
@@ -410,14 +410,14 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     //Edit script button
                     if (ScriptsCache.TryGetScriptAsset(meta, out MonoScript script))
                     {
-                        optionButton = EcsGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                        EcsGUI.ScriptAssetButton(optionButton, script);
+                        optionButton = DragonGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                        DragonGUI.ScriptAssetButton(optionButton, script);
                     }
                     //Description icon
                     if (string.IsNullOrEmpty(meta.Description.Text) == false)
                     {
-                        optionButton = EcsGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
-                        EcsGUI.DescriptionIcon(optionButton, meta.Description.Text);
+                        optionButton = DragonGUI.HeadIconsRect.MoveTo(optionButton.center - (Vector2.right * optionButton.width));
+                        DragonGUI.DescriptionIcon(optionButton, meta.Description.Text);
                     }
 
                     RuntimeComponentReflectionCache.FieldInfoData componentInfoData = new RuntimeComponentReflectionCache.FieldInfoData(null, componentType, meta.Name);
@@ -438,7 +438,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
         {
             const int DEPTH_MAX = 24;
 
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
 
                 outData = data;
@@ -479,7 +479,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                         break;
                     case DrawerType.UnitySerializableComposite:
 
-                        using (EcsGUI.CheckChanged())
+                        using (DragonGUI.CheckChanged())
                         {
                             RefEditorWrapper wrapper = cache.GetWrapper(_runtimeComponentsDepth);
                             wrapper.data = data;
@@ -487,7 +487,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                             wrapper.IsExpanded = isExpanded;
                             EditorGUILayout.PropertyField(wrapper.Property, label, true);
 
-                            if (EcsGUI.Changed)
+                            if (DragonGUI.Changed)
                             {
                                 wrapper.SO.ApplyModifiedProperties();
                                 newData = wrapper.Data;
@@ -499,7 +499,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                         break;
                     case DrawerType.UnityNotSerializableComposite:
 
-                        GUILayout.Space(EcsGUI.Spacing);
+                        GUILayout.Space(DragonGUI.Spacing);
                         var foldoutStyle = EditorStyles.foldout;
                         Rect rect = GUILayoutUtility.GetRect(label, foldoutStyle);
                         //rect.xMin += EcsGUI.Indent;
@@ -508,7 +508,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
                         if (isExpanded)
                         {
-                            using (EcsGUI.UpIndentLevel())
+                            using (DragonGUI.UpIndentLevel())
                             {
                                 for (int j = 0, jMax = cache.Fields.Length; j < jMax; j++)
                                 {
@@ -526,7 +526,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                         break;
                     case DrawerType.UnityObject:
 
-                        using (EcsGUI.CheckChanged())
+                        using (DragonGUI.CheckChanged())
                         {
                             var uobj = UnsafeUtility.As<object, UnityObject>(ref data);
                             bool isComponent = typeof(UnityComponent).IsAssignableFrom(fieldInfoData.FieldType);
@@ -696,7 +696,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 }
 
                 expandMatrix.Up();
-                if (childElementChanged || EcsGUI.Changed)
+                if (childElementChanged || DragonGUI.Changed)
                 {
                     outData = newData;
                     return true;

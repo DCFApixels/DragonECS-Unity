@@ -51,11 +51,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
             (foldoutRect, labelField) = foldoutRect.HorizontalSliceLeft(EditorGUIUtility.labelWidth);
 
 
-            using (EcsGUI.CheckChanged())
+            using (DragonGUI.CheckChanged())
             {
                 property.isExpanded = EditorGUI.Foldout(foldoutRect, property.isExpanded, label);
 
-                using (EcsGUI.SetAlignment(EditorStyles.miniLabel, TextAnchor.MiddleRight))
+                using (DragonGUI.SetAlignment(EditorStyles.miniLabel, TextAnchor.MiddleRight))
                 {
                     if (_labelCache.TryGetValue((byte)(flags.Normalize()), out string str) == false)
                     {
@@ -70,7 +70,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
 
                 //property.isExpanded = true;
-                using (EcsGUI.UpIndentLevel())
+                using (DragonGUI.UpIndentLevel())
                 {
                     checkboxRects = checkboxRects.Move(EditorGUIUtility.standardVerticalSpacing, 0);
 
@@ -81,11 +81,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     //LayerName
                     property.Next(true);
-                    using (EcsGUI.SetIndentLevel(0))
+                    using (DragonGUI.SetIndentLevel(0))
                     {
                         flags = flags.SetOverwriteLayerName(EditorGUI.Toggle(checkboxRect, flags.IsOverwriteLayerName()));
                     }
-                    using (EcsGUI.SetEnable(flags.IsOverwriteLayerName()))
+                    using (DragonGUI.SetEnable(flags.IsOverwriteLayerName()))
                     {
                         EditorGUI.PropertyField(fieldRect, property, UnityEditorUtility.GetLabel(property.displayName), true);
                     }
@@ -95,11 +95,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     //SortOrder
                     property.Next(false);
-                    using (EcsGUI.SetIndentLevel(0))
+                    using (DragonGUI.SetIndentLevel(0))
                     {
                         flags = flags.SetOverwriteSortOrder(EditorGUI.Toggle(checkboxRect, flags.IsOverwriteSortOrder()));
                     }
-                    using (EcsGUI.SetEnable(flags.IsOverwriteSortOrder()))
+                    using (DragonGUI.SetEnable(flags.IsOverwriteSortOrder()))
                     {
                         EditorGUI.PropertyField(fieldRect, property, UnityEditorUtility.GetLabel(property.displayName), true);
                     }
@@ -109,16 +109,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                     //IsUnique
                     property.Next(false);
-                    using (EcsGUI.SetIndentLevel(0))
+                    using (DragonGUI.SetIndentLevel(0))
                     {
                         flags = flags.SetOverwriteIsUnique(EditorGUI.Toggle(checkboxRect, flags.IsOverwriteIsUnique()));
                     }
-                    using (EcsGUI.SetEnable(flags.IsOverwriteIsUnique()))
+                    using (DragonGUI.SetEnable(flags.IsOverwriteIsUnique()))
                     {
                         EditorGUI.PropertyField(fieldRect, property, UnityEditorUtility.GetLabel(property.displayName), true);
                     }
 
-                    if (EcsGUI.Changed)
+                    if (DragonGUI.Changed)
                     {
                         flagsProp.enumValueFlag = (int)flags;
                     }
@@ -133,7 +133,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 exti:;
 
                 //EcsGUI.Changed = Event.current.type == EventType.MouseUp;
-                if (EcsGUI.Changed)
+                if (DragonGUI.Changed)
                 {
                     property.serializedObject.ApplyModifiedProperties();
                 }

@@ -107,7 +107,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _headerStyle.fontSize = 28;
             }
 
-            using (EcsGUI.Layout.BeginHorizontal())
+            using (DragonGUI.Layout.BeginHorizontal())
             {
                 GUILayout.Label("[World]", _headerStyle, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
@@ -117,9 +117,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
 
-            EcsGUI.Layout.DrawWorldBaseInfo(Target.World);
+            DragonGUI.Layout.DrawWorldBaseInfo(Target.World);
 
-            EcsGUI.Layout.DrawWorldComponents(Target.World);
+            DragonGUI.Layout.DrawWorldComponents(Target.World);
         }
     }
 }

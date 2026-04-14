@@ -51,9 +51,9 @@ namespace DCFApixels.DragonECS
         public abstract void Apply(short worldID, int entityID);
         #endregion
 
-        protected class ComponentTemplateMetaProxy : MetaProxy
+        protected class ComponentTemplateMetaProxy : MetaProxyBase
         {
-            protected static TypeMeta Meta;
+            protected TypeMeta Meta;
             public override string Name { get { return Meta?.Name; } }
             public override MetaColor? Color { get { return Meta?.Color; } }
             public override MetaGroup Group { get { return Meta?.Group; } }
@@ -61,14 +61,17 @@ namespace DCFApixels.DragonECS
             public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
             public ComponentTemplateMetaProxy(Type type) : base(type)
             {
-                if (type.IsGenericType && type.ContainsGenericParameters == false)
+                Meta = null;
+                var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
+                foreach (var field in fields)
                 {
-                    var g = type.GetGenericArguments();
-                    if (g.Length == 1)
+                    if (field.Name == "component")
                     {
-                        Meta = g[0].GetMeta();
+                        Meta = field.FieldType.GetMeta();
+                        return;
                     }
                 }
+
             }
         }
     }

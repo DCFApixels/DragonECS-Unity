@@ -41,7 +41,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                     else
                     {
-                        color = EcsGUI.SelectPanelColor(meta, i, -1).ToMetaColor();
+                        color = DragonGUI.SelectPanelColor(meta, i, -1).ToMetaColor();
                     }
                     name = $"{meta.Name}{SEPARATOR}{meta.TypeName}{SEPARATOR}{meta.MetaID}{SEPARATOR}{color.colorCode:X8}";
                 }
@@ -71,7 +71,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _headerStyle.fontSize = 28;
             }
 
-            using (EcsGUI.Layout.BeginHorizontal())
+            using (DragonGUI.Layout.BeginHorizontal())
             {
                 GUILayout.Label("[Systems]", _headerStyle, GUILayout.ExpandWidth(true));
                 if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
@@ -83,7 +83,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             IsShowInterfaces = EditorGUILayout.Toggle("Show Interfaces", IsShowInterfaces);
             IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
 
-            using (EcsGUI.Layout.BeginVertical())
+            using (DragonGUI.Layout.BeginVertical())
             {
                 int i = 0;
                 foreach (var item in Target.Pipeline.AllSystems)
@@ -95,7 +95,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             GUILayout.Label("[Runners]", _headerStyle);
 
-            using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
+            using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle()))
             {
                 int i = 0;
                 foreach (var item in Target.Pipeline.AllRunners)
@@ -114,13 +114,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.EndVertical();
                 GUILayout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle());
 
-                using (EcsGUI.Layout.BeginHorizontal()) using (var scope = EcsGUI.SetAlignment(GUI.skin.label))
+                using (DragonGUI.Layout.BeginHorizontal()) using (var scope = DragonGUI.SetAlignment(GUI.skin.label))
                 {
 
                     scope.Target.alignment = TextAnchor.UpperLeft;
                     GUILayout.Label("<", GUILayout.ExpandWidth(true));
                     scope.Target.alignment = TextAnchor.UpperRight;
-                    using (EcsGUI.SetAlpha(0.64f))
+                    using (DragonGUI.SetAlpha(0.64f))
                     {
                         GUILayout.Label($"{markerSystem.layerNameSpace}", GUILayout.ExpandWidth(false));
                     }
@@ -128,7 +128,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     GUILayout.Space(EditorGUIUtility.standardVerticalSpacing * -4f);
 
                     scope.Target.alignment = TextAnchor.UpperLeft;
-                    using (EcsGUI.SetFontStyle(scope.Target, FontStyle.Bold))
+                    using (DragonGUI.SetFontStyle(scope.Target, FontStyle.Bold))
                     {
                         GUILayout.Label($"{markerSystem.layerName}", GUILayout.ExpandWidth(false));
                     }
@@ -147,10 +147,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             string name = meta.Name;
-            Color color = EcsGUI.SelectPanelColor(meta, index, -1);
+            Color color = DragonGUI.SelectPanelColor(meta, index, -1);
 
 
-            using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
+            using (DragonGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
             {
                 if (IsShowInterfaces)
                 {
@@ -168,9 +168,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 return;
             }
-            Color color = EcsGUI.SelectPanelColor(meta, index, -1);
+            Color color = DragonGUI.SelectPanelColor(meta, index, -1);
 
-            using (EcsGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
+            using (DragonGUI.Layout.BeginVertical(color.SetAlpha(0.2f)))
             {
                 GUILayout.Label(meta.Name, EditorStyles.boldLabel);
                 GUILayout.Label(string.Join(", ", runner.ProcessRaw.Cast<object>().Select(o => o.GetType().Name)), systemsListStyle);
