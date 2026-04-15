@@ -390,18 +390,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #endregion
 
         #region small elems
-        public static void DrawTextureSoftColor(Rect position, Texture texture)
-        {
-            DrawTex(position, texture, GUI.color * 0.5f);
-        }
         public static void DrawTexture(Rect position, Texture texture)
         {
             DrawTex(position, texture, GUI.color);
-        }
-        public static void DrawRectSoftColor(Rect position, Color color)
-        {
-            Texture texture = UnityEditorUtility.GetWhiteTexture();
-            DrawTex(position, texture, GUI.color * color * 0.5f);
         }
         public static void DrawRect(Rect position, Color color)
         {
@@ -410,12 +401,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private static void DrawTex(Rect position, Texture texture, Color color)
         {
-            GUI.DrawTexture(position, texture, ScaleMode.ScaleAndCrop, true);
-
-            if (Event.current.type == EventType.Repaint)
+            //GUI.DrawTexture(position, texture, ScaleMode.StretchToFill, true, 0, color, 0, 0);
+            using (SetColor(color))
             {
-                //Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * color, null);
+                GUI.DrawTexture(position, texture, ScaleMode.StretchToFill);
             }
+
+            //if (Event.current.type == EventType.Repaint)
+            //{
+            //    Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * color, null);
+            //}
 
             //var x = GUIClip.visibleRect;
             //Rect visibleRect = new Rect(0, 0, scrollViewWidth, scrollViewHeight); // свой прямоугольник обрезки
@@ -436,7 +431,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             using (SetColor(GUI.enabled ? GUI.color : GUI.color * new Color(1f, 1f, 1f, 0.4f)))
             {
                 GUI.Label(position, UnityEditorUtility.GetLabel(string.Empty, tooltip));
-                DrawTextureSoftColor(RectUtility.AddPadding(position, iconPadding), icon);
+                DrawTexture(RectUtility.AddPadding(position, iconPadding), icon);
             }
         }
         public static (bool, bool) IconButtonGeneric(Rect position)
@@ -691,7 +686,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 w.a = 0.6f;
                 Color b = Color.black;
                 b.a = 0.55f;
-                DrawRectSoftColor(position, w);
+                DrawRect(position, w);
 
                 var (idRect, genWorldRect) = RectUtility.HorizontalSliceLerp(position, 0.4f);
                 var (genRect, worldRect) = RectUtility.HorizontalSliceLerp(genWorldRect, 0.5f);
@@ -699,9 +694,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 idRect = RectUtility.AddPadding(idRect, 2, 1, 0, 0);
                 genRect = RectUtility.AddPadding(genRect, 1, 1, 0, 0);
                 worldRect = RectUtility.AddPadding(worldRect, 1, 2, 0, 0);
-                DrawRectSoftColor(idRect, b);
-                DrawRectSoftColor(genRect, b);
-                DrawRectSoftColor(worldRect, b);
+                DrawRect(idRect, b);
+                DrawRect(genRect, b);
+                DrawRect(worldRect, b);
 
                 GUIStyle style = UnityEditorUtility.GetInputFieldCenterAnhor();
 
