@@ -392,33 +392,36 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region small elems
         public static void DrawTextureSoftColor(Rect position, Texture texture)
         {
-            if (Event.current.type == EventType.Repaint)
-            {
-                Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * 0.5f, null);
-            }
+            DrawTex(position, texture, GUI.color * 0.5f);
         }
         public static void DrawTexture(Rect position, Texture texture)
         {
-            if (Event.current.type == EventType.Repaint)
-            {
-                Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color, null);
-            }
+            DrawTex(position, texture, GUI.color);
         }
         public static void DrawRectSoftColor(Rect position, Color color)
         {
-            if (Event.current.type == EventType.Repaint)
-            {
-                Texture texture = UnityEditorUtility.GetWhiteTexture();
-                Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * color * 0.5f, null);
-            }
+            Texture texture = UnityEditorUtility.GetWhiteTexture();
+            DrawTex(position, texture, GUI.color * color * 0.5f);
         }
         public static void DrawRect(Rect position, Color color)
         {
+            Texture texture = UnityEditorUtility.GetWhiteTexture();
+            DrawTex(position, texture, GUI.color * color);
+        }
+        private static void DrawTex(Rect position, Texture texture, Color color)
+        {
+            GUI.DrawTexture(position, texture, ScaleMode.ScaleAndCrop, true);
+
             if (Event.current.type == EventType.Repaint)
             {
-                Texture texture = UnityEditorUtility.GetWhiteTexture();
-                Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * color, null);
+                //Graphics.DrawTexture(position, texture, new Rect(0f, 0f, 1f, 1f), 0, 0, 0, 0, GUI.color * color, null);
             }
+
+            //var x = GUIClip.visibleRect;
+            //Rect visibleRect = new Rect(0, 0, scrollViewWidth, scrollViewHeight); // свой прямоугольник обрезки
+            //GUI.BeginClip(visibleRect);
+            //Graphics.DrawTexture(new Rect(position.x - visibleRect.x, position.y - visibleRect.y, position.width, position.height), texture);
+            //GUI.EndClip();
         }
         public static void DrawIcon(Rect position, Texture icon, float iconPadding, string tooltip)
         {
@@ -759,7 +762,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DropExpanded = 1 << 0,
             CloseButtonClicked = 1 << 1,
         }
-       
+
 
         private static (DrawTypeMetaBlockResultFlags flags, float optionsWidth) DrawTypeMetaBlock_Internal(ref Rect rect, SerializedProperty rootProperty, ITypeMeta meta, int index = -1, int total = -1)
         {
@@ -882,7 +885,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;
             while (next)
             {
-                if(propsCounter.propertyType != SerializedPropertyType.Generic)
+                if (propsCounter.propertyType != SerializedPropertyType.Generic)
                 {
                     return true;
                 }
