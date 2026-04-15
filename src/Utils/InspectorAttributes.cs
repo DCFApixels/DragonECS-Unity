@@ -332,10 +332,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (IsDrawMetaBlock)
                 {
+                    
                     ref var r = ref rect;
                     var (skip, optionsWidth) = DragonGUI.DrawTypeMetaBlock(ref r, rootProperty, meta);
                     selectionButtonRightOffset = optionsWidth;
                     if (skip)
+                    {
+                        return;
+                    }
+                    if(Event.current.type == EventType.Used)
                     {
                         return;
                     }
