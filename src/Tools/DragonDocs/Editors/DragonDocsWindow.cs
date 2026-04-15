@@ -70,12 +70,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                     moveSign = -1;
                 }
             }
-            _selectedIndex += moveSign;
-            if(moveSign != 0)
-            {
-                Repaint();
-                return;
-            }
+           // _selectedIndex += moveSign;
 
             DragonDocs docs = DragonDocsPrefs.instance.Docs;
             if (docs == null || docs.Metas.IsEmpty)
@@ -106,7 +101,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             MetaGroupInfo selectedGroupInfo;
             using (DragonGUI.Layout.BeginScrollView(ref ButtonsScrolPosition, UnityEditorUtility.GetClearBackgrounStyle(), GUILayout.Width(_buttonsWidth)))
             {
-                selectedGroupInfo = DrawGroups();
+                selectedGroupInfo = DrawGroups(moveSign);
             }
 
             DrawDragger();
@@ -133,6 +128,12 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             if (_selectedIndex >= 0 && _selectedIndex < infos.Length)
             {
                 GUILayout.Label(infos[_selectedIndex].Path);
+            }
+
+            if (moveSign != 0)
+            {
+                Repaint();
+                return;
             }
         }
 
@@ -345,12 +346,15 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             }
         }
 
-        private MetaGroupInfo DrawGroups()
+        private MetaGroupInfo DrawGroups(int moveSign)
         {
             Event current = Event.current;
             MetaGroupInfo result = new MetaGroupInfo("NO_NAME", "NO_NAME", 0, 0, 0);
             var infos = Prefs.Infos;
             var isExpands = Prefs.IsExpands;
+
+            int prevIndex = 0;
+            int nextIndex = 0;
 
             using (DragonGUI.SetIndentLevel(0))
             {
@@ -379,6 +383,15 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                     {
                         clippingDepth = int.MaxValue;
                     }
+                    if(nextIndex < _selectedIndex)
+                    {
+                        prevIndex = nextIndex;
+                    }
+                    if (nextIndex <= _selectedIndex)
+                    {
+                        nextIndex = i;
+                    }
+
 
                     if (_searchingSample.Length == 0)
                     {
@@ -445,6 +458,18 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
                         r.yMax -= 1;
                         EditorGUI.DrawRect(r, new Color(0.2f, 0.6f, 1f));
                     }
+                }
+            }
+            
+            if(moveSign != 0)
+            {
+                if(moveSign < 0)
+                {
+                    _selectedIndex = prevIndex;
+                }
+                else
+                {
+                    _selectedIndex = nextIndex;
                 }
             }
             return result;
