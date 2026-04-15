@@ -83,20 +83,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
         }
-        //[SerializeField]
-        //private bool _isFastModeRuntimeComponents = false;
-        //public bool IsFastModeRuntimeComponents
-        //{
-        //    get => _isFastModeRuntimeComponents;
-        //    set
-        //    {
-        //        if (_isFastModeRuntimeComponents != value)
-        //        {
-        //            _isFastModeRuntimeComponents = value;
-        //            AutoSave();
-        //        }
-        //    }
-        //}
+        [SerializeField]
+        private bool _isShowWrappedMemberMeta = true;
+        public bool IsShowWrappedMemberMeta
+        {
+            get => _isShowWrappedMemberMeta;
+            set
+            {
+                if (_isShowWrappedMemberMeta != value)
+                {
+                    _isShowWrappedMemberMeta = value;
+                    AutoSave();
+                }
+            }
+        }
 
         [SerializeField]
         private ComponentColorMode _componentColorMode = ComponentColorMode.Auto;

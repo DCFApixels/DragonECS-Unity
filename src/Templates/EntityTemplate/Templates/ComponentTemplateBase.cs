@@ -48,8 +48,10 @@ namespace DCFApixels.DragonECS
     }
 
     [Serializable]
-    [MetaProxy(typeof(ComponentTemplateMetaProxy))]
     [DragonMemberWrapper("component")]
+    [MetaColor(MetaColor.DragonCyan)]
+    [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.OTHER_GROUP)]
+    [MetaProxy(typeof(ComponentTemplateMetaProxy))]
     public abstract class ComponentTemplateBase : IComponentTemplate
     {
         #region Properties

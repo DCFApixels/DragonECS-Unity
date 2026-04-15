@@ -41,30 +41,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
             rect.xMin += 9f;
             GUI.Label(rect, "User Settings", EditorStyles.whiteLargeLabel);
 
-            //using (prefs.DisableAutoSave())
-            {
-                prefs.IsShowHidden = EditorGUILayout.ToggleLeft(
-                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)),
-                    prefs.IsShowHidden);
+            prefs.IsShowHidden = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)),
+                prefs.IsShowHidden);
 
-                prefs.IsShowInterfaces = EditorGUILayout.ToggleLeft(
-                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)),
-                    prefs.IsShowInterfaces);
+            prefs.IsShowInterfaces = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)),
+                prefs.IsShowInterfaces);
 
-                prefs.IsShowRuntimeComponents = EditorGUILayout.ToggleLeft(
-                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)),
-                    prefs.IsShowRuntimeComponents);
+            prefs.IsShowRuntimeComponents = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)),
+                prefs.IsShowRuntimeComponents);
 
-                prefs.IsUseCustomNames = EditorGUILayout.ToggleLeft(
-                    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
-                    prefs.IsUseCustomNames);
+            prefs.IsUseCustomNames = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
+                prefs.IsUseCustomNames);
 
-                //prefs.IsFastModeRuntimeComponents = EditorGUILayout.ToggleLeft(
-                //    UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsFastModeRuntimeComponents)),
-                //    prefs.IsFastModeRuntimeComponents);
-
-                prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
-            }
+            prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
 
             GUILayout.EndVertical();
 

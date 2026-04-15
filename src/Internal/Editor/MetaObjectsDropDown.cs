@@ -101,8 +101,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
     }
 
-    internal class DragonFieldCahce
+    internal class DragonFieldCahce : ITypeMeta
     {
+        Type ITypeMeta.Type => Meta.Type;
+        string ITypeMeta.Name => Meta.Name;
+        MetaColor ITypeMeta.Color => Meta.Color;
+        MetaDescription ITypeMeta.Description => Meta.Description;
+        MetaGroup ITypeMeta.Group => Meta.Group;
+        IReadOnlyList<string> ITypeMeta.Tags => Meta.Tags;
+        ITypeMeta ITypeMeta.BaseMeta => Meta;
+
         internal static Type[] All => UnityEditorUtility._serializableTypes;
         internal static HashSet<Type> AllDict;
         internal static Dictionary<Type, DragonFieldCahce> RuntimeDict;
@@ -161,9 +169,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (_meta == null)
                 {
-                    {
-                        _meta = Type.GetMeta();
-                    }
+                    _meta = Type.GetMeta();
                 }
                 return _meta;
             }
@@ -199,6 +205,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return _defaultValueDummy;
             }
         }
+
         public DragonFieldCahce(Type type)
         {
             Type = type;

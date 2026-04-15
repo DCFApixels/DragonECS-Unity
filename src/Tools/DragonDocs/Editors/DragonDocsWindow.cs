@@ -1,6 +1,7 @@
 ﻿#if UNITY_EDITOR
 using DCFApixels.DragonECS.Unity.Editors;
 using DCFApixels.DragonECS.Unity.Internal;
+using DCFApixels.DragonECS.Unity.RefRepairer.Editors;
 using System;
 using UnityEditor;
 using UnityEngine;
@@ -57,6 +58,25 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
         private void OnGUI()
         {
             Event current = Event.current;
+            int moveSign = 0;
+            if (hasFocus && current.type == EventType.KeyUp && current.isKey)
+            {
+                if(current.keyCode == KeyCode.DownArrow)
+                {
+                    moveSign = 1;
+                }
+                if (current.keyCode == KeyCode.UpArrow)
+                {
+                    moveSign = -1;
+                }
+            }
+            _selectedIndex += moveSign;
+            if(moveSign != 0)
+            {
+                Repaint();
+                return;
+            }
+
             DragonDocs docs = DragonDocsPrefs.instance.Docs;
             if (docs == null || docs.Metas.IsEmpty)
             {
@@ -78,7 +98,6 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             {
                 _selectedIndex = 0;
             }
-
 
             DrawToolbar();
 

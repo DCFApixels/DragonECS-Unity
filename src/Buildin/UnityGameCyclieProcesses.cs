@@ -52,7 +52,6 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     [MetaColor(MetaColor.DragonRose)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("DragonECS_2DD8BC809201633E2761D5AEF65B7090")]
     public class EcsLateGizmosRunner : EcsRunner<IEcsGizmos>, IEcsGizmos
@@ -70,7 +69,6 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
     [MetaColor(MetaColor.DragonRose)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("DragonECS_EDE8BC809201603B47C3A9D1EFD4EE95")]
     public class EcsLateRunRunner : EcsRunner<IEcsLateRun>, IEcsLateRun
@@ -88,7 +86,6 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
     [MetaColor(MetaColor.DragonRose)]
     [MetaGroup(EcsUnityConsts.PACK_GROUP, EcsConsts.PROCESSES_GROUP)]
-    [MetaDescription(EcsConsts.AUTHOR, "...")]
     [MetaTags(MetaTags.HIDDEN)]
     [MetaID("DragonECS_45F7BC809201866AA05F6DC096A47F01")]
     public class EcsFixedRunRunner : EcsRunner<IEcsFixedRun>, IEcsFixedRun

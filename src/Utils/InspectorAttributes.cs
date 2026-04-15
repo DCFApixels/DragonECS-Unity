@@ -39,7 +39,6 @@ namespace DCFApixels.DragonECS.Unity
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     using UnityEditor;
-    using UnityEngine.Serialization;
 
     [CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
     [CustomPropertyDrawer(typeof(DragonMetaBlockAttribute), true)]
@@ -294,15 +293,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     if (info != null)
                     {
-                        meta = info.ComponentType.GetMeta();
+                        meta = info.Type.GetMeta();
                     }
-                    else
+                    else if (mrNull == false)
                     {
-                        if (mrNull == false)
-                        {
-                            var type = GetCachedManagedType(property);
-                            meta = type.GetMeta();
-                        }
+                        var type = GetCachedManagedType(property);
+                        meta = type.GetMeta();
                     }
                 }
 
