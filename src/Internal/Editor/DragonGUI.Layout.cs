@@ -121,7 +121,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 EntityField(UnityEditorUtility.GetLabel(label), entity);
             }
-            public static unsafe void EntityField(GUIContent label, entlong entity)
+            public static void EntityField(GUIContent label, entlong entity)
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;

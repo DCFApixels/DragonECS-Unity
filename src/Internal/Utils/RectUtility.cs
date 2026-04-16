@@ -6,6 +6,12 @@ namespace DCFApixels.DragonECS.Unity.Internal
 {
     internal static class RectUtility
     {
+        public static Rect AddOffset(in this Rect rect, Vector2 offset)
+        {
+            var r = rect;
+            r.position += offset;
+            return r;
+        }
         public static (Rect, Rect) HorizontalSliceLerp(in this Rect rect, float t)
         {
             Rect l = rect;

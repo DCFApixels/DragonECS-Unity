@@ -464,7 +464,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 DrawIcon(position, Icons.Instance.HelpIcon, 0, description);
             }
         }
+        public static void WorldHyperlinkButton(Rect position, EcsWorld world)
+        {
+            var current = Event.current;
+            var hover = IconHoverScan(position, current);
 
+            var click = IconButton(position, Icons.Instance.HyperlinkIcon, 2f, string.Empty);
+            if (GUI.enabled)
+            {
+                if (click)
+                {
+                    var monitor = world.Get<EntityLinksComponent>().GetWorldMonitor();
+                    if (monitor != null)
+                    {
+                        EditorGUIUtility.PingObject(monitor);
+                        Selection.activeObject = monitor;
+                    }
+                }
+            }
+        }
         public static void EntityHyperlinkButton(Rect position, EcsWorld world, int entityID)
         {
             var current = Event.current;
@@ -565,13 +583,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             private readonly Storage _storage;
             private EntityLinksComponent(Storage storage) { _storage = storage; }
-            public void SetConnectLink(int entityID, EcsEntityConnect link) { _storage.links[entityID].connect = link; }
-            public void SetMonitorLink(int entityID, EntityMonitor link) { _storage.links[entityID].monitor = link; }
-            public EcsEntityConnect GetConnectLink(int entityID) { return _storage.links[entityID].connect; }
-            public EntityMonitor GetMonitorLink(int entityID) { return _storage.links[entityID].monitor; }
+            public void SetWorldMonitor(WorldMonitor monitor) { _storage.WorldMonitor = monitor; }
+            public WorldMonitor GetWorldMonitor() { return _storage.WorldMonitor; }
+            public void SetConnectLink(int entityID, EcsEntityConnect link) { _storage.Links[entityID].connect = link; }
+            public void SetMonitorLink(int entityID, EntityMonitor link) { _storage.Links[entityID].monitor = link; }
+            public EcsEntityConnect GetConnectLink(int entityID) { return _storage.Links[entityID].connect; }
+            public EntityMonitor GetMonitorLink(int entityID) { return _storage.Links[entityID].monitor; }
             public UnityEngine.Object GetLink(int entityID)
             {
-                ref var links = ref _storage.links[entityID];
+                ref var links = ref _storage.Links[entityID];
                 if (links.connect != null)
                 {
                     return links.connect;
@@ -588,15 +608,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             private class Storage : IEcsWorldEventListener
             {
-                private readonly EcsWorld _world;
-                public (EcsEntityConnect connect, EntityMonitor monitor)[] links;
+                public readonly EcsWorld World;
+                public WorldMonitor WorldMonitor;
+                public (EcsEntityConnect connect, EntityMonitor monitor)[] Links;
                 public Storage(EcsWorld world)
                 {
-                    _world = world;
-                    _world.AddListener(this);
-                    links = new (EcsEntityConnect, EntityMonitor)[_world.Capacity];
+                    World = world;
+                    World.AddListener(this);
+                    Links = new (EcsEntityConnect, EntityMonitor)[World.Capacity];
                 }
-                public void OnWorldResize(int newSize) { Array.Resize(ref links, newSize); }
+                public void OnWorldResize(int newSize) { Array.Resize(ref Links, newSize); }
                 public void OnReleaseDelEntityBuffer(ReadOnlySpan<int> buffer) { }
                 public void OnWorldDestroy() { }
             }
@@ -605,7 +626,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             EntityField(position, DragonGUIContent.Empty, entity);
         }
-        public static unsafe void EntityField(Rect position, DragonGUIContent label, entlong entity)
+        public static void EntityField(Rect position, DragonGUIContent label, entlong entity)
         {
             EntityField(position, label, (EntitySlotInfo)entity);
         }

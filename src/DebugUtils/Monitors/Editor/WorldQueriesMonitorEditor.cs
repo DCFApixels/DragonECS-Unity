@@ -23,7 +23,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _pattern = pattern ?? throw new ArgumentNullException(nameof(pattern));
                 _separator = separator;
             }
-            public Enumerator GetEnumerator() => new Enumerator(_pattern, _separator);
+            public Enumerator GetEnumerator() { return new Enumerator(_pattern, _separator); }
             public ref struct Enumerator
             {
                 private readonly string _pattern;
@@ -43,25 +43,24 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 public ReadOnlySpan<char> Current
                 {
-                    get
-                    {
-                        if (_currentStart < 0)
-                            throw new InvalidOperationException("Enumeration not started or already finished");
-                        return _pattern.AsSpan(_currentStart, _currentLength);
-                    }
+                    get { return _pattern.AsSpan(_currentStart, _currentLength); }
                 }
 
                 public bool MoveNext()
                 {
                     if (_pattern == null || _start > _pattern.Length)
+                    {
                         return false;
+                    }
 
                     int len = _pattern.Length;
                     while (_start <= len)
                     {
                         int i = _start;
                         while (i < len && _pattern[i] != _separator)
+                        {
                             i++;
+                        }
 
                         int subLen = i - _start;
                         if (subLen > 0) // возвращаем только непустые подстроки
@@ -143,8 +142,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 var incs = query.Mask.Incs;
                 var excs = query.Mask.Excs;
+                var anys = query.Mask.Anys;
                 var incsI = 0;
                 var excsI = 0;
+                var anysI = 0;
                 for (int j = 0; j < allpools.Length; j++)
                 {
                     var pool = allpools[j];
@@ -163,6 +164,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                         {
                             sb.Append($"-");
                             excsI++;
+                            continue;
+                        }
+
+                        if (anysI < anys.Length && anys[anysI] == j)
+                        {
+                            sb.Append($"~");
+                            anysI++;
                             continue;
                         }
                     }
@@ -194,8 +202,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            EditorGUILayout.IntField("Count: ", executors.Count);
+            GUILayout.Space(10f);
 
+            EditorGUILayout.IntField("Total Count: ", executors.Count);
 
             HasSearchPattern = true;
             if (string.IsNullOrEmpty(Target.SearchPattern))
@@ -203,13 +212,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 Target.SearchPattern = string.Empty;
                 HasSearchPattern = false;
             }
+            GUILayout.Space(10f);
 
-            Target.SearchPattern = EditorGUILayout.TextField("Search: ", Target.SearchPattern);
-
-
+            Target.SearchPattern = EditorGUILayout.TextField(Target.SearchPattern, EditorStyles.toolbarSearchField);
             string searchPattern = Target.SearchPattern;
 
-            GUILayout.Space(20);
+            var r = GUILayoutUtility.GetRect(EditorGUIUtility.currentViewWidth, 3f);
+            DragonGUI.DrawRect(r, Color.white.SetAlpha(0.5f));
+            GUILayout.Space(10f);
+
 
             //using (EcsGUI.Layout.BeginVertical(UnityEditorUtility.GetStyle(Color.black, 0.2f)))
             {
@@ -273,10 +284,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var mask = executor.Mask;
                 DrawConstraint("+", mask.Incs);
                 DrawConstraint("-", mask.Excs);
+                DrawConstraint("~", mask.Anys);
             }
 
             EditorGUILayout.LongField("Version: ", executor.Version);
             EditorGUILayout.IntField("Entites Count: ", executor.LastCachedCount);
+            if (GUILayout.Button("Snapshot"))
+            {
+                QuerySnapshotWindow.ShowNew(executor.Snapshot());
+            }
 
             //var rect = GUILayoutUtility.GetLastRect();
             //

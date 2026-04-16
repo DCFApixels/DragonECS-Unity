@@ -84,15 +84,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
         [SerializeField]
-        private bool _isShowWrappedMemberMeta = true;
-        public bool IsShowWrappedMemberMeta
+        private bool _isPauseOnSnapshot = true;
+        public bool IsPauseOnSnapshot
         {
-            get => _isShowWrappedMemberMeta;
+            get => _isPauseOnSnapshot;
             set
             {
-                if (_isShowWrappedMemberMeta != value)
+                if (_isPauseOnSnapshot != value)
                 {
-                    _isShowWrappedMemberMeta = value;
+                    _isPauseOnSnapshot = value;
                     AutoSave();
                 }
             }

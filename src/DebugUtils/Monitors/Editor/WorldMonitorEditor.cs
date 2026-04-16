@@ -1,5 +1,5 @@
 ﻿#if UNITY_EDITOR
-using DCFApixels.DragonECS.UncheckedCore;
+using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using System.Text;
 using UnityEditor;
