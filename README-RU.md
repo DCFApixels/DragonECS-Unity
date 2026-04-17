@@ -149,7 +149,13 @@ _pipeline = EcsPipeline.New()
 Показывает состояние `EcsWorld`. На каждый мир, переданный в `AddUnityDebug(...)`, создается отдельный монитор.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543">   
+<img src="https://github.com/user-attachments/assets/83905e7a-a5d1-4470-883a-c3b318cb4726">   
+</p>
+
+* ### `WorldQueriesMonitor` 
+
+<p align="center">
+<img width="400px" src="https://github.com/user-attachments/assets/e6edf718-5c73-437e-abeb-c192ace9f927" />
 </p>
 
 -----
