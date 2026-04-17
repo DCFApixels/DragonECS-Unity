@@ -7,6 +7,16 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity
 {
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true, AllowMultiple = false)]
+    public sealed class DragonMemberWrapperAttribute : Attribute
+    {
+        public string WrappedFieldName;
+        public DragonMemberWrapperAttribute(string wrappedFieldName)
+        {
+            WrappedFieldName = wrappedFieldName;
+        }
+    }
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class ReferenceDropDownAttribute : PropertyAttribute
     {
         public readonly Type[] AllowTypes;
@@ -20,6 +30,7 @@ namespace DCFApixels.DragonECS.Unity
             Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
         }
     }
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class ReferenceDropDownWithoutAttribute : Attribute
     {
         public readonly Type[] PredicateTypes;
@@ -31,6 +42,7 @@ namespace DCFApixels.DragonECS.Unity
             Array.Sort(predicateTypes, (a, b) => string.Compare(a.AssemblyQualifiedName, b.AssemblyQualifiedName, StringComparison.Ordinal));
         }
     }
+    [AttributeUsage(AttributeTargets.Field, Inherited = true, AllowMultiple = false)]
     public sealed class DragonMetaBlockAttribute : PropertyAttribute { }
 }
 
