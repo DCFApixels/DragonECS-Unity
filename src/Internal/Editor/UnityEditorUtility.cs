@@ -120,10 +120,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                //var targetTypes = assembly.GetTypes().Where(type =>
-                //    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
-                //    type.IsSubclassOf(typeof(UnityObject)) == false &&
-                //    type.GetCustomAttribute<SerializableAttribute>() != null);
+                if (AssemblyFilter.IsExcludedAssembly(assembly)) { continue; }
 
                 foreach (var type in assembly.GetTypes())
                 {
@@ -587,6 +584,52 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _worldDatas.Remove(_world);
             }
             public void OnWorldResize(int newSize) { }
+        }
+    }
+
+    public static class AssemblyFilter
+    {
+        private static readonly HashSet<string> ExcludedPrefixes = new HashSet<string>
+        {
+            "Unity.",
+            "UnityEngine.",
+            "UnityEditor.",
+            "System.",
+            "mscorlib",
+            "netstandard",
+            "Mono.",
+            "Microsoft.",
+            "Mono.Security"
+        };
+
+        private static readonly HashSet<string> ExactedExcludedNames = new HashSet<string>
+        {
+            "System",
+            "System.Core",
+            "System.Xml",
+            "System.Runtime",
+            "System.Collections",
+            "System.Linq",
+            "System.Text.RegularExpressions",
+            "UnityEngine",
+            "UnityEditor",
+        };
+
+        public static bool IsExcludedAssembly(Assembly assembly)
+        {
+            string assemblyName = assembly.GetName().Name;
+            if (ExactedExcludedNames.Contains(assemblyName))
+            {
+                return true;
+            }
+            foreach (var prefix in ExcludedPrefixes)
+            {
+                if (assemblyName.StartsWith(prefix, StringComparison.Ordinal))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }
