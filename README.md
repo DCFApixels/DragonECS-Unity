@@ -49,15 +49,17 @@ This package integrates DragonECS with the Unity editor and runtime. It provides
 - [Debug](#debug)
   - [Debug service](#debug-service)
   - [Debug module](#debug-module)
-  - [Visual debugging](#Visual-debugging)
-- [Templates](#Templates)
-- [Binding to GameObjects](#Binding-to-GameObjects)
+  - [Visual debugging](#visual-debugging)
+- [Templates](#templates)
+- [Binding to GameObjects](#binding-to-gameobjects)
 - [World Provider](#world-provider)
-- [Pipeline template](#Pipeline-template)
-- [FixedUpdate LateUpdate](#fixedupdate-lateupdate)
-- [Project documentation](#Project-documentation)
-- [Settings window](#Settings-window)
-- [Reference Repairer](#Reference-Repairer)
+- [Pipeline template](#pipeline-template)
+- [FixedUpdate and LateUpdate](#fixedupdate-and-lateupdate)
+- [Inspector Customization](#inspector-customization)
+- [Jobs Support](#jobs-support)
+- [Project documentation](#project-documentation)
+- [Settings window](#settings-window)
+- [Reference Repairer](#reference-repairer)
 - [FAQ](#faq)
 
 </br>
@@ -147,7 +149,16 @@ Displays processes and systems in a matrix layout. Systems are shown in executio
 Displays `EcsWorld` state. A separate monitor is created for each world passed to `AddUnityDebug(...)`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/7b6455fc-9211-425c-b0b8-288077e61543">   
+<img src="https://github.com/user-attachments/assets/83905e7a-a5d1-4470-883a-c3b318cb4726">   
+</p>
+
+-----
+
+* ### `WorldQueriesMonitor` 
+Located together with `WorldMonitor`, shows a list of all Where queries that systems have executed. At the top there is a search field for filtering queries by component names. The search string can be split with a `/` character to search for multiple components at once. Next to each Where query there is a `Snapshot` button; clicking it opens a window showing a list of all entities that currently match the query mask.
+
+<p align="center">
+<img width="400px" src="https://github.com/user-attachments/assets/e6edf718-5c73-437e-abeb-c192ace9f927" />
 </p>
 
 -----
@@ -243,6 +254,8 @@ public struct Health : IEcsComponent, ITemplateNode
     }
 }
 ```
+
+> The section [Inspector Customization](#Inspector-Customization) describes customization of component display and usage outside of entity templates.
 
 #### Custom template implementation
 
@@ -435,7 +448,7 @@ public class EcsMyWorldSingletonProvider : EcsWorldProvider<EcsMyWorld>
 
 </br>
 
-# Pipeline templates
+# Pipeline template
 Pipelines and entities can be assembled from templates. Pipeline templates are modules implementing the `IEcsModule` interface.
 
 The package provides two pipeline template types by default: `ScriptablePipelineTemplate` and `MonoPipelineTemplate`.
@@ -491,6 +504,125 @@ public class EcsRoot : MonoBehaviour
         _pipeline.LateRun();
     }
     // ...
+}
+```
+
+</br>
+
+# Inspector Customization
+
+## Inspector Attributes
++ **[ReferenceDropDown]** -
+Applied to a field with `[SerializeReference]`. Adds a type selection button from a list. The set of available types can be restricted by passing a list to the constructor.
+
++ **[ReferenceDropDownWithout]** -
+Used together with `[ReferenceDropDown]` to exclude the specified types (and their descendants) from the selection list.
+
++ **[DragonMetaBlock]** -
+Displays the value in the inspector similarly to how components are displayed in entity templates. Takes meta-attributes into account (`MetaGroup`, `MetaColor`, `MetaDescription`, `MetaID`, etc.).
+
+## Behavior of Meta‑Attributes
++ Hierarchical grouping of items in the `Add Component` menu or `[ReferenceDropDown]` is defined via `[MetaGroup]`.
++ The component color in the inspector is determined by the type name by default. The coloring mode can be changed in the settings window. An explicit color is set via `[MetaColor]`.
++ When the type name matches the file name (or when `[MetaID]` is present), a file icon appears next to the delete button: a single click selects the script in the project, a double click opens it.
++ If `[MetaDescription]` is specified, a tooltip icon with the description text is displayed next to it.
++ When restoring a Missing Reference using Reference Repairer, the tool searches for a match between the old and new type names by the `[MetaID(id)]` attribute.
+
+
+## Examples:
+
+`DragonMetaBlock` attribute:
+```c#
+// Display of the field customizable via meta-attributes.
+// Similar to components in MonoEntityTemplate or ScriptableEntityTemplate.
+[DragonMetaBlock]
+public SomeComponent Component;
+
+// Can be applied to any field of any type.
+[DragonMetaBlock]
+public Foo Foo;
+```
+
+`ReferenceDropDown` and `ReferenceDropDownWithout`:
+```c#
+// Adds a button to select an implementation of ITemplateNode from a drop-down list.
+[SerializeReference]
+[ReferenceDropDown]
+public ITemplateNode Template;
+```
+
+```c#
+// Also applicable to any field of any type.
+// The list will contain only type Foo and its descendants, excluding FooExc and its descendants.
+[SerializeReference]
+[ReferenceDropDown(typeof(Foo))]
+[ReferenceDropDownWithout(typeof(FooExc))]
+public object Template;
+```
+
+Combination and other use cases:
+```c#
+// Attributes can be combined.
+[DragonMetaBlock]
+[ReferenceDropDown]
+public ITemplateNode Template;
+
+// A wrapper over ITemplateNode, similar to the example above.
+public ComponentTemplateProperty Template;
+
+// Attributes work correctly with arrays and lists.
+[DragonMetaBlock]
+[ReferenceDropDown]
+public ITemplateNode[] Template;
+```
+
+</br>
+
+# Jobs Support
+
+DragonECS is compatible with Unity's Job system by default. Example:
+```c#
+EcsWorld _world;
+class Aspect : EcsAspect
+{
+    // Pool for unmanaged components.
+    public EcsValuePool<Cmp> Cmps = Inc;
+}
+public void Run()
+{
+    var job = new Job()
+    {
+        // Same as Where, but returns an unmanaged entity list.
+        Entities = _world.WhereUnsafe(out Aspect a),
+        // Convert the pool to its unmanaged version
+        Cmps = a.Cmps.AsNative(),
+        X = 10f,
+    };
+    JobHandle jobHandle = job.Schedule(job.Entities.Count, 64);
+    jobHandle.Complete();
+}
+```
+```c#
+// Unmanaged component.
+public struct Cmp : IEcsValueComponent
+{
+    public float A;
+}
+private struct Job : IJobParallelFor
+{
+    public EcsUnsafeSpan Entities;
+    public NativeEcsValuePool<Cmp> Cmps;
+    public float X;
+    public Job(EcsUnsafeSpan entities, float x)
+    {
+        Entities = entities;
+        X = x;
+    }
+    public void Execute(int index)
+    {
+        var e = Entities[index];
+        Cmps[e].A += X;
+    }
 }
 ```
 
