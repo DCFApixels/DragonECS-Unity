@@ -56,6 +56,8 @@
 - [World Provider](#world-provider)
 - [Шаблон Пайплайна](#шаблон-пайплайна)
 - [FixedUpdate LateUpdate](#fixedupdate-lateupdate)
+- [Кастомизация инспектора](#Кастомизация-инспектора)
+- [Поддержка Jobs](#Поддержка-Jobs)
 - [Документация проекта](#документация-проекта)
 - [Окно настроек](#окно-настроек)
 - [Reference Repairer](#Reference-Repairer)
@@ -269,48 +271,6 @@ class SomeComponentTemplate : IComponentTemplate
 ```
 
 </details>
-</br>
-
-### Кастомизация отображения типов
-В раскрывающемся при нажатии `Add Component` меню выбора компонента поддерживается иерархическое группирование. Производится группирование на основе мета-атрибута `[MetaGroup]`.
-
-Компоненты в инспекторе по умолчанию отображаются со случайным цветом, зависящим от его имени, выбрать другой режим окраски можно в [окне настроек](#окно-настроек) фреймворка. Задать конкретный цвет можно при помощи мета-атрибута `[MetaColor]`.
-
-Если интеграции удается найти соответствующий скрипт (по совпадению имени типа и файла, либо при наличии `[MetaID]`), рядом с крестиком удаления появляется иконка файла — клик выделяет скрипт в проекте, двойной клик открывает его.
-
-При наличии атрибута `[MetaDescription]` показывается иконка подсказки с текстом из него.
-
-</br>
-
-### Применение шаблонов компонентов вне стандартных шаблонов сущностей
-Шаблоны компонентов можно использовать не только внутри стандартных `MonoEntityTemplate` и `ScriptableEntityTemplate`, но и в любых пользовательских классах. Для этого предусмотрены два способа:
-
-Атрибут `[ComponentTemplateField]`:
-```c#
-// Отображение поля как компонента, настраиваемая мета атрибутами.
-// Аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
-[SerializeField, ComponentTemplateField]
-private SomeComponent _someComponent1;
-```
-```c#
-// Для SerializeReference добавляет кнопку выбора доступной реализации ITemplateNode
-[SerializeReference, ComponentTemplateField]
-private ITemplateNode _someComponent1;
-```
-
-Обертка `ComponentTemplateProperty`:
-```c#
-// Обертка над ITemplateNode, аналогично примеру с атрибутом ComponentTemplateField.
-private ComponentTemplateProperty _someComponent2;
-```
-
-Оба подхода работают и для массивов:
-```c#
-[SerializeReference, ComponentTemplateField]
-private IComponentTemplate[] _components;
-// или
-private ComponentTemplateProperty[] _components;
-```
 
 </br>
 
@@ -491,6 +451,125 @@ public class EcsRoot : MonoBehaviour
         _pipeline.LateRun();
     }
     // ...
+}
+```
+
+</br>
+
+
+# Кастомизация инспектора
+
+## Атрибуты инспектора
++ **[ReferenceDropDown]** -
+Применяется к полю с `[SerializeReference]`. Добавляет кнопку выбора типа из списка. Можно ограничить набор доступных типов, передав список в конструктор.
++ **[ReferenceDropDownWithout]** -
+Используется вместе с `[ReferenceDropDown]`, чтобы исключить указанные типы (и их наследников) из списка выбора.
++ **[DragonMetaBlock]** -
+Отображает значение в инспекторе так же, как компоненты в шаблонах сущности. Учитывает meta-атрибуты (`MetaGroup`, `MetaColor`, `MetaDescription`, `MetaID` и др.).
+
+
+## Поведение Meta-атрибутов
++ Иерархическая группировка элементов в меню `Add Component` или `[ReferenceDropDown]` задаётся через `[MetaGroup]`.
++ Цвет компонента в инспекторе по умолчанию определяется именем типа. Режим окраски можно изменить в окне настроек. Явный цвет задаётся через `[MetaColor]`.
++ При совпадении имени типа и файла (или при наличии `[MetaID]`) рядом с кнопкой удаления появляется иконка файла: один клик — выделение скрипта в проекте, двойной клик — открытие.
++ Если указан `[MetaDescription]`, рядом отображается иконка подсказки с текстом описания.
++ При восстановлении **Missing Reference** с помощью [**Reference Repairer**](#Reference-Repairer), инструмент ищет соответствие старого и нового имени типа по атрибуту `[MetaID(id)]`.
+
+
+## Примеры:
+
+Атрибут `DragonMetaBlock`:
+```c#
+// Отображение поля настраиваемое мета-атрибутами.
+// Аналогично компонентам в MonoEntityTemplate или ScriptableEntityTemplate.
+[DragonMetaBlock]
+public SomeComponent Component;
+
+// Можно применять к любому полю любого типа.
+[DragonMetaBlock]
+public Foo Foo;
+```
+
+`ReferenceDropDown` и `ReferenceDropDownWithout`:
+```c#
+// Добавляет кнопку выбора реализации ITemplateNode из выпадающего списка.
+[SerializeReference]
+[ReferenceDropDown]
+public ITemplateNode Template;
+```
+
+```c#
+// Так же можно применять к любому полю любого типа. 
+// В списке будут только тип Foo и его наследники, исключая FooExc и его наследников.
+[SerializeReference]
+[ReferenceDropDown(typeof(Foo))]
+[ReferenceDropDownWithout(typeof(FooExc))]
+public object Template;
+```
+
+Комбинирование и другие варианты использования:
+```c#
+// Атрибуты можно комбинировать.
+[DragonMetaBlock]
+[ReferenceDropDown]
+public ITemplateNode Template;
+
+// Обертка над ITemplateNode, аналогично примеру выше.
+public ComponentTemplateProperty Template;
+
+// Атрибуты корректно работают с массивами и листами.
+[DragonMetaBlock]
+[ReferenceDropDown]
+public ITemplateNode[] Template;
+```
+
+</br>
+
+# Поддержка Jobs
+
+DragonECS по умолчанию совместим с Job системой Unity. Пример:
+```c#
+EcsWorld _world;
+class Aspect : EcsAspect
+{
+    // Пул для unmanaged компонентов.
+    public EcsValuePool<Cmp> Cmps = Inc;
+}
+public void Run()
+{
+    var job = new Job()
+    {
+        // Идентично Where, но возвращает unmanaged список сущностей.
+        Entities = _world.WhereUnsafe(out Aspect a),
+        // Конвертация пула в unmanaged версию
+        Cmps = a.Cmps.AsNative(),
+        X = 10f,
+    };
+    JobHandle jobHandle = job.Schedule(job.Entities.Count, 64);
+    jobHandle.Complete();
+}
+```
+```c#
+// Unmanaged компонент.
+public struct Cmp : IEcsValueComponent
+{
+    public float A;
+}
+private struct Job : IJobParallelFor
+{
+    public EcsUnsafeSpan Entities;
+    public NativeEcsValuePool<Cmp> Cmps;
+    public float X;
+    public Job(EcsUnsafeSpan entities, float x)
+    {
+        Entities = entities;
+        X = x;
+    }
+    public void Execute(int index)
+    {
+        var e = Entities[index];
+        Cmps[e].A += X;
+    }
 }
 ```
 
