@@ -178,8 +178,10 @@ namespace DCFApixels.DragonECS
             {
                 case CloneMethod.Set:
                     return component;
+#if DEBUG
                 case CloneMethod.Clone_Reflection:
                     return (T)component.Clone_Reflection();
+#endif
                 case CloneMethod.ICloneable:
                     return (T)_defaultValueCloneable.Clone();
             }
