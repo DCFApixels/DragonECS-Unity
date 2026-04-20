@@ -904,7 +904,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         internal static bool IsNullManagedReference(this SerializedProperty property)
         {
+#if UNITY_2021_3_OR_NEWER
             return property.managedReferenceId == ManagedReferenceUtility.RefIdNull;
+#else
+            return property.managedReferenceId == SerializationUtility.RefIdNull;
+#endif
         }
         internal static int GetChildPropertiesCount(this SerializedProperty property, Type type, out bool isEmpty)
         {
