@@ -9,6 +9,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CanEditMultipleObjects]
     internal class EcsEntityConnectEditor : ExtendedEditor<EcsEntityConnect>
     {
+        public override bool RequiresConstantRepaint()
+        {
+            return UserSettingsPrefs.instance.RuntimeDrawMode == RuntimeDrawMode.Live ? true : base.RequiresConstantRepaint();
+        }
         protected override void DrawCustom()
         {
             DrawEntityInfo();
