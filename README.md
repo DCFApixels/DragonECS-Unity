@@ -167,7 +167,7 @@ Located together with `WorldMonitor`, shows a list of all Where queries that sys
 Displays entity state and allows adding, modifying or removing components at runtime (Play Mode). One monitor is created per entity; entity monitors are grouped under the corresponding world monitor.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1">   
+<img src="https://github.com/user-attachments/assets/fc7ac96d-a9a4-45bd-9695-e80f790495ef">   
 </p>
 
 -----
@@ -641,7 +641,7 @@ A documentation window based on meta-attributes is available via `Tools > Dragon
 The settings window exposes several options, including component display modes in the Inspector. At the bottom, toggles for framework define symbols are available. Open via `Tools > DragonECS > Settings`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
+<img src="https://github.com/user-attachments/assets/e0e84846-bde3-4321-8faf-637dd9522837">   
 </p>
 
 </br>
