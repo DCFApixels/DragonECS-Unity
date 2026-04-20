@@ -8,6 +8,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [CustomEditor(typeof(EntityMonitor))]
     internal class EntityMonitorEditor : ExtendedEditor<EntityMonitor>
     {
+        public override bool RequiresConstantRepaint()
+        {
+            return UserSettingsPrefs.instance.RuntimeDrawMode == RuntimeDrawMode.Live ? true : base.RequiresConstantRepaint();
+        }
         protected override void DrawCustom()
         {
             var entity = Target.Entity;

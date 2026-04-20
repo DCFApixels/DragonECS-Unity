@@ -47,10 +47,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
             set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
         }
-        protected static ComponentColorMode ComponentColorMode
+        protected static MetaBlockColorMode ComponentColorMode
         {
-            get { return UserSettingsPrefs.instance.ComponentColorMode; }
-            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
+            get { return UserSettingsPrefs.instance.MetaBlockColorMode; }
+            set { UserSettingsPrefs.instance.MetaBlockColorMode = value; }
         }
 
         protected bool IsMultipleTargets => targets.Length > 1;
@@ -210,10 +210,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
             set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
         }
-        protected static ComponentColorMode ComponentColorMode
+        protected static MetaBlockColorMode ComponentColorMode
         {
-            get { return UserSettingsPrefs.instance.ComponentColorMode; }
-            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
+            get { return UserSettingsPrefs.instance.MetaBlockColorMode; }
+            set { UserSettingsPrefs.instance.MetaBlockColorMode = value; }
         }
         protected virtual bool IsStaticInit { get { return _isStaticInit; } }
         protected virtual bool IsInit { get { return _isInit; } }

@@ -28,6 +28,12 @@ namespace DCFApixels.DragonECS.Unity.Internal
             r.xMin += with;
             return (l, r);
         }
+        public static Rect HorizontalGetLeft(in this Rect rect, float with)
+        {
+            Rect l = rect;
+            l.xMax = l.xMin + with;
+            return l;
+        }
         public static (Rect, Rect) HorizontalSliceRight(in this Rect rect, float with)
         {
             Rect l = rect;

@@ -222,11 +222,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 public VerticalScope(GUILayoutOption[] options) { GUILayout.BeginVertical(options); }
                 public VerticalScope(GUIStyle style, GUILayoutOption[] options) { GUILayout.BeginVertical(style, options); }
+                public VerticalScope(GUIStyle style, Color backgroundColor, GUILayoutOption[] options)
+                {
+                    using (SetColor(backgroundColor))
+                    {
+                        GUILayout.BeginVertical(style, options);
+                    }
+                }
                 public VerticalScope(Color backgroundColor, GUILayoutOption[] options)
                 {
                     using (SetColor(backgroundColor))
                     {
-                        GUILayout.BeginVertical(UnityEditorUtility.GetWhiteStyle(), options);
+                        GUILayout.BeginVertical(UnityEditorUtility.GetWhiteStyleWithPadding(), options);
                     }
                 }
                 public void Dispose() { GUILayout.EndVertical(); }
@@ -239,7 +246,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     using (SetColor(backgroundColor))
                     {
-                        GUILayout.BeginHorizontal(UnityEditorUtility.GetWhiteStyle(), options);
+                        GUILayout.BeginHorizontal(UnityEditorUtility.GetWhiteStyleWithPadding(), options);
                     }
                 }
                 public void Dispose() { GUILayout.EndHorizontal(); }
@@ -262,6 +269,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             public static VerticalScope BeginVertical(params GUILayoutOption[] options) => new VerticalScope(options);
             public static VerticalScope BeginVertical(GUIStyle style, params GUILayoutOption[] options) => new VerticalScope(style, options);
             public static VerticalScope BeginVertical(Color backgroundColor, params GUILayoutOption[] options) => new VerticalScope(backgroundColor, options);
+            public static VerticalScope BeginVertical(GUIStyle style, Color backgroundColor, params GUILayoutOption[] options) => new VerticalScope(style, backgroundColor, options);
         }
         public static CheckChangedScope CheckChanged() => CheckChangedScope.New();
         public static CheckChangedScopeWithAutoApply CheckChanged(SerializedObject serializedObject) => new CheckChangedScopeWithAutoApply(serializedObject);
@@ -323,10 +331,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get => EditorGUIUtility.standardVerticalSpacing;
         }
-        private static ComponentColorMode AutoColorMode
+        private static MetaBlockColorMode MetaBlockColorMode
         {
-            get { return UserSettingsPrefs.instance.ComponentColorMode; }
-            set { UserSettingsPrefs.instance.ComponentColorMode = value; }
+            get { return UserSettingsPrefs.instance.MetaBlockColorMode; }
+            set { UserSettingsPrefs.instance.MetaBlockColorMode = value; }
         }
         private static bool IsShowHidden
         {
@@ -784,7 +792,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             if (meta == null)
             {
-                EditorGUI.DrawRect(rect, Color.black.SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA));
+                EditorGUI.DrawRect(rect, Color.black.SetAlpha(EscEditorConsts.MetaBlockFillStyle_Alpha));
                 return (DrawTypeMetaBlockResultFlags.None, 0f);
             }
 
@@ -803,11 +811,34 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-            Color panelColor = SelectPanelColor(meta, positionIndex, total)
-                .Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE)
-                .SetAlpha(EscEditorConsts.COMPONENT_DRAWER_ALPHA);
-
-            EditorGUI.DrawRect(rect, panelColor);
+            if(Event.current.type == EventType.Repaint)
+            {
+                switch (UserSettingsPrefs.instance.MetaBlockRectStyle)
+                {
+                    default:
+                    case MetaBlockRectStyle.Clean:
+                        {
+                            EditorGUI.DrawRect(rect, Color.white.SetAlpha(EscEditorConsts.MetaBlockCleanStyle_Alpha));
+                        }
+                        break;
+                    case MetaBlockRectStyle.Edge:
+                        {
+                            EditorGUI.DrawRect(rect, Color.white.SetAlpha(EscEditorConsts.MetaBlockCleanStyle_Alpha));
+                            Color panelColor = SelectPanelColor(meta, positionIndex, total)
+                                .SetAlpha(EscEditorConsts.MetaBlockEdgeStyle_Alpha);
+                            EditorGUI.DrawRect(rect.HorizontalGetLeft(4f), panelColor);
+                        }
+                        break;
+                    case MetaBlockRectStyle.Fill:
+                        {
+                            Color panelColor = SelectPanelColor(meta, positionIndex, total)
+                                .Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE)
+                                .SetAlpha(EscEditorConsts.MetaBlockFillStyle_Alpha);
+                            EditorGUI.DrawRect(rect, panelColor);
+                        }
+                        break;
+                }
+            }
 
             float optionsWidth = 0f;
             Rect optionRect = rect;
@@ -926,13 +957,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                switch (AutoColorMode)
+                switch (MetaBlockColorMode)
                 {
-                    case ComponentColorMode.Auto:
+                    case MetaBlockColorMode.Auto:
                         {
                             return color.ToUnityColor().Desaturate(0.48f) / 1.18f; //.Desaturate(0.48f) / 1.18f;
                         }
-                    case ComponentColorMode.Rainbow:
+                    case MetaBlockColorMode.Rainbow:
                         {
                             int localTotal = Mathf.Max(total, EscEditorConsts.AUTO_COLOR_RAINBOW_MIN_RANGE);
                             Color hsv = Color.HSVToRGB(1f / localTotal * (index % localTotal), 1, 1);

@@ -4,16 +4,16 @@ using System.Collections.Generic;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal class ExpandMatrix
+    internal class ExpandStack
     {
         private const bool TOP_DEFAULT = true;
         private const bool DEFAULT = false;
-        private static Dictionary<Type, ExpandMatrix> _instances = new Dictionary<Type, ExpandMatrix>();
-        public static ExpandMatrix Take(Type type)
+        private static Dictionary<Type, ExpandStack> _instances = new Dictionary<Type, ExpandStack>();
+        public static ExpandStack Take(Type type)
         {
-            if (_instances.TryGetValue(type, out ExpandMatrix result) == false)
+            if (_instances.TryGetValue(type, out ExpandStack result) == false)
             {
-                result = new ExpandMatrix();
+                result = new ExpandStack();
                 _instances.Add(type, result);
             }
             return result;

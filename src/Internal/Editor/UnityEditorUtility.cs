@@ -120,7 +120,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                if (AssemblyFilter.IsExcludedAssembly(assembly)) { continue; }
+                //var targetTypes = assembly.GetTypes().Where(type =>
+                //    (type.IsGenericType || type.IsAbstract || type.IsInterface) == false &&
+                //    type.IsSubclassOf(typeof(UnityObject)) == false &&
+                //    type.GetCustomAttribute<SerializableAttribute>() != null);
 
                 foreach (var type in assembly.GetTypes())
                 {
@@ -454,7 +457,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         #region GetDefaultStyle
         private static Texture2D _whiteTexture;
+
+        private static GUIStyle _whiteStyleWithPadding;
         private static GUIStyle _whiteStyle;
+        private static GUIStyle _whiteEdgeStyle;
+
         private static GUIStyle _transperentBlackBackgrounStyle;
         private static GUIStyle _clearBackgrounStyle;
         public static Texture2D GetWhiteTexture()
@@ -467,15 +474,33 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         private static bool IsNotInitializedStyle(GUIStyle style)
         {
+            //return style == null || style.normal.background == null;
             return style == null || style.normal.background == null;
+        }
+        public static GUIStyle GetWhiteStyleWithPadding()
+        {
+            if (IsNotInitializedStyle(_whiteStyleWithPadding))
+            {
+                _whiteStyleWithPadding = CreateStyle(GetWhiteTexture());
+            }
+            return _whiteStyleWithPadding;
         }
         public static GUIStyle GetWhiteStyle()
         {
             if (IsNotInitializedStyle(_whiteStyle))
             {
-                _whiteStyle = CreateStyle(GetWhiteTexture(), GUI.skin.label);
+                _whiteStyle = CreateStyle(GetWhiteTexture());
+                _whiteStyle.padding = new RectOffset(0,0,0,0);
             }
             return _whiteStyle;
+        }
+        public static GUIStyle GetWhiteEdge4Style()
+        {
+            if (IsNotInitializedStyle(_whiteEdgeStyle))
+            {
+                _whiteEdgeStyle = CreateEdge4Style();
+            }
+            return _whiteEdgeStyle;
         }
         public static GUIStyle GetTransperentBlackBackgrounStyle()
         {
@@ -502,7 +527,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 referenceStyle = GUI.skin.box;
             }
-            GUIStyle result = new GUIStyle(GUI.skin.box);
+            GUIStyle result = new GUIStyle(referenceStyle);
             Texture2D texture2D = texture;
             result.hover.background = texture2D;
             result.hover.scaledBackgrounds = Array.Empty<Texture2D>();
@@ -512,6 +537,57 @@ namespace DCFApixels.DragonECS.Unity.Editors
             result.active.scaledBackgrounds = Array.Empty<Texture2D>();
             result.normal.background = texture2D;
             result.normal.scaledBackgrounds = Array.Empty<Texture2D>();
+            return result;
+        }
+        private static GUIStyle CreateEdge4Style(GUIStyle referenceStyle = null)
+        {
+            const int Size = 8;
+            const int EdgeSize = 4;
+
+            var pixels = new Color[Size * Size];
+            for (var i = 0; i < pixels.Length; ++i)
+            {
+                pixels[i] = Color.clear;
+            }
+            for (int y = 0; y < Size; y++)
+            {
+                for (int x = 0; x < EdgeSize; x++)
+                {
+                    pixels[y * Size + x] = Color.white;
+                }
+            }
+            var texture = new Texture2D(Size, Size)
+            {
+                filterMode = FilterMode.Point
+            };
+            texture.SetPixels(pixels);
+            texture.Apply();
+
+            if (referenceStyle == null)
+            {
+                referenceStyle = GUI.skin.box;
+            }
+            GUIStyle result = new GUIStyle(referenceStyle);
+            Texture2D texture2D = texture;
+            result.hover.background = texture2D;
+            result.hover.scaledBackgrounds = Array.Empty<Texture2D>();
+            result.focused.background = texture2D;
+            result.focused.scaledBackgrounds = Array.Empty<Texture2D>();
+            result.active.background = texture2D;
+            result.active.scaledBackgrounds = Array.Empty<Texture2D>();
+            result.normal.background = texture2D;
+            result.normal.scaledBackgrounds = Array.Empty<Texture2D>();
+
+            result.margin = new RectOffset(0, 0, 0, 0);
+            result.overflow = new RectOffset(0, 0, 0, 0);
+            result.border = new RectOffset(EdgeSize, 0, 0, 0);
+            result.contentOffset = Vector2.zero;
+            result.fixedHeight = 0;
+            result.fixedWidth = 0;
+            result.richText = false;
+
+            var l = GUI.skin.box.padding.left;
+            result.padding = new RectOffset(l + 4, l, l, l);
             return result;
         }
         private static Texture2D CreateTexture(int width, int height, Color color)
@@ -584,52 +660,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _worldDatas.Remove(_world);
             }
             public void OnWorldResize(int newSize) { }
-        }
-    }
-
-    public static class AssemblyFilter
-    {
-        private static readonly HashSet<string> ExcludedPrefixes = new HashSet<string>
-        {
-            "Unity.",
-            "UnityEngine.",
-            "UnityEditor.",
-            "System.",
-            "mscorlib",
-            "netstandard",
-            "Mono.",
-            "Microsoft.",
-            "Mono.Security"
-        };
-
-        private static readonly HashSet<string> ExactedExcludedNames = new HashSet<string>
-        {
-            "System",
-            "System.Core",
-            "System.Xml",
-            "System.Runtime",
-            "System.Collections",
-            "System.Linq",
-            "System.Text.RegularExpressions",
-            "UnityEngine",
-            "UnityEditor",
-        };
-
-        public static bool IsExcludedAssembly(Assembly assembly)
-        {
-            string assemblyName = assembly.GetName().Name;
-            if (ExactedExcludedNames.Contains(assemblyName))
-            {
-                return true;
-            }
-            foreach (var prefix in ExcludedPrefixes)
-            {
-                if (assemblyName.StartsWith(prefix, StringComparison.Ordinal))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

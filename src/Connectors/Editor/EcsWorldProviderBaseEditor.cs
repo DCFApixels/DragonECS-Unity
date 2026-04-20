@@ -42,7 +42,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             using (DragonGUI.SetBackgroundColor(labelBackColor))
             {
-                GUILayout.Box("Is Empty", UnityEditorUtility.GetWhiteStyle(), GUILayout.ExpandWidth(true));
+                GUILayout.Box("Is Empty", UnityEditorUtility.GetWhiteStyleWithPadding(), GUILayout.ExpandWidth(true));
             }
 
             DragonGUI.Layout.DrawWorldBaseInfo(Target.GetCurrentWorldRaw());

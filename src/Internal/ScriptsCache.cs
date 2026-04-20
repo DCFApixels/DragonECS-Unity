@@ -351,7 +351,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (string.IsNullOrEmpty(item.scriptPath) == false)
                 {
-                    _metaIDScriptPathPairs.Add(item.metaID, item.scriptPath);
+                    _metaIDScriptPathPairs[item.metaID] = item.scriptPath;
                 }
             }
         }

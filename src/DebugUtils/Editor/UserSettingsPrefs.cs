@@ -4,7 +4,18 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal enum ComponentColorMode
+    internal enum RuntimeDrawMode
+    {
+        Lazy,
+        Live,
+    }
+    internal enum MetaBlockRectStyle
+    {
+        Clean,
+        Edge,
+        Fill,
+    }
+    internal enum MetaBlockColorMode
     {
         Generic = 0,
         Auto = 1,
@@ -99,15 +110,45 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
         [SerializeField]
-        private ComponentColorMode _componentColorMode = ComponentColorMode.Auto;
-        public ComponentColorMode ComponentColorMode
+        private RuntimeDrawMode _runtimeDrawMode = RuntimeDrawMode.Live;
+        public RuntimeDrawMode RuntimeDrawMode
         {
-            get => _componentColorMode;
+            get => _runtimeDrawMode;
             set
             {
-                if (_componentColorMode != value)
+                if (_runtimeDrawMode != value)
                 {
-                    _componentColorMode = value;
+                    _runtimeDrawMode = value;
+                    AutoSave();
+                }
+            }
+        }
+
+
+        [SerializeField]
+        private MetaBlockRectStyle _metaBlockRectStyle = MetaBlockRectStyle.Edge;
+        public MetaBlockRectStyle MetaBlockRectStyle
+        {
+            get => _metaBlockRectStyle;
+            set
+            {
+                if (_metaBlockRectStyle != value)
+                {
+                    _metaBlockRectStyle = value;
+                    AutoSave();
+                }
+            }
+        }
+        [SerializeField]
+        private MetaBlockColorMode _metaBlockColorMode = MetaBlockColorMode.Auto;
+        public MetaBlockColorMode MetaBlockColorMode
+        {
+            get => _metaBlockColorMode;
+            set
+            {
+                if (_metaBlockColorMode != value)
+                {
+                    _metaBlockColorMode = value;
                     AutoSave();
                 }
             }

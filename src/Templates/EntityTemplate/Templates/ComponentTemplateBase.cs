@@ -10,6 +10,19 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using UnityEngine;
 
+namespace DCFApixels.DragonECS.Unity
+{
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, Inherited = true, AllowMultiple = false)]
+    public sealed class DragonMemberWrapperAttribute : Attribute
+    {
+        public string WrappedFieldName;
+        public DragonMemberWrapperAttribute(string wrappedFieldName)
+        {
+            WrappedFieldName = wrappedFieldName;
+        }
+    }
+}
+
 namespace DCFApixels.DragonECS
 {
 
@@ -178,10 +191,8 @@ namespace DCFApixels.DragonECS
             {
                 case CloneMethod.Set:
                     return component;
-#if DEBUG
                 case CloneMethod.Clone_Reflection:
                     return (T)component.Clone_Reflection();
-#endif
                 case CloneMethod.ICloneable:
                     return (T)_defaultValueCloneable.Clone();
             }

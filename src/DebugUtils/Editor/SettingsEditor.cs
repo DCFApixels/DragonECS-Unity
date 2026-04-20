@@ -27,14 +27,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void OnGUI()
         {
             var prefs = UserSettingsPrefs.instance;
-            float labelWidth = EditorGUIUtility.labelWidth;
-            EditorGUIUtility.labelWidth = 0f;
-
-            //float checkBoxWidth = 20f;
 
             GUILayout.Space(20f);
-            using (new DragonGUI.ColorScope(Color.white * 0.5f))
-                GUILayout.BeginVertical(EditorStyles.helpBox);
+            using (new DragonGUI.ColorScope(Color.white * 0.5f)) GUILayout.BeginVertical(EditorStyles.helpBox);
             //using (new EcsGUI.ColorScope(Color.white * 1.2f))
             GUILayout.Label("", EditorStyles.toolbar, GUILayout.ExpandWidth(true), GUILayout.Height(22f));
             Rect rect = GUILayoutUtility.GetLastRect();
@@ -57,7 +52,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
                 prefs.IsUseCustomNames);
 
-            prefs.ComponentColorMode = (ComponentColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ComponentColorMode)), prefs.ComponentColorMode);
+            prefs.RuntimeDrawMode = (RuntimeDrawMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.RuntimeDrawMode)), prefs.RuntimeDrawMode);
+            prefs.MetaBlockRectStyle = (MetaBlockRectStyle)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.MetaBlockRectStyle)), prefs.MetaBlockRectStyle);
+            prefs.MetaBlockColorMode = (MetaBlockColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.MetaBlockColorMode)), prefs.MetaBlockColorMode);
+
 
             GUILayout.EndVertical();
 
@@ -87,8 +85,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 InitDefines();
             }
             GUILayout.EndVertical();
-
-            EditorGUIUtility.labelWidth = labelWidth;
         }
     }
 }

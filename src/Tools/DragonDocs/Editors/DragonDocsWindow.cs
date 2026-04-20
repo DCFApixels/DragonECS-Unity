@@ -269,7 +269,7 @@ namespace DCFApixels.DragonECS.Unity.Docs.Editors
             {
                 Color panelColor = DragonGUI.SelectPanelColor(meta.Color.ToMetaColor(), meta.IsCustomColor, index, total).Desaturate(EscEditorConsts.COMPONENT_DRAWER_DESATURATE);
                 Color alphaPanelColor = panelColor;
-                alphaPanelColor.a = EscEditorConsts.COMPONENT_DRAWER_ALPHA;
+                alphaPanelColor.a = EscEditorConsts.MetaBlockFillStyle_Alpha;
 
                 using (DragonGUI.Layout.BeginVertical(alphaPanelColor))
                 {
