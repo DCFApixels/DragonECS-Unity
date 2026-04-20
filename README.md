@@ -48,7 +48,6 @@ This package integrates DragonECS with the Unity editor and runtime. It provides
 - [Installation](#installation)
 - [Debug](#debug)
   - [Debug service](#debug-service)
-  - [Debug module](#debug-module)
   - [Visual debugging](#visual-debugging)
 - [Templates](#templates)
 - [Binding to GameObjects](#binding-to-gameobjects)

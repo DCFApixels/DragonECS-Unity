@@ -49,18 +49,17 @@
 - [Установка](#установка)
 - [Debug](#debug)
   - [Debug Сервис](#debug-сервис)
-  - [Debug Модуль](#debug-модуль)
   - [Визуальная отладка](#визуальная-отладка)
 - [Шаблоны](#шаблоны)
 - [Связь с GameObject](#связь-с-gameobject)
 - [World Provider](#world-provider)
 - [Шаблон Пайплайна](#шаблон-пайплайна)
-- [FixedUpdate LateUpdate](#fixedupdate-lateupdate)
+- [FixedUpdate и LateUpdate](#fixedupdate-и-lateupdate)
 - [Кастомизация инспектора](#Кастомизация-инспектора)
 - [Поддержка Jobs](#Поддержка-Jobs)
 - [Документация проекта](#документация-проекта)
 - [Окно настроек](#окно-настроек)
-- [Reference Repairer](#Reference-Repairer)
+- [Reference Repairer](#reference-repairer)
 - [FAQ](#faq)
 
 </br>
@@ -167,7 +166,7 @@ _pipeline = EcsPipeline.New()
 Показывает состояние сущности мира, позволяет добавлять/изменять/удалять компоненты по время Play Mode. На каждую сущность в мире создается отдельный монитор. Все мониторы сущностей помещаются в монитор мира.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/509ff472-05b5-4fd8-a0e6-739d7fa81ab1">   
+<img src="https://github.com/user-attachments/assets/fc7ac96d-a9a4-45bd-9695-e80f790495ef">   
 </p>
 
 -----
@@ -599,7 +598,7 @@ private struct Job : IJobParallelFor
 В окне настроек доступно несколько опций, включая режимы отображения компонентов в инспекторе. Внизу находятся переключатели для define-переменных, используемых в фреймворке. Открыть окно настроек: `Tools > DragonECS > Settings`.
 
 <p align="center">
-<img src="https://github.com/DCFApixels/DragonECS-Unity/assets/99481254/c794be8d-6884-4415-b24a-0a1a28f577a6">   
+<img src="https://github.com/user-attachments/assets/905c03dd-d277-48b9-9963-455a09c4ceda">   
 </p>
 
 </br>
