@@ -187,7 +187,7 @@ namespace DCFApixels.DragonECS
         public sealed override void SetRaw(object raw) { component = (T)raw; }
         protected virtual T CloneComponent(T component)
         {
-#if DEBUG
+#if UNITY_EDITOR
             switch (_defaultValueCloneMethod)
             {
                 case CloneMethod.Set:
