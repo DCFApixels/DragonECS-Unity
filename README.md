@@ -641,7 +641,7 @@ A documentation window based on meta-attributes is available via `Tools > Dragon
 The settings window exposes several options, including component display modes in the Inspector. At the bottom, toggles for framework define symbols are available. Open via `Tools > DragonECS > Settings`.
 
 <p align="center">
-<img src="https://github.com/user-attachments/assets/e0e84846-bde3-4321-8faf-637dd9522837">   
+<img src="https://github.com/user-attachments/assets/905c03dd-d277-48b9-9963-455a09c4ceda">   
 </p>
 
 </br>
