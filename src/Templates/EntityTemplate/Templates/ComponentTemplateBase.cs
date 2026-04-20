@@ -187,6 +187,7 @@ namespace DCFApixels.DragonECS
         public sealed override void SetRaw(object raw) { component = (T)raw; }
         protected virtual T CloneComponent(T component)
         {
+#if DEBUG
             switch (_defaultValueCloneMethod)
             {
                 case CloneMethod.Set:
@@ -196,6 +197,7 @@ namespace DCFApixels.DragonECS
                 case CloneMethod.ICloneable:
                     return (T)_defaultValueCloneable.Clone();
             }
+#endif
             return default;
         }
         object ICloneable.Clone()
