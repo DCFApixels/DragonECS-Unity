@@ -6,14 +6,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
     internal enum RuntimeDrawMode
     {
-        Lazy,
-        Live,
+        Lazy = 0,
+        Live = 1,
     }
     internal enum MetaBlockRectStyle
     {
-        Clean,
-        Edge,
-        Fill,
+        Clean = 0,
+        Edge = 1,
+        Fill = 2,
     }
     internal enum MetaBlockColorMode
     {
@@ -126,7 +126,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
         [SerializeField]
-        private MetaBlockRectStyle _metaBlockRectStyle = MetaBlockRectStyle.Edge;
+        private MetaBlockRectStyle _metaBlockRectStyle = MetaBlockRectStyle.Fill;
         public MetaBlockRectStyle MetaBlockRectStyle
         {
             get => _metaBlockRectStyle;
