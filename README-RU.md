@@ -68,7 +68,7 @@
 Семантика версионирования - [Открыть](https://gist.github.com/DCFApixels/af79284955bf40e9476cdcac79d7b098#file-dcfapixels_versioning-md)
 ## Окружение
 Обязательные требования:
-+ Зависимость: [DragonECS](https://github.com/DCFApixels/DragonECS)
++ Зависимость: [DragonECS](https://github.com/DCFApixels/DragonECS) `[1.0.0]`;
 + Минимальная версия C# 8.0;
 + Минимальная версия Unity 2021.2.0;
 

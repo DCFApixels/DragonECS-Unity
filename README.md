@@ -68,7 +68,7 @@ Versioning semantics - [Open](https://gist.github.com/DCFApixels/af79284955bf40e
 
 ## Environment
 Requirements:
-- Dependency: [DragonECS](https://github.com/DCFApixels/DragonECS)
+- Dependency: [DragonECS](https://github.com/DCFApixels/DragonECS) `[1.0.0]`;
 - Minimum C# version: 8.0
 - Minimum Unity version: 2021.2.0
 
