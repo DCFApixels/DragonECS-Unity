@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Internal
 {
@@ -7,12 +8,25 @@ namespace DCFApixels.DragonECS.Unity.Internal
 	{
 		public static Func<object, object> GetCloneMethod(Type type)
 		{
-			var cloneMethod = GetCloneMethodInfo(type);
-			if(cloneMethod != null)
+			var cloneMethod = GetClonableMethodInfo(type);
+			if (cloneMethod != null)
 			{
 				return (object v) => { return cloneMethod.Invoke(v, Array.Empty<object>()); };
 			}
-			return (object v) => { return v; };
+
+			if (type.IsValueType)
+			{
+				return (object v) => { return v; };
+			}
+			else
+			{
+				return (object v) =>
+				{
+					var json = JsonUtility.ToJson(v);
+					return JsonUtility.FromJson(json, type);
+				};
+			}
+
 		}
 		public static bool TryFindDefaultOrEmptyField(Type type, out FieldInfo field, out bool nameIsEmpty)
 		{
@@ -33,30 +47,24 @@ namespace DCFApixels.DragonECS.Unity.Internal
 			return false;
 		}
 
-		private static MethodInfo GetCloneMethodInfo(Type type)
+		private static MethodInfo GetClonableMethodInfo(Type type)
 		{
-			// Проверяем, реализует ли тип ICloneable
 			if (!typeof(ICloneable).IsAssignableFrom(type))
+			{
 				return null;
+			}
 
-			// Получаем метод интерфейса
 			var interfaceMethod = typeof(ICloneable).GetMethod("Clone");
-
-			// Получаем карту интерфейса для данного типа
 			var map = type.GetInterfaceMap(typeof(ICloneable));
-
-			// Ищем соответствие
 			for (int i = 0; i < map.InterfaceMethods.Length; i++)
 			{
 				if (map.InterfaceMethods[i] == interfaceMethod)
 				{
-					return map.TargetMethods[i]; // реальный метод в типе
+					return map.TargetMethods[i];
 				}
 			}
 
-
-			var memberwiseClone = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
-			return memberwiseClone;
+			return null;
 		}
 	}
 	public static class InternalInstantiationUtility<T>
@@ -105,8 +113,11 @@ namespace DCFApixels.DragonECS.Unity.Internal
 				{
 					if(_isValueType == false && nameIsEmpty == false)
 					{
-						var memberwiseCloneMethdo = typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic);
-						_cloneDefaultValueMethod = (T v) => { return (T)memberwiseCloneMethdo.Invoke(v, Array.Empty<object>()); };
+						_cloneDefaultValueMethod = (T v) => 
+						{
+							var json = JsonUtility.ToJson(v);
+							return JsonUtility.FromJson<T>(json);
+						};
 						_createDefaultInstanceMethod = CreateDefaultInstanceMethod.CloneDefaultValue;
 					}
 				}
