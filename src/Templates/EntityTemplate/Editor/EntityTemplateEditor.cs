@@ -55,87 +55,21 @@ namespace DCFApixels.DragonECS.Unity.Editors
             DragonGUI.Changed = true;
         }
 
-        private SerializedProperty GetTargetProperty(SerializedProperty prop)
-        {
-            IComponentTemplate template = prop.managedReferenceValue as IComponentTemplate;
-            if (template == null || prop.managedReferenceValue == null)
-            {
-                //DrawDamagedComponent_Replaced(componentRefProp, index);
-                return prop;
-            }
-
-            SerializedProperty componentProperty = prop;
-            if (componentProperty.managedReferenceValue is ComponentTemplateBase customTemplate)
-            {
-                componentProperty = prop.FindPropertyRelative("component");
-            }
-
-            return componentProperty == null ? prop : componentProperty;
-        }
-
         private float OnReorderableComponentsListElementHeight(int index)
         {
             SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
             GUIContent label = UnityEditorUtility.GetLabelTemp();
             return EditorGUI.GetPropertyHeight(prop, label) + Spacing * 2f;
-            //var componentProperty = GetTargetProperty(_componentTemplatesProp.GetArrayElementAtIndex(index));
-            //float result = EditorGUI.GetPropertyHeight(componentProperty);
-            //return EcsGUI.GetTypeMetaBlockHeight(result) + Spacing * 2f;
         }
         private void OnReorderableComponentsListDrawElement(Rect rect, int index, bool isActive, bool isFocused)
         {
-            if (index < 0 || Event.current.type == EventType.Used) { return; }
-            SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
+			if (index < 0 || Event.current.type == EventType.Used) { return; }
+			SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
             GUIContent label = UnityEditorUtility.GetLabelTemp();
             rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
 
             EditorGUI.PropertyField(rect, prop, label);
             return;
-            //rect = rect.AddPadding(OneLineHeight + Spacing, Spacing * 2f, Spacing, Spacing);
-            //using (EcsGUI.CheckChanged())
-            //{
-            //    SerializedProperty prop = _componentTemplatesProp.GetArrayElementAtIndex(index);
-            //
-            //    var template = prop.managedReferenceValue;
-            //    if (template == null)
-            //    {
-            //        //DrawDamagedComponent_Replaced(prop, index);
-            //        EditorGUI.PropertyField(rect, prop, UnityEditorUtility.GetLabel(prop.displayName), true);
-            //        return;
-            //    }
-            //    IComponentTemplate componentTemplate = template as IComponentTemplate;
-            //    var componentProp = GetTargetProperty(prop);
-            //
-            //    ITypeMeta meta = template as ITypeMeta;
-            //    if(meta == null)
-            //    {
-            //        if (componentTemplate != null)
-            //        {
-            //            meta = componentTemplate.ComponentType.GetMeta();
-            //        }
-            //        else
-            //        {
-            //            meta = template.GetMeta();
-            //        }
-            //    }
-            //
-            //    if (EcsGUI.DrawTypeMetaElementBlock(ref rect, _componentTemplatesProp, index, componentProp, meta).skip)
-            //    {
-            //        return;
-            //    }
-            //
-            //
-            //    GUIContent label = UnityEditorUtility.GetLabel(meta.Name);
-            //    if (componentProp.propertyType == SerializedPropertyType.Generic)
-            //    {
-            //        EditorGUI.PropertyField(rect, componentProp, label, true);
-            //    }
-            //    else
-            //    {
-            //        EditorGUI.PropertyField(rect.AddPadding(0, 20f, 0, 0), componentProp, label, true);
-            //    }
-            //
-            //}
         }
 
         private void OnReorderableComponentsListAdd(ReorderableList list)

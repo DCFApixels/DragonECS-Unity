@@ -3,12 +3,10 @@
 #endif
 using DCFApixels.DragonECS.Unity;
 using DCFApixels.DragonECS.Unity.Attributes;
-using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace DCFApixels.DragonECS
 {
@@ -29,7 +27,8 @@ namespace DCFApixels.DragonECS
         [SerializeReference]
         [ReferenceDropDown(true)]
         [DragonMetaBlock]
-        private ITemplateNode[] _componentTemplates;
+		[InlineInspector]
+		private ITemplateNode[] _componentTemplates;
 
         #region Methods
         public ReadOnlySpan<ScriptableEntityTemplateBase> GetTemplates()

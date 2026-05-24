@@ -276,7 +276,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 Init(property);
                 if(position.height == _lastRepaintRect.height)
                 {
-                    position = _lastRepaintRect;
+                    position.x = _lastRepaintRect.x;
+                    position.width = _lastRepaintRect.width;
 				}
                 DrawCustom(position, property, label);
             }
