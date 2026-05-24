@@ -57,7 +57,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                if(item is IComponentTemplate ct) { ct.OnValidate(gameObject); }
+                if (item is IComponentTemplate ct) { ct.OnValidate(gameObject); }
             }
         }
         private void OnDrawGizmos()
@@ -65,7 +65,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                if(item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Always); }
+                if (item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Always); }
             }
         }
         private void OnDrawGizmosSelected()
@@ -73,7 +73,7 @@ namespace DCFApixels.DragonECS
             if (_componentTemplates == null) { return; }
             foreach (var item in _componentTemplates)
             {
-                if(item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Selected); }
+                if (item is IComponentTemplate ct) { ct.OnGizmos(transform, IComponentTemplate.GizmosMode.Selected); }
             }
         }
         #endregion

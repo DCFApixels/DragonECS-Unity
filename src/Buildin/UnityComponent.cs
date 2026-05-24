@@ -59,20 +59,23 @@ namespace DCFApixels.DragonECS
     [MetaProxy(typeof(UnityComponentTemplate<>.UnityComponentMetaProxy))]
     public abstract class UnityComponentTemplate<T> : ComponentTemplateBase<UnityComponent<T>> where T : Component
     {
+        private bool _isInitDefault = false;
         public sealed override void Apply(short worldID, int entityID)
         {
             EcsWorld.GetPoolInstance<EcsPool<UnityComponent<T>>>(worldID).TryAddOrGet(entityID) = component;
         }
         public override void OnValidate(UnityEngine.Object obj)
         {
-            if (component.obj == null)
+            if (_isInitDefault == false && component.obj == null)
             {
                 if (obj is GameObject go)
                 {
                     component.obj = go.GetComponent<T>();
-                }
-            }
-        }
+
+				}
+                _isInitDefault = true;
+			}
+		}
         protected class UnityComponentMetaProxy : ComponentTemplateMetaProxy
         {
             public override string Name { get { return typeof(T).GetMeta().Name; } }

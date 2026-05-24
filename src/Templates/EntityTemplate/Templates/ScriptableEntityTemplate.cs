@@ -27,8 +27,8 @@ namespace DCFApixels.DragonECS
         [SerializeReference]
         [ReferenceDropDown(true)]
         [DragonMetaBlock]
-		[InlineInspector]
-		private ITemplateNode[] _componentTemplates;
+        [InlineInspector]
+        private ITemplateNode[] _componentTemplates;
 
         #region Methods
         public ReadOnlySpan<ScriptableEntityTemplateBase> GetTemplates()

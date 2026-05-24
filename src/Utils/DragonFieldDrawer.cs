@@ -10,18 +10,7 @@ using UnityEngine;
 namespace DCFApixels.DragonECS.Unity.Editors
 {
 	using DCFApixels.DragonECS.Unity.Attributes;
-	using System.Diagnostics;
 	using UnityEditor;
-	using static DCFApixels.DragonECS.ComponentTemplateProperty;
-
-	//[CustomPropertyDrawer(typeof(InlineInspectorAttribute), true)]
-	//public class DragonFieldDrawerX : PropertyDrawer
-	//{
-	//	public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
-	//	{
-	//		EcsDebug.PrintPass(Event.current.type + " " + position + "\r\n" + new StackTrace().ToString());
-	//	}
-	//}
 
 	[CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
     [CustomPropertyDrawer(typeof(DragonMetaBlockAttribute), true)]
@@ -117,7 +106,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override bool IsInit => _isInit;
         private bool IsDrawDropDown => ReferenceDropDownAttribute != null;
         private bool IsDrawMetaBlock => DragonMetaBlockAttribute != null;
-        private bool _isInlineInspector;
 		#endregion
 
 		#region Init
@@ -184,9 +172,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _dropDown.OnSelected += SelectComponent;
             }
 
-            _isInlineInspector = InlineInspectorAttribute != null && sp.propertyType == SerializedPropertyType.ObjectReference;
             _isInit = true;
         }
+
+        private bool CheckIsInilineInspector(SerializedProperty prop)
+        {
+            return InlineInspectorAttribute != null && prop.propertyType == SerializedPropertyType.ObjectReference;
+		}
 
         [ThreadStatic]
         private static SerializedProperty currentProperty;
@@ -277,7 +269,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     result = EditorGUI.GetPropertyHeight(componentProp, label);
                 }
-                if(_isInlineInspector && _cachedInlineInspectorHeightInit && componentProp.isExpanded)
+                if(CheckIsInilineInspector(componentProp) && _cachedInlineInspectorHeightInit && componentProp.isExpanded)
                 {
                     result += Mathf.Abs(_cachedInlineInspectorHeight);
                 }
@@ -356,9 +348,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             else
             {
-                if (_isInlineInspector)
+                if (CheckIsInilineInspector(componentProp))
                 {
-					bool unityObj = componentProp.objectReferenceValue;
+					var unityObj = componentProp.objectReferenceValue;
 					if (unityObj)
 					{
 						meta = unityObj.GetMeta();
@@ -432,7 +424,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (_hasSerializableData)
                 {
-                    if(_isInlineInspector)
+                    if(CheckIsInilineInspector(componentProp))
                     {
                         EditorGUI.BeginProperty(fieldRect, label, componentProp);
 						var position = fieldRect;
