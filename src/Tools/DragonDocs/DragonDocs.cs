@@ -1,4 +1,5 @@
 ﻿using DCFApixels.DragonECS.Core;
+using DCFApixels.DragonECS.Unity.Editors;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -40,6 +41,7 @@ namespace DCFApixels.DragonECS.Unity.Docs
             List<Type> result = new List<Type>(512);
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
+                if (AssemblyFilter.IsIgnoredAssembly(assembly)) { continue; }
                 foreach (var type in assembly.GetTypes())
                 {
                     if (TypeMeta.IsHasCustomMeta(type))
@@ -51,5 +53,4 @@ namespace DCFApixels.DragonECS.Unity.Docs
             return result;
         }
     }
-
 }
