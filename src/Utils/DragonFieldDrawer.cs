@@ -9,13 +9,13 @@ using UnityEngine;
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-	using DCFApixels.DragonECS.Unity.Attributes;
-	using UnityEditor;
+    using DCFApixels.DragonECS.Unity.Attributes;
+    using UnityEditor;
 
-	[CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
+    [CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
     [CustomPropertyDrawer(typeof(DragonMetaBlockAttribute), true)]
     [CustomPropertyDrawer(typeof(InlineInspectorAttribute), true)]
-	internal class DragonFieldDrawer : ExtendedPropertyDrawer
+    internal class DragonFieldDrawer : ExtendedPropertyDrawer
     {
         private const float DamagedComponentHeight = 18f * 2f;
         private DragonFieldDropDown _dropDown;
@@ -26,7 +26,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private DragonMetaBlockAttribute DragonMetaBlockAttribute;
         private InlineInspectorAttribute InlineInspectorAttribute;
 
-		private bool _isInit = false;
+        private bool _isInit = false;
         private bool _hasSerializableData = true;
         private bool _isForceRepaint = false;
 
@@ -35,53 +35,53 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isSerializeReference;
 
         private bool _cachedInlineInspectorHeightInit = false;
-		private float _cachedInlineInspectorHeight = 0f;
+        private float _cachedInlineInspectorHeight = 0f;
         private Editor _cachedInlineInspectorEditor;
         private Editor GetCachedInlineInspectorEditor(UnityEngine.Object target)
         {
-			if (_cachedInlineInspectorEditor != null && _cachedInlineInspectorEditor.target != target)
+            if (_cachedInlineInspectorEditor != null && _cachedInlineInspectorEditor.target != target)
             {
-				UnityEngine.Object.DestroyImmediate(_cachedInlineInspectorEditor);
-				_cachedInlineInspectorHeightInit = false;
-			}
+                UnityEngine.Object.DestroyImmediate(_cachedInlineInspectorEditor);
+                _cachedInlineInspectorHeightInit = false;
+            }
             if (_cachedInlineInspectorEditor == null && target != null)
             {
                 _cachedInlineInspectorEditor = Editor.CreateEditor(target); ;
             }
-			return _cachedInlineInspectorEditor;
+            return _cachedInlineInspectorEditor;
         }
         private float GetCachedInlineInspectorHeight(UnityEngine.Object target)
         {
-			float result = Mathf.Abs(_cachedInlineInspectorHeight);
-			if (_cachedInlineInspectorHeightInit == false || _cachedInlineInspectorHeight <= 0f)
+            float result = Mathf.Abs(_cachedInlineInspectorHeight);
+            if (_cachedInlineInspectorHeightInit == false || _cachedInlineInspectorHeight <= 0f)
             {
                 var editor = GetCachedInlineInspectorEditor(target);
                 if (editor != null)
                 {
-					EditorGUILayout.BeginVertical();
-					editor.OnInspectorGUI();
-					EditorGUILayout.EndVertical();
+                    EditorGUILayout.BeginVertical();
+                    editor.OnInspectorGUI();
+                    EditorGUILayout.EndVertical();
 
-					result = Mathf.Abs(_cachedInlineInspectorHeight);
+                    result = Mathf.Abs(_cachedInlineInspectorHeight);
 
-					if (Event.current.type == EventType.Repaint)
-					{
-						Rect lastRect = GUILayoutUtility.GetLastRect();
-						if (lastRect.height > 0)
-						{
-							_cachedInlineInspectorHeight = lastRect.height;
-							result = _cachedInlineInspectorHeight;
-							_isForceRepaint = true;
-						}
-					}
-				}
+                    if (Event.current.type == EventType.Repaint)
+                    {
+                        Rect lastRect = GUILayoutUtility.GetLastRect();
+                        if (lastRect.height > 0)
+                        {
+                            _cachedInlineInspectorHeight = lastRect.height;
+                            result = _cachedInlineInspectorHeight;
+                            _isForceRepaint = true;
+                        }
+                    }
+                }
                 _cachedInlineInspectorHeightInit = true;
 
-			}
+            }
             return result;
-		}
+        }
 
-		private Type _cachedManagedType;
+        private Type _cachedManagedType;
         private long _cachedManagedTypeID;
         private Type GetCachedManagedType(SerializedProperty sp)
         {
@@ -106,10 +106,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected override bool IsInit => _isInit;
         private bool IsDrawDropDown => ReferenceDropDownAttribute != null;
         private bool IsDrawMetaBlock => DragonMetaBlockAttribute != null;
-		#endregion
+        #endregion
 
-		#region Init
-		protected override void OnStaticInit()
+        #region Init
+        protected override void OnStaticInit()
         {
             if (_unrecursiveLabel == null)
             {
@@ -178,7 +178,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool CheckIsInilineInspector(SerializedProperty prop)
         {
             return InlineInspectorAttribute != null && prop.propertyType == SerializedPropertyType.ObjectReference;
-		}
+        }
 
         [ThreadStatic]
         private static SerializedProperty currentProperty;
@@ -203,11 +203,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             return ReferenceEquals(label, _unrecursiveLabel);
 
-		}
+        }
         protected override float GetCustomHeight(SerializedProperty property, GUIContent label)
         {
-			_isForceRepaint = false;
-			if (IsRecursive(label)) { return EditorGUI.GetPropertyHeight(property, label); }
+            _isForceRepaint = false;
+            if (IsRecursive(label)) { return EditorGUI.GetPropertyHeight(property, label); }
             _unrecursiveLabel.text = label.text;
             _unrecursiveLabel.tooltip = label.tooltip;
             label = _unrecursiveLabel;
@@ -219,8 +219,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             SerializedProperty componentProp = property;
 
-			// SerializeReference field
-			if (_isSerializeReference)
+            // SerializeReference field
+            if (_isSerializeReference)
             {
                 if (property.IsNullManagedReference())
                 {
@@ -269,7 +269,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     result = EditorGUI.GetPropertyHeight(componentProp, label);
                 }
-                if(CheckIsInilineInspector(componentProp) && _cachedInlineInspectorHeightInit && componentProp.isExpanded)
+                if (CheckIsInilineInspector(componentProp) && _cachedInlineInspectorHeightInit && componentProp.isExpanded)
                 {
                     result += Mathf.Abs(_cachedInlineInspectorHeight);
                 }
@@ -285,8 +285,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
 
 
-			_isForceRepaint = false;
-			if (IsRecursive(label)) { EditorGUI.PropertyField(rect, property, label, true); return; }
+            _isForceRepaint = false;
+            if (IsRecursive(label)) { EditorGUI.PropertyField(rect, property, label, true); return; }
 
             _unrecursiveLabel.text = label.text;
             _unrecursiveLabel.tooltip = label.tooltip;
@@ -306,7 +306,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             bool isDrawDropDown = IsDrawDropDown && _isSerializeReference;
 
             Rect srcRect = rect;
-			if (_isSerializeReference)
+            if (_isSerializeReference)
             {
                 DragonFieldCahce info = null;
                 bool mrNull = property.IsNullManagedReference();
@@ -350,25 +350,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (CheckIsInilineInspector(componentProp))
                 {
-					var unityObj = componentProp.objectReferenceValue;
-					if (unityObj)
-					{
-						meta = unityObj.GetMeta();
-					}
+                    var unityObj = componentProp.objectReferenceValue;
+                    if (unityObj)
+                    {
+                        meta = unityObj.GetMeta();
+                    }
                     else
                     {
-						meta = PropertyType.GetMeta();
-					}
-				}
+                        meta = PropertyType.GetMeta();
+                    }
+                }
                 else
                 {
-					var fieldType = PropertyType;
-					if (DragonFieldCahce.RuntimeDict.TryGetValue(fieldType, out var info) && info.HasWrappedFieldName)
-					{
-						componentProp = property.FindPropertyRelative(info.WrappedFieldName);
-					}
-					meta = fieldType.GetMeta();
-				}
+                    var fieldType = PropertyType;
+                    if (DragonFieldCahce.RuntimeDict.TryGetValue(fieldType, out var info) && info.HasWrappedFieldName)
+                    {
+                        componentProp = property.FindPropertyRelative(info.WrappedFieldName);
+                    }
+                    meta = fieldType.GetMeta();
+                }
             }
             if (componentProp == null)
             {
@@ -377,11 +377,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             float selectionButtonRightOffset = 0f;
 
-			if (isDrawProperty)
+            if (isDrawProperty)
             {
                 if (IsDrawMetaBlock)
                 {
-                    
+
                     ref var r = ref rect;
                     var (skip, optionsWidth) = DragonGUI.DrawTypeMetaBlock(ref r, rootProperty, meta);
                     selectionButtonRightOffset = optionsWidth;
@@ -389,7 +389,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         return;
                     }
-                    if(Event.current.type == EventType.Used)
+                    if (Event.current.type == EventType.Used)
                     {
                         return;
                     }
@@ -404,17 +404,17 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-			if (isDrawDropDown)
+            if (isDrawDropDown)
             {
                 srcRect.xMax -= selectionButtonRightOffset;
                 DrawSelectionDropDown(srcRect, property, label);
             }
 
-			if (isDrawProperty)
+            if (isDrawProperty)
             {
                 var fieldRect = rect;
 
-				if (ReferenceEquals(property, componentProp) &&
+                if (ReferenceEquals(property, componentProp) &&
                     componentProp.propertyType != SerializedPropertyType.Generic &&
                     componentProp.propertyType != SerializedPropertyType.ManagedReference)
                 {
@@ -424,91 +424,91 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                 if (_hasSerializableData)
                 {
-                    if(CheckIsInilineInspector(componentProp))
+                    if (CheckIsInilineInspector(componentProp))
                     {
                         EditorGUI.BeginProperty(fieldRect, label, componentProp);
-						var position = fieldRect;
-						var targetObject = componentProp.objectReferenceValue;
+                        var position = fieldRect;
+                        var targetObject = componentProp.objectReferenceValue;
 
-						Rect foldoutRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
-						Rect objectFieldRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y,
-														position.width - EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+                        Rect foldoutRect = new Rect(position.x, position.y, EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
+                        Rect objectFieldRect = new Rect(position.x + EditorGUIUtility.labelWidth, position.y,
+                                                        position.width - EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
 
-						bool foldout = componentProp.isExpanded;
+                        bool foldout = componentProp.isExpanded;
                         bool isDraw = foldout;
-						if (targetObject != null)
-						{
-							EditorGUI.BeginChangeCheck();
-							foldout = EditorGUI.Foldout(foldoutRect, foldout, label, true);
-							if (EditorGUI.EndChangeCheck())
-							{
-								componentProp.isExpanded = foldout;
-								componentProp.serializedObject.ApplyModifiedProperties();
-							}
-							EditorGUI.ObjectField(objectFieldRect, componentProp, GUIContent.none);
-							if (foldout == false)
-							{
+                        if (targetObject != null)
+                        {
+                            EditorGUI.BeginChangeCheck();
+                            foldout = EditorGUI.Foldout(foldoutRect, foldout, label, true);
+                            if (EditorGUI.EndChangeCheck())
+                            {
+                                componentProp.isExpanded = foldout;
+                                componentProp.serializedObject.ApplyModifiedProperties();
+                            }
+                            EditorGUI.ObjectField(objectFieldRect, componentProp, GUIContent.none);
+                            if (foldout == false)
+                            {
                                 isDraw = false;
-							}
-						}
-						else
-						{
-							Rect propRect = position;
-							//propRect.xMax -= 30f;
-							//Rect buttonRect = position;
-							//buttonRect.xMin = propRect.xMax + EditorGUIUtility.standardVerticalSpacing;
+                            }
+                        }
+                        else
+                        {
+                            Rect propRect = position;
+                            //propRect.xMax -= 30f;
+                            //Rect buttonRect = position;
+                            //buttonRect.xMin = propRect.xMax + EditorGUIUtility.standardVerticalSpacing;
                             //
-							//if (GUI.Button(buttonRect, "+"))
-							//{
-							//	CreateScriptableObjectWindow.Show(property, fieldInfo.FieldType);
-							//}
+                            //if (GUI.Button(buttonRect, "+"))
+                            //{
+                            //	CreateScriptableObjectWindow.Show(property, fieldInfo.FieldType);
+                            //}
 
-							EditorGUI.PropertyField(propRect, componentProp, label);
+                            EditorGUI.PropertyField(propRect, componentProp, label);
                             isDraw = false;
-						}
+                        }
 
                         if (isDraw)
                         {
-							var inspectorHeight = Mathf.Abs(_cachedInlineInspectorHeight);
+                            var inspectorHeight = Mathf.Abs(_cachedInlineInspectorHeight);
 
-							int il = EditorGUI.indentLevel;
-							EditorGUI.indentLevel++;
+                            int il = EditorGUI.indentLevel;
+                            EditorGUI.indentLevel++;
 
-							float indent = (EditorGUI.indentLevel + 1) * 15f;
-							Rect inspectorRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing,
-														  position.width, inspectorHeight);
-							inspectorRect.xMax += selectionButtonRightOffset;
-							var et = Event.current.type;
-							var defaultEnabled = GUI.enabled;
-							if (InlineInspectorAttribute.IsReadOnly)
-							{
-								GUI.enabled = false;
-							}
+                            float indent = (EditorGUI.indentLevel + 1) * 15f;
+                            Rect inspectorRect = new Rect(position.x, position.y + EditorGUIUtility.singleLineHeight + EditorGUIUtility.standardVerticalSpacing,
+                                                          position.width, inspectorHeight);
+                            inspectorRect.xMax += selectionButtonRightOffset;
+                            var et = Event.current.type;
+                            var defaultEnabled = GUI.enabled;
+                            if (InlineInspectorAttribute.IsReadOnly)
+                            {
+                                GUI.enabled = false;
+                            }
 
-							EditorGUI.BeginChangeCheck();
-							GUILayout.BeginArea(inspectorRect);
-							GetCachedInlineInspectorEditor(componentProp.objectReferenceValue).OnInspectorGUI();
-							GUILayout.EndArea();
-							if (EditorGUI.EndChangeCheck() && et == EventType.MouseUp)
-							{
-								_cachedInlineInspectorHeightInit = false;
-							}
+                            EditorGUI.BeginChangeCheck();
+                            GUILayout.BeginArea(inspectorRect);
+                            GetCachedInlineInspectorEditor(componentProp.objectReferenceValue).OnInspectorGUI();
+                            GUILayout.EndArea();
+                            if (EditorGUI.EndChangeCheck() && et == EventType.MouseUp)
+                            {
+                                _cachedInlineInspectorHeightInit = false;
+                            }
 
-							GUI.enabled = defaultEnabled;
-							EditorGUI.indentLevel = il;
-						}
-						EditorGUI.EndProperty();
+                            GUI.enabled = defaultEnabled;
+                            EditorGUI.indentLevel = il;
+                        }
+                        EditorGUI.EndProperty();
 
-						if (isDraw)
+                        if (isDraw)
                         {
-							GetCachedInlineInspectorHeight(componentProp.objectReferenceValue);
-						}
-					}
+                            GetCachedInlineInspectorHeight(componentProp.objectReferenceValue);
+                        }
+                    }
                     else
                     {
-						EditorGUI.PropertyField(fieldRect, componentProp, label, true);
-					}
-				}
+                        EditorGUI.PropertyField(fieldRect, componentProp, label, true);
+                    }
+                }
                 else
                 {
                     EditorGUI.LabelField(rect, label);
@@ -525,9 +525,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             if (_isForceRepaint)
-			{
-				EditorWindow.focusedWindow?.Repaint();
-			}
+            {
+                EditorWindow.focusedWindow?.Repaint();
+            }
         }
 
 
