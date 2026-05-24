@@ -265,7 +265,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private Rect _lastRepaintRect = new Rect();
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
-            if(Event.current.type == EventType.Repaint)
+            if (Event.current.type == EventType.Repaint)
             {
                 _lastRepaintRect = position;
             }
@@ -274,11 +274,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 StaticInit();
                 Init(property);
-                if(position.height == _lastRepaintRect.height)
+                if (position.height == _lastRepaintRect.height)
                 {
-                    position.x = _lastRepaintRect.x;
-                    position.width = _lastRepaintRect.width;
-				}
+                    //position.x = _lastRepaintRect.x;
+                    //position.width = _lastRepaintRect.width;
+                    position = _lastRepaintRect;
+                }
                 DrawCustom(position, property, label);
             }
         }

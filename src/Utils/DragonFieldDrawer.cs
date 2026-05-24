@@ -76,7 +76,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     }
                 }
                 _cachedInlineInspectorHeightInit = true;
-
             }
             return result;
         }
@@ -283,8 +282,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         protected override void DrawCustom(Rect rect, SerializedProperty property, GUIContent label)
         {
-
-
             _isForceRepaint = false;
             if (IsRecursive(label)) { EditorGUI.PropertyField(rect, property, label, true); return; }
 
