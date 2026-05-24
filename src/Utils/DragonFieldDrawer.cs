@@ -56,23 +56,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
             if (_cachedInlineInspectorHeightInit == false || _cachedInlineInspectorHeight <= 0f)
             {
                 var editor = GetCachedInlineInspectorEditor(target);
+                result = Mathf.Abs(_cachedInlineInspectorHeight);
                 if (editor != null)
-                {
+				{
                     EditorGUILayout.BeginVertical();
                     editor.OnInspectorGUI();
                     EditorGUILayout.EndVertical();
-
-                    result = Mathf.Abs(_cachedInlineInspectorHeight);
 
                     if (Event.current.type == EventType.Repaint)
                     {
                         Rect lastRect = GUILayoutUtility.GetLastRect();
                         if (lastRect.height > 0)
                         {
-                            _cachedInlineInspectorHeight = lastRect.height;
-                            result = _cachedInlineInspectorHeight;
+                            result = lastRect.height;
+                            _cachedInlineInspectorHeight = result;
                             _isForceRepaint = true;
-                        }
+						}
                     }
                 }
                 _cachedInlineInspectorHeightInit = true;
@@ -488,7 +487,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             GUILayout.EndArea();
                             if (EditorGUI.EndChangeCheck() && et == EventType.MouseUp)
                             {
-                                _cachedInlineInspectorHeightInit = false;
+                                _cachedInlineInspectorHeight = -_cachedInlineInspectorHeight;
+								_cachedInlineInspectorHeightInit = false;
                             }
 
                             GUI.enabled = defaultEnabled;
