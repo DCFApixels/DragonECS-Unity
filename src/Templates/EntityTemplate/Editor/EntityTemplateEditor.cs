@@ -252,7 +252,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     serializedObject.ApplyModifiedProperties();
                     break;
             }
-        }
+		}
     }
 
     [CanEditMultipleObjects]

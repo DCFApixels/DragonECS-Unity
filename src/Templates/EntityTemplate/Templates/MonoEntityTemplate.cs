@@ -2,6 +2,7 @@
 #undef DEBUG
 #endif
 using DCFApixels.DragonECS.Unity;
+using DCFApixels.DragonECS.Unity.Attributes;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
 using System.Collections.Generic;

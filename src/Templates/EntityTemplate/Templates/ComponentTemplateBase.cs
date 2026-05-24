@@ -72,14 +72,19 @@ namespace DCFApixels.DragonECS
         protected class ComponentTemplateMetaProxy : MetaProxyBase
         {
             protected TypeMeta Meta;
+            public override bool IsInherit => Meta == null;
             public override string Name { get { return Meta?.Name; } }
             public override MetaColor? Color { get { return Meta != null && Meta.IsCustomColor ? Meta.Color : null; } }
             public override MetaGroup Group { get { return Meta?.Group; } }
             public override MetaDescription Description { get { return Meta?.Description; } }
             public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
-            public ComponentTemplateMetaProxy(Type type) : base(type)
-            {
+            public ComponentTemplateMetaProxy(Type type, Type declaredType) : base(type, declaredType)
+			{
                 Meta = null;
+                if (type.IsGenericTypeDefinition)
+                {
+                    return;
+                }
                 var fields = type.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
                 foreach (var field in fields)
                 {
@@ -99,75 +104,6 @@ namespace DCFApixels.DragonECS
     public abstract class ComponentTemplateBase<T> : ComponentTemplateBase, ICloneable
     {
         protected static readonly TypeMeta Meta = EcsDebugUtility.GetTypeMeta<T>();
-
-        private static bool _defaultValueInit = false;
-        private static bool _hasDefaultValue = false;
-        private static T _defaultValue;
-        private static ICloneable _defaultValueCloneable;
-        private static CloneMethod _defaultValueCloneMethod;
-        private enum CloneMethod
-        {
-            Set,
-            Clone_Reflection,
-            ICloneable,
-        }
-        protected static void InitStatic()
-        {
-            if (_defaultValueInit == false)
-            {
-                _hasDefaultValue = false;
-                Type type = typeof(T);
-                FieldInfo field;
-                field = type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
-                if (field != null && field.FieldType == type)
-                {
-                    _defaultValue = (T)field.GetValue(null);
-                    _hasDefaultValue = true;
-                }
-                if(_hasDefaultValue == false)
-                {
-                    field = type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                    if (field != null && field.FieldType == type)
-                    {
-                        _defaultValue = (T)field.GetValue(null);
-                        _hasDefaultValue = true;
-                    }
-                }
-                if (_defaultValue == null)
-                {
-                    _hasDefaultValue = false;
-                }
-
-                if (_hasDefaultValue)
-                {
-                    _defaultValueCloneable = _defaultValue as ICloneable;
-                    _defaultValueCloneMethod = CloneMethod.Set;
-
-                    if (type.IsValueType == false)
-                    {
-                        _defaultValueCloneMethod = CloneMethod.Clone_Reflection;
-                    }
-                    if (_defaultValueCloneable != null)
-                    {
-                        _defaultValueCloneMethod = CloneMethod.ICloneable;
-                    }
-                }
-
-                _defaultValueInit = true;
-            }
-        }
-        protected virtual T DefaultComponent
-        {
-            get
-            {
-                if (_hasDefaultValue)
-                {
-                    return CloneComponent(_defaultValue);
-                }
-                return default;
-            }
-        }
-
         [SerializeField]
         protected T component;
         [SerializeField]
@@ -176,29 +112,20 @@ namespace DCFApixels.DragonECS
 
         public ComponentTemplateBase()
         {
-            InitStatic();
-            component = DefaultComponent;
+            component = CreateDefaultValue();
         }
-
         public sealed override Type ComponentType { get { return typeof(T); } }
 
         #region Methods
         public sealed override object GetRaw() { return component; }
         public sealed override void SetRaw(object raw) { component = (T)raw; }
-        protected virtual T CloneComponent(T component)
+		protected virtual T CreateDefaultValue()
+		{
+			return InternalInstantiationUtility<T>.CreateDefaultInstance();
+		}
+		protected virtual T CloneComponent(T component)
         {
-#if UNITY_EDITOR
-            switch (_defaultValueCloneMethod)
-            {
-                case CloneMethod.Set:
-                    return component;
-                case CloneMethod.Clone_Reflection:
-                    return (T)component.Clone_Reflection();
-                case CloneMethod.ICloneable:
-                    return (T)_defaultValueCloneable.Clone();
-            }
-#endif
-            return default;
+            return InternalInstantiationUtility<T>.CloneInstance(component);
         }
         object ICloneable.Clone()
         {
@@ -278,30 +205,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get
             {
-                if (_defaultValueTypeInit == false)
-                {
-                    if (Type.IsValueType)
-                    {
-                        FieldInfo field;
-                        field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
-                        if (field != null && field.FieldType == Type)
-                        {
-                            _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                        }
-
-                        if(_defaultValueDummy == null)
-                        {
-                            field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                            if (field != null && field.FieldType == Type)
-                            {
-                                _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                            }
-                        }
-                    }
-                    _defaultValueTypeInit = true;
-                }
-                return _defaultValueDummy;
-            }
+				if (_defaultValueTypeInit == false)
+				{
+					if (InternalInstantiationUtility.TryFindDefaultOrEmptyField(Type, out var field, out var nameIsEmpty))
+					{
+						_defaultValueDummy = field.GetValue(null).Clone_Reflection();
+					}
+					_defaultValueTypeInit = true;
+				}
+				return _defaultValueDummy;
+			}
         }
         public ComponentTemplateTypeCache(Type type)
         {

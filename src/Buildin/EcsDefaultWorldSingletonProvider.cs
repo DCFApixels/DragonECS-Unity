@@ -3,7 +3,7 @@
 namespace DCFApixels.DragonECS
 {
     [CreateAssetMenu(fileName = NAME, menuName = EcsConsts.FRAMEWORK_NAME + "/Providers/" + NAME, order = 1)]
-    public class EcsDefaultWorldSingletonProvider : EcsWorldProvider<EcsDefaultWorld>
+	public class EcsDefaultWorldSingletonProvider : EcsWorldProvider<EcsDefaultWorld>
     {
         private const string NAME = "SingletonDefaultWorld";
         private static EcsDefaultWorldSingletonProvider _instance;

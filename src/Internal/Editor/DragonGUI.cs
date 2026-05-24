@@ -931,6 +931,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         internal static bool HasSerializableData(this SerializedProperty property)
         {
+            if (property.propertyType != SerializedPropertyType.Generic &&
+                property.propertyType != SerializedPropertyType.ManagedReference)
+            {
+                return true;
+            }
             var propsCounter = property.Copy();
             int lastDepth = propsCounter.depth;
             bool next = propsCounter.Next(true) && lastDepth < propsCounter.depth;

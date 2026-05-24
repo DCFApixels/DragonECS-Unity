@@ -182,23 +182,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 if (_defaultValueTypeInit == false)
                 {
-                    if (Type.IsValueType)
+                    if (InternalInstantiationUtility.TryFindDefaultOrEmptyField(Type, out var field, out var nameIsEmpty))
                     {
-                        FieldInfo field;
-                        field = Type.GetField("Default", BindingFlags.Static | BindingFlags.Public);
-                        if (field != null && field.FieldType == Type)
-                        {
-                            _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                        }
-
-                        if (_defaultValueDummy == null)
-                        {
-                            field = Type.GetField("Empty", BindingFlags.Static | BindingFlags.Public);
-                            if (field != null && field.FieldType == Type)
-                            {
-                                _defaultValueDummy = field.GetValue(null).Clone_Reflection();
-                            }
-                        }
+                        _defaultValueDummy = field.GetValue(null).Clone_Reflection();
                     }
                     _defaultValueTypeInit = true;
                 }

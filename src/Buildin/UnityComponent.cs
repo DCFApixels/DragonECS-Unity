@@ -43,7 +43,7 @@ namespace DCFApixels.DragonECS
             public override MetaGroup Group { get { return Meta?.Group; } }
             public override MetaDescription Description { get { return Meta?.Description; } }
             public override IEnumerable<string> Tags { get { return Meta?.Tags; } }
-            public MetaProxy(Type type) : base(type) { }
+            public MetaProxy(Type type, Type declaredType) : base(type, declaredType) { }
         }
     }
 
@@ -79,7 +79,7 @@ namespace DCFApixels.DragonECS
             public override MetaGroup Group { get { return UnityComponentConsts.BaseGroup; } }
             public override MetaColor? Color { get { return MetaColor.DragonCyan; } }
             public override MetaDescription Description { get { return new MetaDescription(AUTHOR, $"Template for IEcsComponent component. Holds a reference to a Unity {Name} component."); } }
-            public UnityComponentMetaProxy(Type type) : base(type) { }
+            public UnityComponentMetaProxy(Type type, Type declaredType) : base(type, declaredType) { }
         }
     }
 }

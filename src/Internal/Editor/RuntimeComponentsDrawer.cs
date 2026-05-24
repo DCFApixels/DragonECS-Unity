@@ -335,11 +335,14 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                 }
             }
         }
-        private void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout)
+
+        private static string _searchPattern = string.Empty;
+
+		private void DrawRuntimeComponents(int entityID, EcsWorld world, bool isWithFoldout)
         {
             using (DragonGUI.Layout.BeginVertical(UnityEditorUtility.GetTransperentBlackBackgrounStyle())) using (DragonGUI.SetIndentLevel(0))
             {
-                if (_runtimeComponentsDepth >= RuntimeComponentsMaxDepth)
+				if (_runtimeComponentsDepth >= RuntimeComponentsMaxDepth)
                 {
                     GUILayout.Label("Max depth for inspecting components at runtime");
                     return;
@@ -360,20 +363,41 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     {
                         IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
                         RuntimeDrawMode = (RuntimeDrawMode)EditorGUILayout.EnumPopup("Draw Mode", selected: RuntimeDrawMode);
-                    }
+						_searchPattern = EditorGUILayout.TextField(_searchPattern, EditorStyles.toolbarSearchField);
+					}
 
-                    world.GetComponentPoolsFor(entityID, _componentPoolsBuffer);
+					world.GetComponentPoolsFor(entityID, _componentPoolsBuffer);
                     for (int i = 0; i < _componentPoolsBuffer.Count; i++)
                     {
                         var pool = _componentPoolsBuffer[i];
-                        if (pool.ComponentType.IsValueType)
+
+
+                        bool isDraw = true;
+                        if(string.IsNullOrEmpty(_searchPattern) == false)
                         {
-                            DrawRuntimeValueComponent(entityID, pool, 9, i);
-                        }
-                        else
+                            isDraw = false;
+							foreach (var subPattern in new SearchPattern(_searchPattern, SearchPattern.DefaultSeparator))
+							{
+								if (pool.ComponentType.Name.AsSpan().Contains(subPattern, StringComparison.OrdinalIgnoreCase))
+								{
+									isDraw = true;
+									break;
+								}
+							}
+						}
+						
+
+                        if (isDraw)
                         {
-                            DrawRuntimeClassComponent(entityID, pool, 9, i);
-                        }
+							if (pool.ComponentType.IsValueType)
+							{
+								DrawRuntimeValueComponent(entityID, pool, 9, i);
+							}
+							else
+							{
+								DrawRuntimeClassComponent(entityID, pool, 9, i);
+							}
+						}
                     }
                 }
             }

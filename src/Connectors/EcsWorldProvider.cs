@@ -5,21 +5,59 @@ using System;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
+using System.Reflection;
+using DCFApixels.DragonECS.Unity;
+
 #endif
 
 namespace DCFApixels.DragonECS
 {
     [Serializable]
-    public abstract class EcsWorldProviderBase : ScriptableObject
+	public abstract class EcsWorldProviderBase : ScriptableObject
     {
         public abstract bool IsEmpty { get; }
         public abstract void SetRaw(EcsWorld world);
         public abstract EcsWorld GetRaw();
         public abstract EcsWorld GetCurrentWorldRaw();
-    }
+
+		protected class MetaProxy : MetaProxyBase
+		{
+            private Type _type;
+            private Type _worldType;
+			public override MetaGroup Group => MetaGroup.FromName(EcsUnityConsts.PACK_GROUP, EcsConsts.OTHER_GROUP);
+            public override MetaDescription Description
+            {
+                get
+                {
+                    string prefix = string.Empty;
+                    if (_worldType.IsGenericParameter)
+                    {
+                        prefix = "Generic ";
+					}
+					if (_type.Name.Contains("Singleton"))
+					{
+						prefix = "Singleton ";
+					}
+					return
+				        _worldType != null ? new MetaDescription($"{prefix}ScriptableObject provider for {EcsDebugUtility.GetGenericTypeName(_worldType)}") : null;
+				}
+            }
+			public override MetaColor? Color => MetaColor.DragonRose;
+            public MetaProxy(Type type, Type declaredType) : base(type, declaredType)
+            {
+                _type = type;
+				var worldField = declaredType.GetField("_world", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                if(worldField != null)
+                {
+                    _worldType = worldField.FieldType;
+				}
+			}
+		}
+	}
     [Serializable]
+	[MetaProxy(typeof(MetaProxy))]
     public abstract class EcsWorldProvider<TWorld> : EcsWorldProviderBase, IEcsModule
-        where TWorld : EcsWorld
+		where TWorld : EcsWorld
     {
         private TWorld _world;
 

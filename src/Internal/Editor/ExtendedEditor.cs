@@ -262,13 +262,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected abstract float GetCustomHeight(SerializedProperty property, GUIContent label);
 
+        private Rect _lastRepaintRect = new Rect();
         public override void OnGUI(Rect position, SerializedProperty property, GUIContent label)
         {
+            if(Event.current.type == EventType.Repaint)
+            {
+                _lastRepaintRect = position;
+            }
             _trackedArrayProperty = DragonGUI.CurrentTrackedArrayProperty;
             using (new DragonGUI.TrackArrayPropertyScope(null)) using (DragonGUI.CheckChanged(property.serializedObject))
             {
                 StaticInit();
                 Init(property);
+                if(position.height == _lastRepaintRect.height)
+                {
+                    position = _lastRepaintRect;
+				}
                 DrawCustom(position, property, label);
             }
         }
