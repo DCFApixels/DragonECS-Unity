@@ -35,12 +35,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private bool _isSerializeReference;
 
 
-
-		public override bool CanCacheInspectorGUI(SerializedProperty property)
-		{
-            return false;
-		}
-
 		[InitializeOnLoadMethod]
 		private static void Init()
 		{
@@ -446,7 +440,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     if (CheckIsInilineInspector(componentProp))
                     {
-                        EditorGUI.BeginProperty(fieldRect, label, componentProp);
+                        //EditorGUI.BeginProperty(fieldRect, label, componentProp);
                         var position = fieldRect;
                         var targetObject = componentProp.objectReferenceValue;
 
@@ -455,7 +449,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                                                         position.width - EditorGUIUtility.labelWidth, EditorGUIUtility.singleLineHeight);
 
                         bool foldout = componentProp.isExpanded;
-                        bool isDraw = foldout;
+                        bool isDrawInline = foldout;
                         if (targetObject != null)
                         {
                             EditorGUI.BeginChangeCheck();
@@ -468,7 +462,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             EditorGUI.ObjectField(objectFieldRect, componentProp, GUIContent.none);
                             if (foldout == false)
                             {
-                                isDraw = false;
+                                isDrawInline = false;
                             }
                         }
                         else
@@ -484,10 +478,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             //}
 
                             EditorGUI.PropertyField(propRect, componentProp, label);
-                            isDraw = false;
+                            isDrawInline = false;
                         }
 
-                        if (isDraw)
+                        if (isDrawInline)
                         {
                             var inspectorHeight = Mathf.Abs(_cachedInlineInspectorHeight);
 
@@ -518,9 +512,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 							GUI.enabled = defaultEnabled;
                             EditorGUI.indentLevel = il;
                         }
-                        EditorGUI.EndProperty();
+                        //EditorGUI.EndProperty();
 
-                        if (isDraw)
+                        if (isDrawInline)
                         {
                             GetCachedInlineInspectorHeight(componentProp.objectReferenceValue);
                         }
