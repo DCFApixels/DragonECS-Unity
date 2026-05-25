@@ -34,17 +34,37 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private static GUIContent _unrecursiveLabel;
         private bool _isSerializeReference;
 
+
+
+		public override bool CanCacheInspectorGUI(SerializedProperty property)
+		{
+            return false;
+		}
+
+		[InitializeOnLoadMethod]
+		private static void Init()
+		{
+            EditorApplication.update -= EditorUpdate;
+            EditorApplication.update += EditorUpdate;
+		}
+        private static void EditorUpdate()
+        {
+
+        }
+
+        #region InlineInshector Cache
         private bool _cachedInlineInspectorHeightInit = false;
-        private float _cachedInlineInspectorHeight = 0f;
-        private Editor _cachedInlineInspectorEditor;
-        private Editor GetCachedInlineInspectorEditor(UnityEngine.Object target)
+		private float _cachedInlineInspectorHeight = 0f;
+		private Editor _cachedInlineInspectorEditor;
+		private Editor GetCachedInlineInspectorEditor(UnityEngine.Object target)
         {
             if (_cachedInlineInspectorEditor != null && _cachedInlineInspectorEditor.target != target)
             {
                 UnityEngine.Object.DestroyImmediate(_cachedInlineInspectorEditor);
                 _cachedInlineInspectorHeightInit = false;
-            }
-            if (_cachedInlineInspectorEditor == null && target != null)
+                _cachedInlineInspectorHeight = -_cachedInlineInspectorHeight;
+			}
+			if (_cachedInlineInspectorEditor == null && target != null)
             {
                 _cachedInlineInspectorEditor = Editor.CreateEditor(target); ;
             }
@@ -78,8 +98,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
             return result;
         }
+		#endregion
 
-        private Type _cachedManagedType;
+		#region SerializeReference Cache
+		private Type _cachedManagedType;
         private long _cachedManagedTypeID;
         private Type GetCachedManagedType(SerializedProperty sp)
         {
@@ -93,14 +115,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 //}
                 //else
                 {
-                    _cachedManagedType = sp.managedReferenceValue.GetType();
+					_cachedManagedTypeID = cid;
+					_cachedManagedType = sp.managedReferenceValue.GetType();
                 }
             }
             return _cachedManagedType;
         }
+		#endregion
 
-        #region Properties
-        private float Padding => Spacing;
+		#region Properties
+		private float Padding => Spacing;
         protected override bool IsInit => _isInit;
         private bool IsDrawDropDown => ReferenceDropDownAttribute != null;
         private bool IsDrawMetaBlock => DragonMetaBlockAttribute != null;
@@ -116,7 +140,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected override void OnInit(SerializedProperty sp)
         {
-            _isSerializeReference = sp.propertyType == SerializedPropertyType.ManagedReference;
+			_isSerializeReference = sp.propertyType == SerializedPropertyType.ManagedReference;
             PredicateTypesKey key;
             _hasSerializableData = true;
 
@@ -284,7 +308,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             _isForceRepaint = false;
             if (IsRecursive(label)) { EditorGUI.PropertyField(rect, property, label, true); return; }
 
-            _unrecursiveLabel.text = label.text;
+			_unrecursiveLabel.text = label.text;
             _unrecursiveLabel.tooltip = label.tooltip;
             label = _unrecursiveLabel;
 
@@ -487,11 +511,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
                             GUILayout.EndArea();
                             if (EditorGUI.EndChangeCheck() && et == EventType.MouseUp)
                             {
-                                _cachedInlineInspectorHeight = -_cachedInlineInspectorHeight;
 								_cachedInlineInspectorHeightInit = false;
-                            }
+                                _cachedInlineInspectorHeight = -_cachedInlineInspectorHeight;
+							}
 
-                            GUI.enabled = defaultEnabled;
+							GUI.enabled = defaultEnabled;
                             EditorGUI.indentLevel = il;
                         }
                         EditorGUI.EndProperty();

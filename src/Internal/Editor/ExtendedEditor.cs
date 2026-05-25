@@ -274,12 +274,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
             {
                 StaticInit();
                 Init(property);
-                if (position.height == _lastRepaintRect.height)
-                {
-                    position.x = _lastRepaintRect.x;
-                    position.width = _lastRepaintRect.width;
-                }
-                DrawCustom(position, property, label);
+
+
+				if (Event.current.type == EventType.Layout && position.height == _lastRepaintRect.height)
+				{
+				    position.x = _lastRepaintRect.x;
+				    position.width = _lastRepaintRect.width;
+				}
+				DrawCustom(position, property, label);
             }
         }
         protected abstract void DrawCustom(Rect position, SerializedProperty property, GUIContent label);
