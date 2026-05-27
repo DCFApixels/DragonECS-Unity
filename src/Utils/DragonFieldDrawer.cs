@@ -3,16 +3,81 @@
 #endif
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Reflection;
 using UnityEngine;
 
 
 #if UNITY_EDITOR
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    using DCFApixels.DragonECS.Unity.Attributes;
-    using UnityEditor;
+	using DCFApixels.DragonECS.Unity.Attributes;
+	using UnityEditor;
+	using static UnityEngine.GraphicsBuffer;
 
-    [CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
+	internal class InlineEditorWrapper : EditorWindow
+	{
+        private UnityEngine.Object _target;
+		private Editor _editor;
+		public static InlineEditorWrapper Create(UnityEngine.Object target, Editor editor)
+		{
+
+			var window = CreateInstance<InlineEditorWrapper>();
+			// Create a floating utility window (not dockable, no tab)
+			//InlineEditorWrapper window = GetWindow<InlineEditorWrapper>(utility: true);
+			window._editor = editor;
+			window._target = target;
+			window.ShowPopup();
+
+            //SetWindowTransparent(window);
+
+			return window;
+		}
+
+
+	    private static void SetWindowTransparent(EditorWindow window)
+		{
+			// Получаем внутренний контейнер окна (m_Parent)
+			var parentField = typeof(EditorWindow).GetField("m_Parent", BindingFlags.NonPublic | BindingFlags.Instance);
+			var parent = parentField?.GetValue(window);
+			if (parent == null) return;
+
+			// Ищем свойство backgroundColor у родительского элемента
+			var backgroundColorProp = parent.GetType().GetProperty("backgroundColor", BindingFlags.NonPublic | BindingFlags.Instance);
+			if (backgroundColorProp != null)
+			{
+				backgroundColorProp.SetValue(parent, new Color(0, 0, 0, 0));
+			}
+			else
+			{
+				// Альтернативный метод для старых версий Unity (через поле)
+				var bgField = parent.GetType().GetField("m_BackgroundColor", BindingFlags.NonPublic | BindingFlags.Instance);
+				if (bgField != null)
+				{
+					bgField.SetValue(parent, new Color(0, 0, 0, 0));
+				}
+			}
+		}
+
+
+		public void MoveToRect(Rect rect)
+		{
+			position = rect;
+		}
+		private void OnGUI()
+		{
+			_editor.OnInspectorGUI();
+
+            if (_target == null)
+            {
+                DestroyImmediate(this);
+                DestroyImmediate(_editor);
+			}
+		}
+	}
+
+
+
+	[CustomPropertyDrawer(typeof(ReferenceDropDownAttribute), true)]
     [CustomPropertyDrawer(typeof(DragonMetaBlockAttribute), true)]
     [CustomPropertyDrawer(typeof(InlineInspectorAttribute), true)]
     internal class DragonFieldDrawer : ExtendedPropertyDrawer
@@ -49,19 +114,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
         #region InlineInshector Cache
         private bool _cachedInlineInspectorHeightInit = false;
 		private float _cachedInlineInspectorHeight = 0f;
+        private InlineEditorWrapper _cachedInlineEditorWrapper;
 		private Editor _cachedInlineInspectorEditor;
 		private Editor GetCachedInlineInspectorEditor(UnityEngine.Object target)
         {
             if (_cachedInlineInspectorEditor != null && _cachedInlineInspectorEditor.target != target)
             {
                 UnityEngine.Object.DestroyImmediate(_cachedInlineInspectorEditor);
-                _cachedInlineInspectorHeightInit = false;
+                UnityEngine.Object.DestroyImmediate(_cachedInlineEditorWrapper);
+				_cachedInlineInspectorHeightInit = false;
                 _cachedInlineInspectorHeight = -_cachedInlineInspectorHeight;
 			}
 			if (_cachedInlineInspectorEditor == null && target != null)
             {
-                _cachedInlineInspectorEditor = Editor.CreateEditor(target); ;
-            }
+                _cachedInlineInspectorEditor = Editor.CreateEditor(target);
+				_cachedInlineEditorWrapper = InlineEditorWrapper.Create(target, _cachedInlineInspectorEditor);
+			}
             return _cachedInlineInspectorEditor;
         }
         private float GetCachedInlineInspectorHeight(UnityEngine.Object target)
@@ -215,6 +283,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
 
+        
         private bool IsRecursive(GUIContent label)
         {
             return ReferenceEquals(label, _unrecursiveLabel);
@@ -440,7 +509,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     if (CheckIsInilineInspector(componentProp))
                     {
-                        //EditorGUI.BeginProperty(fieldRect, label, componentProp);
+                        EditorGUI.BeginProperty(fieldRect, label, componentProp);
                         var position = fieldRect;
                         var targetObject = componentProp.objectReferenceValue;
 
@@ -501,8 +570,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                             EditorGUI.BeginChangeCheck();
                             GUILayout.BeginArea(inspectorRect);
-                            GetCachedInlineInspectorEditor(componentProp.objectReferenceValue).OnInspectorGUI();
-                            GUILayout.EndArea();
+							GetCachedInlineInspectorEditor(componentProp.objectReferenceValue);
+							_cachedInlineEditorWrapper.MoveToRect(inspectorRect);
+
+							GUILayout.EndArea();
                             if (EditorGUI.EndChangeCheck() && et == EventType.MouseUp)
                             {
 								_cachedInlineInspectorHeightInit = false;
@@ -512,7 +583,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 							GUI.enabled = defaultEnabled;
                             EditorGUI.indentLevel = il;
                         }
-                        //EditorGUI.EndProperty();
+                        EditorGUI.EndProperty();
 
                         if (isDrawInline)
                         {

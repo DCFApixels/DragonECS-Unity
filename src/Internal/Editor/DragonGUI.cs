@@ -636,13 +636,13 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static void EntityField(Rect position, DragonGUIContent label, entlong entity)
         {
-            EntityField(position, label, (EntitySlotInfo)entity);
+            EntityField(position, label, (RawEntLong)entity);
         }
-        public static void EntityField(Rect position, EntitySlotInfo entity)
+        public static void EntityField(Rect position, RawEntLong entity)
         {
             EntityField(position, DragonGUIContent.Empty, entity);
         }
-        public static void EntityField(Rect position, DragonGUIContent label, EntitySlotInfo entity)
+        public static void EntityField(Rect position, DragonGUIContent label, RawEntLong entity)
         {
             bool isAlive = false;
             if (EcsWorld.TryGetWorld(entity.worldID, out EcsWorld world))
@@ -657,7 +657,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         public static void EntityField(Rect position, SerializedProperty property, DragonGUIContent label)
         {
-            EntitySlotInfo entity = new EntitySlotInfo(property.FindPropertyRelative("_full").longValue);
+            RawEntLong entity = new RawEntLong(property.FindPropertyRelative("_full").longValue);
 
             if (property.hasMultipleDifferentValues)
             {

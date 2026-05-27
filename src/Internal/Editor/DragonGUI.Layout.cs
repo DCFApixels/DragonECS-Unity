@@ -127,15 +127,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 float height = EntityBarHeight;
                 DragonGUI.EntityField(GUILayoutUtility.GetRect(width, height), label, entity);
             }
-            public static void EntityField(EntitySlotInfo entity)
+            public static void EntityField(RawEntLong entity)
             {
                 EntityField(default(GUIContent), entity);
             }
-            public static void EntityField(string label, EntitySlotInfo entity)
+            public static void EntityField(string label, RawEntLong entity)
             {
                 EntityField(UnityEditorUtility.GetLabel(label), entity);
             }
-            public static void EntityField(GUIContent label, EntitySlotInfo entity)
+            public static void EntityField(GUIContent label, RawEntLong entity)
             {
                 float width = EditorGUIUtility.currentViewWidth;
                 float height = EntityBarHeight;

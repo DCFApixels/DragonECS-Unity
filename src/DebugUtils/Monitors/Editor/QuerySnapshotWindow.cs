@@ -3,7 +3,6 @@ using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using UnityEditor;
 using UnityEngine;
-using static DCFApixels.DragonECS.Unity.Editors.DragonGUI;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {

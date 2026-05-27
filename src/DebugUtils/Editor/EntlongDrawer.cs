@@ -50,7 +50,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             SerializedProperty fulleProperty = property.FindPropertyRelative("_full");
-            EntitySlotInfo entity = new EntitySlotInfo(fulleProperty.longValue);
+            RawEntLong entity = new RawEntLong(fulleProperty.longValue);
             EcsWorld.TryGetWorld(entity.worldID, out EcsWorld world);
 
             if (drawFoldout && isExpanded)

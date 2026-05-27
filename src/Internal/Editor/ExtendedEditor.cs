@@ -151,6 +151,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private IEnumerable<Attribute> _attributes = null;
 
+		public void OnEnable()
+        {
+            EcsDebug.PrintWarning("OnEnable called for " + fieldInfo.Name);
+		}
+        
         private Type _propertyType = null;
         private bool _isArrayElement;
         private SerializedProperty _trackedArrayProperty = null;
