@@ -166,6 +166,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 			Init_Internal();
 			var count = _world.GetComponentsCount(entityID);
 			ref var monitor = ref _entityMonitors[entityID];
+			if (monitor == null) { return; }
 			if (count == 1)
 			{
 				if (monitor.IsDefaultName)
