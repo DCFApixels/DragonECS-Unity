@@ -12,13 +12,15 @@ namespace DCFApixels.DragonECS.Unity.Editors
 {
 	using DCFApixels.DragonECS.Unity.Attributes;
 	using UnityEditor;
+	using static Codice.Client.BaseCommands.Import.Commit;
 	using static UnityEngine.GraphicsBuffer;
 
 	internal class InlineEditorWrapper : EditorWindow
 	{
         private UnityEngine.Object _target;
+        private UnityEngine.Object _selected;
 		private Editor _editor;
-		public static InlineEditorWrapper Create(UnityEngine.Object target, Editor editor)
+		public static InlineEditorWrapper Create(UnityEngine.Object selected, UnityEngine.Object target, Editor editor)
 		{
 
 			var window = CreateInstance<InlineEditorWrapper>();
@@ -26,15 +28,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
 			//InlineEditorWrapper window = GetWindow<InlineEditorWrapper>(utility: true);
 			window._editor = editor;
 			window._target = target;
+			window._selected = selected;
 			window.ShowPopup();
 
             //SetWindowTransparent(window);
 
+
+            Selection.selectionChanged += window.SelectionChanged;
+
+
 			return window;
 		}
 
+		private void SelectionChanged()
+		{
 
-	    private static void SetWindowTransparent(EditorWindow window)
+			if (_editor == null || _selected == null || _selected != Selection.activeObject)
+			{
+				Close();
+				DestroyImmediate(this);
+				Selection.selectionChanged -= SelectionChanged;
+			}
+		}
+
+		private static void SetWindowTransparent(EditorWindow window)
 		{
 			// Получаем внутренний контейнер окна (m_Parent)
 			var parentField = typeof(EditorWindow).GetField("m_Parent", BindingFlags.NonPublic | BindingFlags.Instance);
@@ -65,13 +82,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
 		}
 		private void OnGUI()
 		{
-			_editor.OnInspectorGUI();
 
-            if (_target == null)
-            {
-                DestroyImmediate(this);
-                DestroyImmediate(_editor);
+			if (GUILayout.Button("123"))
+			{
+				Close();
+				DestroyImmediate(this);
+			Selection.selectionChanged -= SelectionChanged;
 			}
+			_editor.OnInspectorGUI();
 		}
 	}
 
@@ -116,7 +134,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 		private float _cachedInlineInspectorHeight = 0f;
         private InlineEditorWrapper _cachedInlineEditorWrapper;
 		private Editor _cachedInlineInspectorEditor;
-		private Editor GetCachedInlineInspectorEditor(UnityEngine.Object target)
+		private Editor GetCachedInlineInspectorEditor(UnityEngine.Object selected, UnityEngine.Object target)
         {
             if (_cachedInlineInspectorEditor != null && _cachedInlineInspectorEditor.target != target)
             {
@@ -128,16 +146,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
 			if (_cachedInlineInspectorEditor == null && target != null)
             {
                 _cachedInlineInspectorEditor = Editor.CreateEditor(target);
-				_cachedInlineEditorWrapper = InlineEditorWrapper.Create(target, _cachedInlineInspectorEditor);
+				_cachedInlineEditorWrapper = InlineEditorWrapper.Create(Selection.activeObject, target, _cachedInlineInspectorEditor);
 			}
             return _cachedInlineInspectorEditor;
         }
-        private float GetCachedInlineInspectorHeight(UnityEngine.Object target)
+        private float GetCachedInlineInspectorHeight(UnityEngine.Object selected, UnityEngine.Object target)
         {
             float result = Mathf.Abs(_cachedInlineInspectorHeight);
             if (_cachedInlineInspectorHeightInit == false || _cachedInlineInspectorHeight <= 0f)
             {
-                var editor = GetCachedInlineInspectorEditor(target);
+                var editor = GetCachedInlineInspectorEditor(selected, target);
                 result = Mathf.Abs(_cachedInlineInspectorHeight);
                 if (editor != null)
 				{
@@ -570,7 +588,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                             EditorGUI.BeginChangeCheck();
                             GUILayout.BeginArea(inspectorRect);
-							GetCachedInlineInspectorEditor(componentProp.objectReferenceValue);
+							GetCachedInlineInspectorEditor(componentProp.serializedObject.context, componentProp.objectReferenceValue);
 							_cachedInlineEditorWrapper.MoveToRect(inspectorRect);
 
 							GUILayout.EndArea();
@@ -587,7 +605,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
                         if (isDrawInline)
                         {
-                            GetCachedInlineInspectorHeight(componentProp.objectReferenceValue);
+                            GetCachedInlineInspectorHeight(componentProp.serializedObject.context, componentProp.objectReferenceValue);
                         }
                     }
                     else

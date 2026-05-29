@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using UnityEngine;
+using Assembly = System.Reflection.Assembly;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -93,6 +95,69 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         #endregion
     }
+
+	internal static class AssemblyFilter
+	{
+		private static readonly string[] IgnoredAssembliesPrefixes = new string[]
+		{
+			"Unity.",
+			"UnityEngine.",
+			"UnityEditor.",
+			"System.",
+			"mscorlib",
+			"netstandard",
+			"Mono.",
+			"Microsoft.",
+			"Mono.Security",
+
+			"TextMeshPro",
+			"Microsoft.GeneratedCode",
+			"I18N",
+			"Boo.",
+			"UnityScript.",
+			"ICSharpCode.",
+			"ExCSS.Unity",
+#if UNITY_EDITOR
+			//"Assembly-CSharp-Editor",
+			//"Assembly-UnityScript-Editor",
+			"nunit.",
+			"SyntaxTree.",
+			"AssetStoreTools",
+#endif
+        };
+
+		private static readonly HashSet<string> IgnoredAssembliesNames = new HashSet<string>
+		{
+			"System",
+			"System.Core",
+			"System.Xml",
+			"System.Runtime",
+			"System.Collections",
+			"System.Linq",
+			"System.Text.RegularExpressions",
+			"UnityEngine",
+			"UnityEditor",
+		};
+
+
+		internal static readonly CompareInfo caseInsensitiveComparer = new CultureInfo("en-US").CompareInfo;
+		public static bool IsIgnoredAssembly(Assembly assembly)
+		{
+			string assemblyName = assembly.GetName().Name;
+			if (IgnoredAssembliesNames.Contains(assemblyName))
+			{
+				return true;
+			}
+			foreach (var prefix in IgnoredAssembliesPrefixes)
+			{
+				if (caseInsensitiveComparer.IsPrefix(assemblyName, prefix, CompareOptions.IgnoreCase))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
+	}
 }
 
 
@@ -100,9 +165,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 namespace DCFApixels.DragonECS.Unity.Editors
 {
     using DCFApixels.DragonECS.Unity.Internal;
-	using System.Globalization;
 	using UnityEditor;
-    using Assembly = System.Reflection.Assembly;
 
     [InitializeOnLoad]
     internal static partial class UnityEditorUtility
@@ -662,68 +725,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _worldDatas.Remove(_world);
             }
             public void OnWorldResize(int newSize) { }
-        }
-    }
-    internal static class AssemblyFilter
-    {
-        private static readonly string[] IgnoredAssembliesPrefixes = new string[]
-        {
-            "Unity.",
-            "UnityEngine.",
-            "UnityEditor.",
-            "System.",
-            "mscorlib",
-            "netstandard",
-            "Mono.",
-            "Microsoft.",
-            "Mono.Security",
-
-			"TextMeshPro",
-			"Microsoft.GeneratedCode",
-			"I18N",
-			"Boo.",
-			"UnityScript.",
-			"ICSharpCode.",
-			"ExCSS.Unity",
-#if UNITY_EDITOR
-			//"Assembly-CSharp-Editor",
-			//"Assembly-UnityScript-Editor",
-			"nunit.",
-			"SyntaxTree.",
-			"AssetStoreTools",
-#endif
-        };
-
-        private static readonly HashSet<string> IgnoredAssembliesNames = new HashSet<string>
-        {
-            "System",
-            "System.Core",
-            "System.Xml",
-            "System.Runtime",
-            "System.Collections",
-            "System.Linq",
-            "System.Text.RegularExpressions",
-            "UnityEngine",
-            "UnityEditor",
-        };
-
-
-		internal static readonly CompareInfo caseInsensitiveComparer = new CultureInfo("en-US").CompareInfo;
-		public static bool IsIgnoredAssembly(Assembly assembly)
-        {
-            string assemblyName = assembly.GetName().Name;
-			if (IgnoredAssembliesNames.Contains(assemblyName))
-            {
-                return true;
-            }
-            foreach (var prefix in IgnoredAssembliesPrefixes)
-            {
-				if (caseInsensitiveComparer.IsPrefix(assemblyName, prefix, CompareOptions.IgnoreCase))
-                {
-                    return true;
-                }
-            }
-            return false;
         }
     }
 }

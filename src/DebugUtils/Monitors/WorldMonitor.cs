@@ -30,13 +30,14 @@ namespace DCFApixels.DragonECS.Unity.Internal
 	[MetaDescription(EcsConsts.AUTHOR, "...")]
 	[MetaTags(MetaTags.HIDDEN)]
 	[MetaID("DragonECS_B5FBB680920179310BEBB305817462B5")]
-	internal class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener, IEcsDestroy
+	internal class WorldMonitorSystem : IEcsInit, IEcsWorldEventListener, IEcsEntityEventListener, IEcsDestroy, IEcsRun
 	{
 		private EcsWorld _world;
 		private WorldMonitor _monitor;
 		private WorldQueriesMonitor _queriesMonitor;
 		private Transform _entityMonitorsPoolRoot;
 		private EntityMonitor[] _entityMonitors;
+		private EcsGroup _migratedGroup;
 		public EcsWorld World
 		{
 			get { return _world; }
@@ -48,6 +49,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
 			_world.AddListener(entityEventListener: this);
 			_world.AddListener(worldEventListener: this);
+
+			_migratedGroup = EcsGroup.New(_world);
 		}
 		public void Init()
 		{
@@ -139,7 +142,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 				throw new Exception();
 			}
 			var ent = _world.GetEntityLong(entityID);
-			if (ent != entityMonitor.Entity)
+			if(ent != entityMonitor.Entity)
 			{
 				entityMonitor.Set(ent);
 				entityMonitor.transform.SetParent(_monitor.transform);
@@ -163,32 +166,39 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
 		public void OnMigrateEntity(int entityID)
 		{
-			Init_Internal();
-			var count = _world.GetComponentsCount(entityID);
-			ref var monitor = ref _entityMonitors[entityID];
-			if (monitor == null) { return; }
-			if (count == 1)
-			{
-				if (monitor.IsDefaultName)
-				{
-					var id = _world.GetFirstComponentTypeIDFor(entityID);
-					var pool = _world.FindPoolInstance(id);
-					if (pool != null)
-					{
-						monitor.SetMetaName(pool.ComponentType.GetMeta().Name);
-					}
-				}
-			}
-			else
-			{
-				var meta = _world.GetEntitySlotMeta(entityID);
-				monitor.SetMetaName(meta.Name);
-			}
+			_migratedGroup.Add(entityID);
 		}
 
 		public void Destroy()
 		{
 			_world.EntityMetaChanged -= OnEntityMetaChanged;
+		}
+
+		public void Run()
+		{
+			foreach (var entityID in _migratedGroup)
+			{
+				var count = _world.GetComponentsCount(entityID);
+				ref var monitor = ref _entityMonitors[entityID];
+				if (monitor == null) { return; }
+				if (count == 1)
+				{
+					if (monitor.IsDefaultName)
+					{
+						var id = _world.GetFirstComponentTypeIDFor(entityID);
+						var pool = _world.FindPoolInstance(id);
+						if (pool != null)
+						{
+							monitor.SetMetaName(pool.ComponentType.GetMeta().Name);
+						}
+					}
+				}
+				else
+				{
+					var meta = _world.GetEntitySlotMeta(entityID);
+					monitor.SetMetaName(meta.Name);
+				}
+			}
 		}
 	}
 }

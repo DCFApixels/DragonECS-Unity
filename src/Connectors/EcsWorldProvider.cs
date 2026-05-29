@@ -3,11 +3,10 @@
 #endif
 using System;
 using UnityEngine;
+using DCFApixels.DragonECS.Unity;
+using System.Reflection;
 #if UNITY_EDITOR
 using UnityEditor;
-using System.Reflection;
-using DCFApixels.DragonECS.Unity;
-
 #endif
 
 namespace DCFApixels.DragonECS
