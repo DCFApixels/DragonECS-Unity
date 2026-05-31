@@ -45,20 +45,20 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
 
 
         #region Properties
-        private static RuntimeDrawMode RuntimeDrawMode
+        private static RuntimeRefreshMode RuntimeRefreshMode
         {
-            get { return UserSettingsPrefs.instance.RuntimeDrawMode; }
-            set { UserSettingsPrefs.instance.RuntimeDrawMode = value; }
+            get { return UserSettingsPrefs.instance.RuntimeRefreshMode; }
+            set { UserSettingsPrefs.instance.RuntimeRefreshMode = value; }
         }
         private static bool IsShowHidden
         {
-            get { return UserSettingsPrefs.instance.IsShowHidden; }
-            set { UserSettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.ShowHidden; }
+            set { UserSettingsPrefs.instance.ShowHidden = value; }
         }
         private static bool IsShowRuntimeComponents
         {
-            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
-            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return UserSettingsPrefs.instance.ShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.ShowRuntimeComponents = value; }
         }
         #endregion
 
@@ -362,7 +362,7 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     using (DragonGUI.Layout.BeginVertical(Color.white.SetAlpha(0.066f)))
                     {
                         IsShowHidden = EditorGUILayout.Toggle("Show Hidden", IsShowHidden);
-                        RuntimeDrawMode = (RuntimeDrawMode)EditorGUILayout.EnumPopup("Draw Mode", selected: RuntimeDrawMode);
+                        RuntimeRefreshMode = (RuntimeRefreshMode)EditorGUILayout.EnumPopup("Refresh Mode", selected: RuntimeRefreshMode);
 						_searchPattern = EditorGUILayout.TextField(_searchPattern, EditorStyles.toolbarSearchField);
 					}
 
@@ -370,7 +370,6 @@ namespace DCFApixels.DragonECS.Unity.Editors.X
                     for (int i = 0; i < _componentPoolsBuffer.Count; i++)
                     {
                         var pool = _componentPoolsBuffer[i];
-
 
                         bool isDraw = true;
                         if(string.IsNullOrEmpty(_searchPattern) == false)

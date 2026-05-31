@@ -6,10 +6,10 @@ namespace DCFApixels.DragonECS.Unity.Internal
     {
         public readonly Type TargetType;
         public readonly Type[] AllowTypes;
-        public readonly Type[] WithoutTypes;
+        public readonly Type[] ExcludedTypes;
         public PredicateTypesKey(Type signleType) : this(signleType, new Type[] { signleType } , Type.EmptyTypes) { }
         public PredicateTypesKey(Type targetType, Type[] types) : this(targetType, types, Type.EmptyTypes) { }
-        public PredicateTypesKey(Type targetType, Type[] types, Type[] withoutTypes)
+        public PredicateTypesKey(Type targetType, Type[] types, Type[] excludedTypes)
         {
             if(targetType == null)
             {
@@ -17,7 +17,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             }
             TargetType = targetType;
             AllowTypes = types;
-            WithoutTypes = withoutTypes;
+            ExcludedTypes = excludedTypes;
         }
         public bool Check(Type type)
         {
@@ -33,7 +33,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
 
             if (isAssignable)
             {
-                foreach (Type withoutType in WithoutTypes)
+                foreach (Type withoutType in ExcludedTypes)
                 {
                     if (withoutType.IsAssignableFrom(type))
                     {
@@ -48,7 +48,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         public bool Equals(PredicateTypesKey other)
         {
             if (AllowTypes.Length != other.AllowTypes.Length) { return false; }
-            if (WithoutTypes.Length != other.WithoutTypes.Length) { return false; }
+            if (ExcludedTypes.Length != other.ExcludedTypes.Length) { return false; }
 
             if (TargetType != other.TargetType)
             {
@@ -61,9 +61,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
                     return false;
                 }
             }
-            for (int i = 0; i < WithoutTypes.Length; i++)
+            for (int i = 0; i < ExcludedTypes.Length; i++)
             {
-                if (WithoutTypes[i] != other.WithoutTypes[i])
+                if (ExcludedTypes[i] != other.ExcludedTypes[i])
                 {
                     return false;
                 }
@@ -76,7 +76,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
         }
         public override int GetHashCode()
         {
-            return HashCode.Combine(TargetType, AllowTypes, WithoutTypes);
+            return HashCode.Combine(TargetType, AllowTypes, ExcludedTypes);
         }
     }
 }

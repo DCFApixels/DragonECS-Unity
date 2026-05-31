@@ -10,7 +10,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public override bool RequiresConstantRepaint()
         {
-            return UserSettingsPrefs.instance.RuntimeDrawMode == RuntimeDrawMode.Live ? true : base.RequiresConstantRepaint();
+            return UserSettingsPrefs.instance.RuntimeRefreshMode == RuntimeRefreshMode.Always ? true : base.RequiresConstantRepaint();
         }
         protected override void DrawCustom()
         {
@@ -34,10 +34,10 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     bool isExpand = false;
                     using (DragonGUI.CheckChanged())
                     {
-                        isExpand = EditorGUILayout.Foldout(UserSettingsPrefs.instance.IsShowEntityOtherData, "Other data");
+                        isExpand = EditorGUILayout.Foldout(UserSettingsPrefs.instance.ShowEntityAdditionalData, "Additional data");
                         if (DragonGUI.Changed)
                         {
-                            UserSettingsPrefs.instance.IsShowEntityOtherData = isExpand;
+                            UserSettingsPrefs.instance.ShowEntityAdditionalData = isExpand;
                         }
                     }
 

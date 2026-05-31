@@ -331,20 +331,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             get => EditorGUIUtility.standardVerticalSpacing;
         }
-        private static MetaBlockColorMode MetaBlockColorMode
+		public static float LabelWidth
+		{
+			get => EditorGUIUtility.labelWidth;
+            set => EditorGUIUtility.labelWidth = value;
+		}
+		private static MetaBlockColorMode MetaBlockColorMode
         {
             get { return UserSettingsPrefs.instance.MetaBlockColorMode; }
             set { UserSettingsPrefs.instance.MetaBlockColorMode = value; }
         }
         private static bool IsShowHidden
         {
-            get { return UserSettingsPrefs.instance.IsShowHidden; }
-            set { UserSettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.ShowHidden; }
+            set { UserSettingsPrefs.instance.ShowHidden = value; }
         }
         private static bool IsShowRuntimeComponents
         {
-            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
-            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return UserSettingsPrefs.instance.ShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.ShowRuntimeComponents = value; }
         }
         //private static bool IsFastModeRuntimeComponents
         //{

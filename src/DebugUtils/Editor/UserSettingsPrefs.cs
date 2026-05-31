@@ -1,13 +1,16 @@
 ﻿#if UNITY_EDITOR
+using System;
+using System.Runtime.CompilerServices;
+using Unity.Collections.LowLevel.Unsafe;
 using UnityEditor;
 using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    internal enum RuntimeDrawMode
+    internal enum RuntimeRefreshMode
     {
         Lazy = 0,
-        Live = 1,
+        Always = 1,
     }
     internal enum MetaBlockRectStyle
     {
@@ -24,120 +27,70 @@ namespace DCFApixels.DragonECS.Unity.Editors
     [FilePath(EcsUnityConsts.USER_SETTINGS_FOLDER + "/" + nameof(UserSettingsPrefs) + ".prefs", FilePathAttribute.Location.ProjectFolder)]
     internal class UserSettingsPrefs : ScriptableSingleton<UserSettingsPrefs>
     {
+
         [SerializeField]
-        private bool _isUseCustomNames = true;
-        public bool IsUseCustomNames
+        private bool _showHidden = false;
+        public bool ShowHidden
         {
-            get => _isUseCustomNames;
-            set
-            {
-                if (_isUseCustomNames != value)
-                {
-                    _isUseCustomNames = value;
-                    AutoSave();
-                }
-            }
+            get => _showHidden;
+            set => SetValue(ref _showHidden, value);
         }
         [SerializeField]
-        private bool _isShowInterfaces = false;
-        public bool IsShowInterfaces
+        private bool _showInterfaces = false;
+        public bool ShowInterfaces
         {
-            get => _isShowInterfaces;
-            set
-            {
-                if (_isShowInterfaces != value)
-                {
-                    _isShowInterfaces = value;
-                    AutoSave();
-                }
-            }
+            get => _showInterfaces;
+            set => SetValue(ref _showInterfaces, value);
         }
         [SerializeField]
-        private bool _isShowHidden = false;
-        public bool IsShowHidden
+        private bool _showRuntimeComponents = false;
+        public bool ShowRuntimeComponents
         {
-            get => _isShowHidden;
-            set
-            {
-                if (_isShowHidden != value)
-                {
-                    _isShowHidden = value;
-                    AutoSave();
-                }
-            }
+            get => _showRuntimeComponents;
+            set => SetValue(ref _showRuntimeComponents, value);
         }
         [SerializeField]
-        private bool _isShowRuntimeComponents = false;
-        public bool IsShowRuntimeComponents
+        private bool _showEntityAdditionalData = false;
+        public bool ShowEntityAdditionalData
         {
-            get => _isShowRuntimeComponents;
-            set
-            {
-                if (_isShowRuntimeComponents != value)
-                {
-                    _isShowRuntimeComponents = value;
-                    AutoSave();
-                }
-            }
+            get => _showEntityAdditionalData;
+            set => SetValue(ref _showEntityAdditionalData, value);
         }
         [SerializeField]
-        private bool _isShowEntityOther = false;
-        public bool IsShowEntityOtherData
+        private bool _useAdvancedInlineInspector = true;
+        public bool UseAdvancedInlineInspector
         {
-            get => _isShowEntityOther;
-            set
-            {
-                if (_isShowEntityOther != value)
-                {
-                    _isShowEntityOther = value;
-                    AutoSave();
-                }
-            }
+            get => _useAdvancedInlineInspector;
+            set => SetValue(ref _useAdvancedInlineInspector, value);
         }
         [SerializeField]
-        private bool _isPauseOnSnapshot = true;
-        public bool IsPauseOnSnapshot
+        private bool _useCustomNames = true;
+        public bool UseCustomNames
         {
-            get => _isPauseOnSnapshot;
-            set
-            {
-                if (_isPauseOnSnapshot != value)
-                {
-                    _isPauseOnSnapshot = value;
-                    AutoSave();
-                }
-            }
+            get => _useCustomNames;
+            set => SetValue(ref _useCustomNames, value);
+        }
+        [SerializeField]
+        private bool _pauseOnQuerySnapshot = true;
+        public bool PauseOnQuerySnapshot
+        {
+            get => _pauseOnQuerySnapshot;
+            set => SetValue(ref _pauseOnQuerySnapshot, value);
         }
 
         [SerializeField]
-        private RuntimeDrawMode _runtimeDrawMode = RuntimeDrawMode.Live;
-        public RuntimeDrawMode RuntimeDrawMode
+        private RuntimeRefreshMode _runtimeDrawMode = RuntimeRefreshMode.Always;
+        public RuntimeRefreshMode RuntimeRefreshMode
         {
             get => _runtimeDrawMode;
-            set
-            {
-                if (_runtimeDrawMode != value)
-                {
-                    _runtimeDrawMode = value;
-                    AutoSave();
-                }
-            }
+            set => SetValue(ref _runtimeDrawMode, value);
         }
-
-
         [SerializeField]
         private MetaBlockRectStyle _metaBlockRectStyle = MetaBlockRectStyle.Fill;
         public MetaBlockRectStyle MetaBlockRectStyle
         {
             get => _metaBlockRectStyle;
-            set
-            {
-                if (_metaBlockRectStyle != value)
-                {
-                    _metaBlockRectStyle = value;
-                    AutoSave();
-                }
-            }
+            set => SetValue(ref _metaBlockRectStyle, value);
         }
         [SerializeField]
         private MetaBlockColorMode _metaBlockColorMode = MetaBlockColorMode.Auto;
@@ -154,6 +107,25 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetValue<T>(ref T sourceValue, T comingValue)
+            where T : struct, Enum
+        {
+            if (UnsafeUtility.EnumEquals(sourceValue, comingValue))
+            {
+                sourceValue = comingValue;
+                AutoSave();
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetValue(ref bool sourceValue, bool comingValue)
+        {
+            if (sourceValue == comingValue)
+            {
+                sourceValue = comingValue;
+                AutoSave();
+            }
+        }
         private void AutoSave()
         {
             Save(true);

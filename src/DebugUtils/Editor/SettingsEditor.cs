@@ -36,23 +36,35 @@ namespace DCFApixels.DragonECS.Unity.Editors
             rect.xMin += 9f;
             GUI.Label(rect, "User Settings", EditorStyles.whiteLargeLabel);
 
-            prefs.IsShowHidden = EditorGUILayout.ToggleLeft(
-                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowHidden)),
-                prefs.IsShowHidden);
+            prefs.ShowHidden = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ShowHidden)),
+                prefs.ShowHidden);
 
-            prefs.IsShowInterfaces = EditorGUILayout.ToggleLeft(
-                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowInterfaces)),
-                prefs.IsShowInterfaces);
+            prefs.ShowInterfaces = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ShowInterfaces)),
+                prefs.ShowInterfaces);
 
-            prefs.IsShowRuntimeComponents = EditorGUILayout.ToggleLeft(
-                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsShowRuntimeComponents)),
-                prefs.IsShowRuntimeComponents);
+            prefs.ShowRuntimeComponents = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ShowRuntimeComponents)),
+                prefs.ShowRuntimeComponents);
 
-            prefs.IsUseCustomNames = EditorGUILayout.ToggleLeft(
-                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.IsUseCustomNames)),
-                prefs.IsUseCustomNames);
+            prefs.ShowEntityAdditionalData = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.ShowEntityAdditionalData)),
+                prefs.ShowEntityAdditionalData);
 
-            prefs.RuntimeDrawMode = (RuntimeDrawMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.RuntimeDrawMode)), prefs.RuntimeDrawMode);
+            prefs.UseAdvancedInlineInspector = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.UseAdvancedInlineInspector)),
+                prefs.UseAdvancedInlineInspector);
+
+            prefs.UseCustomNames = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.UseCustomNames)),
+                prefs.UseCustomNames);
+
+            prefs.PauseOnQuerySnapshot = EditorGUILayout.ToggleLeft(
+                UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.PauseOnQuerySnapshot)),
+                prefs.PauseOnQuerySnapshot);
+
+            prefs.RuntimeRefreshMode = (RuntimeRefreshMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.RuntimeRefreshMode)), prefs.RuntimeRefreshMode);
             prefs.MetaBlockRectStyle = (MetaBlockRectStyle)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.MetaBlockRectStyle)), prefs.MetaBlockRectStyle);
             prefs.MetaBlockColorMode = (MetaBlockColorMode)EditorGUILayout.EnumPopup(UnityEditorUtility.TransformFieldName(nameof(UserSettingsPrefs.MetaBlockColorMode)), prefs.MetaBlockColorMode);
 

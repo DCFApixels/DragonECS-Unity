@@ -98,13 +98,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         #endregion
 
-        protected override void DrawCustom()
+
+		protected override void DrawCustom()
         {
             Init();
 
-
-
-            if (IsSO)
+			if (IsSO)
             {
                 DragonGUI.Layout.ManuallySerializeButton(targets);
             }

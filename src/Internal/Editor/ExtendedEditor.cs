@@ -34,18 +34,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected bool IsShowInterfaces
         {
-            get { return UserSettingsPrefs.instance.IsShowInterfaces; }
-            set { UserSettingsPrefs.instance.IsShowInterfaces = value; }
+            get { return UserSettingsPrefs.instance.ShowInterfaces; }
+            set { UserSettingsPrefs.instance.ShowInterfaces = value; }
         }
         protected bool IsShowHidden
         {
-            get { return UserSettingsPrefs.instance.IsShowHidden; }
-            set { UserSettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.ShowHidden; }
+            set { UserSettingsPrefs.instance.ShowHidden = value; }
         }
         protected bool IsShowRuntimeComponents
         {
-            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
-            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return UserSettingsPrefs.instance.ShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.ShowRuntimeComponents = value; }
         }
         protected static MetaBlockColorMode ComponentColorMode
         {
@@ -72,7 +72,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         protected virtual void OnStaticInit() { }
         protected virtual void OnInit() { }
 
-        public sealed override void OnInspectorGUI()
+		public sealed override void OnInspectorGUI()
         {
             if (AutoChechChanges)
             {
@@ -87,7 +87,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             StaticInit();
             Init();
-            DrawCustom();
+			DrawCustom();
         }
 
         protected abstract void DrawCustom();
@@ -202,18 +202,18 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
         protected bool IsShowInterfaces
         {
-            get { return UserSettingsPrefs.instance.IsShowInterfaces; }
-            set { UserSettingsPrefs.instance.IsShowInterfaces = value; }
+            get { return UserSettingsPrefs.instance.ShowInterfaces; }
+            set { UserSettingsPrefs.instance.ShowInterfaces = value; }
         }
         protected bool IsShowHidden
         {
-            get { return UserSettingsPrefs.instance.IsShowHidden; }
-            set { UserSettingsPrefs.instance.IsShowHidden = value; }
+            get { return UserSettingsPrefs.instance.ShowHidden; }
+            set { UserSettingsPrefs.instance.ShowHidden = value; }
         }
         protected bool IsShowRuntimeComponents
         {
-            get { return UserSettingsPrefs.instance.IsShowRuntimeComponents; }
-            set { UserSettingsPrefs.instance.IsShowRuntimeComponents = value; }
+            get { return UserSettingsPrefs.instance.ShowRuntimeComponents; }
+            set { UserSettingsPrefs.instance.ShowRuntimeComponents = value; }
         }
         protected static MetaBlockColorMode ComponentColorMode
         {

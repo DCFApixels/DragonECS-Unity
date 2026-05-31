@@ -21,7 +21,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 			newWin.Setup(entites);
 			newWin.ShowUtility();
 
-			if (UserSettingsPrefs.instance.IsPauseOnSnapshot)
+			if (UserSettingsPrefs.instance.PauseOnQuerySnapshot)
 			{
 				Debug.Break();
 			}
@@ -85,7 +85,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 			}
 
 			(topLineRect, rect) = rect.VerticalSliceTop(line + space);
-			UserSettingsPrefs.instance.IsPauseOnSnapshot = EditorGUI.ToggleLeft(topLineRect, "Pause On Snapshot", UserSettingsPrefs.instance.IsPauseOnSnapshot);
+			UserSettingsPrefs.instance.PauseOnQuerySnapshot = EditorGUI.ToggleLeft(topLineRect, "Pause On Snapshot", UserSettingsPrefs.instance.PauseOnQuerySnapshot);
 
 			var viewRect = rect;
 			viewRect.x = 0;

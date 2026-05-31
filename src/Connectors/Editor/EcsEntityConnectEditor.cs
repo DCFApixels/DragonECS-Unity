@@ -11,7 +11,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         public override bool RequiresConstantRepaint()
         {
-            return UserSettingsPrefs.instance.RuntimeDrawMode == RuntimeDrawMode.Live ? true : base.RequiresConstantRepaint();
+            return UserSettingsPrefs.instance.RuntimeRefreshMode == RuntimeRefreshMode.Always ? true : base.RequiresConstantRepaint();
         }
         protected override void DrawCustom()
         {
