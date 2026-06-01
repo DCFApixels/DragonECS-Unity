@@ -120,7 +120,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var monitor = links.GetWorldMonitor();
             if (monitor == null)
             {
-                GUILayout.Label("No any debug monitor found!");
+                GUILayout.Label("No any debug monitor found!", EditorStyles.centeredGreyMiniLabel);
                 return;
             }
 
