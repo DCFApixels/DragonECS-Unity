@@ -97,21 +97,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
         public MetaBlockColorMode MetaBlockColorMode
         {
             get => _metaBlockColorMode;
-            set
-            {
-                if (_metaBlockColorMode != value)
-                {
-                    _metaBlockColorMode = value;
-                    AutoSave();
-                }
-            }
+            set => SetValue(ref _metaBlockColorMode, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetValue<T>(ref T sourceValue, T comingValue)
             where T : struct, Enum
         {
-            if (UnsafeUtility.EnumEquals(sourceValue, comingValue))
+            if (UnsafeUtility.EnumEquals(sourceValue, comingValue) == false)
             {
                 sourceValue = comingValue;
                 AutoSave();
@@ -120,7 +113,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetValue(ref bool sourceValue, bool comingValue)
         {
-            if (sourceValue == comingValue)
+            if (sourceValue != comingValue)
             {
                 sourceValue = comingValue;
                 AutoSave();
