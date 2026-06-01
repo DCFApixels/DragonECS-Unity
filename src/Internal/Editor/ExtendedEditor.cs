@@ -17,7 +17,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
     using UnityEngine;
     using UnityObject = UnityEngine.Object;
 
-
     internal abstract class ExtendedEditor : Editor
     {
         private bool _isStaticInit = false;
