@@ -2,6 +2,7 @@
 using DCFApixels.DragonECS.Core;
 using DCFApixels.DragonECS.Unity.Internal;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
@@ -139,6 +140,12 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             EditorGUILayout.IntField("Total Count: ", executors.Count);
 
+
+            if(GUILayout.Button("Create Query"))
+            {
+                QueryBuilderWindow.ShowNew(Target.World);
+            }
+
             HasSearchPattern = true;
             if (string.IsNullOrEmpty(Target.SearchPattern))
             {
@@ -270,6 +277,103 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
 
             GUILayout.Space(6);
+        }
+    }
+
+    internal class QueryBuilderWindow : EditorWindow
+    {
+        private EcsWorld _world;
+        private Vector2 _scroll;
+        private List<Type> _allTypes = new List<Type>();
+        private List<bool> _incFlags = new List<bool>();
+        private List<bool> _excFlags = new List<bool>();
+        private List<bool> _anyFlags = new List<bool>();
+
+        public static void ShowNew(EcsWorld world)
+        {
+            var window = CreateInstance<QueryBuilderWindow>();
+            window.titleContent = new GUIContent("Create Query");
+            window._world = world;
+            window.LoadFromWorld(world);
+            window.ShowUtility();
+        }
+
+        private void LoadFromWorld(EcsWorld world)
+        {
+            _allTypes.Clear();
+            _incFlags.Clear();
+            _excFlags.Clear();
+            _anyFlags.Clear();
+
+            var pools = world.AllPools.Slice(0, world.PoolsCount);
+            foreach (var pool in pools)
+            {
+                if (pool.IsNullOrDummy()) continue;
+                var t = pool.ComponentType;
+                _allTypes.Add(t);
+                _incFlags.Add(false);
+                _excFlags.Add(false);
+                _anyFlags.Add(false);
+            }
+        }
+
+        private void OnGUI()
+        {
+            if (_world == null)
+            {
+                EditorGUILayout.LabelField("No world assigned");
+                return;
+            }
+
+            EditorGUILayout.LabelField("Select component constraints:");
+            _scroll = EditorGUILayout.BeginScrollView(_scroll);
+            for (int i = 0; i < _allTypes.Count; i++)
+            {
+                var t = _allTypes[i];
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.LabelField(t.GetMeta().TypeName, GUILayout.Width(250));
+                _incFlags[i] = GUILayout.Toggle(_incFlags[i], "Inc", GUILayout.Width(50));
+                _excFlags[i] = GUILayout.Toggle(_excFlags[i], "Exc", GUILayout.Width(50));
+                _anyFlags[i] = GUILayout.Toggle(_anyFlags[i], "Any", GUILayout.Width(50));
+                EditorGUILayout.EndHorizontal();
+            }
+            EditorGUILayout.EndScrollView();
+
+            GUILayout.Space(10);
+            EditorGUILayout.BeginHorizontal();
+            if (GUILayout.Button("Create"))
+            {
+                CreateMaskAndRegister();
+                Close();
+            }
+            if (GUILayout.Button("Cancel"))
+            {
+                Close();
+            }
+            EditorGUILayout.EndHorizontal();
+        }
+
+        private void CreateMaskAndRegister()
+        {
+            var incs = new List<Type>();
+            var excs = new List<Type>();
+            var anys = new List<Type>();
+            for (int i = 0; i < _allTypes.Count; i++)
+            {
+                if (_incFlags[i]) incs.Add(_allTypes[i]);
+                if (_excFlags[i]) excs.Add(_allTypes[i]);
+                if (_anyFlags[i]) anys.Add(_allTypes[i]);
+            }
+
+            // Build EcsStaticMask using Builder API
+            var builder = EcsStaticMask.New();
+            if (incs.Count > 0) builder = builder.Inc(incs.ToArray());
+            if (excs.Count > 0) builder = builder.Exc(excs.ToArray());
+            if (anys.Count > 0) builder = builder.Any(anys.ToArray());
+            var staticMask = builder.Build();
+
+            // Force world to create concrete EcsMask and executor by requesting the executor
+            _world.Where(staticMask);
         }
     }
 }

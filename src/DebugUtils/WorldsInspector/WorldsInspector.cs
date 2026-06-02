@@ -14,39 +14,22 @@ namespace DCFApixels.DragonECS.Unity.Editors
             var wnd = GetWindow<WorldsInspector>();
             wnd.titleContent = new GUIContent(UnityEditorUtility.TransformFieldName(nameof(WorldsInspector)));
             wnd.Show();
-        }
 
+            EcsWorld.OnWorldCreated -= wnd.OnWorldCreated;
+            EcsWorld.OnWorldCreated += wnd.OnWorldCreated;
+        }
+        private void OnWorldCreated(EcsWorld world)
+        {
+            Repaint();
+        }
 
         private EcsWorld _selecedWorld;
         private WorldInfo _lastSelectedWorldInfo;
-        private struct WorldInfo : IEquatable<WorldInfo>
+
+
+        private void OnDestroy()
         {
-            public short ID;
-            public Type Type;
-            public string Name;
-            public bool IsNull
-            {
-                get { return ID == 0 && Type == null && Name == null; }
-            }
-            public WorldInfo(EcsWorld world)
-            {
-                if(world == null)
-                {
-                    ID = 0;
-                    Type = null;
-                    Name = null;
-                }
-                else
-                {
-                    ID = world.ID;
-                    Type = world.GetType();
-                    Name = world.Name;
-                }
-            }
-            public bool Equals(WorldInfo other)
-            {
-                return ID == other.ID && Type == other.Type && Name == other.Name;
-            }
+            EcsWorld.OnWorldCreated -= OnWorldCreated;
         }
 
         private void OnGUI()
@@ -57,7 +40,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 return;
             }
 
-            if (TryGetSelecedWorld(out _))
+            if (TryGetSelecedWorld(out _) == false)
             {
                 if (_lastSelectedWorldInfo.IsNull == false &&
                     EcsWorld.TryGetWorld(_lastSelectedWorldInfo.ID, out var fw) &&
@@ -70,9 +53,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     SelectWorld(null);
                 }
             }
-
-
-
 
 
             if (TryGetSelecedWorld(out var sw))
@@ -137,7 +117,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private bool TryGetSelecedWorld(out EcsWorld world)
         {
-            if(_selecedWorld.IsNullOrDetroyed())
+            if (_selecedWorld.IsNullOrDetroyed())
             {
                 world = null;
                 return false;
@@ -149,6 +129,40 @@ namespace DCFApixels.DragonECS.Unity.Editors
         {
             _selecedWorld = world;
             _lastSelectedWorldInfo = new WorldInfo(world);
+        }
+
+
+
+
+
+        private struct WorldInfo : IEquatable<WorldInfo>
+        {
+            public short ID;
+            public Type Type;
+            public string Name;
+            public bool IsNull
+            {
+                get { return ID == 0 && Type == null && Name == null; }
+            }
+            public WorldInfo(EcsWorld world)
+            {
+                if (world == null)
+                {
+                    ID = 0;
+                    Type = null;
+                    Name = null;
+                }
+                else
+                {
+                    ID = world.ID;
+                    Type = world.GetType();
+                    Name = world.Name;
+                }
+            }
+            public bool Equals(WorldInfo other)
+            {
+                return ID == other.ID && Type == other.Type && Name == other.Name;
+            }
         }
     }
 }

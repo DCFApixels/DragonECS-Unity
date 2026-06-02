@@ -1,4 +1,5 @@
 ﻿#if UNITY_EDITOR
+using Codice.CM.Client.Differences;
 using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using System.Text;
@@ -116,7 +117,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
             }
 
-
+            EditorGUILayout.IntField("ID", Target.World.ID, EditorStyles.boldLabel);
             DragonGUI.Layout.DrawWorldBaseInfo(Target.World);
 
             DragonGUI.Layout.DrawWorldComponents(Target.World);
