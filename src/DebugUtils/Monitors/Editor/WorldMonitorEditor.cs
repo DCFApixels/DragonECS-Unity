@@ -4,6 +4,7 @@ using DCFApixels.DragonECS.Unity.Internal;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
+using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
@@ -109,8 +110,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             using (DragonGUI.Layout.BeginHorizontal())
             {
-                GUILayout.Label("[World]", _headerStyle, GUILayout.ExpandWidth(true));
-                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
+                Vector2 size = _headerStyle.CalcSize(UnityEditorUtility.GetLabel("1"));
+                GUILayout.Label("[World]", _headerStyle, GUILayout.ExpandWidth(true), GUILayout.Height(size.y));
+                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.Height(size.y)))
                 {
                     CopyToClipboard();
                 }

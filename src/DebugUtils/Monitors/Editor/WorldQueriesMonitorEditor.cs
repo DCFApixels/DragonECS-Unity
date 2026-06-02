@@ -13,7 +13,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     internal class WorldQueriesMonitorEditor : ExtendedEditor<WorldQueriesMonitor>
     {
         private GUIStyle _headerStyle;
-        
+
         private void CopyToClipboard()
         {
             const char SEPARATOR = '\t';
@@ -129,8 +129,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
             using (DragonGUI.Layout.BeginHorizontal())
             {
-                GUILayout.Label("[Queries]", _headerStyle, GUILayout.ExpandWidth(true));
-                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.ExpandHeight(true)))
+                Vector2 size = _headerStyle.CalcSize(UnityEditorUtility.GetLabel("1"));
+                GUILayout.Label("[Queries]", _headerStyle, GUILayout.ExpandWidth(true), GUILayout.Height(size.y));
+                if (GUILayout.Button("Copy to Clipboard", GUILayout.ExpandWidth(false), GUILayout.Height(size.y)))
                 {
                     CopyToClipboard();
                 }
@@ -141,7 +142,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
             EditorGUILayout.IntField("Total Count: ", executors.Count);
 
 
-            if(GUILayout.Button("Create Query"))
+            if (GUILayout.Button("Create Query"))
             {
                 QueryBuilderWindow.ShowNew(Target.World);
             }
@@ -171,7 +172,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         foreach (var type in types)
                         {
-                            if(type.Name.AsSpan().Contains(searchPatternRaw, StringComparison.OrdinalIgnoreCase))
+                            if (type.Name.AsSpan().Contains(searchPatternRaw, StringComparison.OrdinalIgnoreCase))
                             {
                                 return true;
                             }
@@ -200,9 +201,9 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     {
                         isDraw = true;
                     }
-    
 
-                    if(isDraw)
+
+                    if (isDraw)
                     {
                         DrawQueryInfo(executor, i++);
                     }
@@ -284,7 +285,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
     {
         private EcsWorld _world;
         private Vector2 _scroll;
-        private List<Type> _allTypes = new List<Type>();
+        private StructList<Type> _allTypes = new StructList<Type>(32);
         private List<bool> _incFlags = new List<bool>();
         private List<bool> _excFlags = new List<bool>();
         private List<bool> _anyFlags = new List<bool>();
@@ -314,6 +315,16 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 _incFlags.Add(false);
                 _excFlags.Add(false);
                 _anyFlags.Add(false);
+            }
+            Array.Sort(_allTypes._items, 0, _allTypes._count, TypeNameComparer.Instance);
+        }
+
+        private class TypeNameComparer : IComparer<Type>
+        {
+            public static readonly TypeNameComparer Instance = new TypeNameComparer();
+            public int Compare(Type x, Type y)
+            {
+                return string.Compare(x.GetMeta().TypeName, y.GetMeta().TypeName, StringComparison.Ordinal);
             }
         }
 
@@ -355,24 +366,23 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
         private void CreateMaskAndRegister()
         {
-            var incs = new List<Type>();
-            var excs = new List<Type>();
-            var anys = new List<Type>();
+            var builder = EcsStaticMask.New();
             for (int i = 0; i < _allTypes.Count; i++)
             {
-                if (_incFlags[i]) incs.Add(_allTypes[i]);
-                if (_excFlags[i]) excs.Add(_allTypes[i]);
-                if (_anyFlags[i]) anys.Add(_allTypes[i]);
+                if (_incFlags[i])
+                {
+                    builder.Inc(_allTypes[i]);
+                }
+                if (_excFlags[i])
+                {
+                    builder.Exc(_allTypes[i]);
+                }
+                if (_anyFlags[i])
+                {
+                    builder.Any(_allTypes[i]);
+                }
             }
-
-            // Build EcsStaticMask using Builder API
-            var builder = EcsStaticMask.New();
-            if (incs.Count > 0) builder = builder.Inc(incs.ToArray());
-            if (excs.Count > 0) builder = builder.Exc(excs.ToArray());
-            if (anys.Count > 0) builder = builder.Any(anys.ToArray());
             var staticMask = builder.Build();
-
-            // Force world to create concrete EcsMask and executor by requesting the executor
             _world.Where(staticMask);
         }
     }

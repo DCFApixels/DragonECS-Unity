@@ -100,11 +100,32 @@ namespace DCFApixels.DragonECS.Unity.Editors
             set => SetValue(ref _metaBlockColorMode, value);
         }
 
+        [SerializeField]
+        private WorldsInspector.WorldInfo _lastSelectedWorldInInspector = default;
+        public WorldsInspector.WorldInfo LastSelectedWorldInInspector
+        {
+            get => _lastSelectedWorldInInspector;
+            set => SetValue(ref _lastSelectedWorldInInspector, value);
+        }
+
+
+
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void SetValue<T>(ref T sourceValue, T comingValue)
             where T : struct, Enum
         {
             if (UnsafeUtility.EnumEquals(sourceValue, comingValue) == false)
+            {
+                sourceValue = comingValue;
+                AutoSave();
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private void SetValue<T>(ref T sourceValue, T comingValue, bool _0 = false)
+            where T : struct, IEquatable<T>
+        {
+            if (sourceValue.Equals(comingValue) == false)
             {
                 sourceValue = comingValue;
                 AutoSave();

@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
-    public class WorldsInspector : EditorWindow
+    internal class WorldsInspector : EditorWindow
     {
         [MenuItem("Tools/" + EcsConsts.FRAMEWORK_NAME + "/WorldsInspector")]
         public static void Open()
@@ -24,12 +24,20 @@ namespace DCFApixels.DragonECS.Unity.Editors
         }
 
         private EcsWorld _selecedWorld;
-        private WorldInfo _lastSelectedWorldInfo;
+        private WorldInfo _lastSelectedWorldInfo => UserSettingsPrefs.instance.LastSelectedWorldInInspector;
 
 
         private void OnDestroy()
         {
             EcsWorld.OnWorldCreated -= OnWorldCreated;
+            if (_worldMonitorEditor)
+            {
+                DestroyImmediate(_worldMonitorEditor);
+            }
+            if (_wolrdQueriesMonitorEditor)
+            {
+                DestroyImmediate(_wolrdQueriesMonitorEditor);
+            }
         }
 
         private void OnGUI()
@@ -50,7 +58,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 }
                 else
                 {
-                    SelectWorld(null);
+                    //SelectWorld(null);
                 }
             }
 
@@ -88,6 +96,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private EcsWorld _worldEditorsWorld;
         private Editor _worldMonitorEditor;
         private Editor _wolrdQueriesMonitorEditor;
+        private Vector2 _worldScrollPos;
+        private float _height;
         private void DrawWorld(EcsWorld world)
         {
             if (GUILayout.Button("<- Back"))
@@ -95,24 +105,49 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 SelectWorld(null);
             }
 
-            ref var links = ref world.Get<DragonGUI.EntityLinksComponent>();
+            //GUI.VerticalScrollbar(new Rect(position.width - GUI.skin.verticalScrollbar.fixedWidth, 0, GUI.skin.verticalScrollbar.fixedWidth, position.height), _worldScrollPos.y, 1f, 0f, 1f);
+            //
+            float height = 0;
 
-            var monitor = links.GetWorldMonitor();
-            if (monitor == null)
+            _worldScrollPos = GUILayout.BeginScrollView(_worldScrollPos, false, true, GUILayout.ExpandHeight(true));
             {
-                GUILayout.Label("No any debug monitor found!", EditorStyles.centeredGreyMiniLabel);
-                return;
-            }
+                GUILayout.Space(_height);
+                float contentWidth = position.width - GUI.skin.verticalScrollbar.fixedWidth;
+                GUILayout.BeginArea(new Rect(0, 0, contentWidth, _height));
+                GUILayout.Space(0);
+                Rect r1 = GUILayoutUtility.GetLastRect();
 
-            if (_worldEditorsWorld != world)
+
+                ref var links = ref world.Get<DragonGUI.EntityLinksComponent>();
+
+                var monitor = links.GetWorldMonitor();
+                if (monitor == null)
+                {
+                    GUILayout.Label("No any debug monitor found!", EditorStyles.centeredGreyMiniLabel);
+                    return;
+                }
+
+                if (_worldEditorsWorld != world)
+                {
+                    _worldEditorsWorld = world;
+                    _worldMonitorEditor = Editor.CreateEditor(monitor);
+                    _wolrdQueriesMonitorEditor = Editor.CreateEditor(monitor.GetComponent<WorldQueriesMonitor>());
+                }
+                _worldMonitorEditor.OnInspectorGUI();
+                _wolrdQueriesMonitorEditor.OnInspectorGUI();
+
+                GUILayout.Space(0);
+                Rect r2 = GUILayoutUtility.GetLastRect();
+                height = r2.y - r1.y;
+                GUILayout.EndArea();
+            }
+            GUILayout.EndScrollView();
+
+            var e = Event.current;
+            if (e.type == EventType.Repaint || e.type == EventType.Layout && height > 6f)
             {
-                _worldEditorsWorld = world;
-                _worldMonitorEditor = Editor.CreateEditor(monitor);
-                _wolrdQueriesMonitorEditor = Editor.CreateEditor(monitor.GetComponent<WorldQueriesMonitor>());
+                _height = height;
             }
-
-            _worldMonitorEditor.OnInspectorGUI();
-            _wolrdQueriesMonitorEditor.OnInspectorGUI();
         }
 
         private bool TryGetSelecedWorld(out EcsWorld world)
@@ -128,14 +163,11 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private void SelectWorld(EcsWorld world)
         {
             _selecedWorld = world;
-            _lastSelectedWorldInfo = new WorldInfo(world);
+            UserSettingsPrefs.instance.LastSelectedWorldInInspector = new WorldInfo(world);
         }
 
-
-
-
         [System.Serializable]
-        private struct WorldInfo : IEquatable<WorldInfo>
+        internal struct WorldInfo : IEquatable<WorldInfo>
         {
             public short ID;
             public Type Type;
