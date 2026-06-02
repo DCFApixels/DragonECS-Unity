@@ -6,7 +6,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using DCFApixels.DragonECS.Unity;
 using UnityEngine;
-using DCFApixels.DragonECS.Unity.Internal;
 #if UNITY_EDITOR
 using UnityEditor;
 using DCFApixels.DragonECS.Unity.Editors;
@@ -75,8 +74,6 @@ namespace DCFApixels.DragonECS
         private entlong _entity;
         private EcsWorld _world;
 
-        private static SparseArray<EcsEntityConnect> _connectedEntities = new SparseArray<EcsEntityConnect>();
-
         [SerializeField]
         private bool _deleteEntityWithDestroy = false;
         [SerializeField]
@@ -85,12 +82,6 @@ namespace DCFApixels.DragonECS
         private MonoEntityTemplateBase[] _monoTemplates = System.Array.Empty<MonoEntityTemplateBase>();
 
         private bool _isConnectInvoked = false;
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
-        private static void OnLoad()
-        {
-            _connectedEntities.Clear();
-        }
 
         #region Properties
         public entlong Entity
@@ -139,7 +130,6 @@ namespace DCFApixels.DragonECS
 #if UNITY_EDITOR
                 world.Get<DragonGUI.EntityLinksComponent>().SetConnectLink(entity.GetIDUnchecked(), this);
 #endif
-                _connectedEntities.Add(GetInstanceID(), this);
                 var goConnects = world.GetPool<GameObjectConnect>();
                 if (goConnects.Has(newEntityID))
                 {
@@ -169,7 +159,6 @@ namespace DCFApixels.DragonECS
                 var unityGameObjects = _world.GetPool<GameObjectConnect>();
                 unityGameObjects.TryDel(oldEntityID);
             }
-            _connectedEntities.Remove(GetInstanceID());
             _world = null;
             _entity = entlong.NULL;
         }
@@ -212,17 +201,6 @@ namespace DCFApixels.DragonECS
             //{
             //    world.DelEntity(id);
             //}
-        }
-        #endregion
-
-        #region Other
-        public static EcsEntityConnect GetConnectByInstanceID(int instanceID)
-        {
-            return _connectedEntities[instanceID];
-        }
-        public static bool TryGetConnectByInstanceID(int instanceID, out EcsEntityConnect conncet)
-        {
-            return _connectedEntities.TryGetValue(instanceID, out conncet);
         }
         #endregion
 
