@@ -8,6 +8,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
         //Everything inside #if UNITY_EDITOR is not serialized in the release build
 #if UNITY_EDITOR
         [SerializeField]
+        private Texture _logo128 = null;
+        [SerializeField]
         private Texture _helpIcon = null;
         [SerializeField]
         private Texture _fileIcon = null;
@@ -99,6 +101,7 @@ namespace DCFApixels.DragonECS.Unity.Internal
             _dummyYellow = Create(Color.yellow);
         }
 
+        internal Texture Logo128 { get { return _logo128 != null ? _logo128 : Dummy; } }
         internal Texture HelpIcon { get { return _helpIcon != null ? _helpIcon : Dummy; } }
         internal Texture FileIcon { get { return _fileIcon != null ? _fileIcon : Dummy; } }
         internal Texture MetaIDIcon { get { return _metaIDIcon != null ? _metaIDIcon : Dummy; } }

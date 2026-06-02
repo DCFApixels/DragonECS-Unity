@@ -4,6 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
+  - _logo128: {fileID: 2800000, guid: 08812623dd8372f448c3f1008a25523b, type: 3}
   - _helpIcon: {fileID: 2800000, guid: e135cf23a5d53ce48a75e163b41e39d5, type: 3}
   - _fileIcon: {fileID: 2800000, guid: 4f1ca6aa9d407844485856184c785946, type: 3}
   - _metaIDIcon: {fileID: 2800000, guid: d3c6215cfdc36cb448661398160560a7, type: 3}

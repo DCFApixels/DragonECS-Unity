@@ -56,10 +56,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     _selecedWorld = fw;
                 }
-                else
-                {
-                    //SelectWorld(null);
-                }
             }
 
 
@@ -73,22 +69,39 @@ namespace DCFApixels.DragonECS.Unity.Editors
             }
         }
         private void DrawNoWorlds()
-        {
-            GUILayout.Label("No Worlds found!", EditorStyles.centeredGreyMiniLabel);
+        { 
+            var logorect = new Rect(0, 0, 64, 64);
+            using (DragonGUI.SetAlpha(0.3f))
+            {
+                GUI.DrawTexture(logorect, Icons.Instance.Logo128);
+            }
+            GUILayout.Label("No Worlds found!", EditorStyles.centeredGreyMiniLabel, GUILayout.ExpandHeight(true));
         }
         private void DrawWorldSelection()
         {
-            foreach (var worldID in EcsWorld.AllWorldIDs)
+            using (DragonGUI.Layout.BeginHorizontal())
             {
-                var world = EcsWorld.GetWorld((short)worldID);
-
-                using (DragonGUI.Layout.BeginHorizontal())
+                var logorect = GUILayoutUtility.GetRect(64, 64, GUILayout.ExpandWidth(false));
+                using (DragonGUI.SetAlpha(0.3f))
                 {
-                    if (GUILayout.Button($"World {world.ID} ({world.Name})"))
+                    GUI.DrawTexture(logorect, Icons.Instance.Logo128);
+                }
+
+                using (DragonGUI.Layout.BeginVertical())
+                {
+                    foreach (var worldID in EcsWorld.AllWorldIDs)
                     {
-                        SelectWorld(world);
+                        var world = EcsWorld.GetWorld((short)worldID);
+
+                        using (DragonGUI.Layout.BeginHorizontal())
+                        {
+                            if (GUILayout.Button($"World {world.ID} ({world.Name})"))
+                            {
+                                SelectWorld(world);
+                            }
+                            GUILayout.Label(world.Count.ToString(), GUILayout.MaxWidth(80f));
+                        }
                     }
-                    GUILayout.Label(world.Count.ToString(), GUILayout.MaxWidth(80f));
                 }
             }
         }
@@ -100,15 +113,29 @@ namespace DCFApixels.DragonECS.Unity.Editors
         private float _height;
         private void DrawWorld(EcsWorld world)
         {
-            if (GUILayout.Button("<- Back"))
+            using (DragonGUI.Layout.BeginHorizontal())
             {
-                SelectWorld(null);
+                var logorect = GUILayoutUtility.GetRect(64, 64, GUILayout.ExpandWidth(false));
+                using (DragonGUI.SetAlpha(0.3f))
+                {
+                    GUI.DrawTexture(logorect, Icons.Instance.Logo128);
+                }
+                if (GUILayout.Button("<- Back"))
+                {
+                    SelectWorld(null);
+                }
+            }
+                
+
+            ref var links = ref world.Get<DragonGUI.EntityLinksComponent>();
+            var monitor = links.GetWorldMonitor();
+            if (monitor == null)
+            {
+                GUILayout.Label("No any debug monitor found!", EditorStyles.centeredGreyMiniLabel, GUILayout.ExpandHeight(true));
+                return;
             }
 
-            //GUI.VerticalScrollbar(new Rect(position.width - GUI.skin.verticalScrollbar.fixedWidth, 0, GUI.skin.verticalScrollbar.fixedWidth, position.height), _worldScrollPos.y, 1f, 0f, 1f);
-            //
             float height = 0;
-
             _worldScrollPos = GUILayout.BeginScrollView(_worldScrollPos, false, true, GUILayout.ExpandHeight(true));
             {
                 GUILayout.Space(_height);
@@ -116,16 +143,6 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 GUILayout.BeginArea(new Rect(0, 0, contentWidth, _height));
                 GUILayout.Space(0);
                 Rect r1 = GUILayoutUtility.GetLastRect();
-
-
-                ref var links = ref world.Get<DragonGUI.EntityLinksComponent>();
-
-                var monitor = links.GetWorldMonitor();
-                if (monitor == null)
-                {
-                    GUILayout.Label("No any debug monitor found!", EditorStyles.centeredGreyMiniLabel);
-                    return;
-                }
 
                 if (_worldEditorsWorld != world)
                 {
