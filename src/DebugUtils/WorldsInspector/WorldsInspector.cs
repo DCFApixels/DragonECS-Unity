@@ -134,7 +134,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
 
 
 
-
+        [System.Serializable]
         private struct WorldInfo : IEquatable<WorldInfo>
         {
             public short ID;

@@ -100,9 +100,9 @@ namespace DCFApixels.DragonECS.Unity.Internal
 				monitor.SetMetaName(meta.Name);
 			}
 			monitor.Color = meta.Color.ToUnityColor();
-		}
+        }
 
-		void IEcsWorldEventListener.OnWorldResize(int newSize)
+        void IEcsWorldEventListener.OnWorldResize(int newSize)
 		{
 			Array.Resize(ref _entityMonitors, newSize);
 		}
@@ -199,6 +199,8 @@ namespace DCFApixels.DragonECS.Unity.Internal
 					monitor.SetMetaName(meta.Name);
 				}
 			}
-		}
+            _migratedGroup.Clear();
+
+        }
 	}
 }

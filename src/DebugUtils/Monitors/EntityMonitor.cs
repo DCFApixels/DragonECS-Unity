@@ -23,12 +23,16 @@ namespace DCFApixels.DragonECS.Unity.Internal
 		{
 			_entity = entity;
 			_cachedEntityID = entity.GetIDUnchecked();
-			SetMetaName(string.Empty);
+			if(entity.TryUnpack(out var e, out EcsWorld world))
+			{
+				var meta = world.GetEntitySlotMeta(e);
+                SetMetaName(meta.Name);
+				Color = meta.Color.ToUnityColor();
 #if UNITY_EDITOR
-			var world = entity.GetWorldUnchecked();
-			world.Get<DragonGUI.EntityLinksComponent>().SetMonitorLink(entity.GetIDUnchecked(), this);
+                world.Get<DragonGUI.EntityLinksComponent>().SetMonitorLink(entity.GetIDUnchecked(), this);
 #endif
-		}
+            }
+        }
 		public bool IsDefaultName
 		{
 			get

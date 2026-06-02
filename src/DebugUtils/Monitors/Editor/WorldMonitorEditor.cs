@@ -1,5 +1,4 @@
 ﻿#if UNITY_EDITOR
-using Codice.CM.Client.Differences;
 using DCFApixels.DragonECS.Core.Unchecked;
 using DCFApixels.DragonECS.Unity.Internal;
 using System.Text;
