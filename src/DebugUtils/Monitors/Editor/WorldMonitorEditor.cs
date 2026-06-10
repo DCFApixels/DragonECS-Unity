@@ -4,7 +4,6 @@ using DCFApixels.DragonECS.Unity.Internal;
 using System.Text;
 using UnityEditor;
 using UnityEngine;
-using static Codice.CM.WorkspaceServer.WorkspaceTreeDataStore;
 
 namespace DCFApixels.DragonECS.Unity.Editors
 {
