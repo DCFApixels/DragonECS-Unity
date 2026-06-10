@@ -390,7 +390,7 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 var splitedGroup = group.Splited;
 
                 Item parent = root;
-                if (splitedGroup.Count > 0)
+                if (splitedGroup.Length > 0)
                 {
                     int i = 1;
                     foreach (var subgroup in splitedGroup)
@@ -453,8 +453,8 @@ namespace DCFApixels.DragonECS.Unity.Editors
                 {
                     return false;
                 }
-                IEnumerator<string> splitedEnum = Group.Splited.GetEnumerator();
-                IEnumerator<string> splitedEnumOther = other.Group.Splited.GetEnumerator();
+                var splitedEnum = Group.Splited.GetEnumerator();
+                var splitedEnumOther = other.Group.Splited.GetEnumerator();
                 for (int i = 0; i < Length; i++)
                 {
                     splitedEnum.MoveNext();
@@ -475,9 +475,14 @@ namespace DCFApixels.DragonECS.Unity.Editors
                     state ^= state << 13;
                     state ^= state >> 17;
                     state ^= state << 5;
-                    var x = Group.Splited.GetEnumerator();
-                    x.MoveNext();
-                    return x.Current.GetHashCode() ^ state;
+
+                    int x = 0;
+                    var splited = Group.Splited;
+                    if (splited.Length > 1)
+                    {
+                        x ^= splited[0].GetHashCode();
+                    }
+                    return x ^ state;
                 }
             }
         }
