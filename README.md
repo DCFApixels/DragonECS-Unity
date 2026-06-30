@@ -44,7 +44,7 @@ This package integrates DragonECS with the Unity editor and runtime. It provides
 > Have questions or want to stay updated on development? Join our community! -> [Feedback](#Feedback)
 
 > [!Note]
-> Built‑in implementations of `UnityComponent<T>` templates have been moved HERE. Since some Unity modules are optional (e.g., disabling the Physics module would cause the code for `UnityComponent<Rigidbody>` or `UnityComponent<Collider>` to fail compilation), they are now provided as external templates.
+> Built‑in implementations of `UnityComponent<T>` templates have been moved [HERE](https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs). Since some Unity modules are optional (e.g., disabling the Physics module would cause the code for `UnityComponent<Rigidbody>` or `UnityComponent<Collider>` to fail compilation), they are now provided as external templates.
 
 # Table of contents
 - [Installation](#installation)
