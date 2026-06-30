@@ -39,12 +39,14 @@
 
 > [!WARNING]
 > Проект в стадии разработки. API может меняться.  
-> Readme еще не завершен, если есть не ясные моменты, вопросы можно задать тут [Обратная связь](https://github.com/DCFApixels/DragonECS/blob/main/README-RU.md#%D0%BE%D0%B1%D1%80%D0%B0%D1%82%D0%BD%D0%B0%D1%8F-%D1%81%D0%B2%D1%8F%D0%B7%D1%8C)
 
-> [!WARNING]
+> [!Note]
+> Есть вопросы или хотите быть в курсе разработки? Присоединяйтесь к нашему комьюнити! -> [Обратная связь](#обратная-связь)
+
+> [!Note]
 > Встроенные реализации шаблонов `UnityComponent<T>` были перенесены [СЮДА](https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs) Так как некоторые модули Unity отключаемы, и например отключение модуля физики приведет к тому что код реализации `UnityComponent<Rigidbody>` или  `UnityComponent<Collider>` не будет компилироваться.
 
-//https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs
+
 # Оглавление
 - [Установка](#установка)
 - [Debug](#debug)
@@ -61,6 +63,8 @@
 - [Окно настроек](#окно-настроек)
 - [Reference Repairer](#reference-repairer)
 - [FAQ](#faq)
+- [Обратная связь](#обратная-связь)
+- [Лицензия](#лицензия)
 
 </br>
 
@@ -615,3 +619,22 @@ private struct Job : IJobParallelFor
 # FAQ
 ## Не могу повесить `EcsEntityConnect` или другие компоненты
 Иногда это происходит после обновления пакета. Решения: выполните `Assets -> Reimport All` или перезапустите Unity после удаления папки `Library` в корне проекта.
+
+</br>
+
+# Обратная связь
++ Discord (RU-EN) [https://discord.gg/kqmJjExuCf](https://discord.gg/kqmJjExuCf)
++ QQ (中文) [949562781](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=IbDcH43vhfArb30luGMP1TMXB3GCHzxm&authKey=s%2FJfqvv46PswFq68irnGhkLrMR6y9tf%2FUn2mogYizSOGiS%2BmB%2B8Ar9I%2Fnr%2Bs4oS%2B&noverify=0&group_code=949562781)
+
+</br>
+
+# Лицензия
+MIT Лицензия: [Открыть](LICENSE.md)
+
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+<img width="0" src="https://github.com/user-attachments/assets/7bc29394-46d6-44a3-bace-0a3bae65d755"><!--Чтоб флаг подгружался в любом случае-->

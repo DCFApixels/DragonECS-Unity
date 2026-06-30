@@ -39,10 +39,12 @@ This package integrates DragonECS with the Unity editor and runtime. It provides
 
 > [!WARNING]
 > The project is a work in progress, API may change.
-> 
-> While the English version of the README is incomplete, the [Russian README](https://github.com/DCFApixels/DragonECS-Unity/blob/main/README-RU.md) contains additional details.
 
-//https://gist.github.com/DCFApixels/c250f2561f09e09ab3e6a4bd4f3013cb#file-unitycomponenttemplates-cs
+> [!Note]
+> Have questions or want to stay updated on development? Join our community! -> [Feedback](#Feedback)
+
+> [!Note]
+> Built‑in implementations of `UnityComponent<T>` templates have been moved HERE. Since some Unity modules are optional (e.g., disabling the Physics module would cause the code for `UnityComponent<Rigidbody>` or `UnityComponent<Collider>` to fail compilation), they are now provided as external templates.
 
 # Table of contents
 - [Installation](#installation)
@@ -60,6 +62,8 @@ This package integrates DragonECS with the Unity editor and runtime. It provides
 - [Settings window](#settings-window)
 - [Reference Repairer](#reference-repairer)
 - [FAQ](#faq)
+- [Feedback](#feedback)
+- [License](#license)
 
 </br>
 
@@ -657,3 +661,22 @@ Some parts of the integration heavily use `[SerializeReference]`, which can lose
 # FAQ
 ## Cannot add `EcsEntityConnect` or other components
 This issue may appear after a package update. Recommended remediation steps: run `Assets -> Reimport All`, or close Unity, remove the project's `Library` folder and reopen the project.
+
+</br>
+
+# Feedback
++ Discord (RU-EN) [https://discord.gg/kqmJjExuCf](https://discord.gg/kqmJjExuCf)
++ QQ (中文) [949562781](http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=IbDcH43vhfArb30luGMP1TMXB3GCHzxm&authKey=s%2FJfqvv46PswFq68irnGhkLrMR6y9tf%2FUn2mogYizSOGiS%2BmB%2B8Ar9I%2Fnr%2Bs4oS%2B&noverify=0&group_code=949562781)
+
+</br>
+
+# License
+The MIT License: [Open](LICENSE.md)
+
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+</br></br></br>
+<img width="0" src="https://github.com/user-attachments/assets/30528cb5-f38e-49f0-b23e-d001844ae930"><!--Чтоб флаг подгружался в любом случае-->
