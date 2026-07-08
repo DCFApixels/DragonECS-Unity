@@ -20,7 +20,7 @@ namespace DCFApixels.DragonECS
                 if (_singletonInstance == null)
                 {
 #if UNITY_6000_0_OR_NEWER
-                    _singletonInstance = FindFirstObjectByType<EcsRootUnitySingleton>();
+                    _singletonInstance = FindAnyObjectByType<EcsRootUnitySingleton>();
 #else
                     _singletonInstance = FindObjectOfType<EcsRootUnitySingleton>();
 #endif

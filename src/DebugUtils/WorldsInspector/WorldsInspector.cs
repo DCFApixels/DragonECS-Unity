@@ -187,30 +187,30 @@ namespace DCFApixels.DragonECS.Unity.Editors
         internal struct WorldInfo : IEquatable<WorldInfo>
         {
             public short ID;
-            public Type Type;
+            public string TypeAssemblyQualifiedName;
             public string Name;
             public bool IsNull
             {
-                get { return ID == 0 && Type == null && Name == null; }
+                get { return ID == 0 && TypeAssemblyQualifiedName == null && Name == null; }
             }
             public WorldInfo(EcsWorld world)
             {
                 if (world == null)
                 {
                     ID = 0;
-                    Type = null;
+                    TypeAssemblyQualifiedName = null;
                     Name = null;
                 }
                 else
                 {
                     ID = world.ID;
-                    Type = world.GetType();
+                    TypeAssemblyQualifiedName = world.GetType().AssemblyQualifiedName;
                     Name = world.Name;
                 }
             }
             public bool Equals(WorldInfo other)
             {
-                return ID == other.ID && Type == other.Type && Name == other.Name;
+                return ID == other.ID && TypeAssemblyQualifiedName == other.TypeAssemblyQualifiedName && Name == other.Name;
             }
         }
     }
